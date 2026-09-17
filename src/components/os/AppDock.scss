@@ -1,0 +1,58 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+.tablet-dock-container {
+  position: absolute;
+  bottom: 14px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  z-index: 40;
+  pointer-events: none;
+
+  .tablet-dock-glass {
+    pointer-events: auto;
+    background: rgba(255, 255, 255, 0.28);
+    backdrop-filter: blur(28px);
+    -webkit-backdrop-filter: blur(28px);
+    border: 1.5px solid rgba(255, 255, 255, 0.45);
+    border-radius: 2rem;
+    padding: 0.6rem 1.1rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.3);
+
+    .dock-item-btn {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0;
+
+      .dock-icon-squircle {
+        @include squircle-icon(56px);
+
+        @media (max-width: 640px) {
+          width: 48px;
+          height: 48px;
+        }
+      }
+
+      .dock-active-indicator {
+        position: absolute;
+        bottom: -5px;
+        width: 5px;
+        height: 5px;
+        border-radius: 50%;
+        background: #FFFFFF;
+        box-shadow: 0 0 6px rgba(255, 255, 255, 0.9);
+      }
+    }
+  }
+}
+

@@ -1,0 +1,63 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+.coming-soon-container {
+  min-height: 70vh;
+  @include flex-center;
+  flex-direction: column;
+  padding: 2rem 1.5rem;
+  text-align: center;
+  max-width: 540px;
+  width: 100%;
+  margin: 0 auto;
+  animation: fadeIn 0.25s ease-out;
+
+  .coming-soon-icon {
+    width: 110px;
+    height: 110px;
+    border-radius: 2rem;
+    @include flex-center;
+    font-size: 3.8rem;
+    box-shadow: $shadow-xl;
+    border: 4px solid #FFFFFF;
+    margin-bottom: 1.5rem;
+    animation: gentleFloat 3s infinite alternate ease-in-out;
+  }
+
+  .in-lab-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.35rem 0.85rem;
+    border-radius: $radius-pill;
+    background: #F3E8FF;
+    color: $color-primary;
+    font-family: $font-display;
+    font-weight: 800;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.75rem;
+  }
+
+  .coming-soon-title {
+    font-family: $font-display;
+    font-weight: 800;
+    font-size: 2.2rem;
+    color: $color-text-dark;
+  }
+
+  .coming-soon-desc {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: $color-text-muted;
+    margin-top: 0.5rem;
+    line-height: 1.5;
+  }
+
+  .coming-soon-actions {
+    margin-top: 2rem;
+    width: 100%;
+  }
+}
+

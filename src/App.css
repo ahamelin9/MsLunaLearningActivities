@@ -1,0 +1,534 @@
+/* =========================================================
+   MS. LUNA'S LEARNING PAD - TABLET OS STYLESHEET
+   ========================================================= */
+
+/* --- Tablet OS Root Container & Wallpapers --- */
+.tablet-os-root {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+  color: #1E293B;
+  transition: background 0.5s ease;
+}
+
+.theme-sunset {
+  background: linear-gradient(145deg, #2E0854 0%, #4B1A78 35%, #7E22CE 65%, #FF70A6 100%);
+}
+
+.theme-day {
+  background: linear-gradient(145deg, #1E3A8A 0%, #3B82F6 40%, #60A5FA 70%, #93C5FD 100%);
+}
+
+.theme-cosmic {
+  background: linear-gradient(145deg, #0F172A 0%, #1E1B4B 45%, #312E81 75%, #4C1D95 100%);
+}
+
+/* Floating background ambient bubbles */
+.home-bg-bubble {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  filter: blur(60px);
+  z-index: 0;
+  opacity: 0.35;
+}
+
+.bubble-1 {
+  width: 380px;
+  height: 380px;
+  background: #FF9F1C;
+  top: -80px;
+  left: -80px;
+  animation: floatSlow 14s infinite alternate ease-in-out;
+}
+
+.bubble-2 {
+  width: 440px;
+  height: 440px;
+  background: #FF5964;
+  bottom: 80px;
+  right: -100px;
+  animation: floatSlow 18s infinite alternate-reverse ease-in-out;
+}
+
+.bubble-3 {
+  width: 300px;
+  height: 300px;
+  background: #70D6FF;
+  bottom: -60px;
+  left: 20%;
+  animation: floatSlow 12s infinite alternate ease-in-out;
+}
+
+@keyframes floatSlow {
+  0% { transform: translateY(0) scale(1); }
+  100% { transform: translateY(30px) scale(1.1); }
+}
+
+/* --- Tablet Status Bar --- */
+.status-bar-container {
+  height: 48px;
+  padding: 0 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+  color: #FFFFFF;
+  z-index: 40;
+  position: relative;
+}
+
+.status-bar-time {
+  font-size: 0.95rem;
+  letter-spacing: 0.02em;
+}
+
+.status-bar-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.18);
+  color: #FFFFFF;
+  transition: all 0.2s ease;
+  position: relative;
+  cursor: pointer;
+}
+
+.status-bar-btn:hover {
+  background: rgba(255, 255, 255, 0.35);
+  transform: scale(1.08);
+}
+
+.status-bar-btn:active {
+  transform: scale(0.92);
+}
+
+.badge-notification-dot {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #FF5964;
+  border: 1.5px solid #FFFFFF;
+}
+
+/* --- Tablet Viewport & Home Screen --- */
+.os-viewport {
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.home-screen-container {
+  flex: 1;
+  overflow-y: auto;
+  padding-bottom: 100px;
+  position: relative;
+  z-index: 10;
+}
+
+.home-content-wrapper {
+  animation: fadeIn 0.4s ease-out;
+}
+
+.grade-pill-badge, .streak-pill-badge {
+  display: flex;
+  flex-direction: column;
+  padding: 0.4rem 0.85rem;
+  border-radius: 1rem;
+  transition: all 0.2s ease;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.grade-pill-badge {
+  background: #FAF5FF;
+}
+.grade-pill-badge:hover {
+  background: #F3E8FF;
+  transform: translateY(-2px);
+}
+
+.streak-pill-badge {
+  background: #FFFBEB;
+}
+.streak-pill-badge:hover {
+  background: #FEF3C7;
+  transform: translateY(-2px);
+}
+
+/* --- Tablet Dock --- */
+.tablet-dock-container {
+  position: absolute;
+  bottom: 16px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  z-index: 30;
+  pointer-events: none;
+}
+
+.tablet-dock-glass {
+  pointer-events: auto;
+  background: rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1.5px solid rgba(255, 255, 255, 0.5);
+  border-radius: 2rem;
+  padding: 0.5rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.25);
+}
+
+.dock-item-btn {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.dock-icon-box {
+  width: 54px;
+  height: 54px;
+  border-radius: 1.15rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1.5px solid rgba(255, 255, 255, 0.4);
+}
+
+.dock-tooltip {
+  position: absolute;
+  bottom: -22px;
+  color: #FFFFFF;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+  opacity: 0;
+  transform: translateY(-4px);
+  transition: all 0.2s ease;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.dock-item-btn:hover .dock-tooltip {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.dock-ready-dot {
+  position: absolute;
+  bottom: -4px;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #FFFFFF;
+  box-shadow: 0 0 6px rgba(255, 255, 255, 0.8);
+}
+
+/* --- App Window Overlay & Transitions --- */
+.app-window-overlay {
+  position: absolute;
+  inset: 0;
+  background: #FAF8F5;
+  display: flex;
+  flex-direction: column;
+  z-index: 30;
+  overflow: hidden;
+}
+
+.animate-app-open {
+  animation: appLaunchZoom 0.32s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes appLaunchZoom {
+  0% {
+    opacity: 0;
+    transform: scale(0.92) translateY(24px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.tablet-home-indicator-bar {
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 20;
+}
+
+.tablet-home-pill {
+  width: 140px;
+  height: 5px;
+  border-radius: 3px;
+  background: #CBD5E1;
+  transition: all 0.2s ease;
+}
+
+.tablet-home-pill:hover {
+  background: #7E22CE;
+  height: 7px;
+  width: 160px;
+}
+
+/* --- Mascot & Speech Bubble --- */
+.mascot-avatar {
+  background: linear-gradient(135deg, #FAF5FF 0%, #E9D5FF 100%);
+  border: 3px solid #C084FC;
+}
+
+.mascot-speech-bubble {
+  background: #FFFFFF;
+  border-radius: 1.25rem;
+  padding: 0.85rem 1.15rem;
+  border: 2px solid #F3E8FF;
+  box-shadow: 0 4px 14px rgba(126, 34, 206, 0.08);
+  max-width: 480px;
+  position: relative;
+}
+
+.speech-arrow {
+  position: absolute;
+  top: 50%;
+  left: -8px;
+  transform: translateY(-50%) rotate(45deg);
+  width: 14px;
+  height: 14px;
+  background: #FFFFFF;
+  border-left: 2px solid #F3E8FF;
+  border-bottom: 2px solid #F3E8FF;
+}
+
+/* --- Tactile 3D Buttons (Child-Friendly Hit States) --- */
+.btn-fun {
+  border-bottom: 4px solid rgba(0, 0, 0, 0.2);
+  transition: transform 0.1s ease, border-bottom 0.1s ease, background-color 0.2s ease;
+}
+
+.btn-fun:active {
+  transform: translateY(2px) scale(0.98);
+  border-bottom-width: 2px;
+}
+
+.btn-blue {
+  background: #3B82F6;
+  color: #FFFFFF;
+  border-bottom-color: #1D4ED8;
+}
+.btn-blue:hover {
+  background: #2563EB;
+}
+
+.btn-green {
+  background: #10B981;
+  color: #FFFFFF;
+  border-bottom-color: #047857;
+}
+.btn-green:hover {
+  background: #059669;
+}
+
+.btn-purple {
+  background: #8B5CF6;
+  color: #FFFFFF;
+  border-bottom-color: #6D28D9;
+}
+.btn-purple:hover {
+  background: #7C3AED;
+}
+
+.btn-yellow {
+  background: #F59E0B;
+  color: #FFFFFF;
+  border-bottom-color: #B45309;
+}
+.btn-yellow:hover {
+  background: #D97706;
+}
+
+.btn-white {
+  background: #FFFFFF;
+  color: #334155;
+  border: 2px solid #E2E8F0;
+  border-bottom: 4px solid #CBD5E1;
+}
+.btn-white:hover {
+  background: #F8FAFC;
+}
+
+/* --- Letter Tiles & Slots --- */
+.letter-tile-btn {
+  box-shadow: 0 4px 0 #C084FC, 0 6px 12px rgba(126, 34, 206, 0.12);
+  border-bottom-width: 5px;
+}
+
+.letter-tile-btn:active {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 #C084FC;
+}
+
+.letter-slot-box {
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* --- Star Badge & Counters --- */
+.star-badge-container {
+  display: inline-flex;
+  align-items: center;
+  background: #FFFBEB;
+  border: 1.5px solid #FDE68A;
+  border-radius: 9999px;
+  box-shadow: 0 2px 6px rgba(245, 158, 11, 0.15);
+}
+
+.animate-bounce-short {
+  animation: bounceShort 0.5s ease-out;
+}
+
+@keyframes bounceShort {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-8px) scale(1.08); }
+}
+
+/* --- Progress Bars --- */
+.progress-bar-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+}
+
+.progress-track {
+  flex: 1;
+  height: 14px;
+  background: #E2E8F0;
+  border-radius: 9999px;
+  overflow: hidden;
+  position: relative;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #10B981, #06D6A0);
+  border-radius: 9999px;
+  transition: width 0.4s ease-out;
+  position: relative;
+}
+
+.progress-shimmer {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+.progress-text {
+  font-size: 0.85rem;
+  color: #475569;
+  white-space: nowrap;
+}
+
+/* --- Modals & Backdrop Blur --- */
+.modal-backdrop-blur {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.modal-card {
+  animation: modalPop 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes modalPop {
+  0% {
+    opacity: 0;
+    transform: scale(0.9) translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* --- Toggle Switch Controls --- */
+.toggle-switch-btn {
+  width: 48px;
+  height: 28px;
+  border-radius: 14px;
+  padding: 3px;
+  transition: background-color 0.25s ease;
+  position: relative;
+  cursor: pointer;
+}
+
+.toggle-on {
+  background-color: #10B981;
+}
+
+.toggle-off {
+  background-color: #CBD5E1;
+}
+
+.toggle-switch-handle {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #FFFFFF;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  transition: transform 0.25s ease;
+}
+
+.toggle-on .toggle-switch-handle {
+  transform: translateX(20px);
+}
+
+.toggle-off .toggle-switch-handle {
+  transform: translateX(0);
+}
+
+/* --- Responsive Adaptations --- */
+@media (max-width: 640px) {
+  .tablet-dock-container {
+    bottom: 8px;
+  }
+  .dock-icon-box {
+    width: 46px;
+    height: 46px;
+    border-radius: 0.9rem;
+  }
+  .home-screen-container {
+    padding-bottom: 90px;
+  }
+}

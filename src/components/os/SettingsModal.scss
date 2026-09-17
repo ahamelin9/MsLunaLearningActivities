@@ -1,0 +1,307 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+.modal-backdrop-blur {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.65);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  @include flex-center;
+  padding: 1.25rem;
+  z-index: 100;
+  animation: modalFadeIn 0.2s ease-out;
+
+  .modal-card {
+    max-width: 520px;
+    width: 100%;
+    background: #FFFFFF;
+    border-radius: 2rem;
+    padding: 1.75rem;
+    box-shadow: $shadow-xl;
+    border: 4px solid #F3E8FF;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    max-height: 90vh;
+    overflow-y: auto;
+    animation: modalPopIn 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+
+    .modal-header {
+      @include flex-between;
+      border-bottom: 1.5px solid #F1F5F9;
+      padding-bottom: 0.85rem;
+
+      .header-title-group {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+
+        .settings-avatar {
+          font-size: 2rem;
+        }
+
+        .modal-title {
+          font-family: $font-display;
+          font-weight: 800;
+          font-size: 1.35rem;
+          color: $color-text-dark;
+        }
+
+        .modal-subtitle {
+          font-size: 0.8rem;
+          font-weight: 600;
+          color: $color-text-muted;
+        }
+      }
+
+      .modal-close-btn {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        @include flex-center;
+        background: #F1F5F9;
+        color: #64748B;
+        border: none;
+        cursor: pointer;
+        transition: all 0.15s ease;
+
+        &:hover {
+          background: #E2E8F0;
+          color: $color-text-dark;
+        }
+      }
+    }
+
+    .settings-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+
+      .group-label {
+        font-family: $font-display;
+        font-weight: 800;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: $color-primary;
+      }
+
+      .setting-item-row {
+        @include flex-between;
+        padding: 0.85rem 1rem;
+        border-radius: 1.25rem;
+        background: #FAF5FF;
+        border: 1px solid #E9D5FF;
+
+        .item-left {
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
+
+          .item-emoji {
+            font-size: 1.4rem;
+          }
+
+          .item-text {
+            display: flex;
+            flex-direction: column;
+
+            .item-title {
+              font-family: $font-display;
+              font-weight: 800;
+              font-size: 0.95rem;
+              color: $color-text-dark;
+            }
+
+            .item-desc {
+              font-size: 0.75rem;
+              font-weight: 600;
+              color: $color-text-muted;
+            }
+          }
+        }
+      }
+    }
+
+    .toggle-switch-btn {
+      width: 48px;
+      height: 28px;
+      border-radius: 14px;
+      padding: 3px;
+      background: #CBD5E1;
+      border: none;
+      cursor: pointer;
+      position: relative;
+      transition: background 0.2s ease;
+
+      &.toggle-on {
+        background: $color-green;
+        .toggle-switch-handle {
+          transform: translateX(20px);
+        }
+      }
+
+      .toggle-switch-handle {
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        background: #FFFFFF;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        transition: transform 0.2s ease;
+      }
+    }
+
+    .grade-selector-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.65rem;
+
+      .grade-select-btn {
+        padding: 0.75rem 0.5rem;
+        border-radius: 1.25rem;
+        border: 2px solid #E2E8F0;
+        background: #F8FAFC;
+        cursor: pointer;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.25rem;
+        transition: all 0.15s ease;
+
+        .grade-btn-emoji {
+          font-size: 1.5rem;
+        }
+
+        .grade-btn-label {
+          font-family: $font-display;
+          font-weight: 800;
+          font-size: 0.8rem;
+          color: $color-text-dark;
+        }
+
+        &.active {
+          border-color: $color-primary;
+          background: #FAF5FF;
+          box-shadow: 0 4px 12px rgba(126, 34, 206, 0.15);
+
+          .grade-btn-label {
+            color: $color-primary;
+          }
+        }
+
+        &:hover:not(.active) {
+          background: #F1F5F9;
+        }
+      }
+    }
+
+    .reset-area {
+      border-top: 1.5px solid #F1F5F9;
+      padding-top: 0.85rem;
+
+      .reset-trigger-btn {
+        width: 100%;
+        padding: 0.85rem;
+        border-radius: 1.25rem;
+        background: #FEF2F2;
+        border: 1.5px solid #FECACA;
+        color: #DC2626;
+        font-family: $font-display;
+        font-weight: 800;
+        font-size: 0.9rem;
+        cursor: pointer;
+        @include flex-center;
+        gap: 0.5rem;
+        transition: background 0.15s ease;
+
+        &:hover {
+          background: #FEE2E2;
+        }
+      }
+
+      .reset-confirm-box {
+        background: #FEF2F2;
+        border: 2px solid #F87171;
+        border-radius: 1.25rem;
+        padding: 1rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+
+        .confirm-warning {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          font-family: $font-display;
+          font-weight: 800;
+          font-size: 0.85rem;
+          color: #991B1B;
+        }
+
+        .confirm-actions {
+          display: flex;
+          gap: 0.5rem;
+        }
+
+        .reset-success-alert {
+          background: #10B981;
+          color: #FFFFFF;
+          padding: 0.6rem;
+          border-radius: 0.75rem;
+          font-family: $font-display;
+          font-weight: 800;
+          text-align: center;
+          @include flex-center;
+          gap: 0.4rem;
+        }
+      }
+    }
+  }
+}
+
+@keyframes modalFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes modalPopIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.9) translateY(16px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+
+/* three-step speech speed control */
+.speed-control {
+  display: flex;
+  gap: 4px;
+  background: #FFFFFF;
+  padding: 3px;
+  border-radius: 10px;
+  border: 1.5px solid #E2E8F0;
+
+  .speed-btn {
+    padding: 4px 9px;
+    border-radius: 7px;
+    font-size: 12px;
+    font-weight: 800;
+    border: none;
+    cursor: pointer;
+    background: transparent;
+    color: #475569;
+    transition: background 0.15s ease, color 0.15s ease;
+
+    &:hover { background: #F1F5F9; }
+
+    &.is-active {
+      background: #7E22CE;
+      color: #FFFFFF;
+    }
+  }
+}

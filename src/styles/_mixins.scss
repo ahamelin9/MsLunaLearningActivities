@@ -1,0 +1,55 @@
+@use './variables' as *;
+
+@mixin glassmorphism($blur: 20px, $opacity: 0.3) {
+  background: rgba(255, 255, 255, $opacity);
+  backdrop-filter: blur($blur);
+  -webkit-backdrop-filter: blur($blur);
+  border: 1.5px solid $color-glass-border;
+}
+
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+@mixin squircle-icon($size: 80px) {
+  width: $size;
+  height: $size;
+  border-radius: $radius-squircle;
+  @include flex-center;
+  position: relative;
+  box-shadow: $shadow-squircle;
+  transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.22s ease;
+  user-select: none;
+  cursor: pointer;
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 45%;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.35) 0%, rgba(255, 255, 255, 0) 100%);
+    border-radius: $radius-squircle $radius-squircle 0 0;
+    pointer-events: none;
+  }
+
+  &:hover {
+    transform: translateY(-4px) scale(1.06);
+    box-shadow: 0 14px 28px rgba(0, 0, 0, 0.3), inset 0 1px 2px rgba(255, 255, 255, 0.6);
+  }
+
+  &:active {
+    transform: scale(0.94);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  }
+}
+

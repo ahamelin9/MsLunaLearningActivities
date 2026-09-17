@@ -1,0 +1,207 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+.read-match-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  max-width: 620px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 1rem;
+
+  .target-word-hero {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.85rem;
+
+    .word-hero-box {
+      width: 220px;
+      padding: 1.25rem 1rem;
+      border-radius: 2rem;
+      background: linear-gradient(135deg, #06B6D4 0%, #0284C7 100%);
+      border: 4px solid #FFFFFF;
+      box-shadow: $shadow-lg;
+      color: #FFFFFF;
+      @include flex-center;
+      flex-direction: column;
+      gap: 0.4rem;
+      cursor: pointer;
+      transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+
+      &:hover {
+        transform: scale(1.05) rotate(1deg);
+      }
+
+      .big-word-text {
+        font-family: $font-display;
+        font-weight: 800;
+        font-size: 2.75rem;
+        letter-spacing: 0.06em;
+        line-height: 1;
+      }
+
+      .phonemes-list {
+        display: flex;
+        gap: 0.35rem;
+
+        .phoneme-tag {
+          font-family: $font-display;
+          font-size: 0.8rem;
+          font-weight: 700;
+          background: rgba(255, 255, 255, 0.25);
+          padding: 0.15rem 0.5rem;
+          border-radius: $radius-pill;
+        }
+      }
+
+      .tap-hint {
+        font-size: 0.75rem;
+        font-weight: 700;
+        opacity: 0.9;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+      }
+    }
+
+    .prompt-pill-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.45rem 1.1rem;
+      border-radius: $radius-pill;
+      background: #E0F2FE;
+      color: #0369A1;
+      font-family: $font-display;
+      font-weight: 800;
+      font-size: 0.9rem;
+      border: 1.5px solid #BAE6FD;
+      cursor: pointer;
+      transition: transform 0.15s ease;
+
+      &:hover {
+        transform: translateY(-1px);
+      }
+    }
+  }
+
+  .match-options-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    width: 100%;
+
+    @media (max-width: 600px) {
+      grid-template-columns: 1fr;
+    }
+
+    .match-option-card {
+      padding: 1.25rem 0.75rem;
+      border-radius: 1.5rem;
+      border: 3px solid #E2E8F0;
+      background: #FFFFFF;
+      box-shadow: $shadow-sm;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.6rem;
+      transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+
+      &:hover:not(:disabled) {
+        transform: translateY(-4px);
+        border-color: #0284C7;
+        box-shadow: $shadow-md;
+      }
+
+      &.correct {
+        background: #ECFDF5;
+        border-color: #10B981;
+        transform: scale(1.04);
+        box-shadow: $shadow-md;
+      }
+
+      &.wrong {
+        background: #FEF2F2;
+        border-color: #F87171;
+        opacity: 0.8;
+      }
+
+      .opt-emoji {
+        font-size: 3.2rem;
+      }
+
+      .opt-label {
+        font-family: $font-display;
+        font-weight: 800;
+        font-size: 1.2rem;
+        color: $color-text-dark;
+      }
+
+      .matched-tag {
+        font-size: 0.75rem;
+        font-weight: 800;
+        background: #10B981;
+        color: #FFFFFF;
+        padding: 0.2rem 0.6rem;
+        border-radius: $radius-pill;
+      }
+    }
+  }
+
+  .read-match-success-banner {
+    width: 100%;
+    padding: 1.25rem;
+    border-radius: 1.75rem;
+    background: #ECFDF5;
+    border: 2px solid #A7F3D0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    animation: fadeIn 0.25s ease-out;
+
+    .success-content {
+      font-family: $font-display;
+      font-weight: 800;
+      font-size: 1.15rem;
+      color: #065F46;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      text-align: center;
+    }
+  }
+
+  .read-match-hint-area {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+
+    .hint-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      border-radius: $radius-pill;
+      background: #ECFDF5;
+      border: 1px solid #A7F3D0;
+      color: #065F46;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .hint-pill {
+      background: #FEF9C3;
+      border: 1.5px solid #FDE047;
+      border-radius: 14px;
+      padding: 8px 14px;
+      font-size: 13px;
+      font-weight: 700;
+      color: #854D0E;
+    }
+  }
+}

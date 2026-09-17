@@ -1,0 +1,64 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+.star-badge-container {
+  display: inline-flex;
+  align-items: center;
+  background: #FFFBEB;
+  border: 2px solid #FDE68A;
+  border-radius: $radius-pill;
+  box-shadow: $shadow-sm;
+  user-select: none;
+  transition: transform 0.15s ease;
+
+  &.size-sm {
+    padding: 0.25rem 0.65rem;
+    font-size: 0.85rem;
+    gap: 0.35rem;
+  }
+
+  &.size-md {
+    padding: 0.35rem 0.85rem;
+    font-size: 1rem;
+    gap: 0.45rem;
+  }
+
+  &.size-lg {
+    padding: 0.5rem 1.1rem;
+    font-size: 1.2rem;
+    gap: 0.55rem;
+  }
+
+  &.clickable {
+    cursor: pointer;
+    &:hover {
+      transform: scale(1.05);
+      background: #FEF3C7;
+    }
+    &:active {
+      transform: scale(0.95);
+    }
+  }
+
+  .star-glow-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    filter: drop-shadow(0 1px 3px rgba(245, 158, 11, 0.4));
+  }
+
+  .star-count {
+    font-family: $font-display;
+    font-weight: 800;
+    color: #78350F;
+  }
+
+  .points-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #92400E;
+    padding-left: 0.35rem;
+    border-left: 1.5px solid #FCD34D;
+  }
+}
+

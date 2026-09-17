@@ -1,0 +1,64 @@
+@use '../../styles/variables' as *;
+
+.voice-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.25rem 0.6rem;
+  border-radius: 999px;
+  font-family: $font-display;
+  font-weight: 800;
+  font-size: 0.72rem;
+  white-space: nowrap;
+  animation: viFade 0.3s ease;
+
+  .vi-owl { font-size: 0.95rem; }
+
+  .vi-track {
+    width: 54px;
+    height: 6px;
+    border-radius: 3px;
+    background: rgba(255, 255, 255, 0.55);
+    overflow: hidden;
+
+    .vi-fill {
+      display: block;
+      height: 100%;
+      background: linear-gradient(90deg, $color-amber, $color-orange);
+      transition: width 0.35s ease;
+    }
+  }
+
+  &.is-loading {
+    background: #FEF3C7;
+    color: #92400E;
+    border: 1.5px solid #FCD34D;
+    .vi-owl { animation: viBob 1.1s ease-in-out infinite; }
+  }
+
+  &.is-ready {
+    background: #DCFCE7;
+    color: #166534;
+    border: 1.5px solid #86EFAC;
+  }
+
+  &.is-fallback {
+    background: #F1F5F9;
+    color: #475569;
+    border: 1.5px solid #CBD5E1;
+  }
+}
+
+@keyframes viBob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+
+@keyframes viFade {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 640px) {
+  .voice-indicator .vi-label { display: none; }
+}

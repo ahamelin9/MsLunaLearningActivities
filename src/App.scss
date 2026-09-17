@@ -1,0 +1,76 @@
+@use './styles/variables' as *;
+@use './styles/mixins' as *;
+
+.tablet-os-root {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+  color: $color-text-dark;
+  font-family: $font-main;
+  transition: background 0.5s ease;
+
+  &.theme-sunset {
+    background: linear-gradient(145deg, #1e0938 0%, #3b1366 30%, #6d28d9 65%, #db2777 100%);
+  }
+
+  &.theme-day {
+    background: linear-gradient(145deg, #1E3A8A 0%, #3B82F6 40%, #60A5FA 70%, #93C5FD 100%);
+  }
+
+  &.theme-cosmic {
+    background: linear-gradient(145deg, #0F172A 0%, #1E1B4B 45%, #312E81 75%, #4C1D95 100%);
+  }
+}
+
+/* Floating ambient background glow bubbles */
+.home-bg-bubble {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  filter: blur(70px);
+  z-index: 0;
+  opacity: 0.35;
+
+  &.bubble-1 {
+    width: 420px;
+    height: 420px;
+    background: #F59E0B;
+    top: -100px;
+    left: -100px;
+    animation: floatSlow 14s infinite alternate ease-in-out;
+  }
+
+  &.bubble-2 {
+    width: 480px;
+    height: 480px;
+    background: #EC4899;
+    bottom: 60px;
+    right: -120px;
+    animation: floatSlow 18s infinite alternate-reverse ease-in-out;
+  }
+
+  &.bubble-3 {
+    width: 320px;
+    height: 320px;
+    background: #38BDF8;
+    bottom: -60px;
+    left: 25%;
+    animation: floatSlow 12s infinite alternate ease-in-out;
+  }
+}
+
+@keyframes floatSlow {
+  0% { transform: translateY(0) scale(1); }
+  100% { transform: translateY(30px) scale(1.08); }
+}
+
+.os-viewport {
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+

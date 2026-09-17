@@ -1,0 +1,190 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+.grade-select-page {
+  max-width: 1050px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  animation: fadeIn 0.3s ease-out;
+
+  .grade-select-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 1.25rem;
+
+    .header-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.35rem 0.85rem;
+      border-radius: $radius-pill;
+      background: #F3E8FF;
+      color: $color-primary;
+      font-family: $font-display;
+      font-weight: 800;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .header-title {
+      font-family: $font-display;
+      font-weight: 800;
+      font-size: 2.2rem;
+      color: $color-text-dark;
+      line-height: 1.2;
+
+      @media (max-width: 640px) {
+        font-size: 1.75rem;
+      }
+    }
+
+    .header-desc {
+      font-size: 1rem;
+      font-weight: 600;
+      color: $color-text-muted;
+      max-width: 500px;
+    }
+  }
+
+  .grade-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+
+    @media (max-width: 860px) {
+      grid-template-columns: 1fr;
+    }
+
+    .grade-card-item {
+      background: #FFFFFF;
+      border-radius: 2rem;
+      padding: 2rem 1.5rem;
+      border: 3px solid #E2E8F0;
+      box-shadow: $shadow-md;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: all 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
+      position: relative;
+      user-select: none;
+
+      &:hover {
+        transform: translateY(-6px);
+        box-shadow: $shadow-xl;
+        border-color: #C084FC;
+      }
+
+      &.active {
+        border-color: $color-primary;
+        box-shadow: 0 0 0 4px #F3E8FF, $shadow-lg;
+      }
+
+      .card-top {
+        display: flex;
+        flex-direction: column;
+
+        .grade-badge-circle {
+          width: 80px;
+          height: 80px;
+          border-radius: 1.75rem;
+          @include flex-center;
+          font-size: 2.8rem;
+          box-shadow: $shadow-md;
+          margin-bottom: 1.25rem;
+          border: 2px solid #FFFFFF;
+        }
+
+        .grade-meta-row {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          margin-bottom: 0.5rem;
+
+          .age-pill {
+            padding: 0.2rem 0.6rem;
+            border-radius: $radius-pill;
+            background: #F1F5F9;
+            color: $color-primary;
+            font-family: $font-display;
+            font-weight: 800;
+            font-size: 0.75rem;
+          }
+
+          .active-pill {
+            padding: 0.2rem 0.6rem;
+            border-radius: $radius-pill;
+            background: #D1FAE5;
+            color: #065F46;
+            font-family: $font-display;
+            font-weight: 800;
+            font-size: 0.75rem;
+          }
+        }
+
+        .grade-title {
+          font-family: $font-display;
+          font-weight: 800;
+          font-size: 1.75rem;
+          color: $color-text-dark;
+          margin-bottom: 0.25rem;
+        }
+
+        .grade-subtitle {
+          font-family: $font-display;
+          font-weight: 800;
+          font-size: 1.1rem;
+          color: $color-primary;
+          margin-bottom: 0.75rem;
+        }
+
+        .grade-desc {
+          font-size: 0.9rem;
+          font-weight: 600;
+          color: $color-text-muted;
+          line-height: 1.4;
+        }
+      }
+
+      .card-action-footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-top: 1.5rem;
+        padding-top: 1rem;
+        border-top: 1.5px solid #F1F5F9;
+
+        .select-label {
+          font-family: $font-display;
+          font-weight: 800;
+          font-size: 0.95rem;
+          color: $color-primary;
+        }
+
+        .arrow-circle {
+          width: 38px;
+          height: 38px;
+          border-radius: 50%;
+          @include flex-center;
+          background: #F3E8FF;
+          color: $color-primary;
+          transition: all 0.15s ease;
+        }
+      }
+
+      &:hover .arrow-circle {
+        background: $color-primary;
+        color: #FFFFFF;
+        transform: translateX(3px);
+      }
+    }
+  }
+}
+

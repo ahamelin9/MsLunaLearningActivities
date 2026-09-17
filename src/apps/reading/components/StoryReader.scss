@@ -1,0 +1,224 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+.story-reader-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  max-width: 780px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 1rem;
+  animation: fadeIn 0.25s ease-out;
+
+  .story-card {
+    background: #FFFFFF;
+    border-radius: 2.25rem;
+    padding: 2rem 1.75rem;
+    border: 3.5px solid #E9D5FF;
+    box-shadow: $shadow-lg;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+
+    .story-card-header {
+      @include flex-between;
+      border-bottom: 2px solid #F3E8FF;
+      padding-bottom: 1rem;
+
+      .story-title-group {
+        display: flex;
+        align-items: center;
+        gap: 0.85rem;
+
+        .story-emoji {
+          font-size: 2.5rem;
+        }
+
+        .story-title {
+          font-family: $font-display;
+          font-weight: 800;
+          font-size: 1.6rem;
+          color: $color-primary-dark;
+        }
+      }
+    }
+
+    .tap-word-cue-banner {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.3rem 0.85rem;
+      border-radius: $radius-pill;
+      background: #FAF5FF;
+      color: $color-primary;
+      font-family: $font-display;
+      font-weight: 700;
+      font-size: 0.8rem;
+    }
+
+    .story-sentences-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+
+      .story-sentence-item {
+        padding: 1rem 1.25rem;
+        border-radius: 1.5rem;
+        border: 2px solid #F1F5F9;
+        background: #F8FAFC;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        transition: all 0.15s ease;
+
+        &:hover {
+          background: #FAF5FF;
+          border-color: #DDD6FE;
+        }
+
+        &.active-sentence {
+          background: #F3E8FF;
+          border-color: #C084FC;
+          box-shadow: $shadow-sm;
+        }
+
+        .sentence-speaker-btn {
+          width: 36px;
+          height: 36px;
+          border-radius: 50%;
+          @include flex-center;
+          background: #E9D5FF;
+          color: $color-primary;
+          border: none;
+          cursor: pointer;
+          flex-shrink: 0;
+          transition: transform 0.15s ease;
+
+          &:hover {
+            transform: scale(1.1);
+            background: $color-primary;
+            color: #FFFFFF;
+          }
+        }
+
+        .sentence-words-flow {
+          display: flex;
+          flex-wrap: wrap;
+          align-items: center;
+          gap: 0.35rem;
+
+          .story-word-span {
+            padding: 0.15rem 0.35rem;
+            border-radius: 0.4rem;
+            font-family: 'Fredoka', 'Nunito', sans-serif;
+            font-weight: 600;
+            font-size: 1.2rem;
+            color: $color-text-dark;
+            line-height: 1.4;
+            cursor: pointer;
+            transition: all 0.12s ease;
+
+            &:hover {
+              background: #FDE047;
+              color: #78350F;
+              transform: scale(1.08);
+            }
+
+            &.word-highlighted {
+              background: #FDE047;
+              color: #78350F;
+              font-weight: 800;
+              box-shadow: 0 2px 6px rgba(245, 158, 11, 0.3);
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .comprehension-card {
+    background: #FAF5FF;
+    border-radius: 2rem;
+    padding: 1.75rem;
+    border: 2.5px solid #E9D5FF;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+
+    .comprehension-header {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+
+      .comp-emoji {
+        font-size: 1.6rem;
+      }
+
+      .comp-question {
+        font-family: $font-display;
+        font-weight: 800;
+        font-size: 1.25rem;
+        color: $color-primary-dark;
+      }
+    }
+
+    .comprehension-options-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+
+      .comp-option-btn {
+        padding: 1rem 1.25rem;
+        border-radius: 1.25rem;
+        background: #FFFFFF;
+        border: 2px solid #E2E8F0;
+        cursor: pointer;
+        text-align: left;
+        font-family: $font-display;
+        font-weight: 800;
+        font-size: 1.05rem;
+        color: $color-text-dark;
+        @include flex-between;
+        transition: all 0.15s ease;
+
+        &:hover:not(:disabled) {
+          border-color: #C084FC;
+          background: #FAF5FF;
+        }
+
+        &.correct {
+          background: #10B981;
+          border-color: #34D399;
+          color: #FFFFFF;
+        }
+
+        &.wrong {
+          background: #FEF3C7;
+          border-color: #FCD34D;
+          color: #78350F;
+        }
+      }
+    }
+
+    .comprehension-success-box {
+      background: #D1FAE5;
+      border: 1.5px solid #6EE7B7;
+      border-radius: 1.25rem;
+      padding: 1rem 1.25rem;
+      @include flex-between;
+      gap: 1rem;
+      animation: fadeIn 0.2s ease-out;
+
+      .comp-success-text {
+        font-family: $font-display;
+        font-weight: 800;
+        font-size: 1rem;
+        color: #065F46;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+    }
+  }
+}

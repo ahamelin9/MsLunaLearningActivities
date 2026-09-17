@@ -1,0 +1,547 @@
+@use './world' as *;
+
+.game-shell {
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  padding: 0.9rem 1.1rem 1.1rem;
+  color: $ink;
+  background:
+    radial-gradient(ellipse at 50% -10%, rgba(240, 162, 46, 0.22), transparent 60%),
+    linear-gradient(180deg, #FFF6E6 0%, #FBEBD2 100%);
+  overflow: hidden;
+
+  // Each game's stage takes on the material of its own world.
+  &.shape-scene .shell-stage { background: linear-gradient(180deg, #FFF1D8, #F7DDB4); }
+  &.shape-jar .shell-stage { background: linear-gradient(180deg, #EAF6E6, #CFE9CC); }
+  &.shape-bubbles .shell-stage { background: linear-gradient(180deg, #DFF2FB, #A9DCF2); }
+  &.shape-plate .shell-stage { background: linear-gradient(180deg, #FDEFD6, #F6D9A8); }
+  &.shape-cards .shell-stage { background: linear-gradient(180deg, #F2E7FB, #DCC6F4); }
+  &.shape-book .shell-stage { background: linear-gradient(180deg, #FFFBF0, #F3E4C6); }
+  &.shape-page .shell-stage { background: linear-gradient(180deg, #FFFDF6, #EFE3CA); }
+  &.shape-desk .shell-stage { background: linear-gradient(180deg, #FBEEDD, #E7C99B); }
+  &.shape-radio .shell-stage { background: linear-gradient(180deg, #EDE9FE, #C9BDF5); }
+  &.shape-map .shell-stage { background: linear-gradient(180deg, #FBEFD2, #EBD3A2); }
+  &.shape-baskets .shell-stage { background: linear-gradient(180deg, #F4EFE3, #DFCFB3); }
+
+  // ---------- top bar ----------
+  .shell-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    margin-bottom: 0.7rem;
+    flex-wrap: wrap;
+  }
+
+  .shell-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.4rem 0.85rem;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.8);
+    border: 2px solid rgba(58, 42, 31, 0.18);
+    color: $ink;
+    font-family: 'Fredoka', sans-serif;
+    font-weight: 600;
+    font-size: 0.85rem;
+    cursor: pointer;
+
+    &:hover { background: #FFFFFF; }
+    &:active { transform: scale(0.96); }
+  }
+
+  .round-pips {
+    display: flex;
+    gap: 0.4rem;
+    align-items: center;
+
+    .pip {
+      width: 13px;
+      height: 13px;
+      border-radius: 50%;
+      background: rgba(58, 42, 31, 0.16);
+      border: 2px solid transparent;
+      transition: all 0.25s ease;
+
+      &.done {
+        background: $amber;
+        box-shadow: 0 0 0 3px rgba(240, 162, 46, 0.25);
+      }
+
+      &.current {
+        border-color: $ink;
+        transform: scale(1.25);
+      }
+    }
+  }
+
+  .shell-right {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .replay-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.35rem 0.7rem;
+    border-radius: 999px;
+    background: #FFFFFF;
+    border: 2px solid rgba(58, 42, 31, 0.2);
+    font-family: 'Fredoka', sans-serif;
+    font-weight: 600;
+    font-size: 0.82rem;
+    color: $ink;
+    cursor: pointer;
+
+    &:hover { background: #FFF3DC; }
+    &:active { transform: scale(0.95); }
+  }
+
+  .shell-title {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-family: 'Fredoka', sans-serif;
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: $ink-soft;
+
+    .shell-emoji { font-size: 1.15rem; }
+  }
+
+  // ---------- stage ----------
+  .shell-stage {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 26px;
+    border: 3px solid rgba(58, 42, 31, 0.14);
+    box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.6), 0 10px 26px rgba(58, 42, 31, 0.16);
+    padding: 1.1rem;
+    position: relative;
+    overflow: hidden;
+    min-height: 320px;
+    transition: transform 0.18s ease;
+  }
+
+  &.flash-miss .shell-stage { animation: stageShake 0.42s ease; }
+  &.flash-win .shell-stage { box-shadow: inset 0 0 0 4px rgba(74, 160, 90, 0.55), 0 10px 26px rgba(58, 42, 31, 0.16); }
+
+  // ---------- Luna's perch ----------
+  .luna-perch {
+    display: flex;
+    align-items: flex-end;
+    gap: 0.7rem;
+    margin-top: 0.7rem;
+    min-height: 84px;
+
+    .perch-bubble {
+      @include paper-card(#FFFFFF);
+      position: relative;
+      padding: 0.65rem 0.95rem;
+      max-width: 560px;
+      box-shadow: 0 4px 0 rgba(58, 42, 31, 0.1);
+
+      p {
+        font-family: 'Fredoka', sans-serif;
+        font-weight: 500;
+        font-size: 1rem;
+        line-height: 1.35;
+        color: $ink;
+      }
+
+      .thinking-dots {
+        display: inline-flex;
+        gap: 3px;
+        margin-left: 6px;
+        vertical-align: middle;
+
+        i {
+          width: 5px;
+          height: 5px;
+          border-radius: 50%;
+          background: $plum;
+          animation: thinkingDot 1s ease-in-out infinite;
+        }
+        i:nth-child(2) { animation-delay: 0.15s; }
+        i:nth-child(3) { animation-delay: 0.3s; }
+      }
+
+      .perch-hint {
+        margin-top: 0.4rem;
+        padding-top: 0.4rem;
+        border-top: 2px dashed rgba(58, 42, 31, 0.2);
+        font-size: 0.9rem;
+        color: $moss-deep;
+        font-weight: 600;
+      }
+
+      &::before {
+        content: '';
+        position: absolute;
+        left: -9px;
+        bottom: 18px;
+        width: 16px;
+        height: 16px;
+        background: #FFFFFF;
+        border-left: 2.5px solid rgba(58, 42, 31, 0.16);
+        border-bottom: 2.5px solid rgba(58, 42, 31, 0.16);
+        transform: rotate(45deg);
+      }
+    }
+  }
+
+  // ---------- win flourish ----------
+  .win-veil {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .win-burst {
+      font-size: 6rem;
+      color: #FFD166;
+      text-shadow: 0 0 30px rgba(255, 209, 102, 0.9);
+      animation: burstPop 0.85s cubic-bezier(0.2, 1.4, 0.4, 1) forwards;
+    }
+  }
+
+  // ---------- start screen ----------
+  &.phase-intro {
+    align-items: center;
+    justify-content: center;
+
+    .shell-back { position: absolute; top: 1rem; left: 1.1rem; }
+
+    .intro-panel {
+      @include paper-card;
+      @include grain(0.07);
+      width: min(560px, 100%);
+      padding: 1.4rem 1.6rem 1.5rem;
+      text-align: center;
+      animation: panelRise 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .intro-scene {
+      width: 104px;
+      height: 104px;
+      margin: -3.4rem auto 0.6rem;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: radial-gradient(circle at 35% 30%, #FFFFFF, $paper-deep);
+      border: 3px solid rgba(58, 42, 31, 0.18);
+      box-shadow: 0 8px 18px rgba(58, 42, 31, 0.22);
+
+      .intro-emoji { font-size: 3.1rem; animation: introFloat 3s ease-in-out infinite; }
+    }
+
+    .surprise-banner {
+      @include tape-label;
+      display: inline-block;
+      margin-bottom: 0.5rem;
+      font-size: 0.85rem;
+    }
+
+    .intro-title {
+      font-family: 'Fredoka', sans-serif;
+      font-size: 1.9rem;
+      font-weight: 600;
+      color: $ink;
+      line-height: 1.1;
+    }
+
+    .intro-tagline {
+      font-size: 1.02rem;
+      color: $ink-soft;
+      margin-top: 0.25rem;
+      font-weight: 600;
+    }
+
+    .intro-luna {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      margin: 0.9rem 0 1rem;
+      text-align: left;
+      background: rgba(255, 255, 255, 0.72);
+      border: 2px dashed rgba(58, 42, 31, 0.22);
+      border-radius: 18px;
+      padding: 0.5rem 0.8rem;
+
+      .intro-mission {
+        font-family: 'Fredoka', sans-serif;
+        font-size: 1.05rem;
+        font-weight: 500;
+        color: $plum-deep;
+      }
+    }
+
+    .difficulty-row {
+      display: flex;
+      gap: 0.5rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 1rem;
+    }
+
+    .difficulty-chip {
+      flex: 1 1 140px;
+      display: flex;
+      flex-direction: column;
+      gap: 0.1rem;
+      padding: 0.55rem 0.6rem;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.85);
+      border: 2.5px solid rgba(58, 42, 31, 0.16);
+      cursor: pointer;
+      text-align: center;
+      transition: transform 0.14s ease, border-color 0.14s ease, background 0.14s ease;
+
+      .chip-dots { font-size: 0.7rem; color: $amber-deep; letter-spacing: 2px; }
+      .chip-dots .dim { color: rgba(58, 42, 31, 0.2); }
+      .chip-label { font-family: 'Fredoka', sans-serif; font-weight: 600; font-size: 0.98rem; }
+      .chip-note { font-size: 0.72rem; color: $ink-soft; }
+
+      &:hover { transform: translateY(-2px); }
+
+      &.is-active {
+        background: #FFF1D4;
+        border-color: $amber-deep;
+        box-shadow: 0 4px 0 rgba(201, 123, 18, 0.35);
+      }
+    }
+
+    .play-button {
+      @include chunky($moss, $moss-deep);
+      width: 100%;
+      padding: 0.85rem 1rem;
+      font-size: 1.35rem;
+      letter-spacing: 0.01em;
+    }
+
+    .objective-line {
+      margin-top: 0.9rem;
+      font-size: 0.78rem;
+      color: $ink-soft;
+      line-height: 1.4;
+
+      strong { color: $plum-deep; }
+    }
+  }
+
+  // ---------- reward screen ----------
+  &.phase-reward {
+    align-items: center;
+    justify-content: center;
+
+    .reward-confetti {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 5;
+    }
+
+    .reward-panel {
+      @include paper-card;
+      @include grain(0.06);
+      position: relative;
+      z-index: 6;
+      width: min(540px, 100%);
+      padding: 1.3rem 1.5rem 1.5rem;
+      text-align: center;
+      animation: panelRise 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .reward-luna { display: flex; justify-content: center; margin-top: -3.6rem; }
+
+    .reward-title {
+      font-family: 'Fredoka', sans-serif;
+      font-size: 1.6rem;
+      font-weight: 600;
+      margin-top: 0.3rem;
+    }
+
+    .reward-stars {
+      display: flex;
+      justify-content: center;
+      gap: 0.3rem;
+      margin: 0.7rem 0 0.4rem;
+
+      .reward-star {
+        animation: starDrop 0.55s cubic-bezier(0.2, 1.5, 0.4, 1) backwards;
+        filter: drop-shadow(0 4px 6px rgba(201, 123, 18, 0.45));
+      }
+    }
+
+    .reward-score { color: $ink-soft; font-weight: 700; font-size: 0.95rem; }
+
+    .sticker-award {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      margin: 1rem 0;
+      padding: 0.7rem 0.9rem;
+      background: #FFFFFF;
+      border: 3px dashed $amber;
+      border-radius: 18px;
+      text-align: left;
+
+      .sticker-peel {
+        font-size: 2.7rem;
+        animation: stickerStick 0.7s cubic-bezier(0.2, 1.5, 0.4, 1);
+        filter: drop-shadow(0 3px 4px rgba(58, 42, 31, 0.3));
+      }
+
+      .sticker-kicker {
+        display: block;
+        font-size: 0.72rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: $amber-deep;
+        font-weight: 800;
+      }
+
+      .sticker-name {
+        font-family: 'Fredoka', sans-serif;
+        font-size: 1.15rem;
+        font-weight: 600;
+      }
+    }
+
+    .reward-actions {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .reward-btn {
+      @include chunky(#FFFFFF, rgba(58, 42, 31, 0.25), $ink);
+      padding: 0.6rem 1rem;
+      font-size: 1rem;
+      flex: 1 1 140px;
+
+      &.primary { @include chunky($amber, $amber-deep, #46280A); }
+      &.ghost { box-shadow: none; background: transparent; border: 2px solid rgba(58, 42, 31, 0.2); }
+    }
+  }
+}
+
+// ---------- shared game furniture, used inside stages ----------
+
+.stage-prompt {
+  font-family: 'Fredoka', sans-serif;
+  font-weight: 600;
+  font-size: 1.2rem;
+  color: $ink;
+  text-align: center;
+}
+
+.speak-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem 0.9rem;
+  border-radius: 999px;
+  background: #FFFFFF;
+  border: 2.5px solid rgba(58, 42, 31, 0.18);
+  font-family: 'Fredoka', sans-serif;
+  font-weight: 600;
+  color: $ink;
+  cursor: pointer;
+
+  &:hover { background: #FFF6E6; }
+  &:active { transform: scale(0.96); }
+}
+
+@keyframes stageShake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-9px) rotate(-0.4deg); }
+  45% { transform: translateX(8px) rotate(0.4deg); }
+  70% { transform: translateX(-5px); }
+}
+
+@keyframes burstPop {
+  0% { transform: scale(0.2) rotate(-25deg); opacity: 0; }
+  40% { transform: scale(1.25) rotate(8deg); opacity: 1; }
+  100% { transform: scale(2.2) rotate(20deg); opacity: 0; }
+}
+
+@keyframes panelRise {
+  from { transform: translateY(22px) scale(0.97); opacity: 0; }
+  to { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+@keyframes introFloat {
+  0%, 100% { transform: translateY(0) rotate(-3deg); }
+  50% { transform: translateY(-7px) rotate(3deg); }
+}
+
+@keyframes starDrop {
+  from { transform: translateY(-30px) scale(0.3) rotate(-40deg); opacity: 0; }
+  to { transform: translateY(0) scale(1) rotate(0); opacity: 1; }
+}
+
+@keyframes stickerStick {
+  0% { transform: translate(30px, -26px) rotate(28deg) scale(0.5); opacity: 0; }
+  60% { transform: translate(0, 0) rotate(-8deg) scale(1.2); opacity: 1; }
+  100% { transform: rotate(-4deg) scale(1); }
+}
+
+@media (max-width: 720px) {
+  .game-shell {
+    padding: 0.7rem;
+
+    .luna-perch .perch-bubble p { font-size: 0.92rem; }
+    .shell-right {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .replay-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.35rem 0.7rem;
+    border-radius: 999px;
+    background: #FFFFFF;
+    border: 2px solid rgba(58, 42, 31, 0.2);
+    font-family: 'Fredoka', sans-serif;
+    font-weight: 600;
+    font-size: 0.82rem;
+    color: $ink;
+    cursor: pointer;
+
+    &:hover { background: #FFF3DC; }
+    &:active { transform: scale(0.95); }
+  }
+
+  .shell-title { display: none; }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .game-shell *,
+  .game-shell *::before {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
+
+@keyframes thinkingDot {
+  0%, 100% { transform: translateY(0); opacity: 0.35; }
+  50% { transform: translateY(-3px); opacity: 1; }
+}

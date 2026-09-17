@@ -1,0 +1,90 @@
+// Luna's library: the shared material palette for the hub and every mini-game.
+// Warm paper, painted wood and ink — deliberately not dashboard grey.
+
+$paper: #FFF6E6;
+$paper-deep: #FBE8C8;
+$paper-edge: #E8CFA4;
+$ink: #3A2A1F;
+$ink-soft: #7A6353;
+$wood: #A9713F;
+$wood-dark: #7A4A24;
+$wood-deep: #5A3517;
+
+$plum: #7C3AED;
+$plum-deep: #5B21B6;
+$amber: #F0A22E;
+$amber-deep: #C97B12;
+$moss: #4AA05A;
+$moss-deep: #2F7A3E;
+$berry: #E4572E;
+$berry-deep: #B23C1A;
+$sky: #4FA8D8;
+$sky-deep: #2A7EAE;
+
+$radius-soft: 18px;
+
+// A hand-cut paper edge: slightly irregular, never a perfect rounded rectangle.
+@mixin paper-card($bg: $paper) {
+  background: $bg;
+  border: 2.5px solid rgba(58, 42, 31, 0.16);
+  border-radius: 22px 26px 20px 24px;
+  box-shadow: 0 6px 0 rgba(58, 42, 31, 0.1), 0 12px 26px rgba(58, 42, 31, 0.14);
+}
+
+// Chunky tactile button with a solid bottom edge that compresses on press.
+@mixin chunky($face, $edge, $text: #FFFFFF) {
+  background: $face;
+  color: $text;
+  border: none;
+  border-radius: 16px;
+  box-shadow: 0 5px 0 $edge, 0 8px 14px rgba(58, 42, 31, 0.22);
+  font-family: 'Fredoka', sans-serif;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.12s ease, box-shadow 0.12s ease, filter 0.12s ease;
+
+  &:hover:not(:disabled) {
+    filter: brightness(1.05);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 0 $edge, 0 10px 18px rgba(58, 42, 31, 0.26);
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(4px);
+    box-shadow: 0 1px 0 $edge, 0 3px 6px rgba(58, 42, 31, 0.2);
+  }
+
+  &:disabled {
+    cursor: default;
+    opacity: 0.65;
+  }
+}
+
+// Faint paper grain so large surfaces are never flat white.
+@mixin grain($opacity: 0.05) {
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    border-radius: inherit;
+    opacity: $opacity;
+    background-image:
+      radial-gradient(circle at 20% 30%, rgba(58, 42, 31, 0.7) 0.5px, transparent 0.6px),
+      radial-gradient(circle at 70% 60%, rgba(58, 42, 31, 0.6) 0.5px, transparent 0.6px),
+      radial-gradient(circle at 45% 85%, rgba(58, 42, 31, 0.6) 0.5px, transparent 0.6px);
+    background-size: 18px 18px, 26px 26px, 22px 22px;
+  }
+}
+
+@mixin tape-label {
+  font-family: 'Fredoka', sans-serif;
+  font-weight: 600;
+  background: rgba(240, 162, 46, 0.9);
+  color: #4A2E10;
+  padding: 0.2rem 0.8rem;
+  transform: rotate(-1.6deg);
+  box-shadow: 0 2px 6px rgba(58, 42, 31, 0.2);
+}

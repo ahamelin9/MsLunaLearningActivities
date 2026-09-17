@@ -1,0 +1,224 @@
+// Ms. Luna's expressions. Each mood re-poses the same drawing:
+// lids, brows, pupils, beak and wings move — nothing is swapped out.
+
+.luna-owl {
+  display: block;
+  position: relative;
+  padding: 0;
+  border: none;
+  background: none;
+  flex: 0 0 auto;
+  line-height: 0;
+
+  &.is-tappable {
+    cursor: pointer;
+    &:active .luna-body-group { transform: scale(0.94); }
+  }
+
+  .luna-svg {
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+
+  .luna-shadow {
+    fill: rgba(30, 16, 60, 0.18);
+  }
+
+  .luna-body-group {
+    transform-origin: 60px 100px;
+    animation: lunaBob 3.6s ease-in-out infinite;
+    transition: transform 0.2s ease;
+  }
+
+  .body { fill: #7C3AED; }
+  .belly { fill: #FDE9C8; }
+  .belly-specks circle { fill: #E9C89A; }
+  .face-disc { fill: #F5E6FF; }
+  .tuft { fill: #6D28D9; }
+  .wing { fill: #6D28D9; transform-origin: 60px 66px; transition: transform 0.25s ease; }
+  .eye-white { fill: #FFFFFF; }
+  .pupil { fill: #241243; transition: transform 0.18s ease; }
+  .glint { fill: #FFFFFF; }
+  .beak { fill: #FBA916; transform-origin: 60px 58px; transition: transform 0.2s ease; }
+  .foot { stroke: #FBA916; stroke-width: 3.4; stroke-linecap: round; fill: none; }
+  .blush { fill: #FB7185; opacity: 0.45; }
+  .brow {
+    stroke: #4C1D95;
+    stroke-width: 4;
+    stroke-linecap: round;
+    fill: none;
+    transition: transform 0.2s ease;
+  }
+  .brow-left { transform-origin: 44px 30px; }
+  .brow-right { transform-origin: 76px 30px; }
+
+  .glasses {
+    fill: none;
+    stroke: #F59E0B;
+    stroke-width: 2.6;
+    stroke-linecap: round;
+    opacity: 0.9;
+  }
+
+  // eyelids slide down over the eyes for blinks and expressions
+  .lid {
+    fill: #F5E6FF;
+    transform-origin: center;
+    transform: translateY(-14px);
+    transition: transform 0.16s ease;
+  }
+
+
+  .mood-sparks {
+    fill: #FDE047;
+    opacity: 0;
+    transform-origin: 60px 40px;
+    transition: opacity 0.2s ease;
+  }
+
+  .mood-think text,
+  .mood-zzz text {
+    font-family: 'Fredoka', sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    fill: #A78BFA;
+    opacity: 0;
+  }
+
+  // ---------- moods ----------
+
+  &.mood-happy {
+    .beak { transform: scaleY(1.1); }
+    .blush { opacity: 0.6; }
+  }
+
+  &.mood-cheer {
+    .luna-body-group { animation: lunaCheer 0.6s ease-in-out 2; }
+    .wing-left { transform: rotate(-34deg) translateY(-6px); }
+    .wing-right { transform: rotate(34deg) translateY(-6px); }
+    .brow-left { transform: translateY(-4px) rotate(-10deg); }
+    .brow-right { transform: translateY(-4px) rotate(10deg); }
+    .beak { transform: scaleY(1.35); }
+    .blush { opacity: 0.75; }
+    .mood-sparks { opacity: 1; animation: sparkPop 0.7s ease-out 2; }
+  }
+
+  &.mood-think {
+    .brow-left { transform: translateY(-5px) rotate(-14deg); }
+    .brow-right { transform: translateY(2px) rotate(6deg); }
+    .eye-left .pupil { transform: translate(4px, -3px); }
+    .eye-right .pupil { transform: translate(4px, -3px); }
+    .eye-right .lid { transform: translateY(-8px); }
+    .beak { transform: translateX(2px) rotate(6deg); }
+    .mood-think text { opacity: 1; animation: thinkFloat 2s ease-in-out infinite; }
+  }
+
+  &.mood-oops {
+    .luna-body-group { animation: lunaWobble 0.5s ease-in-out 1; }
+    .brow-left { transform: translateY(3px) rotate(16deg); }
+    .brow-right { transform: translateY(3px) rotate(-16deg); }
+    .eye-left .lid, .eye-right .lid { transform: translateY(-9px); }
+    .beak { transform: scaleY(0.75) translateY(2px); }
+    .wing-left { transform: rotate(12deg); }
+    .wing-right { transform: rotate(-12deg); }
+  }
+
+  &.mood-surprise {
+    .luna-body-group { animation: lunaJump 0.45s ease-out 1; }
+    .eye-white { r: 14; }
+    .pupil { transform: scale(1.25); transform-origin: center; }
+    .brow-left { transform: translateY(-7px); }
+    .brow-right { transform: translateY(-7px); }
+    .beak { transform: scaleY(1.4) translateY(1px); }
+    .tuft { animation: tuftShake 0.4s ease-in-out 2; }
+  }
+
+  &.mood-listen {
+    .wing-right { transform: rotate(-46deg) translate(-6px, -14px); }
+    .brow-left { transform: translateY(-4px) rotate(-8deg); }
+    .eye-left .pupil { transform: translate(-3px, 0); }
+    .eye-right .pupil { transform: translate(-3px, 0); }
+    .tuft { animation: tuftShake 1.6s ease-in-out infinite; }
+  }
+
+  &.mood-sleepy {
+    .luna-body-group { animation: lunaBob 5s ease-in-out infinite; }
+    .lid { transform: translateY(-3px); }
+    .mood-zzz text { opacity: 1; animation: zzzFloat 2.4s ease-in-out infinite; }
+  }
+
+  // beak flaps while she is speaking
+  &.is-talking .beak {
+    animation: beakTalk 0.32s ease-in-out infinite;
+  }
+}
+
+@keyframes lunaBob {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-4px) rotate(-1.2deg); }
+}
+
+@keyframes lunaCheer {
+  0%, 100% { transform: translateY(0) rotate(0); }
+  30% { transform: translateY(-12px) rotate(-5deg) scale(1.04); }
+  60% { transform: translateY(-4px) rotate(5deg); }
+}
+
+@keyframes lunaJump {
+  0% { transform: translateY(0) scale(1); }
+  40% { transform: translateY(-14px) scale(1.06, 0.96); }
+  100% { transform: translateY(0) scale(1); }
+}
+
+@keyframes lunaWobble {
+  0%, 100% { transform: rotate(0); }
+  25% { transform: rotate(-6deg); }
+  75% { transform: rotate(6deg); }
+}
+
+@keyframes beakTalk {
+  0%, 100% { transform: scaleY(0.85); }
+  50% { transform: scaleY(1.3); }
+}
+
+@keyframes tuftShake {
+  0%, 100% { transform: rotate(0); }
+  50% { transform: rotate(-8deg); }
+}
+
+@keyframes sparkPop {
+  0% { opacity: 0; transform: scale(0.4) rotate(-20deg); }
+  50% { opacity: 1; transform: scale(1.15) rotate(10deg); }
+  100% { opacity: 0; transform: scale(0.9) rotate(0); }
+}
+
+@keyframes thinkFloat {
+  0%, 100% { transform: translateY(0); opacity: 0.6; }
+  50% { transform: translateY(-6px); opacity: 1; }
+}
+
+@keyframes zzzFloat {
+  0% { transform: translate(0, 0) scale(0.8); opacity: 0; }
+  40% { opacity: 1; }
+  100% { transform: translate(6px, -14px) scale(1.2); opacity: 0; }
+}
+
+// Blink only in the resting moods, so expression poses are never overridden.
+.luna-owl.mood-idle,
+.luna-owl.mood-happy,
+.luna-owl.mood-listen {
+  .eye .lid { animation: lidBlink 5.4s infinite; }
+  .eye-right .lid { animation-delay: 0.08s; }
+}
+
+@keyframes lidBlink {
+  0%, 93%, 100% { transform: translateY(-14px); }
+  95.5% { transform: translateY(0.5px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .luna-owl * {
+    animation: none !important;
+  }
+}

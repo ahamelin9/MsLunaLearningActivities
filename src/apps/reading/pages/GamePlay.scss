@@ -1,0 +1,57 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+.gameplay-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  padding: 1rem 1.5rem;
+  animation: fadeIn 0.25s ease-out;
+
+  .gameplay-header {
+    max-width: 900px;
+    width: 100%;
+    margin: 0 auto 1.5rem auto;
+    @include flex-between;
+    gap: 1.25rem;
+
+    .exit-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.4rem 0.85rem;
+      border-radius: $radius-pill;
+      background: #FFFFFF;
+      border: 1.5px solid #CBD5E1;
+      color: #334155;
+      font-family: $font-display;
+      font-weight: 800;
+      font-size: 0.85rem;
+      cursor: pointer;
+      box-shadow: $shadow-sm;
+      transition: all 0.15s ease;
+
+      &:hover {
+        background: #FEE2E2;
+        color: #DC2626;
+        border-color: #FCA5A5;
+      }
+
+      &:active {
+        transform: scale(0.95);
+      }
+    }
+
+    .progress-bar-slot {
+      flex: 1;
+      max-width: 320px;
+    }
+  }
+
+  .gameplay-question-body {
+    flex: 1;
+    @include flex-center;
+    flex-direction: column;
+  }
+}
+

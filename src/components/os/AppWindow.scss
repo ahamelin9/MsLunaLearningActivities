@@ -1,0 +1,144 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+.app-window-overlay {
+  position: absolute;
+  inset: 0;
+  background: #FAF8F5;
+  display: flex;
+  flex-direction: column;
+  z-index: 35;
+  overflow: hidden;
+  animation: appZoomLaunch 0.32s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+
+  .app-window-header {
+    height: 54px;
+    padding: 0 1.25rem;
+    @include flex-between;
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-bottom: 1.5px solid #E2E8F0;
+    box-shadow: $shadow-sm;
+    z-index: 30;
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+
+      .home-nav-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        padding: 0.4rem 0.85rem;
+        border-radius: $radius-pill;
+        background: #F1F5F9;
+        color: #334155;
+        font-family: $font-display;
+        font-weight: 800;
+        font-size: 0.85rem;
+        border: 1.5px solid #CBD5E1;
+        cursor: pointer;
+        transition: all 0.15s ease;
+
+        &:hover {
+          background: #FAF5FF;
+          color: $color-primary;
+          border-color: #C084FC;
+          transform: translateY(-1px);
+        }
+
+        &:active {
+          transform: scale(0.95);
+        }
+      }
+
+      .app-title-group {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+
+        .app-header-icon {
+          width: 32px;
+          height: 32px;
+          border-radius: 8px;
+          @include flex-center;
+          box-shadow: $shadow-sm;
+        }
+
+        .app-header-title {
+          font-family: $font-display;
+          font-weight: 800;
+          font-size: 1.1rem;
+          color: $color-text-dark;
+        }
+      }
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+
+      .audio-toggle-btn {
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        @include flex-center;
+        background: #F1F5F9;
+        border: 1.5px solid #CBD5E1;
+        color: #475569;
+        cursor: pointer;
+        transition: background 0.15s ease;
+
+        &:hover {
+          background: #E2E8F0;
+        }
+      }
+    }
+  }
+
+  .app-window-content {
+    flex: 1;
+    overflow-y: auto;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .tablet-home-indicator-bar {
+    height: 28px;
+    @include flex-center;
+    background: linear-gradient(180deg, transparent 0%, rgba(241, 245, 249, 0.9) 100%);
+    z-index: 20;
+
+    .tablet-home-pill {
+      width: 140px;
+      height: 5px;
+      border-radius: 3px;
+      background: #94A3B8;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+
+      &:hover {
+        background: $color-primary;
+        height: 7px;
+        width: 160px;
+      }
+    }
+  }
+}
+
+@keyframes appZoomLaunch {
+  0% {
+    opacity: 0;
+    transform: scale(0.9) translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
