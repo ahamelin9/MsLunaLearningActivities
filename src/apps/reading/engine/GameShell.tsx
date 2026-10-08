@@ -21,7 +21,10 @@ interface GameShellProps {
   grade: GradeLevel;
   progress: UserProgress;
   onExit: () => void;
-  onPlayAnother: () => void;
+  /** the reward screen's second button; left out, the button is not shown */
+  onPlayAnother?: () => void;
+  /** what that button says: "Another game", or "Next lesson" */
+  playAnotherLabel?: string;
   /** Surprise picks skip the start screen and drop straight into play. */
   autoStart?: boolean;
   startDifficulty?: Difficulty;
@@ -41,6 +44,7 @@ export const GameShell: React.FC<GameShellProps> = ({
   progress,
   onExit,
   onPlayAnother,
+  playAnotherLabel = 'Another game',
   autoStart = false,
   startDifficulty = 2,
   surpriseBanner
@@ -111,9 +115,10 @@ export const GameShell: React.FC<GameShellProps> = ({
     warmGameIntro(game.mission);
   }, [game.mission]);
 
-  // Luna introduces the game a beat after a play session starts.
+  // Luna says the mission on the start screen, where it is written. Said as
+  // play began, it was cut off a moment later by the first round's own cue.
   useEffect(() => {
-    if (phase !== 'play') return;
+    if (phase !== 'intro') return;
     const id = window.setTimeout(() => speak(game.mission, 'happy'), 320);
     return () => window.clearTimeout(id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -149,14 +154,15 @@ export const GameShell: React.FC<GameShellProps> = ({
       const perfect = cleanRef.current === game.roundsPerPlay;
       setAward({
         sticker: nextSticker(progress.stickers, game.sticker),
-        stars: Math.max(1, wonRef.current) + (perfect ? 1 : 0),
-        points: wonRef.current * 15 + (perfect ? 25 : 0)
+        // a lesson is worth what the curriculum says, however it went
+        stars: game.lesson?.stars ?? Math.max(1, wonRef.current) + (perfect ? 1 : 0),
+        points: game.lesson?.points ?? wonRef.current * 15 + (perfect ? 25 : 0)
       });
       setPhase('reward');
     } else {
       setRoundIndex(roundIndex + 1);
     }
-  }, [game.roundsPerPlay, game.sticker, progress.stickers, roundIndex]);
+  }, [game.lesson, game.roundsPerPlay, game.sticker, progress.stickers, roundIndex]);
 
   const handleWin = useCallback(
     (opts?: { lunaLine?: string; delay?: number }) => {
@@ -241,19 +247,29 @@ export const GameShell: React.FC<GameShellProps> = ({
     if (phase !== 'reward' || !award || recorded.current) return;
     recorded.current = true;
 
-    storageService.recordGameCompletion({
-      gameId: game.id,
-      starsEarned: award.stars,
-      pointsEarned: award.points,
-      stickerId: award.sticker?.id ?? null
-    });
+    if (game.lesson) {
+      storageService.recordLessonCompletion(
+        game.lesson.id,
+        award.stars,
+        award.points,
+        game.lesson.skillId,
+        award.sticker?.id ?? null
+      );
+    } else {
+      storageService.recordGameCompletion({
+        gameId: game.id,
+        starsEarned: award.stars,
+        pointsEarned: award.points,
+        stickerId: award.sticker?.id ?? null
+      });
+    }
 
     soundManager.playFanfare();
     launchConfetti(canvasRef.current, 2800);
     later(() => {
       speak(lunaSay('finish', game.id).text, 'cheer', award.sticker ? [{ text: award.sticker.line }] : []);
     }, 700);
-  }, [phase, award, game.id, later, speak]);
+  }, [phase, award, game.id, game.lesson, later, speak]);
 
   // ---------- START ----------
   if (phase === 'intro') {
@@ -279,28 +295,31 @@ export const GameShell: React.FC<GameShellProps> = ({
             <p className="intro-mission">“{game.mission}”</p>
           </div>
 
-          <div className="difficulty-row" role="group" aria-label="Choose how tricky">
-            {DIFFICULTY_LABELS.map(level => (
-              <button
-                key={level.value}
-                className={`difficulty-chip ${difficulty === level.value ? 'is-active' : ''}`}
-                onClick={() => {
-                  soundManager.playLetterTap();
-                  setDifficulty(level.value);
-                }}
-              >
-                <span className="chip-dots" aria-hidden="true">
-                  {'●'.repeat(level.value)}
-                  <span className="dim">{'●'.repeat(3 - level.value)}</span>
-                </span>
-                <span className="chip-label">{level.label}</span>
-                <span className="chip-note">{level.note}</span>
-              </button>
-            ))}
-          </div>
+          {/* a lesson's questions are fixed, so there is nothing to choose */}
+          {!game.lesson && (
+            <div className="difficulty-row" role="group" aria-label="Choose how tricky">
+              {DIFFICULTY_LABELS.map(level => (
+                <button
+                  key={level.value}
+                  className={`difficulty-chip ${difficulty === level.value ? 'is-active' : ''}`}
+                  onClick={() => {
+                    soundManager.playLetterTap();
+                    setDifficulty(level.value);
+                  }}
+                >
+                  <span className="chip-dots" aria-hidden="true">
+                    {'●'.repeat(level.value)}
+                    <span className="dim">{'●'.repeat(3 - level.value)}</span>
+                  </span>
+                  <span className="chip-label">{level.label}</span>
+                  <span className="chip-note">{level.note}</span>
+                </button>
+              ))}
+            </div>
+          )}
 
           <button className="play-button" onClick={() => startPlay(difficulty)}>
-            Let’s play!
+            {game.lesson ? 'Let’s learn!' : 'Let’s play!'}
           </button>
 
           <p className="objective-line">
@@ -351,9 +370,11 @@ export const GameShell: React.FC<GameShellProps> = ({
             <button className="reward-btn primary" onClick={() => startPlay(difficulty)}>
               Play again
             </button>
-            <button className="reward-btn" onClick={onPlayAnother}>
-              Another game
-            </button>
+            {onPlayAnother && (
+              <button className="reward-btn" onClick={onPlayAnother}>
+                {playAnotherLabel}
+              </button>
+            )}
             <button className="reward-btn ghost" onClick={onExit}>
               Back to the library
             </button>

@@ -85,14 +85,6 @@ export const GENERAL: Bank = {
 
 /** Per-game flavour so two games never sound alike. */
 export const PER_GAME: Record<string, Partial<Bank>> = {
-  'sound-detective': {
-    intro: [{ text: 'A sound is hiding in this room. Find who makes it!', mood: 'think' }],
-    correct: [
-      { text: 'Case closed! Detective work!', mood: 'cheer' },
-      { text: 'You heard it before I did!', mood: 'surprise' }
-    ],
-    missFirst: [{ text: 'Listen to the very FIRST bit of the word.', mood: 'listen' }]
-  },
   'letter-hunt': {
     intro: [{ text: 'The letters escaped the jar. Catch every one!', mood: 'oops' }],
     correct: [
@@ -141,14 +133,6 @@ export const PER_GAME: Record<string, Partial<Bank>> = {
     ],
     missFirst: [{ text: 'That one is still on the desk. Look again!', mood: 'think' }]
   },
-  'luna-says': {
-    intro: [{ text: 'Ears only for this one. No peeking at words!', mood: 'listen' }],
-    correct: [
-      { text: 'That IS what I said! Good listening.', mood: 'cheer' },
-      { text: 'You heard me perfectly.', mood: 'happy' }
-    ],
-    missFirst: [{ text: 'That’s not what I said. Listen once more.', mood: 'listen' }]
-  },
   'treasure-read': {
     intro: [{ text: 'Read each stone or we’ll never reach the treasure!', mood: 'think' }],
     correct: [
@@ -156,14 +140,6 @@ export const PER_GAME: Record<string, Partial<Bank>> = {
       { text: 'Safe stone! Keep going.', mood: 'happy' }
     ],
     missFirst: [{ text: 'Careful, that stone wobbles. Read it again.', mood: 'think' }]
-  },
-  'sorting-baskets': {
-    intro: [{ text: 'Everything is in the wrong basket. Help me!', mood: 'oops' }],
-    correct: [
-      { text: 'In it goes! Much tidier.', mood: 'cheer' },
-      { text: 'Right basket. My shelves thank you.', mood: 'happy' }
-    ],
-    missFirst: [{ text: 'Hmm, that doesn’t belong there. Where else?', mood: 'think' }]
   },
   'story-time': {
     intro: [{ text: 'Snuggle in. A very short story…', mood: 'happy' }],

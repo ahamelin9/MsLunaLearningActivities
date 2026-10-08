@@ -14,7 +14,6 @@
   overflow: hidden;
 
   // Each game's stage takes on the material of its own world.
-  &.shape-scene .shell-stage { background: linear-gradient(180deg, #FFF1D8, #F7DDB4); }
   &.shape-jar .shell-stage { background: linear-gradient(180deg, #EAF6E6, #CFE9CC); }
   &.shape-bubbles .shell-stage { background: linear-gradient(180deg, #DFF2FB, #A9DCF2); }
   &.shape-plate .shell-stage { background: linear-gradient(180deg, #FDEFD6, #F6D9A8); }
@@ -22,9 +21,18 @@
   &.shape-book .shell-stage { background: linear-gradient(180deg, #FFFBF0, #F3E4C6); }
   &.shape-page .shell-stage { background: linear-gradient(180deg, #FFFDF6, #EFE3CA); }
   &.shape-desk .shell-stage { background: linear-gradient(180deg, #FBEEDD, #E7C99B); }
-  &.shape-radio .shell-stage { background: linear-gradient(180deg, #EDE9FE, #C9BDF5); }
   &.shape-map .shell-stage { background: linear-gradient(180deg, #FBEFD2, #EBD3A2); }
-  &.shape-baskets .shell-stage { background: linear-gradient(180deg, #F4EFE3, #DFCFB3); }
+  &.shape-lesson .shell-stage {
+    background: linear-gradient(180deg, #FFFDF5, #F4E7CD);
+    // A story can be taller than the stage, so a lesson scrolls inside it.
+    // Auto margins centre the lesson when it fits and start it at the top when
+    // it does not; align-items: center would push its first lines up out of
+    // reach (and the "safe" keyword that fixes that is missing on older iPads).
+    align-items: flex-start;
+    overflow-y: auto;
+
+    > .lesson { margin: auto; }
+  }
 
   // ---------- top bar ----------
   .shell-bar {

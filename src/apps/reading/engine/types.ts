@@ -40,7 +40,6 @@ export interface GameApi {
 
 /** How the game's entry looks in Luna's library — deliberately not all cards. */
 export type GameShape =
-  | 'scene'
   | 'jar'
   | 'bubbles'
   | 'plate'
@@ -48,9 +47,8 @@ export type GameShape =
   | 'book'
   | 'page'
   | 'desk'
-  | 'radio'
   | 'map'
-  | 'baskets';
+  | 'lesson';
 
 export type SkillArea = 'phonics' | 'letters' | 'vocabulary' | 'reading' | 'listening';
 
@@ -72,6 +70,13 @@ export interface GameDef<TRound = never> {
   /** built once per play so rounds never repeat within a session */
   makeRounds: (opts: { grade: GradeLevel; difficulty: Difficulty; count: number }) => TRound[];
   Play: React.FC<{ round: TRound; api: GameApi }>;
+  /**
+   * Set when this is one of the curriculum's guided lessons rather than a
+   * game (see engine/lessons.tsx). Its rounds are the lesson's fixed
+   * questions, so there is no difficulty to choose; it earns the lesson's own
+   * stars and points, and finishing it marks the lesson done.
+   */
+  lesson?: { id: string; skillId: string; stars: number; points: number };
 }
 
 /** Registry entry with the round type erased. */

@@ -10,7 +10,7 @@ export interface Sticker {
 }
 
 export const STICKERS: Sticker[] = [
-  { id: 'magnifier', emoji: '🔎', name: 'Sound Detective', line: 'Official detective badge. Wear it proudly.' },
+  { id: 'magnifier', emoji: '🔎', name: 'Letter Detective', line: 'Official detective badge. Wear it proudly.' },
   { id: 'jar', emoji: '🫙', name: 'Letter Jar', line: 'Every letter safely home. Good.' },
   { id: 'bubble', emoji: '🫧', name: 'Bubble Popper', line: 'Soapy, sparkly, earned.' },
   { id: 'cookie', emoji: '🍪', name: "Luna's Snack", line: 'I saved you half. Mostly.' },

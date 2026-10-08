@@ -1,143 +1,57 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import type { SoundToLetterQuestion } from '../../../types/reading';
+import type { GameApi } from '../engine/types';
+import { shuffle } from '../engine/content';
 import { soundManager } from '../../../utils/audio';
 import { pronunciation } from '../../../utils/pronunciation';
-import { Button } from '../../../components/ui/Button';
-import { SpeakerIcon, CheckIcon, SparklesIcon, LightbulbIcon } from '../../../components/ui/Icons';
-import { shuffle } from '../engine/content';
-import './SoundToLetterMatch.scss';
+import { ListenCue, PromptChip } from './LessonKit';
+import { useAnswer, usePrompt } from './lessonHooks';
 
-interface SoundToLetterMatchProps {
-  question: SoundToLetterQuestion;
-  onCorrectAnswer: () => void;
-}
-
-export const SoundToLetterMatch: React.FC<SoundToLetterMatchProps> = ({
+/** Hear a sound, find the letter that makes it. The sound is never written. */
+export const SoundToLetterMatch: React.FC<{ question: SoundToLetterQuestion; api: GameApi }> = ({
   question,
-  onCorrectAnswer
+  api
 }) => {
-  // The written order always put the answer first, which a child learns fast.
   const options = useMemo(() => shuffle(question.options), [question.options]);
-  const [selectedOptionId, setSelectedOptionId] = useState<string | null>(null);
-  const [isCorrect, setIsCorrect] = useState(false);
-  const [showHint, setShowHint] = useState(false);
+  const { solved, wrongId, choose } = useAnswer(api, question.hint);
 
-  // The written prompt never names the sound; only the spoken one does.
+  // the written prompt never names the sound; only the spoken one does
   const sayPrompt = () => {
-    if (question.speechPrompt) {
-      soundManager.speak(question.speechPrompt);
-    } else {
-      pronunciation.speakSequence([
-        { text: 'What letter makes the sound' },
-        { sound: question.targetLetter }
-      ]);
-    }
+    if (question.speechPrompt) soundManager.speak(question.speechPrompt);
+    else pronunciation.speakSequence([{ text: 'What letter makes the sound' }, { sound: question.targetLetter }]);
   };
-
-  useEffect(() => {
-    sayPrompt();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [question.speechPrompt, question.targetLetter]);
-
-  const playTargetSound = () => {
-    soundManager.playLetterTap();
-    pronunciation.speakLetterSound(question.targetLetter);
-  };
-
-  const handleSelectOption = (optionId: string, letter: string, isOptCorrect: boolean) => {
-    if (isCorrect) return;
-    setSelectedOptionId(optionId);
-    pronunciation.speakSequence([{ text: 'Letter' }, { name: letter }]);
-
-    if (isOptCorrect) {
-      setIsCorrect(true);
-      soundManager.playCorrect();
-    } else {
-      soundManager.playTryAgain();
-    }
-  };
+  usePrompt(sayPrompt);
 
   return (
-    <div className="sound-match-container">
-      <div className="sound-cue-card">
-        <button
-          onClick={playTargetSound}
-          className="big-sound-circle-btn"
-          title="Tap to hear sound"
-        >
-          <span className="sound-speaker-icon">
-            <SpeakerIcon size={44} color="#FFFFFF" />
-          </span>
-          {/* heard, never shown: a written /b/ would name the letter */}
-          <span className="sound-phoneme-text" aria-hidden="true">?</span>
-          <span className="sound-tap-hint">Tap to listen</span>
-        </button>
+    <div className="lesson">
+      <ListenCue
+        answer={solved ? question.targetLetter : null}
+        onClick={() => {
+          soundManager.playLetterTap();
+          pronunciation.speakLetterSound(question.targetLetter);
+        }}
+      />
+      <PromptChip text={question.prompt} onClick={sayPrompt} />
 
-        <button
-          onClick={sayPrompt}
-          className="prompt-pill-btn"
-        >
-          <SpeakerIcon size={16} />
-          <span>{question.prompt}</span>
-        </button>
-      </div>
-
-      <div className="letter-options-grid">
-        {options.map((option) => {
-          const isSelected = selectedOptionId === option.id;
-          const isOptionSuccess = isSelected && option.isCorrect;
-          const isOptionWrong = isSelected && !option.isCorrect;
-
-          return (
-            <button
-              key={option.id}
-              onClick={() => handleSelectOption(option.id, option.letter, option.isCorrect)}
-              disabled={isCorrect}
-              className={`letter-card-btn ${isOptionSuccess ? 'correct' : ''} ${isOptionWrong ? 'wrong' : ''}`}
-            >
-              <span className="letter-char">{option.letter}</span>
-              {isOptionSuccess && (
-                <span className="match-pill">Correct! ✨</span>
-              )}
-            </button>
-          );
-        })}
-      </div>
-
-      {isCorrect && (
-        <div className="sound-match-success-banner">
-          <div className="success-content">
-            <SparklesIcon size={24} color="#059669" />
-            <span>Awesome ears! Letter {question.targetLetter} makes {question.targetSoundName}!</span>
-          </div>
-          <Button
-            variant="success"
-            size="lg"
-            onClick={onCorrectAnswer}
-            style={{ minWidth: '180px' }}
-          >
-            <span>Next Question</span>
-            <CheckIcon size={20} />
-          </Button>
-        </div>
-      )}
-
-      {!isCorrect && question.hint && (
-        <div className="sound-match-hint-area">
-          {/* hints are spoken, never written: on screen they would name the answer */}
+      <div className="lesson-choices">
+        {options.map(option => (
           <button
-            onClick={() => {
-              soundManager.playPop();
-              setShowHint(true);
-              soundManager.speak(question.hint || '');
-            }}
-            className="hint-btn"
+            key={option.id}
+            className={`lesson-choice ${wrongId === option.id ? 'is-wrong' : ''} ${
+              solved && option.isCorrect ? 'is-right' : ''
+            }`}
+            disabled={solved}
+            onClick={() =>
+              choose(option.id, option.isCorrect, onEnd =>
+                pronunciation.speakSequence([{ text: 'Letter' }, { name: option.letter }], { onEnd })
+              )
+            }
+            aria-label={`letter ${option.letter}`}
           >
-            <LightbulbIcon size={14} color="#059669" />
-            <span>{showHint ? 'Hear the hint again' : 'Need a hint?'}</span>
+            <span className="choice-letter">{option.letter}</span>
           </button>
-        </div>
-      )}
+        ))}
+      </div>
     </div>
   );
 };

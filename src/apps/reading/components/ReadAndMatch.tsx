@@ -1,139 +1,64 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import type { ReadAndMatchQuestion } from '../../../types/reading';
+import type { GameApi } from '../engine/types';
+import { shuffle } from '../engine/content';
 import { soundManager } from '../../../utils/audio';
 import { pronunciation } from '../../../utils/pronunciation';
-import { Button } from '../../../components/ui/Button';
-import { SpeakerIcon, CheckIcon, SparklesIcon, LightbulbIcon } from '../../../components/ui/Icons';
-import { shuffle } from '../engine/content';
-import './ReadAndMatch.scss';
+import { PromptChip } from './LessonKit';
+import { useAnswer, usePrompt } from './lessonHooks';
 
-interface ReadAndMatchProps {
-  question: ReadAndMatchQuestion;
-  onCorrectAnswer: () => void;
-}
-
-export const ReadAndMatch: React.FC<ReadAndMatchProps> = ({
-  question,
-  onCorrectAnswer
-}) => {
-  // The written order always put the answer first, which a child learns fast.
+/** Read a word, find its picture. */
+export const ReadAndMatch: React.FC<{ question: ReadAndMatchQuestion; api: GameApi }> = ({ question, api }) => {
   const options = useMemo(() => shuffle(question.options), [question.options]);
-  const [selectedOptionId, setSelectedOptionId] = useState<string | null>(null);
-  const [isCorrect, setIsCorrect] = useState(false);
-  const [showHint, setShowHint] = useState(false);
+  const { solved, wrongId, choose } = useAnswer(api, question.hint);
 
-  useEffect(() => {
-    if (question.speechPrompt) {
-      soundManager.speak(question.speechPrompt);
-    } else {
-      pronunciation.speakSequence([{ text: 'Read the word' }, { word: question.word }]);
-    }
-  }, [question.speechPrompt, question.word]);
-
-  const playWord = () => {
-    soundManager.playPop();
-    pronunciation.speakWord(question.word);
+  const sayPrompt = () => {
+    if (question.speechPrompt) soundManager.speak(question.speechPrompt);
+    else pronunciation.speakSequence([{ text: 'Read the word' }, { word: question.word }]);
   };
-
-  const handleSelectOption = (optionId: string, isOptCorrect: boolean, text: string) => {
-    if (isCorrect) return;
-    setSelectedOptionId(optionId);
-    soundManager.speak(text);
-
-    if (isOptCorrect) {
-      setIsCorrect(true);
-      soundManager.playCorrect();
-    } else {
-      soundManager.playTryAgain();
-    }
-  };
+  usePrompt(sayPrompt);
 
   return (
-    <div className="read-match-container">
-      <div className="target-word-hero">
-        <button
-          onClick={playWord}
-          className="word-hero-box"
-          title="Tap to hear word"
-        >
-          <span className="big-word-text">{question.word.toUpperCase()}</span>
-          {question.phonemes && question.phonemes.length > 0 && (
-            <div className="phonemes-list">
-              {question.phonemes.map((ph, idx) => (
-                <span key={idx} className="phoneme-tag">{ph}</span>
-              ))}
-            </div>
-          )}
-          <span className="tap-hint">Tap to listen</span>
-        </button>
+    <div className="lesson">
+      <button
+        className="lesson-card is-button"
+        onClick={() => {
+          soundManager.playPop();
+          pronunciation.speakWord(question.word);
+        }}
+        title="Hear the word"
+      >
+        <span className="card-word">{question.word.toUpperCase()}</span>
+        {question.phonemes && question.phonemes.length > 0 && (
+          <span className="lesson-phonemes">
+            {question.phonemes.map((ph, i) => (
+              <span key={i}>{ph}</span>
+            ))}
+          </span>
+        )}
+        <span className="card-tap">tap to listen</span>
+      </button>
+      <PromptChip text={question.prompt} onClick={sayPrompt} />
 
-        <button
-          onClick={() => soundManager.speak(question.prompt)}
-          className="prompt-pill-btn"
-        >
-          <SpeakerIcon size={16} />
-          <span>{question.prompt}</span>
-        </button>
-      </div>
-
-      <div className="match-options-grid">
-        {options.map((option) => {
-          const isSelected = selectedOptionId === option.id;
-          const isOptionSuccess = isSelected && option.isCorrect;
-          const isOptionWrong = isSelected && !option.isCorrect;
-
-          return (
-            <button
-              key={option.id}
-              onClick={() => handleSelectOption(option.id, option.isCorrect, option.text)}
-              disabled={isCorrect}
-              className={`match-option-card ${isOptionSuccess ? 'correct' : ''} ${isOptionWrong ? 'wrong' : ''}`}
-            >
-              <span className="opt-emoji">{option.imageEmoji}</span>
-              {/* a written label would let the word be matched letter for letter */}
-              {(!option.imageEmoji || isCorrect) && <span className="opt-label">{option.text}</span>}
-              {isOptionSuccess && (
-                <span className="matched-tag">Matches! ✨</span>
-              )}
-            </button>
-          );
-        })}
-      </div>
-
-      {isCorrect && (
-        <div className="read-match-success-banner">
-          <div className="success-content">
-            <SparklesIcon size={24} color="#059669" />
-            <span>Spot on! That's the matching picture for "${question.word.toUpperCase()}"! 🎉</span>
-          </div>
-          <Button
-            variant="success"
-            size="lg"
-            onClick={onCorrectAnswer}
-            style={{ minWidth: '180px' }}
-          >
-            <span>Next Question</span>
-            <CheckIcon size={20} />
-          </Button>
-        </div>
-      )}
-
-      {!isCorrect && question.hint && (
-        <div className="read-match-hint-area">
-          {/* hints are spoken, never written: on screen they would name the answer */}
+      <div className="lesson-choices">
+        {options.map(option => (
           <button
-            onClick={() => {
-              soundManager.playPop();
-              setShowHint(true);
-              soundManager.speak(question.hint || '');
-            }}
-            className="hint-btn"
+            key={option.id}
+            className={`lesson-choice ${wrongId === option.id ? 'is-wrong' : ''} ${
+              solved && option.isCorrect ? 'is-right' : ''
+            }`}
+            disabled={solved}
+            onClick={() =>
+              choose(option.id, option.isCorrect, onEnd => pronunciation.speakText(option.text, { onEnd }))
+            }
+            aria-label={option.text}
           >
-            <LightbulbIcon size={14} color="#059669" />
-            <span>{showHint ? 'Hear the hint again' : 'Need a hint?'}</span>
+            <span className="choice-emoji">{option.imageEmoji}</span>
+            {/* named once found: written, it would be matched to the word letter for letter */}
+            {solved && <span className="choice-label">{option.text}</span>}
           </button>
-        </div>
-      )}
+        ))}
+      </div>
     </div>
   );
 };

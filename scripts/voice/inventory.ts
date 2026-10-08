@@ -35,6 +35,7 @@ import * as content from '../../src/apps/reading/engine/content';
 import * as luna from '../../src/apps/reading/engine/luna';
 import { STICKERS } from '../../src/apps/reading/engine/stickers';
 import { GAMES } from '../../src/apps/reading/games';
+import { lessonsFor } from '../../src/apps/reading/engine/lessons';
 
 export { RATE_BUCKETS, RATE_BUCKET_NAMES, keyOf, speedFor };
 export type { ClipKind, RateBucket };
@@ -368,8 +369,9 @@ export function buildInventory(): Clip[] {
   for (const text of LITERAL_PROMPTS) prose.add(text);
   // a sticker's line is said when it is won and when it is tapped in the tin
   for (const sticker of STICKERS) prose.add(sticker.line);
-  // every game opens with Luna saying its mission
+  // every game and lesson opens with Luna saying its mission
   for (const game of GAMES) prose.add(game.mission);
+  for (const grade of GRADES) for (const lesson of lessonsFor(grade.id)) prose.add(lesson.mission);
 
   // every literal at a speak*() call site, read straight from the source
   harvestSourceLiterals(out);

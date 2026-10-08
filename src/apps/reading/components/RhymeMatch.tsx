@@ -1,154 +1,57 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import type { RhymeMatchQuestion } from '../../../types/reading';
+import type { GameApi } from '../engine/types';
+import { shuffle } from '../engine/content';
 import { soundManager } from '../../../utils/audio';
 import { pronunciation } from '../../../utils/pronunciation';
-import { Button } from '../../../components/ui/Button';
-import { SpeakerIcon, CheckIcon, SparklesIcon, LightbulbIcon } from '../../../components/ui/Icons';
-import { shuffle } from '../engine/content';
-import './RhymeMatch.scss';
+import { PromptChip } from './LessonKit';
+import { useAnswer, usePrompt } from './lessonHooks';
 
-interface RhymeMatchProps {
-  question: RhymeMatchQuestion;
-  onCorrectAnswer: () => void;
-}
-
-export const RhymeMatch: React.FC<RhymeMatchProps> = ({
-  question,
-  onCorrectAnswer
-}) => {
-  // The written order always put the answer first, which a child learns fast.
+/**
+ * Which picture rhymes? Rhyme is heard: the choices are pictures, named once
+ * found, because written "hat" is just matched to "cat" by its last letters.
+ */
+export const RhymeMatch: React.FC<{ question: RhymeMatchQuestion; api: GameApi }> = ({ question, api }) => {
   const options = useMemo(() => shuffle(question.options), [question.options]);
-  const [selectedWord, setSelectedWord] = useState<string | null>(null);
-  const [isCorrect, setIsCorrect] = useState(false);
-  const [showHint, setShowHint] = useState(false);
+  const { solved, wrongId, choose } = useAnswer(api, question.hint);
 
-  useEffect(() => {
-    if (question.speechPrompt) {
-      soundManager.speak(question.speechPrompt);
-    }
-  }, [question.speechPrompt]);
-
-  const handleSelectOption = (word: string, isRhyme: boolean) => {
-    if (isCorrect) return;
-    setSelectedWord(word);
-    pronunciation.speakWord(word);
-
-    if (isRhyme) {
-      setIsCorrect(true);
-      soundManager.playCorrect();
-    } else {
-      soundManager.playTryAgain();
-    }
-  };
+  const sayPrompt = () => soundManager.speak(question.speechPrompt ?? question.prompt);
+  usePrompt(sayPrompt);
 
   return (
-    <div className="rhyme-match-container">
-      {/* Target Rhyme Word Card */}
-      <div className="target-rhyme-card">
-        <button
-          onClick={() => pronunciation.speakWord(question.targetWord)}
-          className="big-rhyme-box"
-          title="Tap to hear word"
-        >
-          <span className="rhyme-emoji">
-            {question.targetEmoji}
-          </span>
-          <span className="rhyme-word">
-            {question.targetWord}
-          </span>
-        </button>
+    <div className="lesson">
+      <button
+        className="lesson-card is-button"
+        onClick={() => {
+          soundManager.playPop();
+          pronunciation.speakWord(question.targetWord);
+        }}
+        title="Hear the word"
+      >
+        <span className="card-emoji">{question.targetEmoji}</span>
+        <span className="card-word">{question.targetWord}</span>
+        <span className="card-tap">tap to listen</span>
+      </button>
+      <PromptChip text={question.prompt} onClick={sayPrompt} />
 
-        <button
-          onClick={() => soundManager.speak(question.prompt)}
-          className="prompt-button"
-        >
-          <SpeakerIcon size={18} />
-          <span>{question.prompt}</span>
-        </button>
-      </div>
-
-      {/* Rhyme Options Grid */}
-      <div className="rhyme-options-grid">
-        {options.map(option => {
-          const isSelected = selectedWord === option.word;
-          const isOptionSuccess = isSelected && option.isRhyme;
-          const isOptionWrong = isSelected && !option.isRhyme;
-
-          return (
-            <button
-              key={option.word}
-              onClick={() => handleSelectOption(option.word, option.isRhyme)}
-              disabled={isCorrect}
-              className={`rhyme-card-btn ${isOptionSuccess ? 'correct' : ''} ${isOptionWrong ? 'wrong' : ''}`}
-            >
-              <span className="opt-emoji">
-                {option.emoji}
-              </span>
-              {/* rhyme is heard: written, "hat" would just be matched to "cat" by its last letters */}
-              {isCorrect && (
-                <span className="opt-word">
-                  {option.word}
-                </span>
-              )}
-              {isOptionSuccess && (
-                <span className="opt-rhyme-pill">
-                  Rhymes! 🎵
-                </span>
-              )}
-            </button>
-          );
-        })}
-      </div>
-
-      {/* Success Banner */}
-      {isCorrect && (
-        <div className="rhyme-success-banner">
-          <div className="success-text">
-            <SparklesIcon size={22} color="#059669" />
-            <span>Music to my ears! {question.targetWord} rhymes with {selectedWord}!</span>
-          </div>
-          <Button
-            variant="success"
-            size="lg"
-            onClick={onCorrectAnswer}
-            style={{ minWidth: '180px' }}
-          >
-            <span>Next Question</span>
-            <CheckIcon size={20} />
-          </Button>
-        </div>
-      )}
-
-      {/* Hint Area */}
-      {!isCorrect && question.hint && (
-        <div style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
-          {/* hints are spoken, never written: on screen they would name the answer */}
+      <div className="lesson-choices">
+        {options.map(option => (
           <button
-            onClick={() => {
-              soundManager.playPop();
-              setShowHint(true);
-              soundManager.speak(question.hint || '');
-            }}
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '6px',
-              padding: '6px 14px',
-              borderRadius: '9999px',
-              background: '#ECFDF5',
-              border: '1px solid #A7F3D0',
-              color: '#065F46',
-              fontSize: '13px',
-              fontWeight: 700,
-              cursor: 'pointer'
-            }}
+            key={option.word}
+            className={`lesson-choice ${wrongId === option.word ? 'is-wrong' : ''} ${
+              solved && option.isRhyme ? 'is-right' : ''
+            }`}
+            disabled={solved}
+            onClick={() =>
+              choose(option.word, option.isRhyme, onEnd => pronunciation.speakWord(option.word, { onEnd }))
+            }
+            aria-label={option.word}
           >
-            <LightbulbIcon size={14} color="#059669" />
-            <span>{showHint ? 'Hear the hint again' : 'Need a hint?'}</span>
+            <span className="choice-emoji">{option.emoji}</span>
+            {solved && <span className="choice-label">{option.word}</span>}
           </button>
-        </div>
-      )}
+        ))}
+      </div>
     </div>
   );
 };
-

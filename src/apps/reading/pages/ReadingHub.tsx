@@ -1,8 +1,8 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import type { GradeLevel, Lesson } from '../../../types/reading';
+import type { GradeLevel } from '../../../types/reading';
 import type { UserProgress } from '../../../types/user';
 import type { AnyGameDef, GameShape } from '../engine/types';
-import { GRADES, READING_CURRICULUM } from '../../../data/readingCurriculum';
+import { GRADES } from '../../../data/readingCurriculum';
 import { GAMES } from '../games';
 import { LunaOwl } from '../engine/LunaOwl';
 import { greeting, lunaSay, maybeQuirk, type LunaMood } from '../engine/luna';
@@ -16,13 +16,14 @@ import './ReadingHub.scss';
 interface ReadingHubProps {
   grade: GradeLevel;
   progress: UserProgress;
+  /** this grade's guided lessons, in teaching order (engine/lessons.ts) */
+  lessons: AnyGameDef[];
   onPlayGame: (game: AnyGameDef) => void;
   onSurprise: () => void;
   onChangeGrade: () => void;
-  onOpenLesson: (lesson: Lesson) => void;
 }
 
-/** Painted spines for the reading shelf, cycled so no two neighbours match. */
+/** Painted spines for the lesson books, cycled so no two neighbours match. */
 const SPINE_COLORS = ['#E4572E', '#4AA05A', '#4FA8D8', '#7C3AED', '#C97B12', '#B2566E'];
 
 /** Each shape gets its own little piece of scenery inside the tile. */
@@ -70,28 +71,12 @@ const Scenery: React.FC<{ shape: GameShape; emoji: string }> = ({ shape, emoji }
           <span className="map-x">✕</span>
         </span>
       );
-    case 'baskets':
-      return (
-        <span className="scenery basket-scenery" aria-hidden="true">
-          <i>🧺</i>
-          <i>🪣</i>
-        </span>
-      );
     case 'desk':
       return (
         <span className="scenery desk-scenery" aria-hidden="true">
           <i>🧦</i>
           <i>🔑</i>
           <i>🍎</i>
-        </span>
-      );
-    case 'radio':
-      return (
-        <span className="scenery radio-scenery" aria-hidden="true">
-          <i />
-          <i />
-          <i />
-          <i />
         </span>
       );
     case 'book':
@@ -118,11 +103,13 @@ const Scenery: React.FC<{ shape: GameShape; emoji: string }> = ({ shape, emoji }
           <i>big</i>
         </span>
       );
-    default:
+    case 'lesson':
+      // an exercise book: a painted spine and ruled lines, the lesson's picture faint on the page
       return (
-        <span className="scenery scene-scenery" aria-hidden="true">
-          <span className="scene-lamp">{emoji}</span>
-          <span className="scene-rug" />
+        <span className="scenery lesson-scenery" aria-hidden="true">
+          <span className="lesson-spine" />
+          <span className="lesson-lines" />
+          <span className="lesson-mark">{emoji}</span>
         </span>
       );
   }
@@ -131,20 +118,17 @@ const Scenery: React.FC<{ shape: GameShape; emoji: string }> = ({ shape, emoji }
 export const ReadingHub: React.FC<ReadingHubProps> = ({
   grade,
   progress,
+  lessons,
   onPlayGame,
   onSurprise,
-  onChangeGrade,
-  onOpenLesson
+  onChangeGrade
 }) => {
   const gradeInfo = GRADES.find(g => g.id === grade) || GRADES[0];
-  const lessons = useMemo(() => (READING_CURRICULUM[grade] || []).flatMap(s => s.lessons), [grade]);
 
   const [line, setLine] = useState(() => greeting());
   const wordOfTheDay = useMemo(() => pick(wordsUpTo(tierFor(grade, 2))), [grade]);
   const [mood, setMood] = useState<LunaMood>('happy');
   const [talking, setTalking] = useState(false);
-
-  const totalPlays = Object.values(progress.gamePlays || {}).reduce((a, b) => a + b, 0);
 
   // Get Luna's voice ready for this grade while the child is still choosing.
   useEffect(() => warmReadingVoice(grade), [grade]);
@@ -224,6 +208,47 @@ export const ReadingHub: React.FC<ReadingHubProps> = ({
           </button>
         </div>
       </header>
+
+      {/* ---- the lessons come first: the structured teaching, in order ---- */}
+      {lessons.length > 0 && (
+        <section className="hub-lessons">
+          <h2 className="rug-heading">
+            <span>Luna’s Lessons</span>
+            <small>
+              {lessons.length} lessons for {gradeInfo.title} — start with the first
+            </small>
+          </h2>
+
+          <div className="lesson-yard">
+            {lessons.map((lesson, i) => {
+              const done = lesson.lesson ? progress.completedLessons.includes(lesson.lesson.id) : false;
+              return (
+                <button
+                  key={lesson.id}
+                  className={`game-thing shape-lesson skill-${lesson.skill} ${done ? 'is-done' : ''}`}
+                  style={{ '--spine': SPINE_COLORS[i % SPINE_COLORS.length] } as React.CSSProperties}
+                  onClick={() => startGame(lesson)}
+                >
+                  <Scenery shape={lesson.shape} emoji={lesson.emoji} />
+
+                  <span className="thing-body">
+                    <span className="thing-kicker">Lesson {i + 1}</span>
+                    <span className="thing-emoji">{lesson.emoji}</span>
+                    <span className="thing-title">{lesson.title}</span>
+                    <span className="thing-tagline">{lesson.tagline}</span>
+                  </span>
+
+                  {done && (
+                    <span className="lesson-done" title="Finished">
+                      ✓ done
+                    </span>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        </section>
+      )}
 
       {/* ---- the play rug: every game is an object, not a card ---- */}
       <section className="hub-rug">
@@ -307,39 +332,11 @@ export const ReadingHub: React.FC<ReadingHubProps> = ({
           })}
         </div>
 
-        {totalPlays === 0 && <p className="tin-note">Finish any game to peel your first sticker.</p>}
+        {progress.stickers.length === 0 && (
+          <p className="tin-note">Finish any lesson or game to peel your first sticker.</p>
+        )}
       </section>
 
-      {/* ---- the old curriculum, kept as Luna's reading shelf ---- */}
-      {lessons.length > 0 && (
-        <section className="hub-bookshelf">
-          <h2 className="shelf-heading">Luna’s Reading Shelf</h2>
-          <p className="shelf-note">Longer guided lessons for {gradeInfo.title}.</p>
-
-          <div className="shelf-books">
-            {lessons.map((lesson, i) => {
-              const done = progress.completedLessons.includes(lesson.id);
-              return (
-                <button
-                  key={lesson.id}
-                  className={`book-spine ${done ? 'is-read' : ''}`}
-                  style={{ '--spine': SPINE_COLORS[i % SPINE_COLORS.length] } as React.CSSProperties}
-                  onClick={() => {
-                    soundManager.playPop();
-                    onOpenLesson(lesson);
-                  }}
-                  title={lesson.description}
-                >
-                  <span className="spine-emoji">{lesson.icon}</span>
-                  <span className="spine-title">{lesson.title}</span>
-                  {done && <span className="spine-mark">✓</span>}
-                </button>
-              );
-            })}
-          </div>
-          <div className="shelf-plank" aria-hidden="true" />
-        </section>
-      )}
     </div>
   );
 };

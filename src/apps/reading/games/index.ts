@@ -1,14 +1,11 @@
 import type { AnyGameDef } from '../engine/types';
-import { soundDetective } from './SoundDetective';
 import { letterHunt } from './LetterHunt';
 import { bubbleSounds } from './BubbleSounds';
 import { feedLuna } from './FeedLuna';
 import { memoryMatch } from './MemoryMatch';
 import { buildSentence } from './BuildSentence';
 import { whatsMissing } from './WhatsMissing';
-import { lunaSays } from './LunaSays';
 import { treasureRead } from './TreasureRead';
-import { sortingBaskets } from './SortingBaskets';
 import { storyTime } from './StoryTime';
 import './games.scss';
 
@@ -17,16 +14,13 @@ import './games.scss';
  * entry here — the hub, the shell and Surprise Me all read from this list.
  */
 export const GAMES: AnyGameDef[] = [
-  soundDetective,
   letterHunt,
   bubbleSounds,
   feedLuna,
   memoryMatch,
   buildSentence,
   whatsMissing,
-  lunaSays,
   treasureRead,
-  sortingBaskets,
   storyTime
 ];
 

@@ -140,7 +140,9 @@ class StorageService {
     lessonId: string,
     starsEarned: number,
     pointsEarned: number,
-    skillId: string
+    skillId: string,
+    /** lessons run in the game shell, so finishing one can peel a sticker too */
+    stickerId?: string | null
   ): { isFirstCompletion: boolean; newAchievements: string[] } {
     const isFirstCompletion = !this.progress.completedLessons.includes(lessonId);
 
@@ -164,9 +166,14 @@ class StorageService {
       totalStars
     );
 
+    const stickers = stickerId && !this.progress.stickers.includes(stickerId)
+      ? [...this.progress.stickers, stickerId]
+      : this.progress.stickers;
+
     this.progress = {
       ...this.progress,
       completedLessons: updatedCompleted,
+      stickers,
       totalStars,
       totalPoints,
       skillMastery: updatedMastery,

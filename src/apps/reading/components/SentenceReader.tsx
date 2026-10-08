@@ -1,167 +1,83 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import type { SentenceComprehensionQuestion } from '../../../types/reading';
+import type { GameApi } from '../engine/types';
+import { shuffle } from '../engine/content';
 import { soundManager } from '../../../utils/audio';
 import { pronunciation } from '../../../utils/pronunciation';
-import { Button } from '../../../components/ui/Button';
-import { SpeakerIcon, CheckIcon, SparklesIcon, LightbulbIcon } from '../../../components/ui/Icons';
-import { shuffle } from '../engine/content';
-import './SentenceReader.scss';
+import { PromptChip } from './LessonKit';
+import { useAnswer, usePrompt } from './lessonHooks';
 
-interface SentenceReaderProps {
-  question: SentenceComprehensionQuestion;
-  onCorrectAnswer: () => void;
-}
-
-export const SentenceReader: React.FC<SentenceReaderProps> = ({
+/** Read a sentence, any word of it tappable, and find the picture it describes. */
+export const SentenceReader: React.FC<{ question: SentenceComprehensionQuestion; api: GameApi }> = ({
   question,
-  onCorrectAnswer
+  api
 }) => {
-  // The written order always put the answer first, which a child learns fast.
   const options = useMemo(() => shuffle(question.options), [question.options]);
-  const [selectedOptionId, setSelectedOptionId] = useState<string | null>(null);
-  const [isCorrect, setIsCorrect] = useState(false);
-  const [showHint, setShowHint] = useState(false);
+  const { solved, wrongId, choose } = useAnswer(api, question.hint);
+  const [active, setActive] = useState<number | null>(null);
 
-  useEffect(() => {
-    if (question.speechPrompt) {
-      soundManager.speak(question.speechPrompt);
-    } else {
-      pronunciation.speakSentence(question.sentence);
-    }
-  }, [question.speechPrompt, question.sentence]);
-
-  const handleSelectOption = (optionId: string, isOptCorrect: boolean, text: string) => {
-    if (isCorrect) return;
-    setSelectedOptionId(optionId);
-    soundManager.speak(text);
-
-    if (isOptCorrect) {
-      setIsCorrect(true);
-      soundManager.playCorrect();
-    } else {
-      soundManager.playTryAgain();
-    }
-  };
-
-  const handleReadFullSentence = () => {
-    soundManager.playPop();
-    pronunciation.speakSentence(question.sentence);
-  };
-
-  const handleReadWord = (word: string, e: React.MouseEvent) => {
-    e.stopPropagation();
-    soundManager.playPop();
-    const cleanWord = word.replace(/[.,/#!$%^&*;:{}=\-_`~()?"']/g, '');
-    pronunciation.speakWord(cleanWord);
-  };
+  const sayPrompt = () => soundManager.speak(question.speechPrompt ?? question.prompt);
+  usePrompt(sayPrompt);
 
   const words = question.sentence.split(' ');
+  const keys = new Set((question.highlightWords ?? []).map(w => w.toLowerCase()));
 
   return (
-    <div className="sentence-reader-container">
-      <div className="sentence-display-card">
-        <div className="sentence-prompt-header">
-          <button
-            onClick={() => soundManager.speak(question.prompt)}
-            className="prompt-pill-btn"
-          >
-            <SpeakerIcon size={16} />
-            <span>{question.prompt}</span>
-          </button>
+    <div className="lesson">
+      <PromptChip text={question.prompt} onClick={sayPrompt} />
+
+      <div className="lesson-card">
+        <div className="lesson-sentence">
+          {words.map((word, i) => {
+            // the reader keeps apostrophes; the inventory renders both spellings
+            const clean = word.replace(/[.,/#!$%^&*;:{}=\-_`~()?"']/g, '');
+            return (
+              <button
+                key={`${word}-${i}`}
+                className={`lesson-word-chip ${keys.has(clean.toLowerCase()) ? 'is-key' : ''} ${
+                  active === i ? 'is-active' : ''
+                }`}
+                onClick={() => {
+                  soundManager.playPop();
+                  setActive(i);
+                  pronunciation.speakWord(clean, { onEnd: () => setActive(null) });
+                }}
+              >
+                {word}
+              </button>
+            );
+          })}
         </div>
-
-        <div className="sentence-box">
-          <div className="words-flow">
-            {words.map((word, idx) => {
-              const clean = word.replace(/[.,/#!$%^&*;:{}=\-_`~()?"']/g, '').toLowerCase();
-              const isHighlighted = question.highlightWords?.some(
-                hw => hw.toLowerCase() === clean
-              );
-
-              return (
-                <button
-                  key={`${word}-${idx}`}
-                  onClick={(e) => handleReadWord(word, e)}
-                  className={`word-chip ${isHighlighted ? 'highlighted' : ''}`}
-                  title="Tap to hear word"
-                >
-                  {word}
-                </button>
-              );
-            })}
-          </div>
-
-          <button
-            onClick={handleReadFullSentence}
-            className="read-sentence-btn"
-            title="Read whole sentence"
-          >
-            <SpeakerIcon size={20} />
-            <span>Hear Sentence</span>
-          </button>
-        </div>
+        <button
+          className="lesson-action"
+          onClick={() => {
+            soundManager.playPop();
+            pronunciation.speakSentence(question.sentence);
+          }}
+        >
+          🔊 Hear the sentence
+        </button>
       </div>
 
-      <div className="sentence-options-grid">
-        {options.map((option) => {
-          const isSelected = selectedOptionId === option.id;
-          const isOptionSuccess = isSelected && option.isCorrect;
-          const isOptionWrong = isSelected && !option.isCorrect;
-
-          return (
-            <button
-              key={option.id}
-              onClick={() => handleSelectOption(option.id, option.isCorrect, option.text)}
-              disabled={isCorrect}
-              className={`sentence-option-card ${isOptionSuccess ? 'correct' : ''} ${isOptionWrong ? 'wrong' : ''}`}
-            >
-              {option.imageEmoji && (
-                <span className="option-emoji">{option.imageEmoji}</span>
-              )}
-              {/* a written label repeats the sentence's words, so it waits for the answer */}
-              {(!option.imageEmoji || isCorrect) && <span className="option-label">{option.text}</span>}
-              {isOptionSuccess && (
-                <span className="success-badge">Matches! ✨</span>
-              )}
-            </button>
-          );
-        })}
-      </div>
-
-      {isCorrect && (
-        <div className="sentence-success-banner">
-          <div className="success-content">
-            <SparklesIcon size={22} color="#059669" />
-            <span>Great reading! You understood the sentence! 🎉</span>
-          </div>
-          <Button
-            variant="success"
-            size="lg"
-            onClick={onCorrectAnswer}
-            style={{ minWidth: '180px' }}
-          >
-            <span>Next Question</span>
-            <CheckIcon size={20} />
-          </Button>
-        </div>
-      )}
-
-      {!isCorrect && question.hint && (
-        <div className="sentence-hint-area">
-          {/* hints are spoken, never written: on screen they would name the answer */}
+      <div className="lesson-choices">
+        {options.map(option => (
           <button
-            onClick={() => {
-              soundManager.playPop();
-              setShowHint(true);
-              soundManager.speak(question.hint || '');
-            }}
-            className="hint-btn"
+            key={option.id}
+            className={`lesson-choice ${wrongId === option.id ? 'is-wrong' : ''} ${
+              solved && option.isCorrect ? 'is-right' : ''
+            }`}
+            disabled={solved}
+            onClick={() =>
+              choose(option.id, option.isCorrect, onEnd => pronunciation.speakText(option.text, { onEnd }))
+            }
+            aria-label={option.text}
           >
-            <LightbulbIcon size={14} color="#059669" />
-            <span>{showHint ? 'Hear the hint again' : 'Need a hint?'}</span>
+            {option.imageEmoji ? <span className="choice-emoji">{option.imageEmoji}</span> : null}
+            {/* a written label repeats the sentence's words, so it waits for the answer */}
+            {(solved || !option.imageEmoji) && <span className="choice-label">{option.text}</span>}
           </button>
-        </div>
-      )}
+        ))}
+      </div>
     </div>
   );
 };

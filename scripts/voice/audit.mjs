@@ -39,6 +39,7 @@ export * as content from '../src/apps/reading/engine/content';
 export * as luna from '../src/apps/reading/engine/luna';
 export { LETTER_PHONICS, TEAM_PHONICS } from '../src/utils/phonics';
 export { GAMES } from '../src/apps/reading/games';
+export { lessonsFor } from '../src/apps/reading/engine/lessons';
 export { STICKERS } from '../src/apps/reading/engine/stickers';
 TS`]);
 bundle(ENTRY, '_audit-entry.mjs');
@@ -69,7 +70,7 @@ globalThis.fetch = async url => {
 };
 
 const mod = await import(`${join(tmp, '_audit-entry.mjs')}?v=${Date.now()}`);
-const { pronunciation, content, curriculum, luna, LETTER_PHONICS, TEAM_PHONICS, GAMES, STICKERS } = mod;
+const { pronunciation, content, curriculum, luna, LETTER_PHONICS, TEAM_PHONICS, GAMES, STICKERS, lessonsFor } = mod;
 
 // --- the one mistake this audit cannot catch by running things ---
 //
@@ -178,8 +179,11 @@ for (const sticker of STICKERS) {
   }
 }
 
-// every game opens with its mission
-for (const game of GAMES) push(game.mission, o => pronunciation.speakText(game.mission.replace(/[…]/g, '...'), o));
+// every game and lesson opens with its mission
+const LESSONS = curriculum.GRADES.flatMap(g => lessonsFor(g.id));
+for (const game of [...GAMES, ...LESSONS]) {
+  push(game.mission, o => pronunciation.speakText(game.mission.replace(/[…]/g, '...'), o));
+}
 
 // Every spoken part a game keeps in its rounds — cues, prompts, hints — found
 // by playing each game many times at every grade and difficulty. Rounds are

@@ -22,8 +22,8 @@ src/
   apps/reading/
     engine/        game shell, content bank, Luna's character and dialogue
     games/         one file per mini-game
-    components/    the original guided-lesson activity components
-    pages/         library hub, grade select, lesson player
+    components/    the guided lessons' question screens (one per question type)
+    pages/         library hub, grade select
   components/os/   tablet shell: status bar, app window, settings, trophies
   utils/           audio (sound effects), pronunciation (speech), phonics, storage
   data/            the guided reading curriculum
@@ -75,6 +75,19 @@ api.miss({ hint: [{ text: 'Listen for' }, { sound: 'M' }, { text: 'like' }, { wo
 
 Content comes from one bank (`engine/content.ts`) at three difficulty tiers, so
 adding a word or sentence there reaches every game at once.
+
+### Lessons
+
+The guided lessons in `data/readingCurriculum.ts` are the structured teaching,
+so they sit at the top of the library, numbered in the order they are taught,
+with the games below. They run in the same `GameShell` as the games:
+`engine/lessons.ts` turns each lesson into a `GameDef` whose rounds are its fixed
+questions, and `components/LessonRound.tsx` shows each question type. A lesson
+therefore gets Luna, spoken hints, "Again", stickers and the reward screen like
+any game, with no difficulty to choose; its `lesson` field makes it earn the
+curriculum's stars and marks it done in the child's progress. A new lesson is
+data only. A new question type is one screen in `components/`, built from
+`LessonKit.tsx` and `lessonHooks.ts`, plus a case in `LessonRound`.
 
 ## Speech and phonics
 

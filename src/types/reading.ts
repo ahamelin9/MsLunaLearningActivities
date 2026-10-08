@@ -14,15 +14,12 @@ export interface GradeInfo {
 export type QuestionType =
   | 'sound-to-letter'
   | 'find-letter'
-  | 'letter-sound'
   | 'blend-and-read'
   | 'read-and-match'
   | 'sight-word-reader'
   | 'sentence-comprehension'
   | 'rhyme-match'
-  | 'story-read'
-  | 'build-word'
-  | 'sentence-build';
+  | 'story-read';
 
 export interface BaseQuestion {
   id: string;
@@ -50,20 +47,6 @@ export interface FindLetterQuestion extends BaseQuestion {
   options: {
     id: string;
     letter: string;
-    isCorrect: boolean;
-  }[];
-}
-
-export interface LetterSoundQuestion extends BaseQuestion {
-  type: 'letter-sound';
-  letter: string;
-  soundName: string;
-  targetWord: string;
-  imageEmoji: string;
-  options: {
-    id: string;
-    text: string;
-    imageEmoji?: string;
     isCorrect: boolean;
   }[];
 }
@@ -150,35 +133,15 @@ export interface StoryReadQuestion extends BaseQuestion {
   };
 }
 
-export interface SentenceBuildQuestion extends BaseQuestion {
-  type: 'sentence-build';
-  targetSentence: string;
-  scrambledWords: string[];
-  distractorWords?: string[];
-  imageEmoji: string;
-}
-
-export interface BuildWordQuestion extends BaseQuestion {
-  type: 'build-word';
-  word: string;
-  imageEmoji: string;
-  letters: string[];
-  distractors: string[];
-  phonemes?: string[];
-}
-
 export type LessonQuestion =
   | SoundToLetterQuestion
   | FindLetterQuestion
-  | LetterSoundQuestion
   | BlendAndReadQuestion
   | ReadAndMatchQuestion
   | SightWordReaderQuestion
   | SentenceComprehensionQuestion
   | RhymeMatchQuestion
-  | StoryReadQuestion
-  | SentenceBuildQuestion
-  | BuildWordQuestion;
+  | StoryReadQuestion;
 
 export interface ReadingSkill {
   id: string;

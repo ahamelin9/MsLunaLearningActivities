@@ -1,14 +1,13 @@
-import React, { useState } from 'react';
-import type { GradeLevel, Lesson } from '../../types/reading';
+import React, { useMemo, useState } from 'react';
+import type { GradeLevel } from '../../types/reading';
 import type { UserProgress } from '../../types/user';
 import type { AnyGameDef } from './engine/types';
 import type { Difficulty } from './engine/content';
-import { READING_CURRICULUM } from '../../data/readingCurriculum';
 import { storageService } from '../../utils/storage';
 import { GradeSelect } from './pages/GradeSelect';
 import { ReadingHub } from './pages/ReadingHub';
-import { GamePlay } from './pages/GamePlay';
 import { GameShell } from './engine/GameShell';
+import { lessonsFor } from './engine/lessons';
 import { surprisePick } from './games';
 
 interface ReadingAppProps {
@@ -26,10 +25,10 @@ interface ActiveGame {
 
 export const ReadingApp: React.FC<ReadingAppProps> = ({ progress, onGradeChange }) => {
   const [activeGame, setActiveGame] = useState<ActiveGame | null>(null);
-  const [activeLesson, setActiveLesson] = useState<Lesson | null>(null);
   const [isChangingGrade, setIsChangingGrade] = useState(false);
 
   const currentGrade = progress.selectedGrade;
+  const lessons = useMemo(() => (currentGrade ? lessonsFor(currentGrade) : []), [currentGrade]);
 
   const handleSelectGrade = (grade: GradeLevel) => {
     storageService.setGrade(grade);
@@ -50,56 +49,45 @@ export const ReadingApp: React.FC<ReadingAppProps> = ({ progress, onGradeChange 
     });
   };
 
-  const handleNextLesson = () => {
-    if (!currentGrade || !activeLesson) return;
-    const allLessons = (READING_CURRICULUM[currentGrade] || []).flatMap(s => s.lessons);
-    const index = allLessons.findIndex(l => l.id === activeLesson.id);
-    setActiveLesson(index >= 0 && index + 1 < allLessons.length ? allLessons[index + 1] : null);
-  };
+  const play = (game: AnyGameDef) => setActiveGame({ game, autoStart: false, difficulty: 2 });
 
-  // View 1: a mini-game
+  // View 1: a lesson or a mini-game, both run by the same shell
   if (activeGame && currentGrade) {
+    const { game } = activeGame;
+    // a finished lesson leads on to the next one; a game to one Luna picks
+    const nextLesson = game.lesson ? lessons[lessons.findIndex(l => l.id === game.id) + 1] : undefined;
     return (
       <GameShell
-        key={`${activeGame.game.id}-${activeGame.autoStart}-${activeGame.difficulty}`}
-        game={activeGame.game}
+        key={`${game.id}-${activeGame.autoStart}-${activeGame.difficulty}`}
+        game={game}
         grade={currentGrade}
         progress={progress}
         autoStart={activeGame.autoStart}
         startDifficulty={activeGame.difficulty}
         surpriseBanner={activeGame.banner}
         onExit={() => setActiveGame(null)}
-        onPlayAnother={() => handleSurprise(activeGame.game.id)}
+        onPlayAnother={
+          game.lesson ? (nextLesson ? () => play(nextLesson) : undefined) : () => handleSurprise(game.id)
+        }
+        playAnotherLabel={game.lesson ? 'Next lesson' : 'Another game'}
       />
     );
   }
 
-  // View 2: a guided lesson from the original curriculum
-  if (activeLesson) {
-    return (
-      <GamePlay
-        lesson={activeLesson}
-        progress={progress}
-        onExit={() => setActiveLesson(null)}
-        onNextLesson={handleNextLesson}
-      />
-    );
-  }
-
-  // View 3: pick a grade
+  // View 2: pick a grade
   if (!currentGrade || isChangingGrade) {
     return <GradeSelect currentGrade={currentGrade} onSelectGrade={handleSelectGrade} />;
   }
 
-  // View 4: Luna's library
+  // View 3: Luna's library
   return (
     <ReadingHub
       grade={currentGrade}
       progress={progress}
-      onPlayGame={game => setActiveGame({ game, autoStart: false, difficulty: 2 })}
+      lessons={lessons}
+      onPlayGame={play}
       onSurprise={() => handleSurprise()}
       onChangeGrade={() => setIsChangingGrade(true)}
-      onOpenLesson={setActiveLesson}
     />
   );
 };
