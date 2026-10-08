@@ -12,19 +12,22 @@ import {
 } from '../engine/content';
 import { LunaOwl } from '../engine/LunaOwl';
 import { soundManager } from '../../../utils/audio';
-import { pronunciation } from '../../../utils/pronunciation';
+import { pronunciation, type SpeechPart } from '../../../utils/pronunciation';
 
 type Mode = 'toLower' | 'toUpper' | 'bySound' | 'byWord';
 
-type CuePart = { text?: string; sound?: string; name?: string; word?: string };
-
 interface Round {
   mode: Mode;
-  /** what Luna is asking for, shown on her little sign */
-  cue: string;
+  /**
+   * What Luna's sign says. Never the letter, its sound or the word: the child
+   * knows their letters, so any of those would be the answer in writing.
+   */
+  ask: string;
   cueEmoji?: string;
   /** spoken as a sequence so a phoneme stays a phoneme */
-  cueParts: CuePart[];
+  cueParts: SpeechPart[];
+  /** said after a second wrong cookie */
+  hint: SpeechPart[];
   answer: string;
   options: string[];
 }
@@ -54,9 +57,10 @@ function buildRound(tier: 1 | 2 | 3): Round {
     );
     return {
       mode,
-      cue: word.word,
+      ask: 'first letter?',
       cueEmoji: word.emoji,
-      cueParts: [{ text: 'I want the letter that starts' }, { word: word.word }],
+      cueParts: [{ text: 'I want the first letter of' }, { word: word.word }],
+      hint: [{ text: 'Stretch the word.' }, { word: word.word }, { text: 'What is the very first sound?' }],
       answer,
       options: shuffle([answer, ...decoys])
     };
@@ -70,16 +74,21 @@ function buildRound(tier: 1 | 2 | 3): Round {
     );
     return {
       mode,
-      cue: letter.sound,
+      ask: 'the letter for this sound',
       cueParts: [{ text: 'I am hungry for the letter that says' }, { sound: letter.letter }],
+      hint: [{ text: 'Listen again.' }, { sound: letter.letter }, { text: 'Which letter makes that sound?' }],
       answer,
       options: shuffle([answer, ...decoys])
     };
   }
 
+  // Luna names the letter and says which size she wants; the sign does not
+  // show its partner, or the round is just matching two shapes
   const toLower = mode === 'toLower';
-  const cue = toLower ? letter.letter : letter.letter.toLowerCase();
   const answer = toLower ? letter.letter.toLowerCase() : letter.letter;
+  const cueParts: SpeechPart[] = toLower
+    ? [{ text: 'Find the little' }, { name: letter.letter }]
+    : [{ text: 'Find the big' }, { name: letter.letter }];
   const decoys = sample(
     others.map(l => (toLower ? l.letter.toLowerCase() : l.letter)),
     decoyCount
@@ -87,10 +96,9 @@ function buildRound(tier: 1 | 2 | 3): Round {
 
   return {
     mode,
-    cue,
-    cueParts: toLower
-      ? [{ text: 'Find the little' }, { name: letter.letter }, { text: 'that matches this big' }, { name: letter.letter }]
-      : [{ text: 'Find the big' }, { name: letter.letter }, { text: 'that matches this little' }, { name: letter.letter }],
+    ask: toLower ? 'a little letter' : 'a BIG letter',
+    cueParts,
+    hint: [{ text: 'Listen carefully.' }, ...cueParts],
     answer,
     options: shuffle([answer, ...decoys])
   };
@@ -126,7 +134,7 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
       soundManager.playLetterSnap();
       window.setTimeout(() => {
         pronunciation.speakSequence([
-          { text: `Mmm! ${char === char.toLowerCase() ? 'little' : 'big'}` },
+          char === char.toLowerCase() ? { text: 'Mmm! little' } : { text: 'Mmm! big' },
           { name: char }
         ]);
       }, 260);
@@ -134,14 +142,7 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
     } else {
       setSpat(char);
       window.setTimeout(() => setSpat(null), 800);
-      api.miss({
-        hint:
-          round.mode === 'bySound'
-            ? `Say the sound out loud: ${round.cue}. Which letter makes it?`
-            : round.mode === 'byWord'
-              ? `Stretch the word: ${round.cue}. What is the very first sound?`
-              : `Look at the shape of ${round.cue}. Its partner looks almost the same, just a different size.`
-      });
+      api.miss({ hint: round.hint });
     }
   };
 
@@ -208,11 +209,13 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
           {round.cueEmoji ? (
             <span className="sign-picture">
               <span className="sign-emoji">{round.cueEmoji}</span>
-              <span className="sign-word">{round.cue}</span>
-              <span className="sign-hint">first letter?</span>
+              <span className="sign-hint">{round.ask}</span>
             </span>
           ) : (
-            <span className="sign-char">{round.cue}</span>
+            <>
+              <span className="sign-char" aria-hidden="true">?</span>
+              <span className="sign-hint">{round.ask}</span>
+            </>
           )}
           <span className="sign-tap">🔊 tap to hear</span>
         </button>
@@ -259,7 +262,7 @@ export const feedLuna: GameDef<Round> = {
   title: 'Feed Luna the Letter',
   emoji: '🍪',
   tagline: 'She only eats the letter she asked for.',
-  objective: 'Match uppercase to lowercase letters and letters to their sounds.',
+  objective: 'Hear a letter’s name, its sound or a word, then find that letter — big or little.',
   skill: 'letters',
   mission: 'I am SO hungry. Feed me the right letter cookie!',
   roundsPerPlay: 5,

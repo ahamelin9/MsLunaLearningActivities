@@ -665,6 +665,10 @@
 
       &.is-owned {
         cursor: pointer;
+        // the faint colour above is for the empty slot's dot; browsers apply
+        // a colour's transparency to emoji too, so an earned sticker drawn
+        // with it came out washed out, looking as if it had not been won
+        color: $ink;
         background: #FFFFFF;
         border: 2.5px solid $amber;
         box-shadow: 0 3px 6px rgba(58, 42, 31, 0.2);

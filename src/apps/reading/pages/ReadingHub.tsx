@@ -9,6 +9,7 @@ import { greeting, lunaSay, maybeQuirk, type LunaMood } from '../engine/luna';
 import { STICKERS, stickerById } from '../engine/stickers';
 import { pick, tierFor, wordsUpTo } from '../engine/content';
 import { soundManager } from '../../../utils/audio';
+import { pronunciation, type SpeechPart } from '../../../utils/pronunciation';
 import { warmReadingVoice } from '../engine/warmup';
 import './ReadingHub.scss';
 
@@ -148,11 +149,17 @@ export const ReadingHub: React.FC<ReadingHubProps> = ({
   // Get Luna's voice ready for this grade while the child is still choosing.
   useEffect(() => warmReadingVoice(grade), [grade]);
 
-  const say = (text: string, nextMood: LunaMood = 'happy') => {
+  /**
+   * `parts`, when given, is what Luna says in place of `text`: a line built
+   * around a word is said as clips that exist, not as a sentence per word.
+   */
+  const say = (text: string, nextMood: LunaMood = 'happy', parts?: SpeechPart[]) => {
     setLine({ text, mood: nextMood });
     setMood(nextMood);
     setTalking(true);
-    soundManager.speak(text.replace(/[…]/g, '...'), { onEnd: () => setTalking(false) });
+    const onEnd = () => setTalking(false);
+    if (parts) pronunciation.speakSequence(parts, { onEnd });
+    else soundManager.speak(text.replace(/[…]/g, '...'), { onEnd });
     window.setTimeout(() => setTalking(false), 3800);
   };
 
@@ -257,7 +264,9 @@ export const ReadingHub: React.FC<ReadingHubProps> = ({
             className="game-thing nook"
             onClick={() => {
               soundManager.playLetterTap();
-              say(`Today's word is ${wordOfTheDay.word}. ${wordOfTheDay.word}!`, 'happy');
+              const word = wordOfTheDay.word;
+              const shown = `Today's word is ${word}. ${word}!`;
+              say(shown, 'happy', [{ text: 'Today’s word is' }, { word }, { word }]);
             }}
           >
             <span className="nook-kicker">Word of the day</span>

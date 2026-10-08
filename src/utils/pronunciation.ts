@@ -1,23 +1,25 @@
 // Ms. Luna's voice.
 //
 // Two engines sit behind one API:
-//   1. Kokoro-82M, a neural voice that runs entirely on the device
-//      (WebGPU when available, WASM otherwise). No API key, no server,
+//   1. Clips rendered ahead of time by Kokoro-82M (see scripts/voice/) and
+//      served as ordinary audio files. Nothing is synthesised on the child's
+//      device, so a tap makes a sound immediately; no API key, no server,
 //      nothing about the child leaves the browser.
-//   2. The browser's built-in speechSynthesis, used only if Kokoro cannot
-//      load, so the app never goes silent.
+//   2. The browser's built-in speechSynthesis, used only for an utterance
+//      nobody thought to render, so the app never goes silent.
 //
 // The API is deliberately split by educational intent rather than by string:
 // speakLetterName('V') says "vee", speakLetterSound('V') makes the /v/ sound.
 // Callers must choose; nothing here guesses.
 
-import {
-  carrierFor,
-  COMMON_PHONICS_KEYS,
-  ipaFor,
-  letterNameOf,
-  phonicsFor
-} from './phonics';
+import { carrierFor, letterNameOf, phonicsFor } from './phonics';
+import { splitPhonics, type SpeechPart } from './speechParts';
+import { voiceClips } from './voiceClips';
+import { bucketFor, type ClipKind, type RateBucket } from './voiceKeys';
+
+// re-exported: warmup.ts and main.tsx have always imported these from here
+export { splitPhonics };
+export type { SpeechPart };
 
 export type VoiceEngine = 'neural' | 'browser' | 'none';
 
@@ -62,159 +64,23 @@ export const LUNA_VOICES: LunaVoice[] = [
 
 export const DEFAULT_VOICE_ID = 'af_heart';
 
-const DB_NAME = 'ms-luna-audio';
-const DB_STORE = 'clips';
-const MEMORY_CACHE_LIMIT = 240;
-
 
 /**
- * Ordinary sentences often carry a phoneme inside them:
- *   "What letter makes the mmmmm sound?"   "S says /s/."
- * Handing that whole string to a speech engine spells the letters out
- * ("m-m-m-m-m"), so those fragments are pulled out and spoken as real
- * phonemes instead. Everything else stays plain text.
+ * What to play, in the terms the rendered library is indexed by. The kind
+ * carries the educational intent — a 'sound' and a 'name' for the same letter
+ * are different recordings — and the bucket is the child's speed setting.
  */
-export function splitPhonics(text: string): SpeechPart[] {
-  const tokens = text.split(/\s+/).filter(Boolean);
-  const parts: SpeechPart[] = [];
-  let buffer: string[] = [];
-
-  const flush = () => {
-    if (buffer.length) {
-      parts.push({ text: buffer.join(' ') });
-      buffer = [];
-    }
-  };
-
-  for (const token of tokens) {
-    const bare = token.replace(/^[^A-Za-z/]+|[^A-Za-z/]+$/g, '');
-    const lower = bare.toLowerCase();
-    const trailing = bare ? token.slice(token.indexOf(bare) + bare.length) : '';
-
-    // a phoneme written out: /m/ or /sh/
-    const slash = /^\/([a-z]{1,3})\/$/.exec(lower);
-    // a held digraph: shhh, thhh  (checked before the single-letter run)
-    const digraph = /^(sh|ch|th|wh|ng)[hz]*$/.exec(lower);
-    // a held consonant: mmmm, Sssss, ffff
-    const run = /^([a-z])\1{2,}$/.exec(lower);
-
-    const key =
-      (slash && phonicsFor(slash[1]) ? slash[1] : null) ??
-      (digraph && lower.length > 2 && phonicsFor(digraph[1]) ? digraph[1] : null) ??
-      (run && phonicsFor(run[1]) ? run[1] : null);
-
-    if (key) {
-      flush();
-      parts.push({ sound: key });
-      // keep any trailing punctuation with the words that follow
-      if (trailing.trim()) buffer.push(trailing.trim());
-    } else {
-      buffer.push(token);
-    }
-  }
-
-  flush();
-
-  // a fragment of pure punctuation is not worth speaking
-  return parts.filter(p => (p.sound ? true : /[A-Za-z0-9]/.test(p.text ?? '')));
-}
-
-/** One piece of speech, tagged with what kind of sound it is. */
-export interface SpeechPart {
-  text?: string;
-  sound?: string;
-  name?: string;
-  word?: string;
-}
-
-type WorkerOut =
-  | { id: number; type: 'progress'; progress: number }
-  | { id: number; type: 'ready'; device: string; dtype: string }
-  | { id: number; type: 'samples'; samples: Float32Array }
-  | { id: number; type: 'error'; message: string };
-
 interface ClipRequest {
-  /** cache identity */
-  key: string;
-  /** the text is a phonics carrier the neural voice would spell out */
-  neuralUnsafe?: boolean;
-  /** IPA when we know the exact phonemes, otherwise plain text */
-  ipa?: string;
+  kind: ClipKind;
+  value: string;
+  /** handed to the browser voice if this clip was never rendered */
   text: string;
-  rate: number;
-}
-
-/** Small IndexedDB store so a sound is only ever generated once per device. */
-class ClipStore {
-  private dbPromise: Promise<IDBDatabase | null> | null = null;
-
-  private open(): Promise<IDBDatabase | null> {
-    if (this.dbPromise) return this.dbPromise;
-    this.dbPromise = new Promise(resolve => {
-      try {
-        if (typeof indexedDB === 'undefined') return resolve(null);
-        const request = indexedDB.open(DB_NAME, 1);
-        request.onupgradeneeded = () => {
-          const db = request.result;
-          if (!db.objectStoreNames.contains(DB_STORE)) db.createObjectStore(DB_STORE);
-        };
-        request.onsuccess = () => resolve(request.result);
-        request.onerror = () => resolve(null);
-      } catch {
-        resolve(null);
-      }
-    });
-    return this.dbPromise;
-  }
-
-  async get(key: string): Promise<Float32Array | null> {
-    const db = await this.open();
-    if (!db) return null;
-    return new Promise(resolve => {
-      try {
-        const tx = db.transaction(DB_STORE, 'readonly');
-        const req = tx.objectStore(DB_STORE).get(key);
-        req.onsuccess = () => {
-          const value = req.result;
-          resolve(value instanceof ArrayBuffer ? new Float32Array(value) : null);
-        };
-        req.onerror = () => resolve(null);
-      } catch {
-        resolve(null);
-      }
-    });
-  }
-
-  async put(key: string, samples: Float32Array) {
-    const db = await this.open();
-    if (!db) return;
-    try {
-      const tx = db.transaction(DB_STORE, 'readwrite');
-      // store a copy so the underlying buffer is never detached
-      tx.objectStore(DB_STORE).put(samples.slice().buffer, key);
-    } catch {
-      // storage full or blocked — the in-memory cache still applies
-    }
-  }
-
-  async clear() {
-    const db = await this.open();
-    if (!db) return;
-    try {
-      const tx = db.transaction(DB_STORE, 'readwrite');
-      tx.objectStore(DB_STORE).clear();
-    } catch {
-      // ignore
-    }
-  }
+  bucket: RateBucket;
 }
 
 class PronunciationService {
-  private worker: Worker | null = null;
   private ready = false;
   private loading: Promise<boolean> | null = null;
-  private nextId = 1;
-  private pending = new Map<number, { resolve: (s: Float32Array | null) => void }>();
   private status: VoiceStatus = { state: 'idle' };
   private listeners = new Set<(s: VoiceStatus) => void>();
   private busyListeners = new Set<(busy: boolean) => void>();
@@ -222,23 +88,15 @@ class PronunciationService {
   private ctx: AudioContext | null = null;
   private currentSource: AudioBufferSourceNode | null = null;
 
-  private memory = new Map<string, Float32Array>();
-  private warmQueue: ClipRequest[] = [];
-  private warmQueued = new Set<string>();
-  private warming = false;
-  private store = new ClipStore();
-  private inflight = new Map<string, Promise<Float32Array | null>>();
-
-  /** which model build produced the cached clips, e.g. "webgpu-fp32" */
-  private buildId = '';
   /** bumped whenever speech is interrupted, so late clips stay silent */
   private generation = 0;
-  /** real utterances currently being generated, so warm-up can yield to them */
+  /** utterances a child is waiting on, so warming can yield to them */
   private liveRequests = 0;
+  /** when init was last tried, so a failed index is retried but not hammered */
+  private lastInitAttempt = 0;
   private voiceId: string = DEFAULT_VOICE_ID;
   private rate = 1;
   private muted = false;
-  private quality: 'best' | 'compact' = 'best';
   /** the caller can replay whatever was said last */
   private lastRequest: (() => void) | null = null;
   private browserVoices: SpeechSynthesisVoice[] = [];
@@ -255,8 +113,24 @@ class PronunciationService {
 
   // ---------- configuration ----------
 
+  /**
+   * Each voice is a separate set of rendered clips, so switching means a
+   * different manifest. A voice that was never rendered — a choice saved
+   * before that voice existed, say — falls back to the default rather than
+   * quietly dropping Luna to the robotic browser voice.
+   */
   setVoice(voiceId: string) {
-    if (LUNA_VOICES.some(v => v.id === voiceId)) this.voiceId = voiceId;
+    if (!LUNA_VOICES.some(v => v.id === voiceId)) return;
+    if (voiceId === this.voiceId) return;
+
+    this.voiceId = voiceId;
+
+    void voiceClips.manifest(voiceId).then(manifest => {
+      if (!manifest && this.voiceId === voiceId) {
+        this.voiceId = DEFAULT_VOICE_ID;
+      }
+      if (this.ready) void this.prewarmPhonics();
+    });
   }
 
   getVoice(): string {
@@ -270,21 +144,6 @@ class PronunciationService {
   setMuted(muted: boolean) {
     this.muted = muted;
     if (muted) this.stop();
-  }
-
-  /**
-   * 'best' uses the full-precision voice (clean, ~325 MB, fast on WebGPU).
-   * 'compact' uses the small 8-bit voice (~92 MB, also clean, slower).
-   */
-  setQuality(quality: 'best' | 'compact') {
-    if (this.quality === quality) return;
-    this.quality = quality;
-    this.worker?.terminate();
-    this.worker = null;
-    this.ready = false;
-    this.loading = null;
-    this.memory.clear();
-    this.setStatus({ state: 'idle' });
   }
 
   onStatus(listener: (s: VoiceStatus) => void): () => void {
@@ -344,97 +203,45 @@ class PronunciationService {
   }
 
   /**
-   * Starts the voice worker and downloads the model. Safe to call repeatedly;
-   * the app keeps working on the browser voice until this resolves.
+   * Loads the index of rendered clips. This is one small JSON fetch, not a
+   * model download, so it finishes in milliseconds — the progress states
+   * survive only because the UI already knows how to show them.
    */
   async init(): Promise<boolean> {
     if (this.ready) return true;
     if (this.loading) return this.loading;
 
-    this.loading = new Promise<boolean>(resolve => {
-      this.setStatus({ state: 'loading', progress: 0, label: 'Waking Ms. Luna up…' });
+    this.loading = (async () => {
+      this.setStatus({ state: 'loading', progress: 10, label: 'Waking Ms. Luna up…' });
 
-      let worker: Worker;
-      try {
-        worker = new Worker(new URL('./voiceWorker.ts', import.meta.url), { type: 'module' });
-      } catch {
-        this.failed('This browser cannot run the natural voice.');
-        return resolve(false);
+      let manifest = await voiceClips.manifest(this.voiceId);
+      // A voice saved before it stopped being shipped (every voice used to
+      // run on-device) has no clips: start as Luna rather than failing, or
+      // the child's first impression is the browser voice.
+      if (!manifest && this.voiceId !== DEFAULT_VOICE_ID) {
+        this.voiceId = DEFAULT_VOICE_ID;
+        manifest = await voiceClips.manifest(this.voiceId);
+      }
+      if (!manifest) {
+        this.failed(`No rendered voice for "${this.voiceId}".`);
+        return false;
       }
 
-      const initId = this.nextId++;
-
-      worker.onmessage = (event: MessageEvent<WorkerOut>) => {
-        const message = event.data;
-
-        if (message.type === 'progress') {
-          this.setStatus({
-            state: 'loading',
-            progress: message.progress,
-            label: 'Downloading Ms. Luna’s voice…'
-          });
-          return;
-        }
-
-        if (message.type === 'ready') {
-          this.ready = true;
-          this.buildId = `${message.device}-${message.dtype}`;
-          void this.dropClipsFromOtherBuilds(this.buildId);
-          this.setStatus({ state: 'ready', engine: 'neural', device: message.device });
-          resolve(true);
-          return;
-        }
-
-        if (message.type === 'samples') {
-          this.pending.get(message.id)?.resolve(message.samples);
-          this.pending.delete(message.id);
-          return;
-        }
-
-        if (message.type === 'error') {
-          const waiter = this.pending.get(message.id);
-          if (waiter) {
-            waiter.resolve(null);
-            this.pending.delete(message.id);
-            return;
-          }
-          if (message.id === initId) {
-            this.failed(message.message);
-            resolve(false);
-          }
-        }
-      };
-
-      worker.onerror = () => {
-        this.failed('The voice worker stopped unexpectedly.');
-        resolve(false);
-      };
-
-      this.worker = worker;
-      worker.postMessage({ id: initId, type: 'init', quality: this.quality });
-    });
+      this.ready = true;
+      this.setStatus({ state: 'ready', engine: 'neural', device: 'pre-rendered' });
+      return true;
+    })();
 
     return this.loading;
   }
 
-  /** Clips generated by a previous model build are thrown away, not reused. */
-  private async dropClipsFromOtherBuilds(buildId: string) {
-    const KEY = 'ms_luna_voice_build';
-    try {
-      const previous = localStorage.getItem(KEY);
-      if (previous === buildId) return;
-      this.memory.clear();
-      await this.store.clear();
-      localStorage.setItem(KEY, buildId);
-    } catch {
-      // private mode or full storage: the in-memory cache was cleared anyway
-      this.memory.clear();
-    }
+  /** The voices that actually have audio on disk, so the picker can hide the rest. */
+  async renderedVoices(): Promise<Set<string>> {
+    return voiceClips.available(LUNA_VOICES.map(v => v.id));
   }
 
   private failed(reason: string) {
     this.ready = false;
-    this.worker = null;
     this.loading = null;
     this.setStatus({
       state: 'unavailable',
@@ -448,69 +255,20 @@ class PronunciationService {
 
   // ---------- generation & playback ----------
 
-  private async generate(req: ClipRequest): Promise<Float32Array | null> {
-    const cached = this.memory.get(req.key);
-    if (cached) return cached;
-
-    const stored = await this.store.get(req.key);
-    if (stored) {
-      this.remember(req.key, stored);
-      return stored;
-    }
-
-    const existing = this.inflight.get(req.key);
-    if (existing) return existing;
-
-    const task = (async () => {
-      const worker = this.worker;
-      if (!worker || !this.ready) return null;
-
-      const id = this.nextId++;
-      const samples = await new Promise<Float32Array | null>(resolve => {
-        this.pending.set(id, { resolve });
-        worker.postMessage({
-          id,
-          type: 'generate',
-          voice: this.voiceId,
-          speed: req.rate,
-          ipa: req.ipa,
-          text: req.ipa ? undefined : req.text
-        });
-        // a wedged worker must not leave callers waiting forever
-        window.setTimeout(() => {
-          if (this.pending.delete(id)) resolve(null);
-        }, 30000);
-      });
-
-      this.inflight.delete(req.key);
-      if (!samples || samples.length === 0) return null;
-
-      this.remember(req.key, samples);
-      void this.store.put(req.key, samples);
-      return samples;
-    })();
-
-    this.inflight.set(req.key, task);
-    return task;
+  /** The decoded clip for this request, or null if it was never rendered. */
+  private async fetchClip(req: ClipRequest): Promise<AudioBuffer | null> {
+    const ctx = this.getContext();
+    if (!ctx) return null;
+    return voiceClips.get(ctx, this.voiceId, req.kind, req.value, req.bucket);
   }
 
-  private remember(key: string, samples: Float32Array) {
-    if (this.memory.size >= MEMORY_CACHE_LIMIT) {
-      const oldest = this.memory.keys().next().value;
-      if (oldest) this.memory.delete(oldest);
-    }
-    this.memory.set(key, samples);
-  }
-
-  private playSamples(samples: Float32Array, onEnd?: () => void): boolean {
+  private playBuffer(buffer: AudioBuffer, onEnd?: () => void): boolean {
     const ctx = this.getContext();
     if (!ctx) {
       onEnd?.();
       return false;
     }
     try {
-      const buffer = ctx.createBuffer(1, samples.length, 24000);
-      buffer.getChannelData(0).set(samples);
       const source = ctx.createBufferSource();
       source.buffer = buffer;
 
@@ -545,6 +303,13 @@ class PronunciationService {
     if (!this.browserSpeechAvailable() || this.muted) {
       options?.onEnd?.();
       return;
+    }
+    // Reaching the browser voice means a clip was missing. It is meant to be
+    // unreachable in a finished build, so say so loudly in development: the
+    // symptom otherwise is half a second of robot voice before the next
+    // utterance cancels it, which is very hard to trace back to a cause.
+    if (import.meta.env?.DEV) {
+      console.warn(`[voice] FELL BACK to the browser voice for: ${JSON.stringify(text)}`);
     }
     try {
       if (options?.interrupt !== false) window.speechSynthesis.cancel();
@@ -589,32 +354,42 @@ class PronunciationService {
 
     options?.onStart?.();
 
-    if (!this.ready && this.status.state === 'idle') {
-      void this.init();
+    // Loading the index is one small fetch, so it is worth waiting for rather
+    // than letting the first utterance fall back to the browser voice. A
+    // previous failure is retried rather than being final — the app may simply
+    // have opened before the network was up — but not more than once every few
+    // seconds, so a genuinely missing index does not retry on every tap.
+    if (!this.ready) {
+      const now = Date.now();
+      if (this.status.state !== 'unavailable' || now - this.lastInitAttempt > 5000) {
+        this.lastInitAttempt = now;
+        await this.init();
+      }
     }
 
-    if (this.ready && !req.neuralUnsafe) {
+    if (this.ready) {
       this.liveRequests += 1;
-      // only announce a wait if it is long enough to notice
+      // a cached clip plays instantly and a cold one is a short fetch, so
+      // this only ever appears on a genuinely slow network
       const busyTimer = window.setTimeout(() => {
         if (this.liveRequests > 0) this.setBusy(true);
       }, 350);
 
-      let samples: Float32Array | null = null;
+      let buffer: AudioBuffer | null = null;
       try {
-        samples = await this.generate(req);
+        buffer = await this.fetchClip(req);
       } finally {
         this.liveRequests -= 1;
         window.clearTimeout(busyTimer);
         if (this.liveRequests === 0) this.setBusy(false);
       }
 
-      // While this was being generated the child tapped something else, so
+      // While this was being fetched the child tapped something else, so
       // this clip is no longer wanted: drop it rather than talk over them.
       if (generation !== this.generation) return;
 
-      if (samples && samples.length > 0) {
-        if (this.playSamples(samples, options?.onEnd)) return;
+      if (buffer) {
+        if (this.playBuffer(buffer, options?.onEnd)) return;
       }
     }
 
@@ -622,44 +397,45 @@ class PronunciationService {
     this.speakWithBrowser(fallbackText, { ...options, onStart: undefined });
   }
 
-  private keyFor(kind: string, value: string, rate: number): string {
-    // The build is part of the identity: clips made by a different model must
-    // never be replayed, or an old voice leaks into a new one.
-    return `${this.buildId}|${this.voiceId}|${kind}|${value}|${rate.toFixed(2)}`;
-  }
-
-  /** Build the clip request for a piece of speech, without saying it. */
+  /**
+   * Which recording a piece of speech wants, without saying it.
+   *
+   * The rate is folded into one of three buckets because that is what the
+   * settings screen offers and what was rendered; an exact float would name a
+   * file that does not exist.
+   */
   private request(part: SpeechPart, rate?: number): { req: ClipRequest; fallback: string } | null {
+    const bucket = bucketFor(rate ?? this.rate);
+
     if (part.sound) {
-      const ipa = ipaFor(part.sound);
       const carrier = carrierFor(part.sound);
-      const r = rate ?? Math.min(this.rate, 1);
-      if (!ipa) {
-        // No IPA for this chunk: a carrier like "mmmm" would be spelled out by
-        // the neural voice, so leave it to the browser voice instead.
-        return {
-          req: { key: this.keyFor('sound', part.sound, r), text: carrier, rate: r, neuralUnsafe: true },
-          fallback: carrier
-        };
-      }
-      return { req: { key: this.keyFor('sound', part.sound, r), ipa, text: carrier, rate: r }, fallback: carrier };
+      return {
+        req: { kind: 'sound', value: part.sound, text: carrier, bucket },
+        fallback: carrier
+      };
     }
     if (part.name) {
       const name = letterNameOf(part.name);
-      const r = rate ?? this.rate;
-      return { req: { key: this.keyFor('name', part.name.toUpperCase(), r), text: name, rate: r }, fallback: name };
+      return {
+        req: { kind: 'name', value: part.name, text: name, bucket },
+        fallback: name
+      };
     }
     if (part.word) {
-      const clean = part.word.replace(/[^a-zA-Z'’-]/g, '').trim();
+      const clean = part.word.replace(/[^a-zA-Z'\u2019-]/g, '').trim();
       if (!clean) return null;
-      const r = rate ?? Math.min(this.rate, 1);
-      return { req: { key: this.keyFor('word', clean.toLowerCase(), r), text: clean, rate: r }, fallback: clean };
+      return {
+        req: { kind: 'word', value: clean, text: clean, bucket },
+        fallback: clean
+      };
     }
     if (part.text) {
-      const clean = part.text.replace(/[…]/g, '...').trim();
+      const clean = part.text.replace(/[\u2026]/g, '...').trim();
       if (!clean) return null;
-      const r = rate ?? this.rate;
-      return { req: { key: this.keyFor('text', clean, r), text: clean, rate: r }, fallback: clean };
+      return {
+        req: { kind: 'text', value: clean, text: clean, bucket },
+        fallback: clean
+      };
     }
     return null;
   }
@@ -670,9 +446,9 @@ class PronunciationService {
    */
   prefetch(parts: SpeechPart[], rate?: number) {
     if (!this.ready) return;
-    parts.forEach(part => {
+    this.spokenParts(parts).forEach(part => {
       const built = this.request(part, rate);
-      if (built) void this.generate(built.req);
+      if (built) void this.fetchClip(built.req);
     });
   }
 
@@ -689,12 +465,27 @@ class PronunciationService {
    * sounded rather than spelled.
    */
   private speakProse(text: string, options?: SpeakOptions) {
+    const parts = this.proseParts(text);
+    if (parts.length === 1) this.speakPart(parts[0], options);
+    else this.playSequence(parts, options);
+  }
+
+  /**
+   * The pieces a line of prose is said in: a phoneme written inside it ("the
+   * mmmm sound") is a clip of its own, and so is the text either side.
+   * Speaking, prefetching and warming all split prose here, so they ask for
+   * the same clips — and the same ones the renderer made.
+   */
+  private proseParts(text: string): SpeechPart[] {
     const parts = splitPhonics(text);
-    if (parts.length <= 1) {
-      this.speakPart({ text }, options);
-      return;
-    }
-    this.speakSequence(parts, options);
+    if (parts.length > 1) return parts;
+    // a line that is nothing but a phoneme ("Shhh!") is that sound
+    return [parts[0]?.sound ? parts[0] : { text }];
+  }
+
+  /** Every part as it is actually said, with prose split into its pieces. */
+  private spokenParts(parts: SpeechPart[]): SpeechPart[] {
+    return parts.flatMap(part => (part.text ? this.proseParts(part.text) : [part]));
   }
 
   /** "V" → "vee". The name of the letter, never its sound. */
@@ -709,15 +500,15 @@ class PronunciationService {
 
     const entry = phonicsFor(letter);
     if (options?.alternate && entry?.alternate) {
-      const rate = options.rate ?? Math.min(this.rate, 1);
+      const carrier = entry.alternate.carrier;
       void this.say(
         {
-          key: this.keyFor('sound', `${letter}+alt`, rate),
-          ipa: entry.alternate.ipa,
-          text: entry.alternate.carrier,
-          rate
+          kind: 'sound',
+          value: `${letter}+alt`,
+          text: carrier,
+          bucket: bucketFor(options.rate ?? this.rate)
         },
-        entry.alternate.carrier,
+        carrier,
         options
       );
       return;
@@ -757,6 +548,7 @@ class PronunciationService {
     wholeWord: string,
     handlers?: { onChunk?: (index: number) => void; onEnd?: () => void; gapMs?: number }
   ) {
+    this.lastRequest = () => this.soundOutWord(chunks, wholeWord, handlers);
     const gap = handlers?.gapMs ?? 260;
     // generate the whole run up front so the blending is not stop-start
     this.prefetch([...chunks.map(c => ({ sound: c })), { word: wholeWord }]);
@@ -770,7 +562,8 @@ class PronunciationService {
       if (index >= chunks.length) {
         handlers?.onChunk?.(-1);
         window.setTimeout(() => {
-          this.speakWord(wholeWord, { onEnd: handlers?.onEnd, interrupt: false });
+          if (generation !== this.generation) return;
+          this.speakPart({ word: wholeWord }, { onEnd: handlers?.onEnd, interrupt: false });
         }, gap);
         return;
       }
@@ -780,7 +573,7 @@ class PronunciationService {
         index += 1;
         window.setTimeout(next, gap);
       });
-      this.speakLetterSound(chunk, { interrupt: false, onEnd: guard.done });
+      this.speakPart({ sound: chunk }, { interrupt: false, onEnd: guard.done });
     };
 
     next();
@@ -820,6 +613,15 @@ class PronunciationService {
    */
   speakSequence(parts: SpeechPart[], options?: SpeakOptions) {
     this.lastRequest = () => this.speakSequence(parts, options);
+    this.playSequence(parts, options);
+  }
+
+  /**
+   * speakSequence without becoming what replayLast repeats, for the pieces of
+   * a larger utterance: the replay button must say the whole of it.
+   */
+  private playSequence(input: SpeechPart[], options?: SpeakOptions) {
+    const parts = this.spokenParts(input);
     // start every clip generating now, so the pieces run together
     this.prefetch(parts, options?.rate);
     let index = 0;
@@ -835,13 +637,16 @@ class PronunciationService {
       }
       const part = parts[index];
       index += 1;
-      const guard = this.once(() => window.setTimeout(next, 120));
+      // sound after sound is a word being sounded out: give each one the
+      // same room soundOutWord does, so /p/ /i/ /g/ does not run together
+      const gap = part.sound && parts[index]?.sound ? 260 : 120;
+      const guard = this.once(() => window.setTimeout(next, gap));
       const step: SpeakOptions = { interrupt: false, rate: options?.rate, onEnd: guard.done };
 
-      if (part.sound) this.speakLetterSound(part.sound, step);
-      else if (part.name) this.speakLetterName(part.name, step);
-      else if (part.word) this.speakWord(part.word, step);
-      else if (part.text) this.speakText(part.text, step);
+      // speakPart, not speak*(): those remember themselves for replayLast,
+      // and the replay button must repeat the whole sequence rather than
+      // only its last piece (prose is already split into its pieces)
+      if (part.text || part.sound || part.name || part.word) this.speakPart(part, step);
       else next();
     };
 
@@ -872,57 +677,53 @@ class PronunciationService {
   }
 
   /**
-   * Quietly generate the things Luna is about to say, so that by the time a
-   * child taps something the clip is already waiting. The queue always yields
-   * to real speech, so warming never delays an actual utterance.
+   * Quietly pull in the things Luna is about to say, so that by the time a
+   * child taps something the clip is already decoded and waiting.
    */
   warm(parts: SpeechPart[], rate?: number) {
-    for (const part of parts) {
-      const built = this.request(part, rate);
-      if (!built) continue;
-      if (this.memory.has(built.req.key)) continue;
-      if (this.warmQueued.has(built.req.key)) continue;
-      this.warmQueued.add(built.req.key);
-      this.warmQueue.push(built.req);
-    }
-    void this.runWarmQueue();
-  }
-
-  private async runWarmQueue() {
-    if (this.warming) return;
-    this.warming = true;
-
-    try {
-      while (this.warmQueue.length > 0) {
-        if (!this.ready || this.muted) break;
-
-        // never compete with something the child is waiting to hear
-        if (this.liveRequests > 0) {
-          await new Promise(r => window.setTimeout(r, 250));
-          continue;
-        }
-
-        const req = this.warmQueue.shift();
-        if (!req) break;
-        if (!this.memory.has(req.key)) await this.generate(req);
-        await new Promise(r => window.setTimeout(r, 60));
-      }
-    } finally {
-      this.warming = false;
-    }
-  }
-
-  /** The sounds every phonics game needs, generated before they are needed. */
-  async prewarmPhonics() {
     if (!this.ready) return;
-    this.warm(COMMON_PHONICS_KEYS.map(key => ({ sound: key })));
+    const ctx = this.getContext();
+    if (!ctx) return;
+
+    const bucket = bucketFor(rate ?? this.rate);
+    const wanted: Array<{ kind: ClipKind; value: string }> = [];
+
+    for (const part of this.spokenParts(parts)) {
+      const built = this.request(part, rate);
+      if (built) wanted.push({ kind: built.req.kind, value: built.req.value });
+    }
+
+    void voiceClips.prefetch(ctx, this.voiceId, bucket, wanted);
+  }
+
+  /**
+   * Every phoneme and letter name, fetched up front.
+   *
+   * This used to be a slow, selective warm-up because each sound cost a neural
+   * inference; now the whole set is a few hundred kilobytes of audio, so there
+   * is no reason to be choosy — after this, no phonics tap ever waits.
+   */
+  async prewarmPhonics() {
+    if (!this.ready) await this.init();
+    if (!this.ready) return;
+
+    const ctx = this.getContext();
+    if (!ctx) return;
+
+    const bucket = bucketFor(this.rate);
+    const [sounds, names] = await Promise.all([
+      voiceClips.keysOfKind(this.voiceId, 'sound', bucket),
+      voiceClips.keysOfKind(this.voiceId, 'name', bucket)
+    ]);
+
+    await voiceClips.prefetch(ctx, this.voiceId, bucket, [
+      ...sounds.map(value => ({ kind: 'sound' as ClipKind, value })),
+      ...names.map(value => ({ kind: 'name' as ClipKind, value }))
+    ]);
   }
 
   async clearCache() {
-    this.memory.clear();
-    this.warmQueue = [];
-    this.warmQueued.clear();
-    await this.store.clear();
+    voiceClips.clear();
   }
 }
 

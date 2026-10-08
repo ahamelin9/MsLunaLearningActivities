@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import type { BlendAndReadQuestion } from '../../../types/reading';
 import { soundManager } from '../../../utils/audio';
 import { pronunciation } from '../../../utils/pronunciation';
 import { Button } from '../../../components/ui/Button';
 import { SpeakerIcon, CheckIcon, SparklesIcon, LightbulbIcon } from '../../../components/ui/Icons';
+import { shuffle } from '../engine/content';
 import './BlendAndRead.scss';
 
 interface BlendAndReadProps {
@@ -15,6 +16,8 @@ export const BlendAndRead: React.FC<BlendAndReadProps> = ({
   question,
   onCorrectAnswer
 }) => {
+  // The written order always put the answer first, which a child learns fast.
+  const options = useMemo(() => shuffle(question.options), [question.options]);
   const [selectedOptionId, setSelectedOptionId] = useState<string | null>(null);
   const [isCorrect, setIsCorrect] = useState(false);
   const [activePhonemeIndex, setActivePhonemeIndex] = useState<number | null>(null);
@@ -37,9 +40,12 @@ export const BlendAndRead: React.FC<BlendAndReadProps> = ({
     }, 600);
   };
 
+  // Until the child has blended it, this plays the sounds in a row and leaves
+  // the blending to them; saying the word would hand them the answer.
   const handleBlendAll = () => {
     soundManager.playPop();
-    pronunciation.speakWord(question.word);
+    if (isCorrect) pronunciation.speakWord(question.word);
+    else pronunciation.speakSequence(question.phonemes.map(p => ({ sound: p.spokenSound })));
   };
 
   const handleSelectOption = (optionId: string, isOptCorrect: boolean, text: string) => {
@@ -92,12 +98,12 @@ export const BlendAndRead: React.FC<BlendAndReadProps> = ({
           title="Blend and hear word"
         >
           <SpeakerIcon size={20} />
-          <span>Blend & Read: "${question.word.toUpperCase()}"</span>
+          <span>{isCorrect ? `Blend & Read: “${question.word.toUpperCase()}”` : 'Hear the sounds in a row'}</span>
         </button>
       </div>
 
       <div className="blend-options-grid">
-        {question.options.map((option) => {
+        {options.map((option) => {
           const isSelected = selectedOptionId === option.id;
           const isOptionSuccess = isSelected && option.isCorrect;
           const isOptionWrong = isSelected && !option.isCorrect;
@@ -110,7 +116,8 @@ export const BlendAndRead: React.FC<BlendAndReadProps> = ({
               className={`blend-option-card ${isOptionSuccess ? 'correct' : ''} ${isOptionWrong ? 'wrong' : ''}`}
             >
               <span className="option-emoji">{option.imageEmoji}</span>
-              <span className="option-text">{option.text}</span>
+              {/* written names would let the letters be matched without blending */}
+              {isCorrect && <span className="option-text">{option.text}</span>}
               {isOptionSuccess && (
                 <span className="matched-badge">Matches! ✨</span>
               )}
@@ -123,7 +130,7 @@ export const BlendAndRead: React.FC<BlendAndReadProps> = ({
         <div className="blend-success-banner">
           <div className="success-content">
             <SparklesIcon size={24} color="#059669" />
-            <span>Bravo! You blended the sounds into "${question.word.toUpperCase()}"! 🌟</span>
+            <span>Bravo! You blended the sounds into “{question.word.toUpperCase()}”! 🌟</span>
           </div>
           <Button
             variant="success"
@@ -139,23 +146,18 @@ export const BlendAndRead: React.FC<BlendAndReadProps> = ({
 
       {!isCorrect && question.hint && (
         <div className="blend-hint-area">
-          {!showHint ? (
-            <button
-              onClick={() => {
-                soundManager.playPop();
-                setShowHint(true);
-                soundManager.speak(question.hint || '');
-              }}
-              className="hint-btn"
-            >
-              <LightbulbIcon size={14} color="#059669" />
-              <span>Need a hint?</span>
-            </button>
-          ) : (
-            <div className="hint-pill">
-              💡 Hint: {question.hint}
-            </div>
-          )}
+          {/* hints are spoken, never written: on screen they would name the answer */}
+          <button
+            onClick={() => {
+              soundManager.playPop();
+              setShowHint(true);
+              soundManager.speak(question.hint || '');
+            }}
+            className="hint-btn"
+          >
+            <LightbulbIcon size={14} color="#059669" />
+            <span>{showHint ? 'Hear the hint again' : 'Need a hint?'}</span>
+          </button>
         </div>
       )}
     </div>

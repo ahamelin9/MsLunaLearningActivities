@@ -156,29 +156,6 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             onChange={partial => storageService.updateSettings(partial)}
           />
 
-          <div className="setting-item-row">
-            <div className="item-left">
-              <span className="item-emoji">💾</span>
-              <div className="item-text">
-                <span className="item-title">Smaller voice download</span>
-                <span className="item-desc">
-                  {progress.settings.voiceQuality === 'compact'
-                    ? 'Using the small voice (about 92 MB). Clear, but slower to speak.'
-                    : 'Using the full voice (about 325 MB). Best sound and the quickest to speak.'}
-                </span>
-              </div>
-            </div>
-            <button
-              onClick={() =>
-                handleUpdateSetting({
-                  voiceQuality: progress.settings.voiceQuality === 'compact' ? 'best' : 'compact'
-                })
-              }
-              className={`toggle-switch-btn ${progress.settings.voiceQuality === 'compact' ? 'toggle-on' : ''}`}
-            >
-              <div className="toggle-switch-handle" />
-            </button>
-          </div>
         </div>
 
         {/* Grade Level Selector */}

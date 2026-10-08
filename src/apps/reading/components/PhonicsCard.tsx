@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import type { LetterSoundQuestion } from '../../../types/reading';
 import { soundManager } from '../../../utils/audio';
 import { pronunciation } from '../../../utils/pronunciation';
 import { Button } from '../../../components/ui/Button';
 import { SpeakerIcon, CheckIcon, LightbulbIcon, SparklesIcon } from '../../../components/ui/Icons';
+import { shuffle } from '../engine/content';
 import './PhonicsCard.scss';
 
 interface PhonicsCardProps {
@@ -15,6 +16,8 @@ export const PhonicsCard: React.FC<PhonicsCardProps> = ({
   question,
   onCorrectAnswer
 }) => {
+  // The written order always put the answer first, which a child learns fast.
+  const options = useMemo(() => shuffle(question.options), [question.options]);
   const [selectedOptionId, setSelectedOptionId] = useState<string | null>(null);
   const [isCorrect, setIsCorrect] = useState(false);
   const [showHint, setShowHint] = useState(false);
@@ -77,7 +80,7 @@ export const PhonicsCard: React.FC<PhonicsCardProps> = ({
 
       {/* Options Grid */}
       <div className="phonics-options-grid">
-        {question.options.map(option => {
+        {options.map(option => {
           const isSelected = selectedOptionId === option.id;
           const isOptionSuccess = isSelected && option.isCorrect;
           const isOptionWrong = isSelected && !option.isCorrect;
@@ -94,9 +97,13 @@ export const PhonicsCard: React.FC<PhonicsCardProps> = ({
                   {option.imageEmoji}
                 </span>
               )}
-              <span className="opt-text">
-                {option.text}
-              </span>
+              {/* the picture is the choice; its written name would show the
+                  first letter, so it appears once the answer is found */}
+              {(!option.imageEmoji || isCorrect) && (
+                <span className="opt-text">
+                  {option.text}
+                </span>
+              )}
               {isOptionSuccess && (
                 <span className="opt-success-pill">
                   Correct! ✨
@@ -129,35 +136,30 @@ export const PhonicsCard: React.FC<PhonicsCardProps> = ({
       {/* Hint Area */}
       {!isCorrect && question.hint && (
         <div style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
-          {!showHint ? (
-            <button
-              onClick={() => {
-                soundManager.playPop();
-                setShowHint(true);
-                soundManager.speak(question.hint || '');
-              }}
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '6px',
-                padding: '6px 14px',
-                borderRadius: '9999px',
-                background: '#FAF5FF',
-                border: '1px solid #E9D5FF',
-                color: '#7E22CE',
-                fontSize: '13px',
-                fontWeight: 700,
-                cursor: 'pointer'
-              }}
-            >
-              <LightbulbIcon size={14} color="#9333EA" />
-              <span>Need a hint?</span>
-            </button>
-          ) : (
-            <div style={{ background: '#FEF9C3', border: '1.5px solid #FDE047', borderRadius: '14px', padding: '8px 14px', fontSize: '13px', fontWeight: 700, color: '#854D0E' }}>
-              💡 Hint: {question.hint}
-            </div>
-          )}
+          {/* hints are spoken, never written: on screen they would name the answer */}
+          <button
+            onClick={() => {
+              soundManager.playPop();
+              setShowHint(true);
+              soundManager.speak(question.hint || '');
+            }}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              padding: '6px 14px',
+              borderRadius: '9999px',
+              background: '#FAF5FF',
+              border: '1px solid #E9D5FF',
+              color: '#7E22CE',
+              fontSize: '13px',
+              fontWeight: 700,
+              cursor: 'pointer'
+            }}
+          >
+            <LightbulbIcon size={14} color="#9333EA" />
+            <span>{showHint ? 'Hear the hint again' : 'Need a hint?'}</span>
+          </button>
         </div>
       )}
     </div>

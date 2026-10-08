@@ -118,8 +118,8 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
       api.miss({
         hint:
           round.mode === 'sound'
-            ? `Say it slowly: ${current.word}. It begins with “${current.initial}”.`
-            : `A ${current.word} belongs with ${round.baskets.find(b => b.id === current.basketId)?.label.toLowerCase()}.`
+            ? [{ text: 'Say it slowly.' }, { word: current.word }, { text: 'Listen to the very first sound.' }]
+            : [{ text: 'Think about it.' }, { word: current.word }, { text: 'Where does it belong?' }]
       });
     }
   };
@@ -136,7 +136,9 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
               aria-label={current.word}
             >
               <span className="sort-emoji">{current.emoji}</span>
-              <span className="sort-word">{current.word}</span>
+              {/* sorting by first sound means hearing it: the written word would
+                  just be matched letter-for-letter against the basket */}
+              {round.mode === 'category' && <span className="sort-word">{current.word}</span>}
             </button>
           ) : (
             <span className="sort-done">All tidy! 🧹</span>

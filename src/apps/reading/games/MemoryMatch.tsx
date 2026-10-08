@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import type { GameApi, GameDef } from '../engine/types';
 import { distinctByEmoji, lettersFor, sample, shuffle, tierFor, wordsUpTo } from '../engine/content';
 import { soundManager } from '../../../utils/audio';
-import { pronunciation } from '../../../utils/pronunciation';
+import { pronunciation, type SpeechPart } from '../../../utils/pronunciation';
 
 interface Card {
   id: string;
@@ -14,14 +14,20 @@ interface Card {
   kind: 'letter' | 'word';
   /** "big" / "little" for letter cards */
   caseLabel?: string;
-  /** spoken when flipped */
-  spoken: string;
+  /** what a screen reader announces when it is face up; Luna says cardParts() */
+  ariaLabel: string;
 }
 
 interface Round {
   kind: 'case' | 'picture';
   cards: Card[];
   pairCount: number;
+}
+
+/** How a card is said: "big" + the letter's name, or the word. Literal parts, so each has a clip. */
+function cardParts(card: Card): SpeechPart[] {
+  if (card.kind === 'word') return [{ word: card.pair }];
+  return [card.caseLabel === 'big' ? { text: 'big' } : { text: 'little' }, { name: card.label }];
 }
 
 function buildRound(tier: 1 | 2 | 3): Round {
@@ -36,7 +42,7 @@ function buildRound(tier: 1 | 2 | 3): Round {
         label: l.letter,
         kind: 'letter',
         caseLabel: 'big',
-        spoken: `big ${l.letter}`
+        ariaLabel: `big ${l.letter}`
       },
       {
         id: `${l.letter}-low`,
@@ -44,7 +50,7 @@ function buildRound(tier: 1 | 2 | 3): Round {
         label: l.letter.toLowerCase(),
         kind: 'letter',
         caseLabel: 'little',
-        spoken: `little ${l.letter}`
+        ariaLabel: `little ${l.letter}`
       }
     ]);
     return { kind: 'case', cards: shuffle(cards), pairCount };
@@ -52,8 +58,8 @@ function buildRound(tier: 1 | 2 | 3): Round {
 
   const chosen = distinctByEmoji(wordsUpTo(tier), pairCount);
   const cards: Card[] = chosen.flatMap(w => [
-    { id: `${w.word}-pic`, pair: w.word, label: '', emoji: w.emoji, kind: 'word', spoken: w.word },
-    { id: `${w.word}-word`, pair: w.word, label: w.word, kind: 'word', spoken: w.word }
+    { id: `${w.word}-pic`, pair: w.word, label: '', emoji: w.emoji, kind: 'word', ariaLabel: w.word },
+    { id: `${w.word}-word`, pair: w.word, label: w.word, kind: 'word', ariaLabel: w.word }
   ]);
   return { kind: 'picture', cards: shuffle(cards), pairCount };
 }
@@ -81,11 +87,7 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
     if (flipped.includes(card.id) || matched.includes(card.pair)) return;
 
     soundManager.playLetterTap();
-    if (card.kind === 'letter') {
-      pronunciation.speakSequence([{ text: card.caseLabel ?? '' }, { name: card.label }]);
-    } else {
-      pronunciation.speakWord(card.spoken);
-    }
+    pronunciation.speakSequence(cardParts(card));
 
     const next = [...flipped, card.id];
     setFlipped(next);
@@ -119,7 +121,7 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
         if (repeat) {
           api.miss({
             lunaLine: 'We already tried those two! Remember where they live.',
-            hint: `Look for the partner of ${first.spoken}.`
+            hint: [{ text: 'Look for the partner of' }, ...cardParts(first)]
           });
         } else {
           soundManager.playTryAgain();
@@ -151,7 +153,7 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
                 wobble.includes(card.id) ? 'is-wobble' : ''
               }`}
               onClick={() => flip(card)}
-              aria-label={isOpen ? card.spoken : 'face down card'}
+              aria-label={isOpen ? card.ariaLabel : 'face down card'}
             >
               <span className="card-inner">
                 <span className="card-back" aria-hidden="true">

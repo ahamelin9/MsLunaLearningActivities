@@ -48,15 +48,15 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
     pronunciation.speakSentence(story.lines[index]);
   };
 
+  const sayHunt = () => {
+    pronunciation.speakSequence([{ text: 'Now find the word' }, { word: round.hunt }, { text: 'in the story.' }]);
+  };
+
   const turnPage = () => {
     if (allRevealed) {
       setPhase('hunt');
       soundManager.playPop();
-      pronunciation.speakSequence([
-        { text: 'Now find the word' },
-        { word: round.hunt },
-        { text: 'in the story.' }
-      ]);
+      sayHunt();
       return;
     }
     const next = revealed + 1;
@@ -79,7 +79,9 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
         pronunciation.speakSentence(story.question);
       }, 1100);
     } else {
-      api.miss({ hint: `You are looking for “${round.hunt}”. Read each line slowly with your finger.` });
+      api.miss({
+        hint: [{ text: 'You are looking for' }, { word: round.hunt }, { text: 'Read each line slowly with your finger.' }]
+      });
     }
   };
 
@@ -93,7 +95,7 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
     } else {
       setWrongAnswer(text);
       window.setTimeout(() => setWrongAnswer(null), 600);
-      api.miss({ hint: 'Peek back at the story — the answer is hiding in one of the lines.' });
+      api.miss({ hint: [{ text: 'Peek back at the story — the answer is hiding in one of the lines.' }] });
     }
   };
 
@@ -105,9 +107,28 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
         <div className="book-page left">
           <span className="story-emoji">{story.emoji}</span>
           <h3 className="story-title">{story.title}</h3>
+          {/* the word is heard, not shown: written here, the hunt is matching
+              letters rather than reading the story */}
           {phase === 'hunt' && (
             <p className="hunt-task">
-              Find the word <strong>{round.hunt}</strong>
+              {foundWord ? (
+                <>
+                  Found it: <strong>{round.hunt}</strong>
+                </>
+              ) : (
+                <>
+                  Find the word I say{' '}
+                  <button
+                    className="speak-chip"
+                    onClick={() => {
+                      soundManager.playLetterTap();
+                      sayHunt();
+                    }}
+                  >
+                    🔊 Hear it
+                  </button>
+                </>
+              )}
             </p>
           )}
         </div>

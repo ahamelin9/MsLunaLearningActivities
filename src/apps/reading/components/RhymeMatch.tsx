@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import type { RhymeMatchQuestion } from '../../../types/reading';
 import { soundManager } from '../../../utils/audio';
 import { pronunciation } from '../../../utils/pronunciation';
 import { Button } from '../../../components/ui/Button';
 import { SpeakerIcon, CheckIcon, SparklesIcon, LightbulbIcon } from '../../../components/ui/Icons';
+import { shuffle } from '../engine/content';
 import './RhymeMatch.scss';
 
 interface RhymeMatchProps {
@@ -15,6 +16,8 @@ export const RhymeMatch: React.FC<RhymeMatchProps> = ({
   question,
   onCorrectAnswer
 }) => {
+  // The written order always put the answer first, which a child learns fast.
+  const options = useMemo(() => shuffle(question.options), [question.options]);
   const [selectedWord, setSelectedWord] = useState<string | null>(null);
   const [isCorrect, setIsCorrect] = useState(false);
   const [showHint, setShowHint] = useState(false);
@@ -66,7 +69,7 @@ export const RhymeMatch: React.FC<RhymeMatchProps> = ({
 
       {/* Rhyme Options Grid */}
       <div className="rhyme-options-grid">
-        {question.options.map(option => {
+        {options.map(option => {
           const isSelected = selectedWord === option.word;
           const isOptionSuccess = isSelected && option.isRhyme;
           const isOptionWrong = isSelected && !option.isRhyme;
@@ -81,9 +84,12 @@ export const RhymeMatch: React.FC<RhymeMatchProps> = ({
               <span className="opt-emoji">
                 {option.emoji}
               </span>
-              <span className="opt-word">
-                {option.word}
-              </span>
+              {/* rhyme is heard: written, "hat" would just be matched to "cat" by its last letters */}
+              {isCorrect && (
+                <span className="opt-word">
+                  {option.word}
+                </span>
+              )}
               {isOptionSuccess && (
                 <span className="opt-rhyme-pill">
                   Rhymes! 🎵
@@ -116,35 +122,30 @@ export const RhymeMatch: React.FC<RhymeMatchProps> = ({
       {/* Hint Area */}
       {!isCorrect && question.hint && (
         <div style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
-          {!showHint ? (
-            <button
-              onClick={() => {
-                soundManager.playPop();
-                setShowHint(true);
-                soundManager.speak(question.hint || '');
-              }}
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '6px',
-                padding: '6px 14px',
-                borderRadius: '9999px',
-                background: '#ECFDF5',
-                border: '1px solid #A7F3D0',
-                color: '#065F46',
-                fontSize: '13px',
-                fontWeight: 700,
-                cursor: 'pointer'
-              }}
-            >
-              <LightbulbIcon size={14} color="#059669" />
-              <span>Need a hint?</span>
-            </button>
-          ) : (
-            <div style={{ background: '#FEF9C3', border: '1.5px solid #FDE047', borderRadius: '14px', padding: '8px 14px', fontSize: '13px', fontWeight: 700, color: '#854D0E' }}>
-              💡 Hint: {question.hint}
-            </div>
-          )}
+          {/* hints are spoken, never written: on screen they would name the answer */}
+          <button
+            onClick={() => {
+              soundManager.playPop();
+              setShowHint(true);
+              soundManager.speak(question.hint || '');
+            }}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              padding: '6px 14px',
+              borderRadius: '9999px',
+              background: '#ECFDF5',
+              border: '1px solid #A7F3D0',
+              color: '#065F46',
+              fontSize: '13px',
+              fontWeight: 700,
+              cursor: 'pointer'
+            }}
+          >
+            <LightbulbIcon size={14} color="#059669" />
+            <span>{showHint ? 'Hear the hint again' : 'Need a hint?'}</span>
+          </button>
         </div>
       )}
     </div>

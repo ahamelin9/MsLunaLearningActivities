@@ -62,7 +62,7 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
       setWrong(item.word);
       window.setTimeout(() => setWrong(null), 600);
       api.miss({
-        hint: `${item.word} is still on the desk — look, there it is. Which one is NOT there any more?`
+        hint: [{ word: item.word }, { text: 'is still on the desk. Which one is not there any more?' }]
       });
     }
   };

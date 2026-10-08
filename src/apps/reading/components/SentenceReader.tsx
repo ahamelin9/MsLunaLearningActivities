@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import type { SentenceComprehensionQuestion } from '../../../types/reading';
 import { soundManager } from '../../../utils/audio';
 import { pronunciation } from '../../../utils/pronunciation';
 import { Button } from '../../../components/ui/Button';
 import { SpeakerIcon, CheckIcon, SparklesIcon, LightbulbIcon } from '../../../components/ui/Icons';
+import { shuffle } from '../engine/content';
 import './SentenceReader.scss';
 
 interface SentenceReaderProps {
@@ -15,6 +16,8 @@ export const SentenceReader: React.FC<SentenceReaderProps> = ({
   question,
   onCorrectAnswer
 }) => {
+  // The written order always put the answer first, which a child learns fast.
+  const options = useMemo(() => shuffle(question.options), [question.options]);
   const [selectedOptionId, setSelectedOptionId] = useState<string | null>(null);
   const [isCorrect, setIsCorrect] = useState(false);
   const [showHint, setShowHint] = useState(false);
@@ -100,7 +103,7 @@ export const SentenceReader: React.FC<SentenceReaderProps> = ({
       </div>
 
       <div className="sentence-options-grid">
-        {question.options.map((option) => {
+        {options.map((option) => {
           const isSelected = selectedOptionId === option.id;
           const isOptionSuccess = isSelected && option.isCorrect;
           const isOptionWrong = isSelected && !option.isCorrect;
@@ -115,7 +118,8 @@ export const SentenceReader: React.FC<SentenceReaderProps> = ({
               {option.imageEmoji && (
                 <span className="option-emoji">{option.imageEmoji}</span>
               )}
-              <span className="option-label">{option.text}</span>
+              {/* a written label repeats the sentence's words, so it waits for the answer */}
+              {(!option.imageEmoji || isCorrect) && <span className="option-label">{option.text}</span>}
               {isOptionSuccess && (
                 <span className="success-badge">Matches! ✨</span>
               )}
@@ -144,23 +148,18 @@ export const SentenceReader: React.FC<SentenceReaderProps> = ({
 
       {!isCorrect && question.hint && (
         <div className="sentence-hint-area">
-          {!showHint ? (
-            <button
-              onClick={() => {
-                soundManager.playPop();
-                setShowHint(true);
-                soundManager.speak(question.hint || '');
-              }}
-              className="hint-btn"
-            >
-              <LightbulbIcon size={14} color="#059669" />
-              <span>Need a hint?</span>
-            </button>
-          ) : (
-            <div className="hint-pill">
-              💡 Hint: {question.hint}
-            </div>
-          )}
+          {/* hints are spoken, never written: on screen they would name the answer */}
+          <button
+            onClick={() => {
+              soundManager.playPop();
+              setShowHint(true);
+              soundManager.speak(question.hint || '');
+            }}
+            className="hint-btn"
+          >
+            <LightbulbIcon size={14} color="#059669" />
+            <span>{showHint ? 'Hear the hint again' : 'Need a hint?'}</span>
+          </button>
         </div>
       )}
     </div>

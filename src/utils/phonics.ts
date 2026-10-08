@@ -6,8 +6,9 @@
 // and nothing in the app may assume that speaking the character produces
 // the phoneme.
 //
-// `ipa` is fed straight to the neural voice's tokenizer, which accepts IPA,
-// so /v/ is rendered as a real, isolated /v/ rather than "vee".
+// `ipa` is the sound in IPA, for reference. How Luna actually says each sound
+// is decided in scripts/voice/phonemes.mjs, which cuts it out of a real word —
+// a voice model cannot say a phoneme on its own.
 // `carrier` is the fallback spelling used by the built-in browser voice,
 // which can only be handed ordinary text.
 
@@ -22,7 +23,7 @@ export interface PhonicsEntry {
   letterNameSpeech: string;
   /** display form of the sound: /v/ */
   phoneme: string;
-  /** IPA handed to the neural voice — the real phoneme */
+  /** the sound in IPA, for reference */
   ipa: string;
   /** text approximation for the fallback browser voice */
   carrier: string;
@@ -39,9 +40,10 @@ export interface PhonicsEntry {
 }
 
 /**
- * Continuants can be stretched ("mmmmm"), which is what phonics teaching wants,
- * so they carry the IPA length mark. Stops cannot be held; they take the
- * smallest possible schwa so they are audible without becoming "buh-UH".
+ * Continuants are held ("mmmmm"), which is what phonics teaching wants; stops
+ * are a crisp release with no vowel after it. A stop said as "buh" teaches
+ * children to read "bat" as "buh-a-tuh", so nothing here — not even a fallback
+ * spelling the app can avoid — should add one.
  */
 export const LETTER_PHONICS: Record<string, PhonicsEntry> = {
   A: {
@@ -60,7 +62,7 @@ export const LETTER_PHONICS: Record<string, PhonicsEntry> = {
     letterName: 'bee',
     letterNameSpeech: 'bee',
     phoneme: '/b/',
-    ipa: 'bə',
+    ipa: 'b',
     carrier: 'buh',
     exampleWord: 'bug',
     kind: 'stop'
@@ -70,18 +72,18 @@ export const LETTER_PHONICS: Record<string, PhonicsEntry> = {
     letterName: 'see',
     letterNameSpeech: 'see',
     phoneme: '/k/',
-    ipa: 'kə',
+    ipa: 'k',
     carrier: 'kuh',
     exampleWord: 'cat',
     kind: 'stop',
-    alternate: { phoneme: '/s/', ipa: 'sː', carrier: 'ssss', exampleWord: 'city' }
+    alternate: { phoneme: '/s/', ipa: 's', carrier: 'ssss', exampleWord: 'city' }
   },
   D: {
     letter: 'D',
     letterName: 'dee',
     letterNameSpeech: 'dee',
     phoneme: '/d/',
-    ipa: 'də',
+    ipa: 'd',
     carrier: 'duh',
     exampleWord: 'duck',
     kind: 'stop'
@@ -102,7 +104,7 @@ export const LETTER_PHONICS: Record<string, PhonicsEntry> = {
     letterName: 'eff',
     letterNameSpeech: 'eff',
     phoneme: '/f/',
-    ipa: 'fː',
+    ipa: 'f',
     carrier: 'ffff',
     exampleWord: 'fox',
     kind: 'continuant'
@@ -112,18 +114,18 @@ export const LETTER_PHONICS: Record<string, PhonicsEntry> = {
     letterName: 'gee',
     letterNameSpeech: 'jee',
     phoneme: '/g/',
-    ipa: 'ɡə',
+    ipa: 'ɡ',
     carrier: 'guh',
     exampleWord: 'gift',
     kind: 'stop',
-    alternate: { phoneme: '/j/', ipa: 'dʒə', carrier: 'juh', exampleWord: 'giraffe' }
+    alternate: { phoneme: '/j/', ipa: 'dʒ', carrier: 'juh', exampleWord: 'giraffe' }
   },
   H: {
     letter: 'H',
     letterName: 'aitch',
     letterNameSpeech: 'aitch',
     phoneme: '/h/',
-    ipa: 'hə',
+    ipa: 'h',
     carrier: 'huh',
     exampleWord: 'hat',
     kind: 'stop'
@@ -144,7 +146,7 @@ export const LETTER_PHONICS: Record<string, PhonicsEntry> = {
     letterName: 'jay',
     letterNameSpeech: 'jay',
     phoneme: '/j/',
-    ipa: 'dʒə',
+    ipa: 'dʒ',
     carrier: 'juh',
     exampleWord: 'jam',
     kind: 'stop'
@@ -154,7 +156,7 @@ export const LETTER_PHONICS: Record<string, PhonicsEntry> = {
     letterName: 'kay',
     letterNameSpeech: 'kay',
     phoneme: '/k/',
-    ipa: 'kə',
+    ipa: 'k',
     carrier: 'kuh',
     exampleWord: 'key',
     kind: 'stop'
@@ -164,7 +166,7 @@ export const LETTER_PHONICS: Record<string, PhonicsEntry> = {
     letterName: 'el',
     letterNameSpeech: 'ell',
     phoneme: '/l/',
-    ipa: 'lː',
+    ipa: 'l',
     carrier: 'llll',
     exampleWord: 'leaf',
     kind: 'continuant'
@@ -174,7 +176,7 @@ export const LETTER_PHONICS: Record<string, PhonicsEntry> = {
     letterName: 'em',
     letterNameSpeech: 'em',
     phoneme: '/m/',
-    ipa: 'mː',
+    ipa: 'm',
     carrier: 'mmmm',
     exampleWord: 'moon',
     kind: 'continuant'
@@ -184,7 +186,7 @@ export const LETTER_PHONICS: Record<string, PhonicsEntry> = {
     letterName: 'en',
     letterNameSpeech: 'en',
     phoneme: '/n/',
-    ipa: 'nː',
+    ipa: 'n',
     carrier: 'nnnn',
     exampleWord: 'nest',
     kind: 'continuant'
@@ -205,7 +207,7 @@ export const LETTER_PHONICS: Record<string, PhonicsEntry> = {
     letterName: 'pee',
     letterNameSpeech: 'pee',
     phoneme: '/p/',
-    ipa: 'pə',
+    ipa: 'p',
     carrier: 'puh',
     exampleWord: 'pig',
     kind: 'stop'
@@ -225,7 +227,7 @@ export const LETTER_PHONICS: Record<string, PhonicsEntry> = {
     letterName: 'ar',
     letterNameSpeech: 'are',
     phoneme: '/r/',
-    ipa: 'ɹː',
+    ipa: 'ɹ',
     carrier: 'rrrr',
     exampleWord: 'ring',
     kind: 'continuant'
@@ -235,7 +237,7 @@ export const LETTER_PHONICS: Record<string, PhonicsEntry> = {
     letterName: 'ess',
     letterNameSpeech: 'ess',
     phoneme: '/s/',
-    ipa: 'sː',
+    ipa: 's',
     carrier: 'ssss',
     exampleWord: 'sun',
     kind: 'continuant'
@@ -245,7 +247,7 @@ export const LETTER_PHONICS: Record<string, PhonicsEntry> = {
     letterName: 'tee',
     letterNameSpeech: 'tee',
     phoneme: '/t/',
-    ipa: 'tə',
+    ipa: 't',
     carrier: 'tuh',
     exampleWord: 'tent',
     kind: 'stop'
@@ -266,7 +268,7 @@ export const LETTER_PHONICS: Record<string, PhonicsEntry> = {
     letterName: 'vee',
     letterNameSpeech: 'vee',
     phoneme: '/v/',
-    ipa: 'vː',
+    ipa: 'v',
     carrier: 'vvvv',
     exampleWord: 'van',
     kind: 'continuant'
@@ -276,7 +278,7 @@ export const LETTER_PHONICS: Record<string, PhonicsEntry> = {
     letterName: 'double-u',
     letterNameSpeech: 'double you',
     phoneme: '/w/',
-    ipa: 'wə',
+    ipa: 'w',
     carrier: 'wuh',
     exampleWord: 'web',
     kind: 'glide'
@@ -296,7 +298,7 @@ export const LETTER_PHONICS: Record<string, PhonicsEntry> = {
     letterName: 'why',
     letterNameSpeech: 'why',
     phoneme: '/y/',
-    ipa: 'jə',
+    ipa: 'j',
     carrier: 'yuh',
     exampleWord: 'yarn',
     kind: 'glide'
@@ -306,7 +308,7 @@ export const LETTER_PHONICS: Record<string, PhonicsEntry> = {
     letterName: 'zee',
     letterNameSpeech: 'zee',
     phoneme: '/z/',
-    ipa: 'zː',
+    ipa: 'z',
     carrier: 'zzzz',
     exampleWord: 'zebra',
     kind: 'continuant'
@@ -320,7 +322,7 @@ export const TEAM_PHONICS: Record<string, PhonicsEntry> = {
     letterName: 'ess aitch',
     letterNameSpeech: 'ess aitch',
     phoneme: '/sh/',
-    ipa: 'ʃː',
+    ipa: 'ʃ',
     carrier: 'shhh',
     exampleWord: 'ship',
     kind: 'digraph'
@@ -340,18 +342,18 @@ export const TEAM_PHONICS: Record<string, PhonicsEntry> = {
     letterName: 'tee aitch',
     letterNameSpeech: 'tee aitch',
     phoneme: '/th/',
-    ipa: 'θː',
+    ipa: 'θ',
     carrier: 'thhh',
     exampleWord: 'thumb',
     kind: 'digraph',
-    alternate: { phoneme: '/th/ voiced', ipa: 'ðː', carrier: 'thhh', exampleWord: 'this' }
+    alternate: { phoneme: '/th/ voiced', ipa: 'ð', carrier: 'thhh', exampleWord: 'this' }
   },
   WH: {
     letter: 'WH',
     letterName: 'double-u aitch',
     letterNameSpeech: 'double you aitch',
     phoneme: '/wh/',
-    ipa: 'wə',
+    ipa: 'w',
     carrier: 'wuh',
     exampleWord: 'whale',
     kind: 'digraph'
@@ -361,7 +363,7 @@ export const TEAM_PHONICS: Record<string, PhonicsEntry> = {
     letterName: 'en gee',
     letterNameSpeech: 'en jee',
     phoneme: '/ng/',
-    ipa: 'ŋː',
+    ipa: 'ŋ',
     carrier: 'nnng',
     exampleWord: 'ring',
     kind: 'digraph'
@@ -371,7 +373,7 @@ export const TEAM_PHONICS: Record<string, PhonicsEntry> = {
     letterName: 'see kay',
     letterNameSpeech: 'see kay',
     phoneme: '/k/',
-    ipa: 'kə',
+    ipa: 'k',
     carrier: 'kuh',
     exampleWord: 'duck',
     kind: 'digraph'
@@ -390,9 +392,9 @@ export const TEAM_PHONICS: Record<string, PhonicsEntry> = {
 
 /** Blends are two sounds said quickly, not a new sound. */
 export const BLEND_IPA: Record<string, string> = {
-  BL: 'blə', BR: 'bɹə', CL: 'klə', CR: 'kɹə', DR: 'dɹə', FL: 'flə', FR: 'fɹə',
-  GL: 'ɡlə', GR: 'ɡɹə', PL: 'plə', PR: 'pɹə', SC: 'skə', SK: 'skə', SL: 'slə',
-  SM: 'smə', SN: 'snə', SP: 'spə', ST: 'stə', SW: 'swə', TR: 'tɹə', TW: 'twə'
+  BL: 'bl', BR: 'bɹ', CL: 'kl', CR: 'kɹ', DR: 'dɹ', FL: 'fl', FR: 'fɹ',
+  GL: 'ɡl', GR: 'ɡɹ', PL: 'pl', PR: 'pɹ', SC: 'sk', SK: 'sk', SL: 'sl',
+  SM: 'sm', SN: 'sn', SP: 'sp', ST: 'st', SW: 'sw', TR: 'tɹ', TW: 'tw'
 };
 
 /** Vowel teams, so longer words can still be sounded out. */
@@ -406,8 +408,16 @@ export function phonicsFor(key: string): PhonicsEntry | undefined {
   return TEAM_PHONICS[upper] ?? LETTER_PHONICS[upper];
 }
 
-/** IPA for any letter, team, blend or vowel team — used when sounding out. */
+/** A letter's second sound is addressed as "A+alt": the base entry and the alternate. */
+function alternateOf(chunk: string) {
+  const [base, marker] = chunk.trim().toUpperCase().split('+');
+  return marker === 'ALT' ? phonicsFor(base)?.alternate : undefined;
+}
+
+/** IPA for any letter, team, blend or vowel team — and whether it is a sound this app teaches at all. */
 export function ipaFor(chunk: string): string | undefined {
+  const alt = alternateOf(chunk);
+  if (alt) return alt.ipa;
   const upper = chunk.trim().toUpperCase();
   const entry = phonicsFor(upper);
   if (entry) return entry.ipa;
@@ -416,6 +426,8 @@ export function ipaFor(chunk: string): string | undefined {
 
 /** Fallback text for the same chunk when the neural voice is unavailable. */
 export function carrierFor(chunk: string): string {
+  const alt = alternateOf(chunk);
+  if (alt) return alt.carrier;
   const upper = chunk.trim().toUpperCase();
   const entry = phonicsFor(upper);
   if (entry) return entry.carrier;

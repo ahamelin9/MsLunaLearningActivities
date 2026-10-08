@@ -21,7 +21,7 @@ export function warmReadingVoice(grade: GradeLevel) {
   pronunciation.warm([...sounds, ...lines, ...names, ...words]);
 }
 
-/** The prompts a game shows the moment it opens. */
-export function warmGameIntro(mission: string, tagline: string) {
-  pronunciation.warm([{ text: mission }, { text: tagline }]);
+/** What Luna says the moment a game opens. (The tagline is only ever read, not spoken.) */
+export function warmGameIntro(mission: string) {
+  pronunciation.warm([{ text: mission }]);
 }

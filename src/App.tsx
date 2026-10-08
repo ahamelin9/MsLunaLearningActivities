@@ -21,20 +21,14 @@ export function App() {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isTrophyOpen, setIsTrophyOpen] = useState(false);
 
-  // Ms. Luna's neural voice is fetched once, on the first tap: browsers block
-  // audio before a gesture, and this keeps the first paint fast.
+  // Ms. Luna's voice is a set of pre-rendered clips, so it can be loaded
+  // immediately rather than waiting for a tap: decoding audio works on a
+  // suspended AudioContext, and only playback needs a gesture. By the time a
+  // child touches a letter, every phoneme is already decoded and waiting.
   useEffect(() => {
-    const start = () => {
-      void pronunciation.init().then(ready => {
-        if (ready) void pronunciation.prewarmPhonics();
-      });
-    };
-    window.addEventListener('pointerdown', start, { once: true });
-    window.addEventListener('keydown', start, { once: true });
-    return () => {
-      window.removeEventListener('pointerdown', start);
-      window.removeEventListener('keydown', start);
-    };
+    void pronunciation.init().then(ready => {
+      if (ready) void pronunciation.prewarmPhonics();
+    });
   }, []);
 
   // Subscribe to persistent storage updates

@@ -75,8 +75,12 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
       api.miss({
         hint:
           round.kind === 'truefalse'
-            ? `Read the sentence once more: “${round.sentence.text}” Now check the claim word by word.`
-            : `Try the sentence with “${option}” in the gap. Does it sound right?`
+            ? [
+                { text: 'Read the sentence once more.' },
+                { text: round.sentence.text },
+                { text: 'Now check the claim word by word.' }
+              ]
+            : [{ text: 'Try the sentence with' }, { word: option }, { text: 'in the gap. Does it sound right?' }]
       });
     }
   };

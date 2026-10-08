@@ -9,10 +9,11 @@ import {
   shuffle,
   tierFor,
   wordsUpTo,
+  type CategoryId,
   type WordItem
 } from '../engine/content';
 import { soundManager } from '../../../utils/audio';
-import { pronunciation } from '../../../utils/pronunciation';
+import { pronunciation, type SpeechPart } from '../../../utils/pronunciation';
 
 type Kind = 'word' | 'sentence' | 'category' | 'trick';
 
@@ -24,8 +25,12 @@ interface Choice {
 
 interface Round {
   kind: Kind;
-  /** exactly what Luna says out loud */
-  spoken: string;
+  /**
+   * exactly what Luna says out loud, in parts: the fixed wording and the word
+   * are separate clips, where one string per word would be a sentence nobody
+   * rendered
+   */
+  spoken: SpeechPart[];
   /** shown only after the round is solved */
   reveal: string;
   answerId: string;
@@ -34,6 +39,17 @@ interface Round {
   isTrap: boolean;
   rule?: string;
 }
+
+/** A whole line per category: a closed set, so each is one natural-sounding clip. */
+const CATEGORY_ASK: Record<CategoryId, SpeechPart> = {
+  animal: { text: 'Luna says… tap an animal.' },
+  food: { text: 'Luna says… tap something to eat.' },
+  nature: { text: 'Luna says… tap something you find outside.' },
+  home: { text: 'Luna says… tap something in the house.' },
+  clothes: { text: 'Luna says… tap something to wear.' },
+  vehicle: { text: 'Luna says… tap something that goes.' },
+  toy: { text: 'Luna says… tap a toy.' }
+};
 
 function toChoice(w: WordItem, i: number): Choice {
   return { id: `${w.word}-${i}`, emoji: w.emoji, word: w.word };
@@ -57,7 +73,7 @@ function buildRound(tier: 1 | 2 | 3): Round {
     const answer = choices.find(c => c.emoji === sentence.emoji)!;
     return {
       kind,
-      spoken: sentence.text,
+      spoken: [{ text: sentence.text }],
       reveal: sentence.text,
       answerId: answer.id,
       choices,
@@ -77,7 +93,7 @@ function buildRound(tier: 1 | 2 | 3): Round {
     const answer = choices.find(c => c.word === target.word)!;
     return {
       kind,
-      spoken: `Luna says… tap something you would find in ${category.label.toLowerCase()}.`,
+      spoken: [CATEGORY_ASK[category.id]],
       reveal: `${target.word} — that is ${category.label.toLowerCase()}!`,
       answerId: answer.id,
       choices,
@@ -99,7 +115,9 @@ function buildRound(tier: 1 | 2 | 3): Round {
     const trapped = Math.random() < 0.5;
     return {
       kind,
-      spoken: trapped ? `Tap the ${target.word}.` : `Luna says… tap the ${target.word}.`,
+      spoken: trapped
+        ? [{ text: 'Tap the' }, { word: target.word }]
+        : [{ text: 'Luna says… tap the' }, { word: target.word }],
       reveal: trapped ? 'I never said “Luna says”!' : `Luna says: ${target.word}`,
       answerId: trapped ? 'paw' : answer.id,
       choices,
@@ -110,7 +128,7 @@ function buildRound(tier: 1 | 2 | 3): Round {
 
   return {
     kind,
-    spoken: `Luna says… find the ${target.word}.`,
+    spoken: [{ text: 'Luna says… find the' }, { word: target.word }],
     reveal: target.word,
     answerId: answer.id,
     choices,
@@ -126,7 +144,7 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
   const sayIt = () => {
     setListening(true);
     soundManager.playLetterTap();
-    pronunciation.speakSentence(round.spoken, { onEnd: () => setListening(false) });
+    pronunciation.speakSequence(round.spoken, { onEnd: () => setListening(false) });
     window.setTimeout(() => setListening(false), 4200);
   };
 
@@ -148,8 +166,8 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
       api.miss({
         lunaLine: round.isTrap ? 'Careful! I did not say “Luna says”.' : undefined,
         hint: round.isTrap
-          ? 'Listen for the magic words “Luna says” before you tap a picture.'
-          : 'Press the big ear to hear me again, then look at each picture.'
+          ? [{ text: 'Listen for the magic words “Luna says” before you tap a picture.' }]
+          : [{ text: 'Press the big ear to hear me again, then look at each picture.' }]
       });
     }
   };

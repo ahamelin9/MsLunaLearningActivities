@@ -183,35 +183,30 @@ export const SentenceBuilder: React.FC<SentenceBuilderProps> = ({
       {/* Hint */}
       {!isCorrect && question.hint && (
         <div style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
-          {!showHint ? (
-            <button
-              onClick={() => {
-                soundManager.playPop();
-                setShowHint(true);
-                soundManager.speak(question.hint || '');
-              }}
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '6px',
-                padding: '6px 14px',
-                borderRadius: '9999px',
-                background: '#ECFDF5',
-                border: '1px solid #A7F3D0',
-                color: '#065F46',
-                fontSize: '13px',
-                fontWeight: 700,
-                cursor: 'pointer'
-              }}
-            >
-              <LightbulbIcon size={14} color="#059669" />
-              <span>Need a hint?</span>
-            </button>
-          ) : (
-            <div style={{ background: '#FEF9C3', border: '1.5px solid #FDE047', borderRadius: '14px', padding: '8px 14px', fontSize: '13px', fontWeight: 700, color: '#854D0E' }}>
-              💡 Hint: {question.hint}
-            </div>
-          )}
+          {/* hints are spoken, never written: on screen they would name the answer */}
+          <button
+            onClick={() => {
+              soundManager.playPop();
+              setShowHint(true);
+              soundManager.speak(question.hint || '');
+            }}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              padding: '6px 14px',
+              borderRadius: '9999px',
+              background: '#ECFDF5',
+              border: '1px solid #A7F3D0',
+              color: '#065F46',
+              fontSize: '13px',
+              fontWeight: 700,
+              cursor: 'pointer'
+            }}
+          >
+            <LightbulbIcon size={14} color="#059669" />
+            <span>{showHint ? 'Hear the hint again' : 'Need a hint?'}</span>
+          </button>
         </div>
       )}
     </div>

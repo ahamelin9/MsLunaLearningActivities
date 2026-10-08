@@ -175,12 +175,19 @@
       }
 
       .perch-hint {
+        display: block;
+        width: 100%;
         margin-top: 0.4rem;
-        padding-top: 0.4rem;
+        padding: 0.4rem 0 0;
+        border: none;
         border-top: 2px dashed rgba(58, 42, 31, 0.2);
+        background: none;
+        font: inherit;
         font-size: 0.9rem;
         color: $moss-deep;
         font-weight: 600;
+        text-align: left;
+        cursor: pointer;
       }
 
       &::before {

@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import type { SightWordReaderQuestion } from '../../../types/reading';
 import { soundManager } from '../../../utils/audio';
 import { pronunciation } from '../../../utils/pronunciation';
 import { Button } from '../../../components/ui/Button';
 import { SpeakerIcon, CheckIcon, SparklesIcon, LightbulbIcon } from '../../../components/ui/Icons';
+import { shuffle } from '../engine/content';
 import './SightWordReader.scss';
 
 interface SightWordReaderProps {
@@ -15,17 +16,25 @@ export const SightWordReader: React.FC<SightWordReaderProps> = ({
   question,
   onCorrectAnswer
 }) => {
+  // The written order always put the answer first, which a child learns fast.
+  const options = useMemo(() => shuffle(question.options), [question.options]);
   const [selectedOptionId, setSelectedOptionId] = useState<string | null>(null);
   const [isCorrect, setIsCorrect] = useState(false);
   const [showHint, setShowHint] = useState(false);
 
   useEffect(() => {
+    sayPrompt();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [question.speechPrompt, question.word]);
+
+  // The written prompt never names the word; only the spoken one does.
+  function sayPrompt() {
     if (question.speechPrompt) {
       soundManager.speak(question.speechPrompt);
     } else {
-      pronunciation.speakSequence([{ text: 'Read the sight word' }, { word: question.word }]);
+      pronunciation.speakSequence([{ text: 'Find the word' }, { word: question.word }]);
     }
-  }, [question.speechPrompt, question.word]);
+  }
 
   const playWord = () => {
     soundManager.playPop();
@@ -68,12 +77,15 @@ export const SightWordReader: React.FC<SightWordReaderProps> = ({
           className="sight-flashcard"
           title="Tap to hear sight word"
         >
-          <span className="flashcard-badge">👀 Sight Word</span>
-          <span className="flashcard-word">{question.word.toUpperCase()}</span>
+          <span className="flashcard-badge">👂 Sight Word</span>
+          {/* heard, never shown, until it is found: the options are words, so
+              showing it would turn reading into matching letters */}
+          <span className="flashcard-word">{isCorrect ? question.word.toUpperCase() : '?'}</span>
           <span className="flashcard-tap-hint">Tap to listen</span>
         </button>
 
-        {question.exampleSentence && (
+        {/* the sentence highlights the word, so it is the reward, not the clue */}
+        {isCorrect && question.exampleSentence && (
           <button
             onClick={playSentence}
             className="example-sentence-card"
@@ -87,7 +99,7 @@ export const SightWordReader: React.FC<SightWordReaderProps> = ({
         )}
 
         <button
-          onClick={() => soundManager.speak(question.prompt)}
+          onClick={sayPrompt}
           className="prompt-pill-btn"
         >
           <SpeakerIcon size={16} />
@@ -96,7 +108,7 @@ export const SightWordReader: React.FC<SightWordReaderProps> = ({
       </div>
 
       <div className="sight-options-grid">
-        {question.options.map((option) => {
+        {options.map((option) => {
           const isSelected = selectedOptionId === option.id;
           const isOptionSuccess = isSelected && option.isCorrect;
           const isOptionWrong = isSelected && !option.isCorrect;
@@ -121,7 +133,7 @@ export const SightWordReader: React.FC<SightWordReaderProps> = ({
         <div className="sight-success-banner">
           <div className="success-content">
             <SparklesIcon size={24} color="#059669" />
-            <span>Super reader! You recognized the sight word "${question.word.toUpperCase()}"! 🚀</span>
+            <span>Super reader! You recognized the sight word “{question.word.toUpperCase()}”! 🚀</span>
           </div>
           <Button
             variant="success"
@@ -137,23 +149,18 @@ export const SightWordReader: React.FC<SightWordReaderProps> = ({
 
       {!isCorrect && question.hint && (
         <div className="sight-hint-area">
-          {!showHint ? (
-            <button
-              onClick={() => {
-                soundManager.playPop();
-                setShowHint(true);
-                soundManager.speak(question.hint || '');
-              }}
-              className="hint-btn"
-            >
-              <LightbulbIcon size={14} color="#059669" />
-              <span>Need a hint?</span>
-            </button>
-          ) : (
-            <div className="hint-pill">
-              💡 Hint: {question.hint}
-            </div>
-          )}
+          {/* hints are spoken, never written: on screen they would name the answer */}
+          <button
+            onClick={() => {
+              soundManager.playPop();
+              setShowHint(true);
+              soundManager.speak(question.hint || '');
+            }}
+            className="hint-btn"
+          >
+            <LightbulbIcon size={14} color="#059669" />
+            <span>{showHint ? 'Hear the hint again' : 'Need a hint?'}</span>
+          </button>
         </div>
       )}
     </div>

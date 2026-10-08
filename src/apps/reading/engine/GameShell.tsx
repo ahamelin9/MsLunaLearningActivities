@@ -7,7 +7,7 @@ import { lunaSay, type LunaMood } from './luna';
 import { LunaOwl } from './LunaOwl';
 import { nextSticker, type Sticker } from './stickers';
 import { soundManager } from '../../../utils/audio';
-import { pronunciation } from '../../../utils/pronunciation';
+import { pronunciation, type SpeechPart } from '../../../utils/pronunciation';
 import { warmGameIntro } from './warmup';
 import { storageService } from '../../../utils/storage';
 import { launchConfetti } from '../../../utils/confetti';
@@ -50,7 +50,7 @@ export const GameShell: React.FC<GameShellProps> = ({
   const [roundIndex, setRoundIndex] = useState(0);
   const [attempts, setAttempts] = useState(0);
   const [hintLevel, setHintLevel] = useState<0 | 1 | 2>(0);
-  const [hint, setHint] = useState<string | null>(null);
+  const [hint, setHint] = useState<SpeechPart[] | null>(null);
   const [roundsWon, setRoundsWon] = useState(0);
   const [cleanRounds, setCleanRounds] = useState(0);
   const [flash, setFlash] = useState<'win' | 'miss' | null>(null);
@@ -86,14 +86,21 @@ export const GameShell: React.FC<GameShellProps> = ({
     []
   );
 
+  /**
+   * Luna's line in the bubble, spoken. `then` follows it aloud without
+   * joining the bubble: a hint, or a sticker's line. Speaking it as its own
+   * part also means it plays a clip that exists, where the two glued into one
+   * string would be a sentence nobody rendered.
+   */
   const speak = useCallback(
-    (text: string, nextMood: LunaMood = 'happy') => {
+    (text: string, nextMood: LunaMood = 'happy', then: SpeechPart[] = []) => {
       setBubble(text);
       setMood(nextMood);
       setTalking(true);
-      soundManager.speak(text.replace(/[…]/g, '...'), {
-        onEnd: () => setTalking(false)
-      });
+      const line = text.replace(/[…]/g, '...');
+      const onEnd = () => setTalking(false);
+      if (then.length) pronunciation.speakSequence([{ text: line }, ...then], { onEnd });
+      else soundManager.speak(line, { onEnd });
       later(() => setTalking(false), 3600);
     },
     [later]
@@ -101,8 +108,8 @@ export const GameShell: React.FC<GameShellProps> = ({
 
   // The start screen is the moment to prepare what this game will say.
   useEffect(() => {
-    warmGameIntro(game.mission, game.tagline);
-  }, [game.mission, game.tagline]);
+    warmGameIntro(game.mission);
+  }, [game.mission]);
 
   // Luna introduces the game a beat after a play session starts.
   useEffect(() => {
@@ -176,7 +183,7 @@ export const GameShell: React.FC<GameShellProps> = ({
   );
 
   const handleMiss = useCallback(
-    (opts?: { lunaLine?: string; hint?: string }) => {
+    (opts?: { lunaLine?: string; hint?: SpeechPart[] }) => {
       const attemptNumber = attempts + 1;
       setAttempts(attemptNumber);
       setWinStreak(0);
@@ -186,14 +193,16 @@ export const GameShell: React.FC<GameShellProps> = ({
 
       const nextHintLevel: 0 | 1 | 2 = attemptNumber >= 3 ? 2 : attemptNumber >= 2 ? 1 : 0;
       setHintLevel(nextHintLevel);
-      if (nextHintLevel > 0 && opts?.hint) {
-        setHint(opts.hint);
-      }
+      // From the second miss Luna says the hint after her line. It is never
+      // written out: a child who knows their letters would read the answer
+      // straight off it.
+      const spokenHint = nextHintLevel > 0 && opts?.hint?.length ? opts.hint : null;
+      if (spokenHint) setHint(spokenHint);
 
       const line =
         opts?.lunaLine ??
         (attemptNumber >= 2 ? lunaSay('missAgain', game.id).text : lunaSay('missFirst', game.id).text);
-      speak(line, attemptNumber >= 2 ? 'think' : 'oops');
+      speak(line, attemptNumber >= 2 ? 'think' : 'oops', spokenHint ?? []);
     },
     [attempts, game.id, later, speak]
   );
@@ -242,10 +251,7 @@ export const GameShell: React.FC<GameShellProps> = ({
     soundManager.playFanfare();
     launchConfetti(canvasRef.current, 2800);
     later(() => {
-      const closing = award.sticker
-        ? `${lunaSay('finish', game.id).text} ${award.sticker.line}`
-        : lunaSay('finish', game.id).text;
-      speak(closing, 'cheer');
+      speak(lunaSay('finish', game.id).text, 'cheer', award.sticker ? [{ text: award.sticker.line }] : []);
     }, 700);
   }, [phase, award, game.id, later, speak]);
 
@@ -419,9 +425,15 @@ export const GameShell: React.FC<GameShellProps> = ({
             )}
           </p>
           {hint && (
-            <p className="perch-hint">
-              <span aria-hidden="true">🔦</span> {hint}
-            </p>
+            <button
+              className="perch-hint"
+              onClick={() => {
+                soundManager.playLetterTap();
+                pronunciation.speakSequence(hint);
+              }}
+            >
+              <span aria-hidden="true">🔦</span> Hear my hint again
+            </button>
           )}
         </div>
       </div>

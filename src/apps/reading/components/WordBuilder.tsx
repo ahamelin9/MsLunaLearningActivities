@@ -47,10 +47,16 @@ export const WordBuilder: React.FC<WordBuilderProps> = ({
   const [isSoundingOut, setIsSoundingOut] = useState(false);
   const [showHint, setShowHint] = useState(false);
 
-  // Speak target word prompt on mount (without spelling it out)
+  // Say the word to spell, never spell it out. Without a written prompt it is
+  // two parts, both of them rendered clips.
+  const sayPrompt = () => {
+    if (question.speechPrompt) soundManager.speak(question.speechPrompt);
+    else pronunciation.speakSequence([{ text: 'Spell the word' }, { word: question.word }]);
+  };
+
   useEffect(() => {
-    const promptToSpeak = question.speechPrompt || `Spell the word: ${question.word}`;
-    soundManager.speak(promptToSpeak);
+    sayPrompt();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [question.speechPrompt, question.word]);
 
   // Handle letter tile tap from bank
@@ -167,7 +173,7 @@ export const WordBuilder: React.FC<WordBuilderProps> = ({
         <button
           onClick={() => {
             soundManager.playPop();
-            soundManager.speak(question.speechPrompt || `Spell the word: ${question.word}`);
+            sayPrompt();
           }}
           className="prompt-speak-btn"
         >
@@ -276,23 +282,18 @@ export const WordBuilder: React.FC<WordBuilderProps> = ({
       {/* Hint Area */}
       {!isCorrect && question.hint && (
         <div className="hint-area">
-          {!showHint ? (
-            <button
-              onClick={() => {
-                soundManager.playPop();
-                setShowHint(true);
-                soundManager.speak(question.hint || '');
-              }}
-              className="hint-trigger-btn"
-            >
-              <LightbulbIcon size={14} color="#9333EA" />
-              <span>Need a hint?</span>
-            </button>
-          ) : (
-            <div className="hint-box">
-              <span>💡 Hint: {question.hint}</span>
-            </div>
-          )}
+          {/* hints are spoken, never written: on screen they would name the answer */}
+          <button
+            onClick={() => {
+              soundManager.playPop();
+              setShowHint(true);
+              soundManager.speak(question.hint || '');
+            }}
+            className="hint-trigger-btn"
+          >
+            <LightbulbIcon size={14} color="#9333EA" />
+            <span>{showHint ? 'Hear the hint again' : 'Need a hint?'}</span>
+          </button>
         </div>
       )}
     </div>

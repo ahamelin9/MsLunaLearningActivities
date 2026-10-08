@@ -125,7 +125,7 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
     } else {
       pronunciation.speakSequence([{ text: 'That one says' }, { sound: bubble.char }]);
       api.miss({
-        hint: `You want ${round.letter.sound}, like ${round.letter.anchor}. That bubble is ${bubble.char}.`
+        hint: [{ text: 'Listen for' }, { sound: round.letter.letter }, { text: 'like' }, { word: round.letter.anchor }]
       });
     }
   };
@@ -133,9 +133,10 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
   return (
     <div className="game-surface bubbles">
       <div className="bubble-header">
-        <button className="sound-horn small" onClick={sayTarget}>
+        {/* the sound is only ever heard: written here, it would name the bubble to pop */}
+        <button className="sound-horn small" onClick={sayTarget} title="Hear the sound again">
           <span className="horn-icon" aria-hidden="true">🫧</span>
-          <span className="horn-sound">{round.letter.sound}</span>
+          <span className="horn-sound">Listen</span>
         </button>
         <div className="bubble-tally" aria-label={`${popped} of ${round.needed} popped`}>
           {Array.from({ length: round.needed }).map((_, i) => (

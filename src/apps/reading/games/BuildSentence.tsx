@@ -84,8 +84,8 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
       api.miss({
         hint:
           firstWrong === 0
-            ? `A sentence starts with a capital letter. Which word begins with a big letter?`
-            : `Word ${firstWrong + 1} is not quite right. Read it out loud and listen for the bump.`
+            ? [{ text: 'A sentence starts with a capital letter. Which word begins with a big letter?' }]
+            : [{ text: 'Look at the word' }, { word: attempt[firstWrong] }, { text: 'Is it in the right place? Read it out loud and listen for the bump.' }]
       });
     }
   };

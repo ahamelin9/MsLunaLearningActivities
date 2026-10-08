@@ -21,7 +21,7 @@ export interface LunaLine {
 
 type Bank = Record<string, LunaLine[]>;
 
-const GENERAL: Bank = {
+export const GENERAL: Bank = {
   greet: [
     { text: 'Oh good, you came! I have games ready.', mood: 'happy' },
     { text: 'Welcome back to my library!', mood: 'happy' },
@@ -84,7 +84,7 @@ const GENERAL: Bank = {
 };
 
 /** Per-game flavour so two games never sound alike. */
-const PER_GAME: Record<string, Partial<Bank>> = {
+export const PER_GAME: Record<string, Partial<Bank>> = {
   'sound-detective': {
     intro: [{ text: 'A sound is hiding in this room. Find who makes it!', mood: 'think' }],
     correct: [

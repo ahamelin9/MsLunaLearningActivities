@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import type { SoundToLetterQuestion } from '../../../types/reading';
 import { soundManager } from '../../../utils/audio';
 import { pronunciation } from '../../../utils/pronunciation';
 import { Button } from '../../../components/ui/Button';
 import { SpeakerIcon, CheckIcon, SparklesIcon, LightbulbIcon } from '../../../components/ui/Icons';
+import { shuffle } from '../engine/content';
 import './SoundToLetterMatch.scss';
 
 interface SoundToLetterMatchProps {
@@ -15,11 +16,14 @@ export const SoundToLetterMatch: React.FC<SoundToLetterMatchProps> = ({
   question,
   onCorrectAnswer
 }) => {
+  // The written order always put the answer first, which a child learns fast.
+  const options = useMemo(() => shuffle(question.options), [question.options]);
   const [selectedOptionId, setSelectedOptionId] = useState<string | null>(null);
   const [isCorrect, setIsCorrect] = useState(false);
   const [showHint, setShowHint] = useState(false);
 
-  useEffect(() => {
+  // The written prompt never names the sound; only the spoken one does.
+  const sayPrompt = () => {
     if (question.speechPrompt) {
       soundManager.speak(question.speechPrompt);
     } else {
@@ -28,6 +32,11 @@ export const SoundToLetterMatch: React.FC<SoundToLetterMatchProps> = ({
         { sound: question.targetLetter }
       ]);
     }
+  };
+
+  useEffect(() => {
+    sayPrompt();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [question.speechPrompt, question.targetLetter]);
 
   const playTargetSound = () => {
@@ -59,12 +68,13 @@ export const SoundToLetterMatch: React.FC<SoundToLetterMatchProps> = ({
           <span className="sound-speaker-icon">
             <SpeakerIcon size={44} color="#FFFFFF" />
           </span>
-          <span className="sound-phoneme-text">{question.targetSoundName}</span>
+          {/* heard, never shown: a written /b/ would name the letter */}
+          <span className="sound-phoneme-text" aria-hidden="true">?</span>
           <span className="sound-tap-hint">Tap to listen</span>
         </button>
 
         <button
-          onClick={() => soundManager.speak(question.prompt)}
+          onClick={sayPrompt}
           className="prompt-pill-btn"
         >
           <SpeakerIcon size={16} />
@@ -73,7 +83,7 @@ export const SoundToLetterMatch: React.FC<SoundToLetterMatchProps> = ({
       </div>
 
       <div className="letter-options-grid">
-        {question.options.map((option) => {
+        {options.map((option) => {
           const isSelected = selectedOptionId === option.id;
           const isOptionSuccess = isSelected && option.isCorrect;
           const isOptionWrong = isSelected && !option.isCorrect;
@@ -114,23 +124,18 @@ export const SoundToLetterMatch: React.FC<SoundToLetterMatchProps> = ({
 
       {!isCorrect && question.hint && (
         <div className="sound-match-hint-area">
-          {!showHint ? (
-            <button
-              onClick={() => {
-                soundManager.playPop();
-                setShowHint(true);
-                soundManager.speak(question.hint || '');
-              }}
-              className="hint-btn"
-            >
-              <LightbulbIcon size={14} color="#059669" />
-              <span>Need a hint?</span>
-            </button>
-          ) : (
-            <div className="hint-pill">
-              💡 Hint: {question.hint}
-            </div>
-          )}
+          {/* hints are spoken, never written: on screen they would name the answer */}
+          <button
+            onClick={() => {
+              soundManager.playPop();
+              setShowHint(true);
+              soundManager.speak(question.hint || '');
+            }}
+            className="hint-btn"
+          >
+            <LightbulbIcon size={14} color="#059669" />
+            <span>{showHint ? 'Hear the hint again' : 'Need a hint?'}</span>
+          </button>
         </div>
       )}
     </div>

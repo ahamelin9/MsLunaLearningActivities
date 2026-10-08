@@ -1,0 +1,210 @@
+{
+  "_comment": [
+    "Per-clip corrections, applied on top of the recipes in phonemes.mjs.",
+    "A phonics sound is keyed by its sound id, which the review page shows:",
+    "'sound|m', 'sound|ay', 'sound|st'. Words and sentences are keyed by",
+    "'<kind>|<value>' exactly as the inventory names them.",
+    "",
+    "holdMs    how long a held sound lasts (hisses, hums, vowels, buzzes);",
+    "          for ch and x, the most of the word ending to keep",
+    "targetDb  loudness, if one sound sits oddly against the others",
+    "carrier   cut the sound from a different word, written in misaki",
+    "          phonemes, e.g. \"hˈʌm\" (the renderer checks the spelling)",
+    "word      with carrier: the word's ordinary spelling, for the review page",
+    "speed     with carrier: say that word a little slower (not below 0.8)",
+    "afterMs   stops, glides, blends, j: how much of the vowel after the",
+    "          consonant survives before the fade",
+    "noiseDb   z, v, voiced th: how loud the hiss is against the voice",
+    "pulse     z, v, voiced th: how strongly the hiss throbs with the voice (0-1)",
+    "natural   true: keep a hum, vowel or long vowel as long as it was in",
+    "          the word, instead of holding it",
+    "pitch     'follow': a held sound keeps the small wobbles in pitch of the",
+    "          word it came from, instead of an even, flat pitch",
+    "",
+    "Render, listen on the review page, change a number, render again.",
+    "Only the clips whose tuning changed are regenerated:",
+    "  npm run voice:render -- --only sound"
+  ],
+  "sound|ar": {
+    "carrier": "ˈɑɹ",
+    "natural": true,
+    "word": "are"
+  },
+  "sound|ay": {
+    "carrier": "ˈA",
+    "natural": true,
+    "word": "A"
+  },
+  "sound|b": {
+    "afterMs": 80,
+    "carrier": "bˈʌɡ",
+    "word": "bug"
+  },
+  "sound|bl": {
+    "carrier": "blˈæk",
+    "word": "black"
+  },
+  "sound|ch": {
+    "carrier": "mˈʌʧ",
+    "word": "much"
+  },
+  "sound|d": {
+    "afterMs": 80,
+    "carrier": "dˈʌk",
+    "word": "duck"
+  },
+  "sound|e": {
+    "carrier": "hˈɛd",
+    "pitch": "follow",
+    "speed": 0.85,
+    "word": "head"
+  },
+  "sound|ee": {
+    "carrier": "hˈi",
+    "natural": true,
+    "word": "he"
+  },
+  "sound|er": {
+    "carrier": "hˈɜɹ",
+    "pitch": "follow",
+    "word": "her"
+  },
+  "sound|eye": {
+    "carrier": "hˈI",
+    "natural": true,
+    "word": "high"
+  },
+  "sound|f": {
+    "carrier": "kˈʌf",
+    "targetDb": -27,
+    "word": "cuff"
+  },
+  "sound|fl": {
+    "carrier": "flˈæɡ",
+    "word": "flag"
+  },
+  "sound|g": {
+    "afterMs": 80,
+    "carrier": "ɡˈʌm",
+    "word": "gum"
+  },
+  "sound|i": {
+    "carrier": "bˈɪd",
+    "holdMs": 320,
+    "pitch": "follow",
+    "word": "bid"
+  },
+  "sound|j": {
+    "afterMs": 70,
+    "carrier": "ˈɑʤə",
+    "word": "lodger"
+  },
+  "sound|k": {
+    "afterMs": 45,
+    "carrier": "kˈʌp",
+    "word": "cup"
+  },
+  "sound|kw": {
+    "afterMs": 65,
+    "carrier": "kwˈɪk",
+    "word": "quick"
+  },
+  "sound|l": {
+    "carrier": "bˈɛl",
+    "pitch": "follow",
+    "word": "bell"
+  },
+  "sound|m": {
+    "carrier": "mˈʌm",
+    "holdMs": 500,
+    "human": true,
+    "word": "mum"
+  },
+  "sound|n": {
+    "carrier": "sˈʌn",
+    "pitch": "follow",
+    "word": "sun"
+  },
+  "sound|o": {
+    "carrier": "hˈɑt",
+    "pitch": "follow",
+    "word": "hot"
+  },
+  "sound|oh": {
+    "carrier": "hˈO",
+    "pitch": "follow",
+    "word": "hoe"
+  },
+  "sound|or": {
+    "carrier": "kˈɔɹ",
+    "natural": true,
+    "word": "core"
+  },
+  "sound|p": {
+    "afterMs": 25,
+    "carrier": "pˈʌp",
+    "word": "pup"
+  },
+  "sound|r": {
+    "carrier": "fˈɜɹ",
+    "pitch": "follow",
+    "word": "fur"
+  },
+  "sound|s": {
+    "carrier": "jˈɛs",
+    "word": "yes"
+  },
+  "sound|sh": {
+    "carrier": "pˈʊʃ",
+    "word": "push"
+  },
+  "sound|sk": {
+    "afterMs": 5,
+    "carrier": "skˈʌl",
+    "word": "skull"
+  },
+  "sound|sm": {
+    "holdSecond": 230
+  },
+  "sound|st": {
+    "carrier": "stˈɑp",
+    "word": "stop"
+  },
+  "sound|sw": {
+    "afterMs": 95,
+    "carrier": "swˈɪm",
+    "word": "swim"
+  },
+  "sound|th": {
+    "carrier": "bˈæθ",
+    "holdMs": 500,
+    "word": "bath"
+  },
+  "sound|u": {
+    "carrier": "mˈʌd",
+    "holdMs": 350,
+    "human": true,
+    "word": "mud"
+  },
+  "sound|w": {
+    "afterMs": 80,
+    "carrier": "wˈʌn",
+    "fadeMs": 100,
+    "speed": 0.8,
+    "word": "won"
+  },
+  "sound|y": {
+    "afterMs": 90,
+    "carrier": "jˈɛs",
+    "fadeMs": 110,
+    "word": "yes"
+  },
+  "sound|you": {
+    "carrier": "hjˈu",
+    "natural": true,
+    "word": "hue"
+  },
+  "sound|z": {
+    "noiseDb": -10
+  }
+}

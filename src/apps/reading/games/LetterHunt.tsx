@@ -126,7 +126,12 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
       window.setTimeout(() => setMissId(null), 600);
       pronunciation.speakSequence([{ text: 'That is' }, { name: bug.char }]);
       api.miss({
-        hint: `You want ${round.target}${round.alsoAccept ? ` or ${round.alsoAccept}` : ''}. ${bug.char} is a tricky twin!`
+        hint: [
+          { text: 'That one is a tricky twin!' },
+          { text: 'Find every letter' },
+          { name: round.target },
+          ...(round.alsoAccept ? [{ text: 'Big ones and little ones!' }] : [])
+        ]
       });
     }
   };
@@ -136,10 +141,10 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
   return (
     <div className="game-surface hunt">
       <div className="hunt-header">
+        {/* the letter is only ever heard: shown here, the hunt is just matching shapes */}
         <div className="hunt-target">
-          <span className="hunt-label">Catch every</span>
-          <span className="hunt-char">{round.target}</span>
-          {round.alsoAccept && <span className="hunt-twin">{round.alsoAccept}</span>}
+          <span className="hunt-label">Catch every letter I say</span>
+          <span className="hunt-char" aria-hidden="true">?</span>
         </div>
         <button className="speak-chip" onClick={announce}>
           🔊 Say it again
@@ -190,7 +195,7 @@ export const letterHunt: GameDef<Round> = {
   title: 'The Letter Jar',
   emoji: '🫙',
   tagline: 'Letters escaped! Catch every single one.',
-  objective: 'Letter recognition — discriminate a target letter from visually similar letters.',
+  objective: 'Letter recognition — hear a letter’s name, then find it among letters that look alike.',
   skill: 'letters',
   mission: 'They wriggled out of the jar again. Catch them all!',
   roundsPerPlay: 4,

@@ -105,7 +105,13 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
         setWrongId(s.id);
         window.setTimeout(() => setWrongId(null), 600);
         api.miss({
-          hint: `Say it slowly: ${s.word}. Does it begin with ${round.letter.sound}? Listen to the very first sound.`
+          hint: [
+            { text: 'Say it slowly.' },
+            { word: s.word },
+            { text: 'Now listen for' },
+            { sound: round.letter.letter },
+            { text: 'at the very start.' }
+          ]
         });
       }, 380);
     }
@@ -116,12 +122,13 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
   return (
     <div className="game-surface detective">
       <div className="detective-brief">
+        {/* the clue is only ever heard: a written /m/ would name the letter outright */}
         <button className="sound-horn" onClick={playSound} title="Hear the sound again">
           <span className="horn-icon" aria-hidden="true">📯</span>
-          <span className="horn-sound">{round.letter.sound}</span>
+          <span className="horn-sound">Listen</span>
         </button>
         <p className="detective-case">
-          Someone here starts with <strong>{round.letter.sound}</strong>. Tap a suspect to hear its name.
+          Someone here starts with <strong>that sound</strong>. Tap a suspect to hear its name.
         </p>
       </div>
 

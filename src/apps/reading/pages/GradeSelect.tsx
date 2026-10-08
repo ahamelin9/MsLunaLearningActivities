@@ -2,9 +2,17 @@ import React from 'react';
 import type { GradeLevel } from '../../../types/reading';
 import { GRADES } from '../../../data/readingCurriculum';
 import { soundManager } from '../../../utils/audio';
+import { pronunciation, type SpeechPart } from '../../../utils/pronunciation';
 import { Mascot } from '../../../components/ui/Mascot';
 import { SparklesIcon, ArrowRightIcon } from '../../../components/ui/Icons';
 import './GradeSelect.scss';
+
+/** Written out whole so each is a rendered clip. */
+const GRADE_LINES: Record<GradeLevel, SpeechPart> = {
+  kindergarten: { text: 'Let’s start Kindergarten!' },
+  grade1: { text: 'Let’s start First Grade!' },
+  grade2: { text: 'Let’s start Second Grade!' }
+};
 
 interface GradeSelectProps {
   onSelectGrade: (grade: GradeLevel) => void;
@@ -17,7 +25,7 @@ export const GradeSelect: React.FC<GradeSelectProps> = ({
 }) => {
   const handleGradeClick = (grade: GradeLevel) => {
     soundManager.playPop();
-    soundManager.speak(`Let’s start ${grade === 'kindergarten' ? 'Kindergarten' : grade === 'grade1' ? 'First Grade' : 'Second Grade'}!`);
+    pronunciation.speakSequence([GRADE_LINES[grade]]);
     onSelectGrade(grade);
   };
 

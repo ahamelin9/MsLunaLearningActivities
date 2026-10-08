@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import type { UserSettings } from '../../types/user';
-import { LUNA_VOICES, pronunciation, type VoiceStatus } from '../../utils/pronunciation';
+import { DEFAULT_VOICE_ID, LUNA_VOICES, pronunciation, type VoiceStatus } from '../../utils/pronunciation';
 import { soundManager } from '../../utils/audio';
 import { SpeakerIcon, CheckIcon } from '../ui/Icons';
 import './VoicePicker.scss';
@@ -24,11 +24,41 @@ const SAMPLE_PARTS = [
 export const VoicePicker: React.FC<VoicePickerProps> = ({ settings, onChange }) => {
   const [status, setStatus] = useState<VoiceStatus>(pronunciation.getStatus());
   const [previewing, setPreviewing] = useState<string | null>(null);
+  const [rendered, setRendered] = useState<Set<string> | null>(null);
 
   useEffect(() => pronunciation.onStatus(setStatus), []);
 
-  const language = settings.voiceLanguage ?? 'en-US';
-  const voices = LUNA_VOICES.filter(v => v.language === language);
+  // A voice exists for the child only if its clips were rendered. Adding one
+  // is `npm run voice:render -- --voice <id>`; until then it is not offered,
+  // because picking it would silently drop Luna to the browser voice.
+  useEffect(() => {
+    let live = true;
+    void pronunciation.renderedVoices().then(set => {
+      if (live) setRendered(set);
+    });
+    return () => {
+      live = false;
+    };
+  }, []);
+
+  const available = LUNA_VOICES.filter(v => !rendered || rendered.has(v.id));
+  // A voice or accent saved before it stopped being offered (every voice used
+  // to run on-device) shows as Luna, which is what the child is hearing,
+  // rather than as an empty list with nothing selected.
+  const savedVoiceGone = rendered !== null && !rendered.has(settings.voiceId);
+  const voiceId = savedVoiceGone ? DEFAULT_VOICE_ID : settings.voiceId;
+  const savedLanguage = settings.voiceLanguage ?? 'en-US';
+  const language = available.some(v => v.language === savedLanguage)
+    ? savedLanguage
+    : (LUNA_VOICES.find(v => v.id === DEFAULT_VOICE_ID)?.language ?? 'en-US');
+  const voices = available.filter(v => v.language === language);
+
+  // ...and the saved settings are corrected to match
+  useEffect(() => {
+    if (savedVoiceGone || language !== savedLanguage) {
+      onChange({ voiceId, voiceLanguage: language });
+    }
+  }, [savedVoiceGone, language, savedLanguage, voiceId, onChange]);
 
   const preview = (voiceId: string) => {
     soundManager.playLetterTap();
@@ -44,13 +74,11 @@ export const VoicePicker: React.FC<VoicePickerProps> = ({ settings, onChange }) 
       case 'loading':
         return `${status.label} ${status.progress}%`;
       case 'ready':
-        return status.engine === 'neural'
-          ? `Natural voice ready (${status.device === 'webgpu' ? 'graphics card' : 'on device'})`
-          : 'Built-in browser voice';
+        return status.engine === 'neural' ? 'Natural voice ready' : 'Built-in browser voice';
       case 'unavailable':
         return status.reason;
       default:
-        return 'Natural voice not downloaded yet';
+        return 'Natural voice ready';
     }
   })();
 
@@ -76,20 +104,22 @@ export const VoicePicker: React.FC<VoicePickerProps> = ({ settings, onChange }) 
               });
             }}
           >
-            Download voice
+            Turn on voice
           </button>
         )}
       </div>
 
       <div className="language-row" role="group" aria-label="Accent">
-        {(['en-US', 'en-GB'] as const).map(code => (
+        {(['en-US', 'en-GB'] as const)
+          .filter(code => available.some(v => v.language === code))
+          .map(code => (
           <button
             key={code}
             className={`language-chip ${language === code ? 'is-active' : ''}`}
             onClick={() => {
               soundManager.playPop();
-              const first = LUNA_VOICES.find(v => v.language === code);
-              onChange({ voiceLanguage: code, voiceId: first?.id ?? settings.voiceId });
+              const first = available.find(v => v.language === code);
+              onChange({ voiceLanguage: code, voiceId: first?.id ?? voiceId });
               if (first) pronunciation.setVoice(first.id);
             }}
           >
@@ -100,7 +130,7 @@ export const VoicePicker: React.FC<VoicePickerProps> = ({ settings, onChange }) 
 
       <div className="voice-list">
         {voices.map(voice => {
-          const isActive = settings.voiceId === voice.id;
+          const isActive = voiceId === voice.id;
           return (
             <button
               key={voice.id}
@@ -123,7 +153,8 @@ export const VoicePicker: React.FC<VoicePickerProps> = ({ settings, onChange }) 
       </div>
 
       <p className="voice-note">
-        Tap a voice to hear it. The voice runs on this device — nothing is sent to a server.
+        Tap a voice to hear it. Ms. Luna speaks from audio built into the app — nothing is
+        sent to a server.
       </p>
     </div>
   );

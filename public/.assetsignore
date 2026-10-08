@@ -1,0 +1,6 @@
+# Build-time voice tooling, not part of the app: the review page for listening
+# to every clip (served by `npm run dev`) and the renderer's caches. Vite copies
+# all of public/ into dist/, so they are kept out of the deploy here.
+voice/*/review.html
+voice/*/.fingerprints.json
+voice/*/.sources.json

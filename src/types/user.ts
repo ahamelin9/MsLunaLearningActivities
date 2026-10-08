@@ -10,8 +10,6 @@ export interface UserSettings {
   voiceId: string;
   /** accent the voices are drawn from */
   voiceLanguage: 'en-US' | 'en-GB';
-  /** 'best' = full-precision voice, 'compact' = smaller download */
-  voiceQuality: 'best' | 'compact';
 }
 
 export interface UserProgress {

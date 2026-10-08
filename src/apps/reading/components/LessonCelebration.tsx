@@ -2,9 +2,23 @@ import React, { useEffect, useRef } from 'react';
 import type { Lesson } from '../../../types/reading';
 import { launchConfetti } from '../../../utils/confetti';
 import { soundManager } from '../../../utils/audio';
+import { pronunciation, type SpeechPart } from '../../../utils/pronunciation';
 import { StarIcon, SparklesIcon, ArrowRightIcon, HomeIcon } from '../../../components/ui/Icons';
 import { Button } from '../../../components/ui/Button';
 import './LessonCelebration.scss';
+
+/**
+ * Every star count a lesson can award, each a whole line. Spoken as its own
+ * clip after the lesson's title, so the whole celebration is made of clips
+ * that were rendered rather than one sentence per lesson per score.
+ */
+const STAR_LINES: Record<number, SpeechPart> = {
+  1: { text: 'And you earned a golden star!' },
+  2: { text: 'And you earned two golden stars!' },
+  3: { text: 'And you earned three golden stars!' },
+  4: { text: 'And you earned four golden stars!' },
+  5: { text: 'And you earned five golden stars!' }
+};
 
 interface LessonCelebrationProps {
   lesson: Lesson;
@@ -32,7 +46,11 @@ export const LessonCelebration: React.FC<LessonCelebrationProps> = ({
     launchConfetti(canvasRef.current, 3500);
 
     setTimeout(() => {
-      soundManager.speak(`Super job! You completed ${lesson.title} and earned ${starsEarned} golden stars!`);
+      pronunciation.speakSequence([
+        { text: 'Super job! You finished' },
+        { text: lesson.title },
+        STAR_LINES[starsEarned] ?? { text: 'And you earned golden stars!' }
+      ]);
     }, 600);
   }, [lesson, starsEarned]);
 

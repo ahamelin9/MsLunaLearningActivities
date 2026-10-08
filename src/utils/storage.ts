@@ -14,7 +14,6 @@ export const DEFAULT_SETTINGS: UserSettings = {
   theme: 'sunset',
   voiceId: DEFAULT_VOICE_ID,
   voiceLanguage: 'en-US',
-  voiceQuality: 'best'
 };
 
 export const DEFAULT_PROGRESS: UserProgress = {
@@ -135,7 +134,6 @@ class StorageService {
     soundManager.setSpeechMuted(!settings.speechEnabled);
     soundManager.setSpeechRate(settings.speechRate);
     pronunciation.setVoice(settings.voiceId || DEFAULT_VOICE_ID);
-    pronunciation.setQuality(settings.voiceQuality === 'compact' ? 'compact' : 'best');
   }
 
   public recordLessonCompletion(

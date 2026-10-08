@@ -2,6 +2,7 @@ import type React from 'react';
 import type { GradeLevel } from '../../../types/reading';
 import type { Difficulty } from './content';
 import type { LunaMood } from './luna';
+import type { SpeechPart } from '../../../utils/pronunciation';
 
 export interface GameContext {
   grade: GradeLevel;
@@ -24,8 +25,13 @@ export interface GameApi {
   locked: boolean;
   /** round solved */
   win: (opts?: { lunaLine?: string; delay?: number }) => void;
-  /** wrong attempt — never a failure, always another go */
-  miss: (opts?: { lunaLine?: string; hint?: string }) => void;
+  /**
+   * wrong attempt — never a failure, always another go. The hint is spoken
+   * from the second miss on, never shown: written on screen it would hand a
+   * child who knows their letters the answer. Build it from parts so a
+   * phoneme stays a phoneme and every piece is a clip that was rendered.
+   */
+  miss: (opts?: { lunaLine?: string; hint?: SpeechPart[] }) => void;
   /** a small good beat inside a round, e.g. 2 of 4 letters found */
   tick: (opts?: { lunaLine?: string }) => void;
   /** let Luna speak out of turn */
