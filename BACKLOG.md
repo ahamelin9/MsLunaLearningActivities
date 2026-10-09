@@ -706,3 +706,4 @@ only record of them. One line each: date, ID, title, and `Done` or
 - **2026-10-09** — BUG-19 Feed Luna: the cheer cuts in under the letter — Done. Luna names the cookie, then cheers; timed over 5 right answers, nothing overlaps or is cut off.
 - **2026-10-09** — BUG-20 Story Corner never reads line 1 — Done. A story opens with its title and then line 1, at every grade.
 - **2026-10-09** — Added the `know-how` skill (`.claude/skills/know-how/`): solved problems written as symptom, cause, fix and check, plus `speech-check.cjs`, a silent browser check that logs and times every clip. A new hook (`.claude/hooks/know-how-nudge.mjs`) reminds Claude to add to it whenever a ticket closes as Done.
+- **2026-10-09** — Added the `app-updates` skill (`.claude/skills/app-updates/`): `/app-updates` writes the day's "App Updates" note for the teacher, in plain words and ready for Apple Notes, from that day's Changelog, new tickets and commits.
