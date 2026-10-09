@@ -13,6 +13,7 @@ npm run dev      # http://localhost:5173
 npm run build    # tsc -b && vite build
 npm run lint
 npm run voice:render   # only when the vocabulary or a phoneme changes
+npm run ui:shots -- --label before   # every screen at four iPad sizes, in screenshots/before/
 ```
 
 ## Layout

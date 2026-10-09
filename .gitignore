@@ -25,3 +25,6 @@ dist-ssr
 
 # voice rendering scratch
 .voice-tmp/
+
+# design-review screenshots (npm run ui:shots)
+screenshots/

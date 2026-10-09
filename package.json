@@ -9,7 +9,8 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "voice:render": "node scripts/voice/render.mjs",
-    "voice:audit": "node scripts/voice/audit.mjs"
+    "voice:audit": "node scripts/voice/audit.mjs",
+    "ui:shots": "node scripts/ui/shots.mjs"
   },
   "dependencies": {
     "react": "^19.2.0",
@@ -27,6 +28,7 @@
     "ffmpeg-static": "^5.3.0",
     "globals": "^16.5.0",
     "kokoro-js": "^1.2.1",
+    "puppeteer-core": "^25.13.0",
     "sass-embedded": "^1.103.1",
     "typescript": "~5.9.3",
     "typescript-eslint": "^8.48.0",

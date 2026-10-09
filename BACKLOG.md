@@ -29,7 +29,7 @@ screenshots. Nothing is assumed.
 **B. The general checks pass:**
 1. `npm run build` and `npm run lint` are clean.
 2. Anything that changes what Luna says: `npm run voice:render`, then `npm run voice:audit` passes.
-3. Anything visual: before/after screenshots at iPad landscape and portrait (see DES-1).
+3. Anything visual: before/after screenshots at iPad landscape and portrait (`npm run ui:shots -- --label before`, then `--label after`).
 4. Targets stay heard, never shown, and hints stay spoken.
 5. No on-device speech or extra runtime audio work (voice stays pre-rendered).
 6. Nothing was built beyond the ticket; extra ideas became new tickets.
@@ -67,7 +67,7 @@ be pulled into Phase 1 for a break from styling.
 
 ### Now / Next
 
-- **Now:** DES-1 → DES-2
+- **Now:** DES-2
 - **Next:** DES-3, DES-4, DES-5
 
 ---
@@ -77,7 +77,6 @@ be pulled into Phase 1 for a break from styling.
 | ID | Title | Type | P | Size | Status |
 |---|---|---|---|---|---|
 | **DES** | **Design system & layout** | Epic | **P0** | | |
-| DES-1 | Screenshot harness for design review | Task | P0 | S | Todo |
 | DES-2 | Write the design standards | Story | P0 | M | Todo |
 | DES-3 | One set of design tokens | Story | P0 | M | Todo |
 | DES-4 | Typography and local fonts | Story | P0 | S | Todo |
@@ -85,7 +84,7 @@ be pulled into Phase 1 for a break from styling.
 | DES-6 | Reduced motion, wired end to end | Story | P0 | S | Todo |
 | DES-7 | Shared component kit | Story | P0 | M | Todo |
 | DES-8 | One set of chrome | Story | P0 | M | Todo |
-| DES-9 | Restyle the tablet shell into Luna's world | Story | P0 | L | Todo |
+| DES-9 | Restyle the tablet shell: iPad feel, boho finish | Story | P0 | L | Todo |
 | DES-10 | Layout grid and breakpoints | Story | P0 | M | Todo |
 | DES-11 | One right/wrong/reveal visual language | Story | P1 | S | Todo |
 | DES-12 | Luna on screen: one owl, clear moods | Story | P1 | S | Todo |
@@ -146,8 +145,9 @@ be pulled into Phase 1 for a break from styling.
 
 ## DES — Design system & layout (Phase 1)
 
-**Goal:** the whole app looks and moves like one product, which is Luna's
-storybook library. Today there are two looks:
+**Goal:** the whole app looks and moves like one product, designed by hand
+rather than generic AI-made. The home screen keeps its iPad feel, and the
+reading app is boho, modern and animated (see DES-2). Today there are two looks:
 - the tablet shell, Settings, Trophies and Grade Select use a generic slate and
   purple style (`src/styles/_variables.scss`) with an emoji owl;
 - the reading app uses warm paper, wood and ink
@@ -161,21 +161,14 @@ On top of that:
 **The epic is done when** every screen uses the shared tokens, components and
 motion, and looks right at the four target sizes (DES-10).
 
-### DES-1 · Screenshot harness for design review
-Task · P0 · S · needs: —
-- **Why:** design work needs before/after pictures at real iPad sizes. The 2026-10-08 review proved headless Chrome works here.
-- **How:**
-  - Add `puppeteer-core` as a devDependency, driving the installed Chrome.
-  - Add `scripts/ui/shots.mjs` and an `npm run ui:shots` script. It writes to `screenshots/<label>/`, which is gitignored.
-  - Viewports: 1180×820, 820×1180, 1024×768, 744×1133.
-  - Steps: clear localStorage, then click through home → grade select → hub (top, rug, tin) → settings → trophies → each game's intro and play screens → a lesson → a reward screen.
-- **Complete when:** one command produces the full set, and a `--label before|after` flag keeps two sets side by side.
-
 ### DES-2 · Write the design standards
-Story · P0 · M · needs: DES-1
+Story · P0 · M · needs: —
 - **Why:** one written source of truth, so every later screen is built the same way.
 - **How:** write `docs/design-standards.md` covering each item below. The values are proposals, to confirm with Alex.
-  - **Direction:** Luna's storybook world everywhere. The purple-gradient OS look retires.
+  - **Direction (Alex, 2026-10-08):** a full redesign. Today it reads as a generic AI-made site, and it should stop: no glassy gradients, stock pills or emoji standing in for icons.
+    - **Home screen:** keeps the iPad feel (status bar, springboard, app icon, home indicator), restyled in the same family as the reading app. The purple-gradient OS look retires.
+    - **Reading app:** boho and modern, and animated. Proposal to confirm: a boho-classroom palette (terracotta, sage, mustard, clay pink, cream), arches and rainbows, paper texture and hand-drawn touches, with motion from DES-5.
+    - **Built from shared components** (DES-7), so later screens are quicker to make and stay consistent.
   - **Theme decision:** the `theme` setting (sunset/day/cosmic) is unused. Either drop it, or design a real day/night pair. Record the choice; DES-3 implements it.
   - **Colour:** semantic tokens (surface, ink, accent, success, retry, focus, disabled) mapped onto the world palette. Text meets WCAG AA (4.5:1).
   - **Type scale:** display font for titles. Text the child reads uses a literacy font (DES-4). Minimums: kid-read text 20px, answer words 32px, answer letters 48px.
@@ -253,7 +246,7 @@ Story · P0 · M · needs: DES-7
   - Fix BUG-11 while you're in there.
 - **Complete when:** each control appears exactly once, and the game stage gets back at least 80px of height in landscape.
 
-### DES-9 · Restyle the tablet shell into Luna's world
+### DES-9 · Restyle the tablet shell: iPad feel, boho finish
 Story · P0 · L · needs: DES-7, DES-8 · split before starting
 - **Scope:**
   - Home screen
@@ -262,13 +255,13 @@ Story · P0 · L · needs: DES-7, DES-8 · split before starting
   - Trophy room
   - Grade Select
   - Coming Soon (if OPS-3 keeps it)
-- **How:** use kit components and tokens throughout. Replace the emoji owl `components/ui/Mascot` with `LunaOwl`. Grade Select talks to the child, not to grown-ups: no "digraphs" and no "dashboard".
-- **Complete when:** the shots from DES-1 show no slate or purple-gradient screens, and `Mascot` is deleted.
+- **How:** the home screen keeps its iPad feel (Alex, 2026-10-08) but drops the purple gradients for the DES-2 palette. Use kit components and tokens throughout. Replace the emoji owl `components/ui/Mascot` with `LunaOwl`. Grade Select talks to the child, not to grown-ups: no "digraphs" and no "dashboard".
+- **Complete when:** the `ui:shots` screenshots show no slate or purple-gradient screens, and `Mascot` is deleted.
 
 ### DES-10 · Layout grid and breakpoints
 Story · P0 · M · needs: DES-7
 - **How:**
-  - Lay out the hub and game stage for the four DES-1 sizes.
+  - Lay out the hub and game stage for the four `ui:shots` sizes (1180×820, 820×1180, 1024×768, 744×1133).
   - Hub: the next lesson and Luna's Pick are visible without scrolling.
   - Play Rug: tiles sit on a consistent grid. Titles must not overlap their scenery (they do today on Feed Luna and Muddled Cards), and Treasure Path's tile must not be oversized.
   - Game stages fit the screen with no scrolling during play.
@@ -624,6 +617,7 @@ only record of them. One line each: date, ID, title, and `Done` or
 `Won't do: <reason>`. Never reuse an ID that appears here.
 
 - **2026-10-08** — Backlog created from the full app review. Design (DES) set as the next priority.
+- **2026-10-08** — DES-1 Screenshot harness for design review — Done
 - **2026-10-08** — Added the `focus` skill and the agenda hook (`.claude/hooks/backlog-focus.mjs`, registered in `.claude/settings.json`). Each message now carries the current agenda, and off-agenda requests get a one-line priority check.
 - **2026-10-08** — Added the Completion criteria. Every ticket now has a checkable **Complete when** (the 30 that had none got one), and finished tickets are deleted from the board instead of marked Done.
 - **2026-10-08** — Added the backlog guard (`.claude/hooks/backlog-guard.mjs`), which refuses any edit to this file that breaks its rules and builds and lints before a ticket is deleted as Done. Added the `luna-board` mod for Alex: `/board` opens a board pane, the status line shows the current ticket, and a toast appears when a ticket is finished.
