@@ -54,15 +54,56 @@ async function refresh($: EngineInterface) {
   $.ui.status(now ? `${working ? '▶' : 'Now:'} ${now.id} ${now.title}` : undefined)
 }
 
-async function toggle($: EngineInterface) {
-  const isOpen = (await $.ui.panes()).some(p => p.id === PANE)
-  if (isOpen) {
+// Opens the pane, or closes it when it is shown. Says what happened: a pane
+// the attached app cannot place stays open but undrawn, with the reason.
+async function toggle($: EngineInterface): Promise<{ state: 'opened' | 'closed' } | { state: 'unplaced'; reason: string }> {
+  const pane = (await $.ui.panes()).find(p => p.id === PANE)
+  if (pane?.isPlaced) {
     await $.ui.close({ id: PANE })
-    return false
+    return { state: 'closed' }
   }
   await refresh($)
-  await $.ui.open({ id: PANE, title: 'Ms. Luna board' })
-  return true
+  const opened = await $.ui.open({ id: PANE, title: 'Ms. Luna board' })
+  return opened.isPlaced ? { state: 'opened' } : { state: 'unplaced', reason: opened.reason }
+}
+
+// The board as Markdown, for apps that place no panes: /board prints it.
+function boardMarkdown(source: string): string {
+  if (!source) return `No ${FILE} in this project.`
+  const b = parseBacklog(source)
+  const line = (t: Ticket) => `- **${t.id}** ${t.title} · ${t.type} · ${t.priority}`
+  const nowIds = ticketsIn(b.now, b.tickets).map(t => t.id)
+  const nextIds = ticketsIn(b.next, b.tickets).map(t => t.id)
+  const todo = b.tickets.filter(t => t.status.startsWith('Todo'))
+  const upNext = [...nowIds, ...nextIds]
+    .map(id => todo.find(t => t.id === id))
+    .filter((t): t is Ticket => t !== undefined)
+  const p0 = todo.filter(t => !upNext.includes(t) && t.priority === 'P0')
+  const others = todo.length - upNext.length - p0.length
+  const inProgress = b.tickets.filter(t => t.status.startsWith('In progress'))
+  const blocked = b.tickets.filter(t => t.status.startsWith('Blocked'))
+  const done = todayIn(b.changelog, new Date())
+  const list = (ts: string[]) => (ts.length ? ts.join('\n') : '- —')
+
+  return [
+    `**${b.phase}**`,
+    '',
+    `**In progress (${inProgress.length})**`,
+    list(inProgress.map(line)),
+    '',
+    `**Up next**`,
+    list(upNext.map(t => `${line(t)}${nowIds.includes(t.id) ? ' — **NOW**' : ''}`)),
+    '',
+    `**Blocked (${blocked.length})**`,
+    list(blocked.map(line)),
+    '',
+    `**Other P0 to do (${p0.length})**`,
+    list(p0.map(line)),
+    others > 0 ? `\n_…and ${others} more P1/P2 tickets._` : '',
+    '',
+    `**Done today (${done.length})**`,
+    list(done.map(d => `- ✓ **${d.id}** ${d.title}`)),
+  ].join('\n')
 }
 
 export const register: Register = on => {
@@ -78,9 +119,13 @@ export const register: Register = on => {
   })
 
   on('command.run', { command: 'board' }, async $ => {
-    const opened = await toggle($)
+    const result = await toggle($)
+    if (result.state !== 'unplaced') return { text: result.state === 'opened' ? 'Board opened.' : 'Board closed.' }
 
-    return { text: opened ? 'Board opened.' : 'Board closed.' }
+    // This app draws no panes: show the board here instead.
+    return {
+      text: `${boardMarkdown(await read($, text))}\n\n_The board pane can't be shown here (${result.reason}), so here it is as text._`,
+    }
   })
 
   on('tool.call', async ($, e, next) => {
