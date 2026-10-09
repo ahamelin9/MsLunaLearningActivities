@@ -1,0 +1,7 @@
+{
+  "name": "luna-board",
+  "version": "0.2.0",
+  "description": "Ms. Luna's backlog as a live task board: a Board button by the prompt, /board, the current ticket in the status line, and a toast when a ticket is finished.",
+  "author": { "name": "Alex Hamelin" },
+  "types": "./types/index.d.ts"
+}
