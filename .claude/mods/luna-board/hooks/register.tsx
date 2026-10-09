@@ -110,7 +110,7 @@ export const register: Register = on => {
   on('session.start', async ($, e, next) => {
     await $.command.register({
       name: 'board',
-      description: "Show or hide Ms. Luna's task board (from BACKLOG.md)",
+      description: "Show or hide Ms. Luna's task board (from BACKLOG.md); /board list prints it in the chat",
     })
     await refresh($)
     $.clock.every(POLL_MS, () => refresh($).catch(() => undefined))
@@ -118,7 +118,10 @@ export const register: Register = on => {
     return next(e)
   })
 
-  on('command.run', { command: 'board' }, async $ => {
+  on('command.run', { command: 'board' }, async ($, e) => {
+    // "/board list" prints the board in the chat, whatever the app can draw.
+    if (e.args.trim() === 'list') return { text: boardMarkdown(await read($, text)) }
+
     const result = await toggle($)
     if (result.state !== 'unplaced') return { text: result.state === 'opened' ? 'Board opened.' : 'Board closed.' }
 

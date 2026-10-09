@@ -5,6 +5,7 @@ Ms. Luna's `BACKLOG.md` as a live task board inside Claude Code.
 - **▦ Board** button at the right of the prompt footer (or `/board`) shows and
   hides the board: To do (Now and Next first, then P0; "Show all" for P1/P2),
   In progress, Blocked, and Done today.
+- `/board list` prints the board in the chat, in any app.
 - The board re-reads `BACKLOG.md` every few seconds and after every tool call,
   so it follows changes made by Claude or by hand. It only reads the file;
   the backlog stays the one source of truth.
