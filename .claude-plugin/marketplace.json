@@ -1,0 +1,5 @@
+{
+  "name": "ms-luna",
+  "owner": { "name": "Alex Hamelin" },
+  "plugins": [{ "name": "luna-board", "source": "./.claude/mods/luna-board" }]
+}
