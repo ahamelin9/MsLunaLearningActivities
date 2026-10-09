@@ -161,8 +161,6 @@ for (const line of new Set(lunaLines)) push(line, o => pronunciation.speakText(l
 // source of the half-second of robot voice before the next clip cut it off.
 for (const s of ['Let\u2019s start Kindergarten!', 'Let\u2019s start First Grade!', 'Let\u2019s start Second Grade!'])
   push(s, o => pronunciation.speakText(s, o));
-for (const s of ['Mmm! little', 'Mmm! big'])
-  push(s, o => pronunciation.speakText(s, o));
 for (const item of content.SENTENCES)
   for (const t of item.truth ?? [])
     if (t.claim) push(t.claim, o => pronunciation.speakText(t.claim, o));
@@ -228,6 +226,11 @@ for (const { src } of sources) {
     const text = m[1].replace(/\\(['"`\\])/g, '$1').trim();
     if (/[a-zA-Z]/.test(text)) push(text, o => pronunciation.speakText(text, o));
   }
+  // a game's own line for Luna, handed to api.win/miss/tick and said by the shell
+  for (const m of src.matchAll(/\blunaLine\s*:\s*'((?:[^'\\\n]|\\.)*)'/g)) {
+    const text = m[1].replace(/\\(['"`\\])/g, '$1').trim();
+    if (/[a-zA-Z]/.test(text)) push(text, o => pronunciation.speakText(text, o));
+  }
 }
 
 // the guided curriculum
@@ -237,7 +240,8 @@ const walkQ = node => {
   if (Array.isArray(node)) return node.forEach(walkQ);
   if (typeof node !== 'object') return;
   const q = node;
-  for (const s of [q.speechPrompt ?? q.prompt, q.sentence, q.targetSentence, q.exampleSentence, q.hint]) {
+  // a story's question and its explanation are read aloud too (StoryReader)
+  for (const s of [q.speechPrompt ?? q.prompt, q.sentence, q.targetSentence, q.exampleSentence, q.hint, q.question, q.explanation]) {
     if (typeof s === 'string' && s.trim() && !seen.has(s)) { seen.add(s); push(s, o => pronunciation.speakSentence(s, o)); }
   }
   if (typeof q.word === 'string' && q.word) push(q.word, o => pronunciation.speakWord(q.word, o));
@@ -245,7 +249,11 @@ const walkQ = node => {
   if (typeof q.title === 'string' && 'starsToEarn' in q) push(q.title, o => pronunciation.speakText(q.title, o));
   // tapping an answer says it
   if (Array.isArray(q.options)) {
-    for (const opt of q.options) if (typeof opt.text === 'string') push(opt.text, o => pronunciation.speakText(opt.text, o));
+    for (const opt of q.options) {
+      if (typeof opt.text === 'string') push(opt.text, o => pronunciation.speakText(opt.text, o));
+      // a story question's answers are bare strings, said as sentences
+      else if (typeof opt === 'string' && opt.trim()) push(opt, o => pronunciation.speakSentence(opt, o));
+    }
   }
   Object.values(node).forEach(walkQ);
 };

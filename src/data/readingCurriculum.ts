@@ -40,13 +40,13 @@ export const READING_CURRICULUM: Record<GradeLevel, ReadingSkill[]> = {
       name: 'Match the Sound',
       icon: '👂',
       color: '#A855F7',
-      description: 'Listen to the sound! Which letter makes the /mmmm/ or /ssss/ sound?',
+      description: 'Hear a letter sound, then find the letter that makes it.',
       lessons: [
         {
           id: 'k-ms-m-s-b-t',
           skillId: 'k-match-sounds',
           grade: 'kindergarten',
-          title: 'Sounds for M, S, B & T',
+          title: 'First Letter Sounds',
           description: 'Listen to the letter sounds and find the matching letter.',
           icon: '🎵',
           difficulty: 1,
@@ -131,7 +131,7 @@ export const READING_CURRICULUM: Record<GradeLevel, ReadingSkill[]> = {
           id: 'k-lh-easy',
           skillId: 'k-letter-hunter',
           grade: 'kindergarten',
-          title: 'Find A, M, S & B',
+          title: 'Look-Alike Letters',
           description: 'Hunt and spot the matching letter card.',
           icon: '🔎',
           difficulty: 1,
@@ -169,7 +169,7 @@ export const READING_CURRICULUM: Record<GradeLevel, ReadingSkill[]> = {
               id: 'q-k-lh-s',
               type: 'find-letter',
               prompt: 'Which letter did Ms. Luna say?',
-              speechPrompt: 'Look for the curvy letter S!',
+              speechPrompt: 'Can you find the letter S?',
               targetLetter: 'S',
               hint: 'Letter S curves like a snake!',
               options: [
@@ -207,9 +207,9 @@ export const READING_CURRICULUM: Record<GradeLevel, ReadingSkill[]> = {
               speechPrompt: 'Tap each letter to hear its sound, then blend them into a word!',
               word: 'cat',
               phonemes: [
-                { text: 'c', soundLabel: '/k/', spokenSound: 'c' },
-                { text: 'a', soundLabel: '/æ/', spokenSound: 'a' },
-                { text: 't', soundLabel: '/t/', spokenSound: 't' }
+                { text: 'c', spokenSound: 'c' },
+                { text: 'a', spokenSound: 'a' },
+                { text: 't', spokenSound: 't' }
               ],
               hint: 'It’s a furry pet that purrs!',
               options: [
@@ -225,9 +225,9 @@ export const READING_CURRICULUM: Record<GradeLevel, ReadingSkill[]> = {
               speechPrompt: 'Sound out /p/ /i/ /g/! What word does it make?',
               word: 'pig',
               phonemes: [
-                { text: 'p', soundLabel: '/p/', spokenSound: 'p' },
-                { text: 'i', soundLabel: '/ɪ/', spokenSound: 'i' },
-                { text: 'g', soundLabel: '/ɡ/', spokenSound: 'g' }
+                { text: 'p', spokenSound: 'p' },
+                { text: 'i', spokenSound: 'i' },
+                { text: 'g', spokenSound: 'g' }
               ],
               hint: 'An oinking farm friend!',
               options: [
@@ -243,9 +243,9 @@ export const READING_CURRICULUM: Record<GradeLevel, ReadingSkill[]> = {
               speechPrompt: 'Sound out /d/ /o/ /g/! Which picture matches?',
               word: 'dog',
               phonemes: [
-                { text: 'd', soundLabel: '/d/', spokenSound: 'd' },
-                { text: 'o', soundLabel: '/ɒ/', spokenSound: 'o' },
-                { text: 'g', soundLabel: '/ɡ/', spokenSound: 'g' }
+                { text: 'd', spokenSound: 'd' },
+                { text: 'o', spokenSound: 'o' },
+                { text: 'g', spokenSound: 'g' }
               ],
               hint: 'A puppy that barks woof!',
               options: [
@@ -270,12 +270,12 @@ export const READING_CURRICULUM: Record<GradeLevel, ReadingSkill[]> = {
               id: 'q-k-bw-sun',
               type: 'blend-and-read',
               prompt: 'Blend the sounds to read the word!',
-              speechPrompt: 'Sound out /s/ /u/ /n/! What shines in the sky?',
+              speechPrompt: 'Sound out /s/ /u/ /n/! Which picture matches?',
               word: 'sun',
               phonemes: [
-                { text: 's', soundLabel: '/s/', spokenSound: 's' },
-                { text: 'u', soundLabel: '/ʌ/', spokenSound: 'u' },
-                { text: 'n', soundLabel: '/n/', spokenSound: 'n' }
+                { text: 's', spokenSound: 's' },
+                { text: 'u', spokenSound: 'u' },
+                { text: 'n', spokenSound: 'n' }
               ],
               hint: 'It shines warm and bright up in the sky!',
               options: [
@@ -288,12 +288,12 @@ export const READING_CURRICULUM: Record<GradeLevel, ReadingSkill[]> = {
               id: 'q-k-bw-bed',
               type: 'blend-and-read',
               prompt: 'Blend the sounds to read the word!',
-              speechPrompt: 'Sound out /b/ /e/ /d/! Where do we sleep?',
+              speechPrompt: 'Sound out /b/ /e/ /d/! Which picture matches?',
               word: 'bed',
               phonemes: [
-                { text: 'b', soundLabel: '/b/', spokenSound: 'b' },
-                { text: 'e', soundLabel: '/ɛ/', spokenSound: 'e' },
-                { text: 'd', soundLabel: '/d/', spokenSound: 'd' }
+                { text: 'b', spokenSound: 'b' },
+                { text: 'e', spokenSound: 'e' },
+                { text: 'd', spokenSound: 'd' }
               ],
               hint: 'Where you sleep with a cozy pillow!',
               options: [
@@ -306,12 +306,12 @@ export const READING_CURRICULUM: Record<GradeLevel, ReadingSkill[]> = {
               id: 'q-k-bw-cup',
               type: 'blend-and-read',
               prompt: 'Blend the sounds to read the word!',
-              speechPrompt: 'Sound out /k/ /u/ /p/! What do you drink from?',
+              speechPrompt: 'Sound out /k/ /u/ /p/! Which picture matches?',
               word: 'cup',
               phonemes: [
-                { text: 'c', soundLabel: '/k/', spokenSound: 'c' },
-                { text: 'u', soundLabel: '/ʌ/', spokenSound: 'u' },
-                { text: 'p', soundLabel: '/p/', spokenSound: 'p' }
+                { text: 'c', spokenSound: 'c' },
+                { text: 'u', spokenSound: 'u' },
+                { text: 'p', spokenSound: 'p' }
               ],
               hint: 'Used to drink warm milk or cold juice!',
               options: [
@@ -329,14 +329,14 @@ export const READING_CURRICULUM: Record<GradeLevel, ReadingSkill[]> = {
       name: 'Sight Word Power',
       icon: '⚡',
       color: '#FFD166',
-      description: 'Recognize high-frequency words instantly by sight: see, the, can, big, and like!',
+      description: 'Recognize common words instantly by sight.',
       lessons: [
         {
           id: 'k-sw-starter',
           skillId: 'k-sight-words',
           grade: 'kindergarten',
           title: 'Starter Sight Words',
-          description: 'Read the high-frequency sight words: SEE, BIG, and CAN.',
+          description: 'Hear a word, then find it among look-alikes.',
           icon: '👀',
           difficulty: 1,
           starsToEarn: 3,
@@ -348,7 +348,7 @@ export const READING_CURRICULUM: Record<GradeLevel, ReadingSkill[]> = {
               speechPrompt: 'Find the sight word SEE: "I see a smiling star!"',
               word: 'see',
               exampleSentence: 'I see a smiling star! ⭐',
-              hint: 'S - E - E spells see with your eyes!',
+              hint: 'Listen closely: see. I see with my eyes!',
               options: [
                 { id: 'opt-see', word: 'see', isCorrect: true },
                 { id: 'opt-sun', word: 'sun', isCorrect: false },
@@ -362,7 +362,7 @@ export const READING_CURRICULUM: Record<GradeLevel, ReadingSkill[]> = {
               speechPrompt: 'Find the sight word BIG: "The elephant is big!"',
               word: 'big',
               exampleSentence: 'The elephant is very big! 🐘',
-              hint: 'B - I - G spells big!',
+              hint: 'Listen closely: big. An elephant is big!',
               options: [
                 { id: 'opt-bag', word: 'bag', isCorrect: false },
                 { id: 'opt-big', word: 'big', isCorrect: true },
@@ -376,7 +376,7 @@ export const READING_CURRICULUM: Record<GradeLevel, ReadingSkill[]> = {
               speechPrompt: 'Find the sight word CAN: "I can read books!"',
               word: 'can',
               exampleSentence: 'I can read books! 📚',
-              hint: 'C - A - N spells can!',
+              hint: 'Listen closely: can. I can read books!',
               options: [
                 { id: 'opt-cat', word: 'cat', isCorrect: false },
                 { id: 'opt-car', word: 'car', isCorrect: false },
@@ -477,9 +477,9 @@ export const READING_CURRICULUM: Record<GradeLevel, ReadingSkill[]> = {
               speechPrompt: 'S and H team up to make /sh/. Blend the sounds: /sh/ /i/ /p/!',
               word: 'ship',
               phonemes: [
-                { text: 'sh', soundLabel: '/ʃ/', spokenSound: 'sh' },
-                { text: 'i', soundLabel: '/ɪ/', spokenSound: 'i' },
-                { text: 'p', soundLabel: '/p/', spokenSound: 'p' }
+                { text: 'sh', spokenSound: 'sh' },
+                { text: 'i', spokenSound: 'i' },
+                { text: 'p', spokenSound: 'p' }
               ],
               hint: 'A large boat that sails on the ocean!',
               options: [
@@ -495,9 +495,9 @@ export const READING_CURRICULUM: Record<GradeLevel, ReadingSkill[]> = {
               speechPrompt: 'F and R blend into /fr/. Blend the sounds: /fr/ /o/ /g/!',
               word: 'frog',
               phonemes: [
-                { text: 'fr', soundLabel: '/fr/', spokenSound: 'fr' },
-                { text: 'o', soundLabel: '/ɒ/', spokenSound: 'o' },
-                { text: 'g', soundLabel: '/ɡ/', spokenSound: 'g' }
+                { text: 'fr', spokenSound: 'fr' },
+                { text: 'o', spokenSound: 'o' },
+                { text: 'g', spokenSound: 'g' }
               ],
               hint: 'A green hopper that ribbits near the pond!',
               options: [
@@ -513,8 +513,8 @@ export const READING_CURRICULUM: Record<GradeLevel, ReadingSkill[]> = {
               speechPrompt: 'S and T blend into /st/. Blend the sounds: /st/ /ar/!',
               word: 'star',
               phonemes: [
-                { text: 'st', soundLabel: '/st/', spokenSound: 'st' },
-                { text: 'ar', soundLabel: '/ɑːr/', spokenSound: 'ar' }
+                { text: 'st', spokenSound: 'st' },
+                { text: 'ar', spokenSound: 'ar' }
               ],
               hint: 'It shines gold in the night sky!',
               options: [
@@ -547,10 +547,9 @@ export const READING_CURRICULUM: Record<GradeLevel, ReadingSkill[]> = {
             {
               id: 'q-g1-bw-cake',
               type: 'read-and-match',
-              prompt: 'Read this Magic E word: CAKE',
-              speechPrompt: 'Read the word CAKE! The silent E makes the A say its name.',
+              prompt: 'Read this Magic E word!',
+              speechPrompt: 'Read the word, then find its picture. The magic E makes the vowel say its name!',
               word: 'cake',
-              phonemes: ['/k/', '/eɪ/', '/k/'],
               hint: 'A sweet birthday treat with frosting and candles!',
               options: [
                 { id: 'opt-cake', text: 'Cake', imageEmoji: '🎂', isCorrect: true },
@@ -561,10 +560,9 @@ export const READING_CURRICULUM: Record<GradeLevel, ReadingSkill[]> = {
             {
               id: 'q-g1-bw-kite',
               type: 'read-and-match',
-              prompt: 'Read this Magic E word: KITE',
-              speechPrompt: 'Read the word KITE! The magic E makes I say /aɪ/.',
+              prompt: 'Read this Magic E word!',
+              speechPrompt: 'Read the word, then find its picture. The magic E makes the vowel say its name!',
               word: 'kite',
-              phonemes: ['/k/', '/aɪ/', '/t/'],
               hint: 'Flies high in the wind on a string!',
               options: [
                 { id: 'opt-kite', text: 'Kite', imageEmoji: '🪁', isCorrect: true },
@@ -575,10 +573,9 @@ export const READING_CURRICULUM: Record<GradeLevel, ReadingSkill[]> = {
             {
               id: 'q-g1-bw-bone',
               type: 'read-and-match',
-              prompt: 'Read this Magic E word: BONE',
-              speechPrompt: 'Read the word BONE! The magic E makes O say /oʊ/.',
+              prompt: 'Read this Magic E word!',
+              speechPrompt: 'Read the word, then find its picture. The magic E makes the vowel say its name!',
               word: 'bone',
-              phonemes: ['/b/', '/oʊ/', '/n/'],
               hint: 'A puppy’s favorite chew toy!',
               options: [
                 { id: 'opt-bone', text: 'Bone', imageEmoji: '🦴', isCorrect: true },
@@ -611,9 +608,9 @@ export const READING_CURRICULUM: Record<GradeLevel, ReadingSkill[]> = {
               id: 'q-g1-rs-frog',
               type: 'sentence-comprehension',
               prompt: 'Read the sentence and find the matching picture!',
-              speechPrompt: 'Read: "The green frog jumps high." Which picture shows this?',
+              speechPrompt: 'Read the sentence. Which picture shows it?',
               sentence: 'The green frog jumps high.',
-              hint: 'Look for the green frog jumping!',
+              hint: 'Tap any word to hear it. Which animal is in the sentence?',
               options: [
                 { id: 'opt-frog', text: 'Green frog hopping', imageEmoji: '🐸', isCorrect: true },
                 { id: 'opt-cat', text: 'Sleeping cat', imageEmoji: '🐱', isCorrect: false },
@@ -624,9 +621,9 @@ export const READING_CURRICULUM: Record<GradeLevel, ReadingSkill[]> = {
               id: 'q-g1-rs-cat',
               type: 'sentence-comprehension',
               prompt: 'Read the sentence and find the matching picture!',
-              speechPrompt: 'Read: "A cute cat plays with yellow yarn." Which picture matches?',
+              speechPrompt: 'Read the sentence. Which picture shows it?',
               sentence: 'A cute cat plays with yellow yarn.',
-              hint: 'Look for the playful cat with yarn!',
+              hint: 'Tap any word to hear it. Which animal is in the sentence?',
               options: [
                 { id: 'opt-cat', text: 'Playful cat with yarn', imageEmoji: '🐱', isCorrect: true },
                 { id: 'opt-dog', text: 'Dog with a bone', imageEmoji: '🐶', isCorrect: false },
@@ -660,10 +657,9 @@ export const READING_CURRICULUM: Record<GradeLevel, ReadingSkill[]> = {
             {
               id: 'q-g2-wp-train',
               type: 'read-and-match',
-              prompt: 'Read this vowel team word: TRAIN',
-              speechPrompt: 'Read TRAIN! A and I work together to make the /eɪ/ sound.',
+              prompt: 'Read this vowel team word!',
+              speechPrompt: 'Read the word, then find its picture. When two vowels go walking, the first one does the talking!',
               word: 'train',
-              phonemes: ['/t/', '/r/', '/eɪ/', '/n/'],
               hint: 'Rides on railroad tracks and goes choo-choo!',
               options: [
                 { id: 'opt-train', text: 'Train', imageEmoji: '🚆', isCorrect: true },
@@ -674,10 +670,9 @@ export const READING_CURRICULUM: Record<GradeLevel, ReadingSkill[]> = {
             {
               id: 'q-g2-wp-boat',
               type: 'read-and-match',
-              prompt: 'Read this vowel team word: BOAT',
-              speechPrompt: 'Read BOAT! O and A work together to make the long /oʊ/ sound.',
+              prompt: 'Read this vowel team word!',
+              speechPrompt: 'Read the word, then find its picture. When two vowels go walking, the first one does the talking!',
               word: 'boat',
-              phonemes: ['/b/', '/oʊ/', '/t/'],
               hint: 'Floats on blue water with a sail!',
               options: [
                 { id: 'opt-boat', text: 'Boat', imageEmoji: '⛵', isCorrect: true },
@@ -688,10 +683,9 @@ export const READING_CURRICULUM: Record<GradeLevel, ReadingSkill[]> = {
             {
               id: 'q-g2-wp-beach',
               type: 'read-and-match',
-              prompt: 'Read this vowel team word: BEACH',
-              speechPrompt: 'Read BEACH! E and A make the long /iː/ sound in beach.',
+              prompt: 'Read this vowel team word!',
+              speechPrompt: 'Read the word, then find its picture. When two vowels go walking, the first one does the talking!',
               word: 'beach',
-              phonemes: ['/b/', '/iː/', '/tʃ/'],
               hint: 'Sandy place where ocean waves splash under the sun!',
               options: [
                 { id: 'opt-beach', text: 'Beach', imageEmoji: '🏖️', isCorrect: true },
@@ -723,8 +717,8 @@ export const READING_CURRICULUM: Record<GradeLevel, ReadingSkill[]> = {
             {
               id: 'q-g2-bw-rainbow',
               type: 'read-and-match',
-              prompt: 'Read this compound word: RAINBOW',
-              speechPrompt: 'Read RAIN + BOW = RAINBOW! Colorful arch in the sky after rain.',
+              prompt: 'Read this compound word!',
+              speechPrompt: 'Read the two little words, then put them together. Which picture is it?',
               word: 'rainbow',
               hint: 'Colorful arc of light in the sky after rain!',
               options: [
@@ -736,8 +730,8 @@ export const READING_CURRICULUM: Record<GradeLevel, ReadingSkill[]> = {
             {
               id: 'q-g2-bw-cupcake',
               type: 'read-and-match',
-              prompt: 'Read this compound word: CUPCAKE',
-              speechPrompt: 'Read CUP + CAKE = CUPCAKE! A delicious little cake.',
+              prompt: 'Read this compound word!',
+              speechPrompt: 'Read the two little words, then put them together. Which picture is it?',
               word: 'cupcake',
               hint: 'A mini cake in a paper cup with yummy frosting!',
               options: [
@@ -755,7 +749,7 @@ export const READING_CURRICULUM: Record<GradeLevel, ReadingSkill[]> = {
       name: 'Decodable Storybooks',
       icon: '📖',
       color: '#9D4EDD',
-      description: 'Read engaging illustrated stories, tap any word to hear it, and answer questions!',
+      description: 'Read short stories on your own, then answer questions about them.',
       lessons: [
         {
           id: 'g2-story-luna-space',
@@ -770,8 +764,8 @@ export const READING_CURRICULUM: Record<GradeLevel, ReadingSkill[]> = {
             {
               id: 'q-g2-story-1',
               type: 'story-read',
-              prompt: 'Read along with Ms. Luna and answer the question!',
-              speechPrompt: 'Let’s read the story together! Click on any sentence to hear it read aloud.',
+              prompt: 'Read the story, then answer the question!',
+              speechPrompt: 'Read the story yourself first, then answer my question. If you get stuck, I can help!',
               title: 'Luna’s Rocket Adventure',
               imageEmoji: '🚀',
               sentences: [
@@ -782,13 +776,9 @@ export const READING_CURRICULUM: Record<GradeLevel, ReadingSkill[]> = {
               ],
               comprehensionQuestion: {
                 question: 'Where did Ms. Luna zoom in her shiny rocket?',
-                options: [
-                  'Into the starry night sky',
-                  'Under the deep blue ocean',
-                  'To the grocery store'
-                ],
+                options: ['Up into space', 'Under the sea', 'To the store'],
                 correctIndex: 0,
-                explanation: 'Yes! The story says the rocket zoomed into the starry night sky!'
+                explanation: 'Yes! The rocket zoomed into the starry night sky, way up in space!'
               }
             }
           ]

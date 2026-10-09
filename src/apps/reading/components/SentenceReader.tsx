@@ -13,7 +13,7 @@ export const SentenceReader: React.FC<{ question: SentenceComprehensionQuestion;
   api
 }) => {
   const options = useMemo(() => shuffle(question.options), [question.options]);
-  const { solved, wrongId, choose } = useAnswer(api, question.hint);
+  const { solved, tried, wrongId, choose } = useAnswer(api, question.hint);
   const [active, setActive] = useState<number | null>(null);
 
   const sayPrompt = () => soundManager.speak(question.speechPrompt ?? question.prompt);
@@ -50,10 +50,12 @@ export const SentenceReader: React.FC<{ question: SentenceComprehensionQuestion;
         </div>
         <button
           className="lesson-action"
+          disabled={!tried}
           onClick={() => {
             soundManager.playPop();
             pronunciation.speakSentence(question.sentence);
           }}
+          title={tried ? undefined : 'Try it first!'}
         >
           🔊 Hear the sentence
         </button>

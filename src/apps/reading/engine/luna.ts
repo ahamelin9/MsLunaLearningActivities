@@ -104,7 +104,7 @@ export const PER_GAME: Record<string, Partial<Bank>> = {
   'feed-luna': {
     intro: [{ text: 'I’m hungry! Feed me the matching letter.', mood: 'happy' }],
     correct: [
-      { text: 'Mmm! Crunchy letter. Delicious.', mood: 'cheer' },
+      { text: 'Crunchy letter. Delicious!', mood: 'cheer' },
       { text: 'Yum! That one tastes like honey.', mood: 'cheer' }
     ],
     missFirst: [{ text: 'Bleh! That one is the wrong flavour.', mood: 'oops' }]

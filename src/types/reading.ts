@@ -53,7 +53,6 @@ export interface FindLetterQuestion extends BaseQuestion {
 
 export interface PhonemeChunk {
   text: string;
-  soundLabel?: string;
   spokenSound: string;
 }
 
@@ -72,7 +71,6 @@ export interface BlendAndReadQuestion extends BaseQuestion {
 export interface ReadAndMatchQuestion extends BaseQuestion {
   type: 'read-and-match';
   word: string;
-  phonemes?: string[];
   options: {
     id: string;
     text: string;

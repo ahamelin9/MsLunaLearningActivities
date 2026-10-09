@@ -71,19 +71,6 @@
   .card-tap { font-size: 0.72rem; color: $ink-soft; text-transform: uppercase; letter-spacing: 0.08em; }
 }
 
-.lesson-phonemes {
-  display: flex;
-  gap: 0.35rem;
-
-  span {
-    padding: 0.1rem 0.5rem;
-    border-radius: 8px;
-    background: rgba(124, 58, 237, 0.12);
-    color: $plum-deep;
-    font-size: 0.95rem;
-  }
-}
-
 // ---------- sounding out: one block per sound ----------
 .lesson-blocks {
   display: flex;
@@ -99,9 +86,8 @@
   align-items: center;
 
   .block-letters { font-size: 2.3rem; line-height: 1.1; }
-  .block-sound { font-family: 'Nunito', sans-serif; font-size: 0.8rem; color: $ink-soft; }
 
-  &.is-active { @include chunky($amber, $amber-deep, #46280A); .block-sound { color: #46280A; } }
+  &.is-active { @include chunky($amber, $amber-deep, #46280A); }
 }
 
 .lesson-action {
@@ -212,6 +198,8 @@
     margin-top: 0.1rem;
     font-size: 0.8rem;
     cursor: pointer;
+
+    &:disabled { cursor: default; opacity: 0.4; }
   }
 }
 

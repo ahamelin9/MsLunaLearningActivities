@@ -60,5 +60,11 @@ export function useAnswer(api: GameApi, hint?: string) {
     say(settle);
   };
 
-  return { solved, wrongId, choose };
+  // A sentence or story is the child's to read first: read aloud whole before
+  // they have answered, it would be a listening question. One answer, right
+  // or wrong, and it reads itself on tap. (A single word can always be tapped,
+  // the way a child would ask the teacher.)
+  const tried = solved || api.attempts > 0;
+
+  return { solved, tried, wrongId, choose };
 }

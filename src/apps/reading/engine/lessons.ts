@@ -38,7 +38,7 @@ const LUNA_LINES: Record<string, string> = {
   'g1-sentences': 'Read the sentence, then find the picture that shows it.',
   'g2-vowel-teams': 'When two vowels go walking, the first one does the talking!',
   'g2-compounds': 'Two little words can join up to make one big word!',
-  'g2-storybooks': 'Story time! Read along with me, then answer my question.'
+  'g2-storybooks': 'Story time! Read it yourself, then answer my question.'
 };
 
 /** The sticker a kind of lesson is known for; after it, the rest of the tin. */

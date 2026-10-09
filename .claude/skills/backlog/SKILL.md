@@ -48,7 +48,9 @@ question; don't rely on memory of it.
    3. Remove its `###` section.
    4. Remove its ID from other tickets' `needs:` lines.
 
-   Note anything found along the way as a new ticket.
+   Note anything found along the way as a new ticket. If finishing it took
+   troubleshooting, add the how-to to the `know-how` skill
+   (`.claude/skills/know-how/`); a hook reminds you when the Done line lands.
 7. **Commit:** offer one commit per ticket, its message starting with the
    ID (`DES-1: screenshot harness`), so git history lines up with the
    Changelog. Commit only when Alex says yes.

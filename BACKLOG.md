@@ -5,7 +5,7 @@ them. Built from the full app review on 2026-10-08. The `/backlog` skill
 (`.claude/skills/backlog/`) explains how Claude picks up, finishes and adds
 tickets.
 
-**Last updated:** 2026-10-08
+**Last updated:** 2026-10-09
 
 ## How to read this
 
@@ -60,6 +60,7 @@ the reason written on the ticket.
 | 5 | Games to standard | GAME | Reworks built on FB and CNT. |
 | 6 | Curriculum | CUR | More lessons, once content is generated from one bank. |
 | 7 | Progress & rewards | PRG | Stars and badges that mean something. |
+| 8 | Writing companion app | WRT | A new ESL app next to Reading, starting with punctuation. Built on the restyled shell, the shared feedback path and the difficulty table, so it starts at the standard the reading games reach in Phase 5. |
 | anytime | Housekeeping | OPS, BUG P2 | Small and independent. Fill gaps between bigger work. |
 
 The P0 bugs are small and don't depend on the design work, so any of them can
@@ -67,8 +68,8 @@ be pulled into Phase 1 for a break from styling.
 
 ### Now / Next
 
-- **Now:** DES-2
-- **Next:** DES-3, DES-4, DES-5
+- **Now:** BUG-6
+- **Next:** BUG-15, GAME-4, BUG-3, then DES-2 once the teacher has chosen
 
 ---
 
@@ -77,7 +78,7 @@ be pulled into Phase 1 for a break from styling.
 | ID | Title | Type | P | Size | Status |
 |---|---|---|---|---|---|
 | **DES** | **Design system & layout** | Epic | **P0** | | |
-| DES-2 | Write the design standards | Story | P0 | M | Todo |
+| DES-2 | Write the design standards | Story | P0 | M | Blocked |
 | DES-3 | One set of design tokens | Story | P0 | M | Todo |
 | DES-4 | Typography and local fonts | Story | P0 | S | Todo |
 | DES-5 | Motion system | Story | P0 | M | Todo |
@@ -89,6 +90,7 @@ be pulled into Phase 1 for a break from styling.
 | DES-11 | One right/wrong/reveal visual language | Story | P1 | S | Todo |
 | DES-12 | Luna on screen: one owl, clear moods | Story | P1 | S | Todo |
 | DES-13 | Lesson path on the hub | Story | P1 | S | Todo |
+| DES-14 | Feed Luna's cookies look like real, different cookies | Story | P2 | S | Todo |
 | **FB** | **Shell feedback & hints** | Epic | **P0** | | |
 | FB-1 | One answer-feedback path in GameShell | Story | P0 | M | Todo |
 | FB-2 | "Show me" after repeated misses | Story | P0 | S | Todo |
@@ -97,10 +99,10 @@ be pulled into Phase 1 for a break from styling.
 | BUG-2 | Feed Luna: one wrong tap counts as two misses | Bug | P0 | S | Todo |
 | BUG-3 | What's Missing can be solved by elimination | Bug | P0 | S | Todo |
 | BUG-4 | Same-sound letters used as wrong answers (C/K) | Bug | P0 | S | Todo |
-| BUG-5 | Lessons say the answer before the child reads | Bug | P0 | S | Todo |
 | BUG-6 | Treasure Path "Read it to me" reads the missing word | Bug | P1 | S | Todo |
 | BUG-7 | Status-bar mute needs two taps to unmute | Bug | P1 | S | Todo |
 | BUG-8 | Story lessons ignore the Beginner speed | Bug | P1 | S | Todo |
+| BUG-15 | Games read the text before the child tries | Bug | P1 | S | Todo |
 | BUG-9 | Story Corner K warm-up plays one story twice | Bug | P2 | S | Todo |
 | BUG-10 | Settings may loop saving when the voice index fails | Bug | P2 | S | Todo |
 | BUG-11 | Launch and close sounds play twice | Bug | P2 | S | Todo |
@@ -129,13 +131,17 @@ be pulled into Phase 1 for a break from styling.
 | GAME-5 | Words Off the Page: bigger sentence pool | Story | P2 | S | Todo |
 | **CUR** | **Curriculum** | Epic | **P1** | | |
 | CUR-1 | Fix lesson/title/copy mismatches | Task | P1 | S | Todo |
-| CUR-2 | No phonetic symbols shown to children | Task | P1 | S | Todo |
 | CUR-3 | Real sight words | Story | P1 | S | Todo |
 | CUR-4 | Expand the curriculum per grade | Story | P1 | L | Todo |
+| CUR-5 | Merge the two K blending lessons | Story | P2 | S | Todo |
 | **PRG** | **Progress & rewards** | Epic | **P1** | | |
 | PRG-1 | Stars reflect performance | Story | P1 | M | Todo |
 | PRG-2 | Points: remove or give them a meaning | Story | P2 | S | Todo |
 | PRG-3 | Achievements worked out in one place | Task | P2 | S | Todo |
+| PRG-4 | Secret platinum trophy for a full sticker tin | Story | P2 | S | Todo |
+| **WRT** | **Writing & grammar app** | Epic | **P1** | | |
+| WRT-1 | Writing app on the home screen | Story | P1 | M | Todo |
+| WRT-2 | Punctuation game: where does the mark go? | Story | P1 | L | Todo |
 | **OPS** | **Housekeeping** | Epic | **P2** | | |
 | OPS-1 | Delete dead code | Task | P2 | S | Todo |
 | OPS-2 | README and stale copy | Task | P2 | S | Todo |
@@ -169,6 +175,8 @@ Story · P0 · M · needs: —
     - **Home screen:** keeps the iPad feel (status bar, springboard, app icon, home indicator), restyled in the same family as the reading app. The purple-gradient OS look retires.
     - **Reading app:** boho and modern, and animated. Proposal to confirm: a boho-classroom palette (terracotta, sage, mustard, clay pink, cream), arches and rainbows, paper texture and hand-drawn touches, with motion from DES-5.
     - **Built from shared components** (DES-7), so later screens are quicker to make and stay consistent.
+    - **ESL first (Alex, 2026-10-08):** this is an ESL teacher's app and reading is the core. No school subjects; any later apps surround ESL reading.
+    - **Four options** (A Boho Classroom, B Moonlit, C Groovy Garden, D Clear, which is iPad-native) share these rules and differ in mood. Ms. Luna's look (8 candidates, plus D's geometric owl) is a separate choice. The teacher decides, picking one option or combining them, and Alex passes the decision on. The doc then records it.
   - **Theme decision:** the `theme` setting (sunset/day/cosmic) is unused. Either drop it, or design a real day/night pair. Record the choice; DES-3 implements it.
   - **Colour:** semantic tokens (surface, ink, accent, success, retry, focus, disabled) mapped onto the world palette. Text meets WCAG AA (4.5:1).
   - **Type scale:** display font for titles. Text the child reads uses a literacy font (DES-4). Minimums: kid-read text 20px, answer words 32px, answer letters 48px.
@@ -178,7 +186,19 @@ Story · P0 · M · needs: —
   - **Motion:** links to DES-5.
   - **Copy voice:** kid-facing text is short and spoken by Luna. Grown-up text (objectives, settings) is plain and lives behind the gate (SET-1).
   - **Heard, never shown:** how a hidden target looks (the "?" cue), and what may appear only after a round is solved.
-- **Complete when:** the doc is reviewed and approved by Alex, and the decisions are copied into DES-3 to DES-7.
+- **Progress (2026-10-08):**
+  - **Done:**
+    - Full audit of today's styles, written up as the appendix of `docs/design-standards.md`: 185 hex colours, 62 keyframes, 56 font sizes, six answer-button styles, two looks.
+    - `docs/design-standards.md` drafted, covering every item above, with option A's values filled in.
+    - Style sample canvas built: <https://claude.ai/artifact/Gr1ngbrVdGS6xE4pALyWsm>. Four options, each with a direction board, iPad home screen, library and a playable round, all animated. There's a component sheet for A and a "Who is Ms. Luna?" page with 8 characters; D adds a ninth, a geometric owl.
+    - Every palette checked for WCAG AA contrast.
+  - **Waiting on:** the teacher's choice of option (or mix) and character, passed on by Alex. **Blocked** on this since 2026-10-09.
+  - **Then:**
+    - Fold the choice into sections 3–9 of the doc.
+    - Settle the theme setting (proposal: drop it).
+    - Copy the decisions into DES-3 to DES-7.
+    - Get Alex's sign-off.
+- **Complete when:** the teacher's choice of option and character is recorded in `docs/design-standards.md`, Alex approves the doc, and the decisions are copied into DES-3 to DES-7.
 
 ### DES-3 · One set of design tokens
 Story · P0 · M · needs: DES-2
@@ -254,8 +274,7 @@ Story · P0 · L · needs: DES-7, DES-8 · split before starting
   - Settings
   - Trophy room
   - Grade Select
-  - Coming Soon (if OPS-3 keeps it)
-- **How:** the home screen keeps its iPad feel (Alex, 2026-10-08) but drops the purple gradients for the DES-2 palette. Use kit components and tokens throughout. Replace the emoji owl `components/ui/Mascot` with `LunaOwl`. Grade Select talks to the child, not to grown-ups: no "digraphs" and no "dashboard".
+- **How:** the home screen keeps its iPad feel (Alex, 2026-10-08) but drops the purple gradients for the DES-2 palette. It centres on Reading: no school-subject apps (OPS-3), with room for future ESL companion apps. Use kit components and tokens throughout. Replace the emoji owl `components/ui/Mascot` with `LunaOwl`. Grade Select talks to the child, not to grown-ups: no "digraphs" and no "dashboard".
 - **Complete when:** the `ui:shots` screenshots show no slate or purple-gradient screens, and `Mascot` is deleted.
 
 ### DES-10 · Layout grid and breakpoints
@@ -282,6 +301,12 @@ Story · P1 · S · needs: DES-9
 Story · P1 · S · needs: DES-10
 - **How:** show the lessons as a path. Done lessons get a tick, the next lesson glows with an "Up next" label, and later lessons stay open but quieter. Finishing a lesson moves the glow along.
 - **Complete when:** a new child sees Lesson 1 marked "Up next", and it moves forward as lessons are finished.
+
+### DES-14 · Feed Luna's cookies look like real, different cookies
+Story · P2 · S · needs: DES-7
+- **Why:** every cookie is the same flat brown circle, which doesn't read as a picture (Alex, 2026-10-09).
+- **How:** a few cookie designs (chocolate chip, sprinkles, jam, and so on), mixed in each round, drawn in the DES-2 style. The letter stays just as easy to read.
+- **Complete when:** a round shows at least two different cookie designs, and every letter still meets the DES-2 type minimums.
 
 ---
 
@@ -310,8 +335,8 @@ Story · P0 · S · needs: FB-1, DES-11
 P0 · fixed by FB-1. Examples:
 - Letter Jar: "That is G" never plays.
 - Treasure Path and Words Off the Page: the sentence read-back after a right answer never plays.
-- Feed Luna: "Mmm! little b" cuts off Luna's cheer.
-- **Complete when:** with clip logging on, the Letter Jar wrong-tap line, the Treasure Path and Words Off the Page read-backs, and Feed Luna's cheer all play in full. Closes with FB-1.
+- (Feed Luna's cheer was fixed on its own in BUG-19, 2026-10-09.)
+- **Complete when:** with clip logging on, the Letter Jar wrong-tap line and the Treasure Path and Words Off the Page read-backs all play in full. Closes with FB-1.
 
 ### BUG-2 · Feed Luna: one wrong tap counts as two misses — confirmed
 P0 · S
@@ -331,14 +356,6 @@ P0 · S
 - **Fix:** filter out wrong choices that share the target's sound, ideally using the same rule as CNT-1.
 - **Complete when:** no round ever offers two letters with the same sound.
 
-### BUG-5 · Lessons say the answer before the child reads
-P0 · S
-- **Cause:**
-  - All 8 read-and-match questions open by saying the word ("Read the word CAKE!", `data/readingCurriculum.ts:551`), so nobody has to read it.
-  - The K blend riddles ("What shines in the sky?") let a child pick the picture without blending.
-- **Fix:** prompts never say the target word, and riddles become hints that only play after a miss.
-- **Complete when:** no lesson prompt says the target word or the answer.
-
 ### BUG-6 · Treasure Path "Read it to me" reads the missing word
 P1 · S (`games/TreasureRead.tsx:123`)
 - **Fix:** before the round is solved, read the sentence with a hum in the gap, or lock the button until after a miss, the way Words Off the Page does.
@@ -355,6 +372,17 @@ P1 · S
 - **Cause:** `components/StoryReader.tsx:29` and `:35` hard-code `rate: 0.9` and `0.85`, which always lands on Normal.
 - **Fix:** remove the overrides, or scale them relative to the user's speed setting.
 - **Complete when:** with Beginner selected, story lines and words play the slow clips (checked with clip logging).
+
+### BUG-15 · Games read the text before the child tries
+P1 · S · confirmed (code read, 2026-10-09)
+- **Cause:**
+  - Treasure Path true/false rounds open by reading the sentence and the claim aloud (`games/TreasureRead.tsx:58`), so the child listens instead of reading.
+  - Story Corner reads each new line aloud as it appears (`games/StoryTime.tsx:62`), and any line on tap.
+- **Fix:** it depends on the grade (Alex, 2026-10-09):
+  - **Kindergarten:** a read-along. Every line is read aloud as it appears, line 1 included.
+  - **1st and 2nd grade:** the lessons' rule (`useAnswer`'s `tried` in `components/lessonHooks.ts`). The text stays silent until the child has answered once, and a wrong answer unlocks the read-aloud. Single words can always be tapped.
+  - This is taken out of GAME-1 and GAME-2, which keep the rest of their work.
+- **Complete when:** in the browser, at Kindergarten every Story Corner line (line 1 included) is read as it appears; at 1st and 2nd grade, no Treasure Path or Story Corner round reads its sentence, claim or lines before the child's first answer, and the text can be heard after a wrong one.
 
 ### BUG-9 · Story Corner K warm-up plays one story twice
 P2 · S
@@ -504,11 +532,11 @@ Story · P1 · M · needs: FB-1, CNT-1
 ### GAME-2 · Story Corner: the child reads first
 Story · P1 · M · needs: FB-1
 - **How:**
-  - Lines aren't read aloud automatically as they appear; "Read it to me" is available after a try.
   - At least 3 stories per tier.
   - Questions can't be answered by copying a line from the story.
   - Resolves BUG-9.
-- **Complete when:** lines are never read aloud automatically, each tier has at least 3 stories, no answer is copied word for word from a line, and BUG-9 is closed.
+  - (Lines no longer reading themselves aloud moved to BUG-15.)
+- **Complete when:** each tier has at least 3 stories, no answer is copied word for word from a line, and BUG-9 is closed.
 
 ### GAME-3 · Bubble Sounds: smooth, fair bubbles
 Story · P1 · S · needs: DES-5, DES-6
@@ -539,12 +567,6 @@ Task · P1 · S
 - The grade cards promise 1st-grade decodable stories, "igh", and chapter stories, none of which exist yet.
 - **Complete when:** every lesson title matches its questions, every grade card describes only lessons that exist, and the story lesson's stars follow the PRG-1 rule.
 
-### CUR-2 · No phonetic symbols shown to children
-Task · P1 · S
-- **Why:** blend tiles and read-and-match cards show IPA like /æ/, /ɒ/, /ɑːr/, /eɪ/ to 5-year-olds.
-- **Fix:** remove them from what children see.
-- **Complete when:** no phonetic symbol appears anywhere a child can see, in any lesson.
-
 ### CUR-3 · Real sight words
 Story · P1 · S
 - **Why:** "big" and "can" can be sounded out, so they aren't sight words. The skill description also promises "the" and "like", which aren't taught.
@@ -561,6 +583,12 @@ Story · P1 · L · needs: CNT-2 · split per grade before starting
 
 ---
 - **Complete when:** each grade has every lesson from its split tickets, each passes the CNT-4 checks, and the grade cards describe them accurately.
+
+### CUR-5 · Merge the two K blending lessons
+Story · P2 · S
+- **Why:** "Pet & Animal Words" and "Everyday Words (Sun, Bed, Cup)" play exactly the same way, three CVC words each (Alex, 2026-10-09).
+- **How:** proposal to confirm with Alex: one blending lesson, or keep two but make the second a step up (for example four pictures, or no sound under each tile). Keep one existing lesson ID so a child's done tick survives.
+- **Complete when:** the K hub shows no two lessons that play the same way, and a child who finished either old lesson still sees it done.
 
 ## PRG — Progress & rewards (Phase 7)
 
@@ -582,6 +610,52 @@ Task · P2 · S
 
 ---
 - **Complete when:** achievements are checked only in `utils/storage.ts`, `TrophyModal` only reads them, and BUG-13 is closed.
+
+### PRG-4 · Secret platinum trophy for a full sticker tin
+Story · P2 · S · needs: PRG-3
+- **Why:** collecting every sticker should feel like a big moment (Alex, 2026-10-09).
+- **How:**
+  - A hidden achievement, checked with the others in `utils/storage.ts` (PRG-3), unlocks when every sticker in `engine/stickers.ts` is in the tin. It counts `STICKERS`, so adding a sticker later raises the bar.
+  - Until then it appears nowhere: no locked slot, no silhouette, no "1 to go".
+  - When it unlocks, Luna celebrates with a pre-rendered line, and the trophy shows in the Trophy room from then on.
+- **Complete when:** with one sticker missing, no screen hints at the trophy; collecting the last one unlocks it, Luna says her line, and it stays in the Trophy room after a reload.
+
+## WRT — Writing & grammar app (Phase 8)
+
+**Goal:** a second ESL companion app next to Reading, for writing and grammar,
+starting with punctuation (Alex, 2026-10-09). Proposal to confirm: it's a
+separate app, not a Reading game, because placing marks is a writing skill.
+The alternative is a punctuation game inside Reading, taught as fluency.
+
+### WRT-1 · Writing app on the home screen
+Story · P1 · M · needs: DES-9
+- **Why:** a home for the punctuation game and later writing and grammar games.
+- **How:**
+  - Register a Writing app in `apps/registry.ts`, built from the DES kit and tokens.
+  - It uses the child's grade and `GameShell` the same way Reading does.
+  - Its only game for now is WRT-2.
+- **Complete when:** the home screen shows Reading and Writing, Writing opens to a hub listing the punctuation game, and build and lint pass.
+
+### WRT-2 · Punctuation game: where does the mark go?
+Story · P1 · L · needs: WRT-1, FB-1, FB-2, LVL-1 · split per grade before starting
+- **Why:** children need to learn where periods, commas and other marks go. For ESL learners, punctuation also changes how a sentence sounds (a stop, a pause, a question that rises), so it can be taught by ear.
+- **How:**
+  - A short sentence sits on a paper card with a mark missing. Luna reads it aloud with the right pause and tone. The child taps the gap, then picks the mark from a tray (or drags it in).
+  - **Heard, never shown:** the right mark isn't shown in place until the round is solved. Hints are spoken ("Listen. Does my voice go up at the end?").
+  - Staggered by tier (LVL-1), following the Common Core language standard for each grade:
+
+    | Tier | Grade | Marks |
+    |---|---|---|
+    | 1 | K | End of a sentence: `.` or `?` |
+    | 2 | 1st | `.` `?` `!`, commas in a list ("a cat, a dog and a pig") and in dates |
+    | 3 | 2nd | Commas in a letter's greeting and closing ("Dear Sam,"), apostrophes in contractions (can't) and possessives (the dog's bone) |
+
+  - Every sentence has exactly one right answer: no sentence where `.` and `!` both work, and no gap before "and" in a list (that comma is optional).
+  - Render each sentence with `scripts/voice/`. Check by ear that questions rise and list commas pause, because the game depends on it, and drop any sentence the voice gets wrong.
+- **Complete when:**
+  - at each tier, a round shows a sentence with a mark missing, plays Luna's reading, and accepts only the right mark in the right gap;
+  - each tier has at least 10 sentences, each with one right answer, with voice rendered and `voice:audit` passing;
+  - the mark never appears in place before the round is solved, and the third miss reveals it (FB-2).
 
 ## OPS — Housekeeping (anytime)
 
@@ -605,10 +679,11 @@ Task · P2 · S
 ### OPS-3 · Decide the "Coming Soon" apps
 Task · P2 · S
 - **Why:** Math, Science and Art are registered, but the home screen only shows Reading, so `ComingSoonApp` can't be reached.
-- **Decide:** show them as locked tiles, or remove them.
+- **Decided (Alex, 2026-10-08):** remove them. This is an ESL teacher's app and reading is the core. Other subjects will never be added. Later apps will only surround ESL reading (activities that support a child's English as a whole), so the home screen leaves room for those, not for school subjects.
+- **How:** delete the Math, Science and Art entries from `apps/registry.ts`, `apps/preview/ComingSoonApp.*`, and the unused icons that only they use.
+- **Complete when:** the registry holds only Reading, `ComingSoonApp` is gone, and build and lint pass.
 
 ---
-- **Complete when:** Alex's choice is in the Changelog, and either locked tiles appear on Home or the apps and `ComingSoonApp` are removed.
 
 ## Changelog
 
@@ -621,3 +696,13 @@ only record of them. One line each: date, ID, title, and `Done` or
 - **2026-10-08** — Added the `focus` skill and the agenda hook (`.claude/hooks/backlog-focus.mjs`, registered in `.claude/settings.json`). Each message now carries the current agenda, and off-agenda requests get a one-line priority check.
 - **2026-10-08** — Added the Completion criteria. Every ticket now has a checkable **Complete when** (the 30 that had none got one), and finished tickets are deleted from the board instead of marked Done.
 - **2026-10-08** — Added the backlog guard (`.claude/hooks/backlog-guard.mjs`), which refuses any edit to this file that breaks its rules and builds and lints before a ticket is deleted as Done. Added the `luna-board` mod for Alex: `/board` opens a board pane, the status line shows the current ticket, and a toast appears when a ticket is finished.
+- **2026-10-09** — Added the WRT epic (Writing & grammar app, Phase 8) with WRT-1 and WRT-2, the punctuation game.
+- **2026-10-09** — DES-2 blocked, waiting on the teacher's design choice. Alex moved the give-away fixes up to fill the gap: BUG-5 (widened to every lesson), then BUG-6, the new BUG-15, GAME-4 and BUG-3.
+- **2026-10-09** — BUG-5 Lessons give the answer away — Done. No lesson says or shows its answer (45 give-aways found by a scan, now 0); a sentence, line or story reads aloud only after the first answer, while single words can be tapped any time (Alex's call). Also gave the story answers their missing clips and taught `voice:audit` to check them.
+- **2026-10-09** — BUG-18 Some of Luna's game lines use the browser voice — Done. The inventory and the audit now both read `lunaLine` literals; "Found it!" and "We already tried those two!" have clips.
+- **2026-10-09** — CUR-2 No phonetic symbols shown to children — Done. Blend tiles and read-and-match cards show letters only; the unused IPA labels are gone from the data. A sweep of all 12 lessons (60 screens) found no phonetic symbol.
+- **2026-10-09** — BUG-16 Word of the day says the word twice — Done. A tap says "Today's word is" and the word once.
+- **2026-10-09** — BUG-17 Feed Luna says "Mmm!" after every right cookie — Done. A right cookie is named ("big M") with no "Mmm!", and Luna's cheer "Mmm! Crunchy letter." is now "Crunchy letter. Delicious!".
+- **2026-10-09** — BUG-19 Feed Luna: the cheer cuts in under the letter — Done. Luna names the cookie, then cheers; timed over 5 right answers, nothing overlaps or is cut off.
+- **2026-10-09** — BUG-20 Story Corner never reads line 1 — Done. A story opens with its title and then line 1, at every grade.
+- **2026-10-09** — Added the `know-how` skill (`.claude/skills/know-how/`): solved problems written as symptom, cause, fix and check, plus `speech-check.cjs`, a silent browser check that logs and times every clip. A new hook (`.claude/hooks/know-how-nudge.mjs`) reminds Claude to add to it whenever a ticket closes as Done.

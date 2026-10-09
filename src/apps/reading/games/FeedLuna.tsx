@@ -113,6 +113,12 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
   const beakRef = useRef<HTMLDivElement | null>(null);
   const surfaceRef = useRef<HTMLDivElement | null>(null);
   const startRef = useRef<{ x: number; y: number } | null>(null);
+  /** she is naming the cookie she ate: taps wait until she has cheered */
+  const naming = useRef(false);
+  const cheerTimer = useRef<number | undefined>(undefined);
+
+  // a timer must not cheer for a round the child has left
+  useEffect(() => () => window.clearTimeout(cheerTimer.current), []);
 
   const sayCue = () => {
     soundManager.playLetterTap();
@@ -126,19 +132,30 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
   }, []);
 
   const feed = (char: string) => {
-    if (api.locked || eaten.includes(char)) return;
+    if (api.locked || naming.current || eaten.includes(char)) return;
 
     if (char === round.answer) {
+      naming.current = true;
       setEaten([...eaten, char]);
       setChewing(true);
       soundManager.playLetterSnap();
-      window.setTimeout(() => {
-        pronunciation.speakSequence([
-          char === char.toLowerCase() ? { text: 'Mmm! little' } : { text: 'Mmm! big' },
-          { name: char }
-        ]);
-      }, 260);
-      api.win({ delay: 1900 });
+
+      // She names what she ate (no "Mmm!", Alex), and only then cheers. Both
+      // at once, the cheer was cut off a quarter-second in and the two
+      // sounded like one jumble. A watchdog cheers anyway if the name's end
+      // is never reported.
+      let cheered = false;
+      const cheer = () => {
+        if (cheered) return;
+        cheered = true;
+        window.clearTimeout(cheerTimer.current);
+        api.win({ delay: 1900 });
+      };
+      cheerTimer.current = window.setTimeout(cheer, 2500);
+      pronunciation.speakSequence(
+        [char === char.toLowerCase() ? { text: 'little' } : { text: 'big' }, { name: char }],
+        { onEnd: cheer }
+      );
     } else {
       setSpat(char);
       window.setTimeout(() => setSpat(null), 800);

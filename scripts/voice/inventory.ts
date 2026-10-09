@@ -68,6 +68,9 @@ const SPOKEN_KEYS = new Set([
   'text',
   'explanation',
   'comprehensionQuestion',
+  // a story question's answers, a bare string[] said when tapped (a lesson's
+  // other options are objects, whose own fields are walked instead)
+  'options',
   'targetSentence',
   'exampleSentence',
   'spoken',
@@ -244,6 +247,8 @@ function argRegion(src: string, openParen: number): string {
 const STRING_LITERAL = /'((?:[^'\\\n]|\\.)*)'|"((?:[^"\\\n]|\\.)*)"|`([^`$\\]*)`/g;
 const TAGGED_PART = /\b(text|sound|name|word)\s*:\s*'((?:[^'\\\n]|\\.)*)'/g;
 const TEXT_PART = /\{\s*text\s*:\s*'((?:[^'\\\n]|\\.)*)'\s*\}/g;
+/** A game's own line for Luna, handed to api.win/miss/tick and said by the shell. */
+const LUNA_LINE = /\blunaLine\s*:\s*'((?:[^'\\\n]|\\.)*)'/g;
 
 function unescape(raw: string): string {
   return raw.replace(/\\(['"`\\])/g, '$1');
@@ -266,6 +271,11 @@ function harvestSourceLiterals(out: Map<string, Clip>): void {
     // reading only call sites missed them and those lines used the browser
     // voice. (Only `text`: `name:` and `word:` are ordinary field names too.)
     for (const m of src.matchAll(TEXT_PART)) {
+      const value = unescape(m[1]).trim();
+      if (/[a-zA-Z]/.test(value)) prose.add(value);
+    }
+    // the same goes for a line a game hands the shell for Luna to say
+    for (const m of src.matchAll(LUNA_LINE)) {
       const value = unescape(m[1]).trim();
       if (/[a-zA-Z]/.test(value)) prose.add(value);
     }

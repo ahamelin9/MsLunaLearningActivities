@@ -42,8 +42,8 @@ export const BlendAndRead: React.FC<{ question: BlendAndReadQuestion; api: GameA
             onClick={() => playSound(i)}
             title="Hear this sound"
           >
+            {/* letters only: a phonetic symbol like /æ/ means nothing to a child; the tile says its sound */}
             <span className="block-letters">{phoneme.text}</span>
-            {phoneme.soundLabel && <span className="block-sound">{phoneme.soundLabel}</span>}
           </button>
         ))}
       </div>

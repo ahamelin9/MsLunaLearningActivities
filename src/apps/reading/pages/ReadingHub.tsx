@@ -290,8 +290,8 @@ export const ReadingHub: React.FC<ReadingHubProps> = ({
             onClick={() => {
               soundManager.playLetterTap();
               const word = wordOfTheDay.word;
-              const shown = `Today's word is ${word}. ${word}!`;
-              say(shown, 'happy', [{ text: 'Today’s word is' }, { word }, { word }]);
+              const shown = `Today's word is ${word}!`;
+              say(shown, 'happy', [{ text: 'Today’s word is' }, { word }]);
             }}
           >
             <span className="nook-kicker">Word of the day</span>

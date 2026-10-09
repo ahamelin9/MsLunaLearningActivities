@@ -12,31 +12,23 @@ export const ReadAndMatch: React.FC<{ question: ReadAndMatchQuestion; api: GameA
   const options = useMemo(() => shuffle(question.options), [question.options]);
   const { solved, wrongId, choose } = useAnswer(api, question.hint);
 
-  const sayPrompt = () => {
-    if (question.speechPrompt) soundManager.speak(question.speechPrompt);
-    else pronunciation.speakSequence([{ text: 'Read the word' }, { word: question.word }]);
-  };
+  // the word is the child's to read: Luna never says it until it is found
+  const sayPrompt = () => soundManager.speak(question.speechPrompt ?? 'Read the word, then find its picture.');
   usePrompt(sayPrompt);
 
   return (
     <div className="lesson">
       <button
-        className="lesson-card is-button"
+        className={`lesson-card ${solved ? 'is-button' : ''}`}
         onClick={() => {
+          if (!solved) return;
           soundManager.playPop();
           pronunciation.speakWord(question.word);
         }}
-        title="Hear the word"
+        title={solved ? 'Hear the word' : undefined}
       >
         <span className="card-word">{question.word.toUpperCase()}</span>
-        {question.phonemes && question.phonemes.length > 0 && (
-          <span className="lesson-phonemes">
-            {question.phonemes.map((ph, i) => (
-              <span key={i}>{ph}</span>
-            ))}
-          </span>
-        )}
-        <span className="card-tap">tap to listen</span>
+        {solved && <span className="card-tap">tap to hear it</span>}
       </button>
       <PromptChip text={question.prompt} onClick={sayPrompt} />
 

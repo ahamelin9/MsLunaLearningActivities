@@ -8,16 +8,20 @@ import { PromptChip } from './LessonKit';
 import { useAnswer, usePrompt } from './lessonHooks';
 
 /** Said from the second wrong answer when a story has no hint of its own. */
-const STORY_HINT = { text: 'Peek back at the story — the answer is hiding in one of the lines.' };
+const STORY_HINT = { text: 'Peek back at the story. Tap a line and I will read it to you.' };
 
-/** Read a short story along with Luna, any line or word on tap, then answer one question about it. */
+/**
+ * Read a short story, then answer one question about it. The child reads it
+ * first; once they have answered, any line is read aloud on tap. A single
+ * word can be tapped any time.
+ */
 export const StoryReader: React.FC<{ question: StoryReadQuestion; api: GameApi }> = ({ question, api }) => {
   const quiz = question.comprehensionQuestion;
   const answers = useMemo(
     () => shuffle(quiz.options.map((text, i) => ({ id: String(i), text, isCorrect: i === quiz.correctIndex }))),
     [quiz]
   );
-  const { solved, wrongId, choose } = useAnswer(api, question.hint ?? STORY_HINT.text);
+  const { solved, tried, wrongId, choose } = useAnswer(api, question.hint ?? STORY_HINT.text);
   const [activeLine, setActiveLine] = useState<number | null>(null);
   const [activeWord, setActiveWord] = useState<string | null>(null);
 
@@ -45,11 +49,13 @@ export const StoryReader: React.FC<{ question: StoryReadQuestion; api: GameApi }
           <span className="story-title">{question.title}</span>
           <button
             className="lesson-action"
+            disabled={!tried}
             onClick={() => {
               soundManager.playPop();
               // line by line: each line is a clip, the whole story glued together is not
               pronunciation.speakSequence(question.sentences.map(s => ({ text: s.text })));
             }}
+            title={tried ? undefined : 'Try it first!'}
           >
             🔊 Read me the whole story
           </button>
@@ -57,7 +63,13 @@ export const StoryReader: React.FC<{ question: StoryReadQuestion; api: GameApi }
 
         {question.sentences.map((sentence, s) => (
           <div key={sentence.id} className={`story-line ${activeLine === s ? 'is-active' : ''}`}>
-            <button className="line-play" onClick={() => readLine(s)} title="Read this line" aria-label="Read this line">
+            <button
+              className="line-play"
+              disabled={!tried}
+              onClick={() => readLine(s)}
+              title="Read this line"
+              aria-label="Read this line"
+            >
               🔊
             </button>
             <span className="lesson-sentence">

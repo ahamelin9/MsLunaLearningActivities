@@ -36,12 +36,14 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
 
   const answers = useMemo(() => shuffle(story.answers), [story]);
 
+  // The book opens on line 1, so it is read with the title, the way "Next
+  // line" reads every line after it.
   useEffect(() => {
     const t = window.setTimeout(() => {
-      pronunciation.speakText(story.title);
+      pronunciation.speakSequence([{ text: story.title }, { text: story.lines[0] }]);
     }, 500);
     return () => window.clearTimeout(t);
-  }, [story.title]);
+  }, [story]);
 
   const readLine = (index: number) => {
     soundManager.playLetterTap();
