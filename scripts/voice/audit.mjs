@@ -164,6 +164,11 @@ for (const s of ['Let\u2019s start Kindergarten!', 'Let\u2019s start First Grade
 for (const item of content.SENTENCES)
   for (const t of item.truth ?? [])
     if (t.claim) push(t.claim, o => pronunciation.speakText(t.claim, o));
+// Treasure Path reads a cloze sentence with "what?" in the gap until it is solved
+for (const item of content.SENTENCES) {
+  const parts = content.readWithGap(item);
+  push(parts.map(p => p.text ?? `(${p.pause} ms)`).join(' + '), o => pronunciation.speakSequence(parts, o));
+}
 
 // Stickers: the line on its own (tapped in the tin) and after every finish line
 // (the end of a game), which the shell says as two parts

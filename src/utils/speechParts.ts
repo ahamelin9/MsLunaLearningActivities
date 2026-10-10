@@ -13,6 +13,8 @@ export interface SpeechPart {
   sound?: string;
   name?: string;
   word?: string;
+  /** milliseconds of quiet before the next piece, e.g. to set a word apart */
+  pause?: number;
 }
 
 /**

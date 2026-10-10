@@ -371,6 +371,9 @@ export function buildInventory(): Clip[] {
   // just `text` — the same name a story's answer options use, which are not
   // tapped and would double the word list for nothing.
   for (const item of content.SENTENCES) tappable.add(item.text);
+  // TreasureRead's "Read it to me" asks "what?" in the gap until the round is solved
+  for (const item of content.SENTENCES)
+    for (const part of content.readWithGap(item)) if (part.text) prose.add(part.text);
   harvest(content.MINI_STORIES);
   harvest(content.LETTERS);
   harvest(content.DIGRAPHS);

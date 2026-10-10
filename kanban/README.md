@@ -10,7 +10,7 @@ tickets.
 - **`epics/<EPIC>.md`**: one file per epic, with its goal and every ticket's full section (Why / How / Complete when). A ticket never moves files when its status changes.
 - **`CHANGELOG.md`**: finished and dropped tickets. Once a ticket is deleted, its changelog line is its only record.
 
-**Last updated:** 2026-10-09
+**Last updated:** 2026-10-10
 
 ## How to read this
 
@@ -72,7 +72,7 @@ be pulled into Phase 1 for a break from styling.
 ### Now / Next
 
 - **Now:** DES-2: the style sample until the teacher gives her final approval (Alex, 2026-10-09: the prototype comes first, since everything else builds on it)
-- **Next:** the rest of DES-2 once she approves, then BUG-6, BUG-15, GAME-4, BUG-3
+- **Next:** BUG-15 while DES-2 waits for the teacher, then GAME-1 (Alex, 2026-10-10: passages instead of single sentences), then the rest of DES-2 once she approves, GAME-4, BUG-3
 
 ## Epics
 
@@ -119,7 +119,6 @@ In board order. A new epic gets its file in `epics/` first, then a link here
 | BUG-2 | Feed Luna: one wrong tap counts as two misses | Bug | P0 | S | Todo |
 | BUG-3 | What's Missing can be solved by elimination | Bug | P0 | S | Todo |
 | BUG-4 | Same-sound letters used as wrong answers (C/K) | Bug | P0 | S | Todo |
-| BUG-6 | Treasure Path "Read it to me" reads the missing word | Bug | P1 | S | Todo |
 | BUG-7 | Status-bar mute needs two taps to unmute | Bug | P1 | S | Todo |
 | BUG-8 | Story lessons ignore the Beginner speed | Bug | P1 | S | Todo |
 | BUG-15 | Games read the text before the child tries | Bug | P1 | S | Todo |
@@ -144,7 +143,7 @@ In board order. A new epic gets its file in `epics/` first, then a link here
 | CNT-3 | Content QA pass | Task | P1 | S | Todo |
 | CNT-4 | Automated content checks in `voice:audit` | Task | P2 | S | Todo |
 | **GAME** | **Games to standard** | Epic | **P1** | | |
-| GAME-1 | Treasure Path: real comprehension | Story | P1 | M | Todo |
+| GAME-1 | Treasure Path: real comprehension | Story | P1 | L | Todo |
 | GAME-2 | Story Corner: the child reads first | Story | P1 | M | Todo |
 | GAME-3 | Bubble Sounds: smooth, fair bubbles | Story | P1 | S | Todo |
 | GAME-4 | Muddled Cards: reading required at tier 2+ | Story | P2 | S | Todo |

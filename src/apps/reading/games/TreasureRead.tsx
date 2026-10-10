@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import type { GameApi, GameDef } from '../engine/types';
-import { pick, sample, sentencesFor, shuffle, tierFor, type SentenceItem } from '../engine/content';
-import { pronunciation } from '../../../utils/pronunciation';
+import { GAP, maskKey, pick, readWithGap, sample, sentencesFor, shuffle, tierFor, type SentenceItem } from '../engine/content';
+import { pronunciation, type SpeechPart } from '../../../utils/pronunciation';
 
 interface Round {
   kind: 'cloze' | 'truefalse';
@@ -11,6 +11,8 @@ interface Round {
   options: string[];
   answer: string;
   claim?: string;
+  /** a cloze sentence read with "what?" in the gap, so hearing it gives nothing away */
+  gapRead?: SpeechPart[];
 }
 
 function buildRound(tier: 1 | 2 | 3): Round {
@@ -29,11 +31,11 @@ function buildRound(tier: 1 | 2 | 3): Round {
     };
   }
 
-  const masked = sentence.text.replace(new RegExp(`\\b${sentence.key}\\b`, 'i'), '_____');
   return {
     kind: 'cloze',
     sentence,
-    masked,
+    masked: maskKey(sentence),
+    gapRead: readWithGap(sentence),
     options: shuffle([sentence.key, ...sample(sentence.decoys, 2)]),
     answer: sentence.key
   };
@@ -109,7 +111,7 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
           </>
         ) : (
           <p className="scroll-sentence">
-            {round.masked.split('_____').map((chunk, i, arr) => (
+            {round.masked.split(GAP).map((chunk, i, arr) => (
               <React.Fragment key={i}>
                 {chunk}
                 {i < arr.length - 1 && (
@@ -120,7 +122,15 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
           </p>
         )}
 
-        <button className="speak-chip" onClick={() => pronunciation.speakSentence(round.sentence.text)}>
+        <button
+          className="speak-chip"
+          onClick={() =>
+            // until the gap is filled, reading the whole sentence would say the answer
+            round.gapRead && !solved
+              ? pronunciation.speakSequence(round.gapRead)
+              : pronunciation.speakSentence(round.sentence.text)
+          }
+        >
           🔊 Read it to me
         </button>
       </div>

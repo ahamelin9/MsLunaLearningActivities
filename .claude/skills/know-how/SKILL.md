@@ -30,13 +30,18 @@ build, or a tool that misbehaved. Skip routine fixes.
 *2026-10-09 · BUG-5, BUG-18*
 
 - **Symptom:** a line plays in the flat built-in browser voice instead of Luna's.
+  In Alex's Firefox each browser-voice line also ends in a loud electric
+  ping or pop, which can be all he notices ("a pop where the word should be").
+  **A ping or pop right after a voice:render means a stale tab, not a bad clip:**
+  don't go analysing the audio files (2026-10-10, BUG-6 lost an hour to that).
 - **Cause 1, the most common:** a stale tab. The app loads the voice index
   (`public/voice/af_heart/manifest.json`) once per page load. Vite hot-reloads
   changed text into an open tab but not the index, so every new or changed line
   has no clip there. `voice:render` also prunes clips for old lines, so those
   404 in a stale tab too.
-  - **Fix:** reload the tab. After any `voice:render`, tell Alex to reload. Alex
-    usually has `npm run dev` open on port 5173.
+  - **Fix:** reload the tab. After any `voice:render`, tell Alex to reload,
+    plainly and first, before asking him to listen to anything. Alex usually
+    has `npm run dev` open on port 5173, in Firefox.
 - **Cause 2:** a speech path that neither `scripts/voice/inventory.ts` nor
   `scripts/voice/audit.mjs` reads, so the line never got a clip and the audit
   still passes. Seen so far:
@@ -56,6 +61,32 @@ build, or a tool that misbehaved. Skip routine fixes.
 - **Not the cause:** `voice:render` pruning. It only removes clips no line uses
   any more. Diff the old and new index keys
   (`git show HEAD:public/voice/af_heart/manifest.json`) to prove it.
+
+## A new line says "ay" for "a", or needs a clear pause
+
+*2026-10-10 · BUG-6*
+
+- **Symptom:** a new prose line comes out wrong: "I see **ay**…" instead of
+  "I see uh…", or a pause you wrote with "..." is too short to hear.
+- **Cause:** Kokoro reads prose through espeak, which decides stress from the
+  punctuation around a word. An "a" right before a comma, "..." or "—" is
+  stressed into the letter name. And punctuation alone never gives more than
+  about 0.3 s of quiet, whatever you write ("...", "… …", "; ...").
+- **Fix:**
+  - "a" before "...": `speakable()` in `scripts/voice/lexicon.mjs` respells
+    it "uh" in the audio only.
+  - A longer pause: say the line as parts with `{ pause: ms }` between them
+    (`SpeechPart`, played by `speakSequence`). Treasure Path's gap is the
+    example: `readWithGap` in `engine/content.ts`.
+- **Check:** before rendering, run each line through the phonemizer that
+  kokoro-js uses, and look for `ˈeɪ` where you meant "a":
+
+  ```bash
+  node --input-type=module -e "import { phonemize } from 'phonemizer'; for (const t of ['I see a...','I see uh...']) console.log(t, (await phonemize(t,'en-us')).join(' | '))"
+  ```
+
+  To measure a pause, use the timed browser check (below): the gap between
+  one clip's end and the next one's start.
 
 ## Two voices at once, or a line cut off
 

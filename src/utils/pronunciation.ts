@@ -647,6 +647,7 @@ class PronunciationService {
       // and the replay button must repeat the whole sequence rather than
       // only its last piece (prose is already split into its pieces)
       if (part.text || part.sound || part.name || part.word) this.speakPart(part, step);
+      else if (part.pause) window.setTimeout(next, part.pause);
       else next();
     };
 

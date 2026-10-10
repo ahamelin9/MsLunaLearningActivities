@@ -3,6 +3,7 @@
 // become available to all games at once, at three difficulty tiers.
 
 import type { GradeLevel } from '../../../types/reading';
+import type { SpeechPart } from '../../../utils/speechParts';
 
 export type Difficulty = 1 | 2 | 3;
 
@@ -473,6 +474,40 @@ export function lettersFor(tier: Difficulty): LetterItem[] {
 export function sentencesFor(tier: Difficulty): SentenceItem[] {
   const exact = SENTENCES.filter(s => s.tier === tier);
   return exact.length >= 4 ? exact : SENTENCES.filter(s => s.tier <= tier);
+}
+
+/** What stands in for the key word while it is still a gap. */
+export const GAP = '_____';
+
+/** The sentence with its key word blanked out: "The cat is _____." */
+export function maskKey(sentence: SentenceItem): string {
+  return sentence.text.replace(new RegExp(`\\b${sentence.key}\\b`, 'i'), GAP);
+}
+
+/** The quiet either side of "what" when a gap is read aloud. */
+const GAP_PAUSE_MS = 300;
+
+/**
+ * The sentence read aloud without giving the gap away, asking "what?" where
+ * the key word goes: "The train stops at the busy… what?" and
+ * "A… what… frog jumps high?". The pause sets "what" apart, so a child hears
+ * it isn't part of the sentence. Each text piece is its own clip; the voice
+ * inventory renders them from this same helper.
+ */
+export function readWithGap(sentence: SentenceItem): SpeechPart[] {
+  const [before, after = ''] = maskKey(sentence).split(GAP).map(piece => piece.trim());
+  const pause: SpeechPart = { pause: GAP_PAUSE_MS };
+  const parts: SpeechPart[] = [];
+  // built text is safe here only because the inventory and voice:audit both
+  // walk every sentence through this helper
+  if (before) parts.push({ text: before + '...' }, pause);
+  if (/[a-z]/i.test(after)) {
+    // the rest of the sentence is still part of the question
+    parts.push({ text: before ? 'what...' : 'What...' }, pause, { text: after.replace(/[.!]$/, '?') });
+  } else {
+    parts.push({ text: before ? 'what?' : 'What?' });
+  }
+  return parts;
 }
 
 export function storiesFor(tier: Difficulty): MiniStory[] {

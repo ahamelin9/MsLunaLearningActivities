@@ -11,6 +11,8 @@
 //     "the sight word SEE" was "ess-ee-ee", "rhymes with CAT" was "see-ay-tee".
 //     A caps word the app also knows as a vocabulary word is lowercased. A caps
 //     letter team is left alone, because "SH is for" means the letters' names.
+//   - An "a" trailing off before "..." is stressed into the letter name too:
+//     "I see a..." was "I see ay". Respelled "uh".
 //
 // Only the audio changes; the text on screen is untouched.
 
@@ -23,6 +25,9 @@ const LETTER_A =
 
 export function speakable(text, vocabulary) {
   return text
+    // "I see a..." trailing off: espeak stresses an "a" before a pause into
+    // the letter name ("I see ay"), so it is respelled as the article
+    .replace(/\b([Aa])(?=\.\.\.|…)/g, (_, a) => (a === 'A' ? 'Uh' : 'uh'))
     .replace(/\b[A-Z]{2,}\b/g, w => (vocabulary.has(w.toLowerCase()) ? w.toLowerCase() : w))
     .replace(LETTER_A, 'eigh');
 }

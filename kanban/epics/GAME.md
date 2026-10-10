@@ -10,9 +10,16 @@ Verdicts from the 2026-10-08 review:
 | Below standard | Treasure Path, What's Missing, Story Corner |
 
 ### GAME-1 · Treasure Path: real comprehension
-Story · P1 · M · needs: FB-1, CNT-1
-- **How:** true/false claims paraphrase the sentence instead of copying it, so they can't be solved by matching text. Fold in BUG-6 and the ambiguous fill-in-the-blanks.
-- **Complete when:** no round can be answered by matching strings or by tapping "Read it to me".
+Story · P1 · L · needs: FB-1, CNT-1
+- **Why:** each stone is one sentence and one question, which is quick to solve and never asks the child to read a passage (Alex, 2026-10-10).
+- **How:**
+  - Each stone is a short passage, longer by grade: about 2 sentences at Kindergarten, 3 at 1st grade, 4–5 at 2nd grade.
+  - Two question types about the passage: true or false, and fill in the blank to make a statement true.
+  - Statements paraphrase the passage instead of copying it, so they can't be solved by matching text, and some need more than one sentence.
+  - Fix the ambiguous fill-in-the-blanks (more than one choice fits). A blank keeps the rule from BUG-6: "Read it to me" never says the missing word (reuse `readWithGap` in `engine/content.ts`).
+  - Passages need writing and their voice clips rendering.
+  - Size L: split before starting (passages, question types, the screen).
+- **Complete when:** at every grade each round shows a passage of that grade's length; both question types come up in one play; no round can be answered by matching strings or by tapping "Read it to me".
 
 ### GAME-2 · Story Corner: the child reads first
 Story · P1 · M · needs: FB-1

@@ -25,11 +25,6 @@ P0 · S
 - **Fix:** filter out wrong choices that share the target's sound, ideally using the same rule as CNT-1.
 - **Complete when:** no round ever offers two letters with the same sound.
 
-### BUG-6 · Treasure Path "Read it to me" reads the missing word
-P1 · S (`games/TreasureRead.tsx:123`)
-- **Fix:** before the round is solved, read the sentence with a hum in the gap, or lock the button until after a miss, the way Words Off the Page does.
-- **Complete when:** before a round is solved, "Read it to me" never says the missing word; once it's solved, it reads the whole sentence.
-
 ### BUG-7 · Status-bar mute needs two taps to unmute
 P1 · S
 - **Cause:** the icon treats sound as "on" only when *both* sound and narration are on, but the toggle (`utils/storage.ts:111`) treats *either* as on.
