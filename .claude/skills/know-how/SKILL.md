@@ -141,3 +141,37 @@ Import `READING_CURRICULUM` from that file and walk the
 skills → lessons → questions. Run the scan against the last commit too
 (`git show HEAD:src/data/readingCurriculum.ts`): a scan that finds nothing in
 the old version either proves nothing.
+
+## A page of raw code pops up in Alex's browser
+
+*2026-10-09 · DES-2*
+
+- **Symptom:** a broken-looking page opens on its own: CSS as plain text,
+  `%%PLANT …%%` placeholders and unstyled buttons, at a `file:///private/tmp/…`
+  address.
+- **Cause:** the desktop app opens any `.html` file Claude writes in the
+  browser. A partial file (a fragment, a template piece) looks broken on its own.
+- **Fix:** give files that aren't whole pages a non-HTML extension (`.frag`,
+  `.part`, `.txt`). Tell Alex the page is a scratch file and safe to close.
+- **Check:** writing the file opens nothing.
+
+## The prototype doesn't follow the canvas's light/dark button
+
+*2026-10-09 · DES-2*
+
+- **Symptom:** the style sample canvas's own light/dark button changes the
+  canvas but not the screens on it.
+- **Cause:** each board is its own page in a frame, and only follows the theme
+  if its script listens. The canvas passes the theme three ways: a
+  `data-theme="dark|light"` attribute on the board's page, `?theme=dark` in its
+  address, and a `{ type: '__dc_theme', theme }` message when the button is
+  pressed. Its runtime only uses them to colour the background.
+- **Fix:** the board reads the attribute or the address on load, and listens
+  for the message, changes to the attribute, and the device setting
+  (`prefers-color-scheme`). See `THEME_JS` in
+  `.claude/skills/luna-design/prototype/gen.py`. Signed-out viewers don't see
+  the canvas's button, so the prototype keeps its own Light/Dark button as well.
+- **Check:** in the built-in browser (signed out is fine), open the canvas and
+  set the colour scheme to light, then dark (`resize_window` with
+  `colorScheme`). The open board switches without a reload, and after a reload
+  it matches the canvas.

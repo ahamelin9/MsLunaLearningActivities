@@ -51,9 +51,11 @@ question; don't rely on memory of it.
    Note anything found along the way as a new ticket. If finishing it took
    troubleshooting, add the how-to to the `know-how` skill
    (`.claude/skills/know-how/`); a hook reminds you when the Done line lands.
-7. **Commit:** offer one commit per ticket, its message starting with the
-   ID (`DES-1: screenshot harness`), so git history lines up with the
-   Changelog. Commit only when Alex says yes.
+7. **Commit message:** suggest one commit per ticket, its message starting
+   with the ID (`DES-1: screenshot harness`), so git history lines up with
+   the Changelog. Alex does all git himself (add, commit, push) on the one
+   branch, `main`. Never run those or create branches; just hand over the
+   message.
 8. **Finishing an epic:** when an epic's last ticket goes, delete the epic's
    board header row and its `##` section, and log `Epic DES complete`.
 9. **Finishing a phase:** when a phase has nothing left, move `— now` in the

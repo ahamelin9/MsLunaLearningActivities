@@ -68,8 +68,8 @@ be pulled into Phase 1 for a break from styling.
 
 ### Now / Next
 
-- **Now:** BUG-6
-- **Next:** BUG-15, GAME-4, BUG-3, then DES-2 once the teacher has chosen
+- **Now:** DES-2: the style sample until the teacher gives her final approval (Alex, 2026-10-09: the prototype comes first, since everything else builds on it)
+- **Next:** OPS-4 (split the backlog into `kanban/`) while the teacher reviews round 2, then the rest of DES-2 once she approves, then BUG-6, BUG-15, GAME-4, BUG-3
 
 ---
 
@@ -78,7 +78,7 @@ be pulled into Phase 1 for a break from styling.
 | ID | Title | Type | P | Size | Status |
 |---|---|---|---|---|---|
 | **DES** | **Design system & layout** | Epic | **P0** | | |
-| DES-2 | Write the design standards | Story | P0 | M | Blocked |
+| DES-2 | Write the design standards | Story | P0 | M | In progress |
 | DES-3 | One set of design tokens | Story | P0 | M | Todo |
 | DES-4 | Typography and local fonts | Story | P0 | S | Todo |
 | DES-5 | Motion system | Story | P0 | M | Todo |
@@ -87,9 +87,11 @@ be pulled into Phase 1 for a break from styling.
 | DES-8 | One set of chrome | Story | P0 | M | Todo |
 | DES-9 | Restyle the tablet shell: iPad feel, boho finish | Story | P0 | L | Todo |
 | DES-10 | Layout grid and breakpoints | Story | P0 | M | Todo |
+| DES-15 | Draw the chosen Ms. Luna | Story | P0 | M | Todo |
 | DES-11 | One right/wrong/reveal visual language | Story | P1 | S | Todo |
-| DES-12 | Luna on screen: one owl, clear moods | Story | P1 | S | Todo |
-| DES-13 | Lesson path on the hub | Story | P1 | S | Todo |
+| DES-12 | Luna on screen: one Luna, clear moods | Story | P1 | S | Todo |
+| DES-13 | Lesson path on the hub: seeds to flowers | Story | P1 | S | Todo |
+| DES-16 | Light and dark mode | Story | P1 | M | Todo |
 | DES-14 | Feed Luna's cookies look like real, different cookies | Story | P2 | S | Todo |
 | **FB** | **Shell feedback & hints** | Epic | **P0** | | |
 | FB-1 | One answer-feedback path in GameShell | Story | P0 | M | Todo |
@@ -129,6 +131,7 @@ be pulled into Phase 1 for a break from styling.
 | GAME-3 | Bubble Sounds: smooth, fair bubbles | Story | P1 | S | Todo |
 | GAME-4 | Muddled Cards: reading required at tier 2+ | Story | P2 | S | Todo |
 | GAME-5 | Words Off the Page: bigger sentence pool | Story | P2 | S | Todo |
+| GAME-6 | Rename "Feed Luna the Letter" | Story | P2 | S | Todo |
 | **CUR** | **Curriculum** | Epic | **P1** | | |
 | CUR-1 | Fix lesson/title/copy mismatches | Task | P1 | S | Todo |
 | CUR-3 | Real sight words | Story | P1 | S | Todo |
@@ -136,13 +139,16 @@ be pulled into Phase 1 for a break from styling.
 | CUR-5 | Merge the two K blending lessons | Story | P2 | S | Todo |
 | **PRG** | **Progress & rewards** | Epic | **P1** | | |
 | PRG-1 | Stars reflect performance | Story | P1 | M | Todo |
+| PRG-5 | Squishies instead of the sticker tin | Story | P1 | M | Todo |
+| PRG-6 | Time per lesson: know it before, see it after | Story | P1 | M | Todo |
 | PRG-2 | Points: remove or give them a meaning | Story | P2 | S | Todo |
 | PRG-3 | Achievements worked out in one place | Task | P2 | S | Todo |
-| PRG-4 | Secret platinum trophy for a full sticker tin | Story | P2 | S | Todo |
+| PRG-4 | Secret platinum trophy for a full squishy shelf | Story | P2 | S | Todo |
 | **WRT** | **Writing & grammar app** | Epic | **P1** | | |
 | WRT-1 | Writing app on the home screen | Story | P1 | M | Todo |
 | WRT-2 | Punctuation game: where does the mark go? | Story | P1 | L | Todo |
 | **OPS** | **Housekeeping** | Epic | **P2** | | |
+| OPS-4 | Split the backlog into a `kanban/` folder, one file per epic | Task | P1 | M | Todo |
 | OPS-1 | Delete dead code | Task | P2 | S | Todo |
 | OPS-2 | README and stale copy | Task | P2 | S | Todo |
 | OPS-3 | Decide the "Coming Soon" apps | Task | P2 | S | Todo |
@@ -172,12 +178,13 @@ Story · P0 · M · needs: —
 - **Why:** one written source of truth, so every later screen is built the same way.
 - **How:** write `docs/design-standards.md` covering each item below. The values are proposals, to confirm with Alex.
   - **Direction (Alex, 2026-10-08):** a full redesign. Today it reads as a generic AI-made site, and it should stop: no glassy gradients, stock pills or emoji standing in for icons.
-    - **Home screen:** keeps the iPad feel (status bar, springboard, app icon, home indicator), restyled in the same family as the reading app. The purple-gradient OS look retires.
-    - **Reading app:** boho and modern, and animated. Proposal to confirm: a boho-classroom palette (terracotta, sage, mustard, clay pink, cream), arches and rainbows, paper texture and hand-drawn touches, with motion from DES-5.
+    - **Home screen:** keeps the iPad feel (status bar, springboard, app icon, home indicator), restyled in the same family as the reading app. The purple-gradient OS look retires. **Teacher (2026-10-09):** keep it simple like today, with just the one Reading app. A little more than today is fine, since it's her app, but no wall of widgets.
+    - **Reading app:** boho and modern, and animated. **Teacher (2026-10-09):** option A Boho, but in lighter tans and browns instead of the rainbow (cream, oat, sand, latte, caramel, cocoa). No rainbow arches. Paper texture and hand-drawn touches stay, with motion from DES-5.
+    - **Lessons grow from seeds to flowers** (teacher, 2026-10-09, from option C): a lesson starts as a seed and blooms once it's learned, so the child can see what they've learned. Goes into DES-13.
     - **Built from shared components** (DES-7), so later screens are quicker to make and stay consistent.
     - **ESL first (Alex, 2026-10-08):** this is an ESL teacher's app and reading is the core. No school subjects; any later apps surround ESL reading.
     - **Four options** (A Boho Classroom, B Moonlit, C Groovy Garden, D Clear, which is iPad-native) share these rules and differ in mood. Ms. Luna's look (8 candidates, plus D's geometric owl) is a separate choice. The teacher decides, picking one option or combining them, and Alex passes the decision on. The doc then records it.
-  - **Theme decision:** the `theme` setting (sunset/day/cosmic) is unused. Either drop it, or design a real day/night pair. Record the choice; DES-3 implements it.
+  - **Theme decision:** the `theme` setting (sunset/day/cosmic) is unused. **Decided (Alex, 2026-10-09):** a real light and dark pair (DES-16), so sunset/day/cosmic goes. DES-3 builds the tokens for both.
   - **Colour:** semantic tokens (surface, ink, accent, success, retry, focus, disabled) mapped onto the world palette. Text meets WCAG AA (4.5:1).
   - **Type scale:** display font for titles. Text the child reads uses a literacy font (DES-4). Minimums: kid-read text 20px, answer words 32px, answer letters 48px.
   - **Touch targets:** answer choices at least 64×64px with at least 12px between them; chrome at least 48px. Nothing a child must hit sits within 16px of the screen edge.
@@ -192,7 +199,27 @@ Story · P0 · M · needs: —
     - `docs/design-standards.md` drafted, covering every item above, with option A's values filled in.
     - Style sample canvas built: <https://claude.ai/artifact/Gr1ngbrVdGS6xE4pALyWsm>. Four options, each with a direction board, iPad home screen, library and a playable round, all animated. There's a component sheet for A and a "Who is Ms. Luna?" page with 8 characters; D adds a ninth, a geometric owl.
     - Every palette checked for WCAG AA contrast.
-  - **Waiting on:** the teacher's choice of option (or mix) and character, passed on by Alex. **Blocked** on this since 2026-10-09.
+  - **Teacher's feedback (2026-10-09):** option A Boho in light tans and browns, a simple home screen, seeds to flowers for lessons. For Luna, a second round of characters:
+    - **Row 1:** the rounder owl (candidate 2), in black glasses, in a few variations.
+    - **Row 2:** a crescent moon, with a face and without one.
+    - Also asked for: squishies instead of the sticker tin (PRG-5), and time per lesson, before and after (PRG-6).
+  - **Round 2 published (2026-10-09):** a new first page on the same canvas, "Round 2 · Teacher's picks" (<https://claude.ai/artifact/Gr1ngbrVdGS6xE4pALyWsm>), with 8 screens in the sand-and-cocoa palette: the look, the home screen twice (just the app; a little more), the library with the lesson garden and times, a round, the lesson-done screen, the squishy shelf, and 8 characters (4 owls in black glasses, 4 crescent moons). Round 1 stays on its own pages. Every text colour passes WCAG AA.
+  - **Round 2 feedback (Alex, 2026-10-09), added to the same page:**
+    - **Light and dark on every screen:** a Light/Dark button in the prototype's bar. Every colour has a dark twin under the same role name (card, ground, edge, ink, action…), so components never hard-code a colour. At night the home screen shows a crescent moon and stars.
+    - **The moon breaks the palette:** moons are moon gold (#F2CF63) on a cocoa night, so they read as moons. It's the one colour outside the palette, and only the moon wears it.
+    - **Round:** a solved round grows flowers up both sides of the stage, and petals fall instead of confetti. The done screen uses the same petals.
+    - **Done screen:** the rare-colour tag shimmers and sparkles.
+    - **Squishy shelf:** easier squishies not found yet show as greyed shapes, harder ones as "?". Each squishy has colour dots, with "?" for colours still to find. A last, secret squishy ("Pearl Moon") sits at the top of the arch.
+    - **Flowers board (new):** six roses (red, blush, cream, coral, yellow, dried mauve), a red rose through the lesson stages, a mixed-garden idea, and six other flowers. Rose is her favourite.
+    - **"Feed Luna" renamed** on the Play Shelf; "Letter Cookies" is a placeholder (GAME-6).
+  - **Later the same day (Alex, 2026-10-09):**
+    - **The canvas's own button switches light/dark too.** Signed-out viewers don't get that button, so the prototype keeps its own.
+    - **No "Luna is ready"** on the home screen (DES-8).
+    - **Library:** Luna's greeting is spoken, not an always-on bubble; tap her to hear it again (DES-12). The space holds a Squishy Shelf card showing the last three squishies and the count, which opens the shelf.
+    - **Home, a little more:** tapping the bunny squishes her, and a "My shelf" button pops up (PRG-5).
+  - **Prototype source and the design skill:** `.claude/skills/luna-design/`. `SKILL.md` holds the direction, the decisions so far, the open questions (// TODO) and how to change the prototype. `prototype/` holds the generator that builds the round 2 boards.
+  - **Now (Alex, 2026-10-09):** the prototype is the main focus until the teacher gives her final approval, because everything else builds on it. The teacher sees round 2 on 2026-10-10.
+  - **Waiting on, from the teacher:** her pick of character, home screen and flower, and the cookie game's name.
   - **Then:**
     - Fold the choice into sections 3–9 of the doc.
     - Settle the theme setting (proposal: drop it).
@@ -206,7 +233,8 @@ Story · P0 · M · needs: DES-2
   - Create `src/styles/_tokens.scss` with SCSS variables plus CSS custom properties on `:root`.
   - Fold in `_variables.scss` and `_world.scss`, then move every stylesheet onto the tokens.
   - Delete the unused palette, and implement the theme decision from DES-2.
-- **Complete when:** searching for hex colours outside `_tokens.scss` finds only illustration art (LunaOwl, scenery), with a comment marking each exception.
+  - Name tokens by role, not colour (card, ground, edge, soil, ink, soft ink, accent, action, pressed, right, try again, rare, super rare, moon), each with a light and a dark value, as on the round 2 Look board.
+- **Complete when:** searching for hex colours outside `_tokens.scss` finds only illustration art (LunaOwl, scenery), with a comment marking each exception, and every token has both a light and a dark value.
 
 ### DES-4 · Typography and local fonts
 Story · P0 · S · needs: DES-2
@@ -261,20 +289,20 @@ Story · P0 · M · needs: DES-7
 - **Why:** inside the app there are two header bars, stars and mute shown twice, `VoiceIndicator` shown twice, and four ways home: the status pill, the Home button, the home-indicator bar, and "Library". Together these take about 130px of an 820px-tall screen.
 - **How:**
   - Inside an app: one header with Home, the title, stars, and the settings gear (gated).
-  - The status bar shrinks to the clock plus the voice indicator, or disappears.
+  - The status bar shrinks to the clock, or disappears. The "Luna is ready" voice indicator goes too (Alex, 2026-10-09: the problem it flagged is fixed).
   - Keep one way home plus "Library" inside games.
   - Fix BUG-11 while you're in there.
 - **Complete when:** each control appears exactly once, and the game stage gets back at least 80px of height in landscape.
 
 ### DES-9 · Restyle the tablet shell: iPad feel, boho finish
-Story · P0 · L · needs: DES-7, DES-8 · split before starting
+Story · P0 · L · needs: DES-7, DES-8, DES-15 · split before starting
 - **Scope:**
   - Home screen
   - Status bar and header
   - Settings
   - Trophy room
   - Grade Select
-- **How:** the home screen keeps its iPad feel (Alex, 2026-10-08) but drops the purple gradients for the DES-2 palette. It centres on Reading: no school-subject apps (OPS-3), with room for future ESL companion apps. Use kit components and tokens throughout. Replace the emoji owl `components/ui/Mascot` with `LunaOwl`. Grade Select talks to the child, not to grown-ups: no "digraphs" and no "dashboard".
+- **How:** the home screen keeps its iPad feel (Alex, 2026-10-08) but drops the purple gradients for the DES-2 palette. It stays simple like today, with the one Reading app in the middle (teacher, 2026-10-09), plus the small extras on the round 2 home board in the style sample. No school-subject apps (OPS-3), with room for future ESL companion apps. Use kit components and tokens throughout. Replace the emoji owl `components/ui/Mascot` with the chosen Luna (DES-15). Grade Select talks to the child, not to grown-ups: no "digraphs" and no "dashboard".
 - **Complete when:** the `ui:shots` screenshots show no slate or purple-gradient screens, and `Mascot` is deleted.
 
 ### DES-10 · Layout grid and breakpoints
@@ -289,24 +317,56 @@ Story · P0 · M · needs: DES-7
 ### DES-11 · One right/wrong/reveal visual language
 Story · P1 · S · needs: DES-5, DES-7
 - **How:** use the same right glow, wrong wobble, win veil and "revealed" style (for FB-2) in every game and lesson, through `Choice` and the shell's flash.
-- **Complete when:** a right answer and a wrong answer look the same in all 8 games and 8 lesson types.
+  - **A win grows flowers (Alex, 2026-10-09):** a solved round grows a few flowers up the sides of the stage, and petals fall instead of confetti, as on the round 2 Round board. The lesson-done screen uses the same petals. Flowers and petals never cover the answer choices or block the next tap.
+- **Complete when:** a right answer and a wrong answer look the same in all 8 games and 8 lesson types, and every solved round grows flowers and drops petals, with no confetti left anywhere.
 
-### DES-12 · Luna on screen: one owl, clear moods
-Story · P1 · S · needs: DES-9
+### DES-12 · Luna on screen: one Luna, clear moods
+Story · P1 · S · needs: DES-9, DES-15
 - **Why:** Feed Luna shows two owls at once (the one on the stage and the one on the perch).
-- **How:** at most one Luna per screen; the perch owl hides when the game's stage has its own. Document what each mood is for. Make sure the talking animation always follows the audio.
-- **Complete when:** no screen shows two owls.
+- **How:** at most one Luna per screen; the perch Luna hides when the game's stage has its own. Document what each mood is for. Make sure the talking animation always follows the audio.
+  - **Spoken, not shown (Alex, 2026-10-09):** where space is tight, as on the library, Luna's greeting is spoken with no always-on speech bubble. A small speaker mark shows she talks, and tapping her says it again.
+- **Complete when:** no screen shows two Lunas.
 
-### DES-13 · Lesson path on the hub
+### DES-13 · Lesson path on the hub: seeds to flowers
 Story · P1 · S · needs: DES-10
-- **How:** show the lessons as a path. Done lessons get a tick, the next lesson glows with an "Up next" label, and later lessons stay open but quieter. Finishing a lesson moves the glow along.
-- **Complete when:** a new child sees Lesson 1 marked "Up next", and it moves forward as lessons are finished.
+- **Why:** the teacher liked option C's garden (2026-10-09): seeing a lesson bloom is how a child knows they learned it.
+- **How:** show the lessons as a garden path. Each lesson is a plant:
+  - **Not started:** a seed in the soil, open but quieter.
+  - **Up next:** a sprout that glows, with an "Up next" label.
+  - **Started, not finished:** a bud.
+  - **Done:** a flower in bloom. Which flower is the teacher's pick from the round 2 Flowers board: the rose is her favourite (red, or another colour), or a mixed garden with a different flower per lesson.
+  - Finishing a lesson plays a short bloom (DES-5; a plain swap with reduced motion), and the glow moves to the next seed.
+- **Complete when:** a new child sees Lesson 1 as a glowing sprout marked "Up next" and the rest as seeds; finishing it shows it in bloom and moves "Up next" to Lesson 2; a lesson left part-way shows a bud.
 
 ### DES-14 · Feed Luna's cookies look like real, different cookies
 Story · P2 · S · needs: DES-7
 - **Why:** every cookie is the same flat brown circle, which doesn't read as a picture (Alex, 2026-10-09).
 - **How:** a few cookie designs (chocolate chip, sprinkles, jam, and so on), mixed in each round, drawn in the DES-2 style. The letter stays just as easy to read.
 - **Complete when:** a round shows at least two different cookie designs, and every letter still meets the DES-2 type minimums.
+
+### DES-16 · Light and dark mode
+Story · P1 · M · needs: DES-3, SET-1
+- **Why:** Alex wants a real dark mode (2026-10-09), and building the components on role tokens from the start keeps every screen working in both.
+- **How:**
+  - Follow the iPad's light/dark setting by default. A grown-up can choose Light, Dark or "Match the iPad" in Settings, behind the gate (SET-1).
+  - Every screen uses the role tokens from DES-3 only. Illustrations (Luna, squishies, flowers) keep their own colours.
+  - At night the home screen shows a crescent moon in moon gold and twinkling stars instead of the sun (round 2 Home board).
+  - With reduced motion (DES-6) the stars don't twinkle.
+- **Complete when:**
+  - with the iPad set to dark, every screen shows the dark set, and switching back shows the light set without a reload;
+  - a check over the tokens finds every text pairing at 4.5:1 or more in both modes;
+  - the home screen shows the moon and stars in dark mode and the sun in light mode;
+  - the Settings choice overrides the iPad and survives a reload.
+
+### DES-15 · Draw the chosen Ms. Luna
+Story · P0 · M · needs: DES-2
+- **Why:** the teacher is choosing a new look for Luna (round 2, 2026-10-09): the rounder owl in black glasses, or a crescent moon with or without a face. Today's `LunaOwl` drawing and the emoji `components/ui/Mascot` both retire.
+- **How:**
+  - Redraw `engine/LunaOwl.tsx` as the chosen character, in the DES-2 palette. If she's no longer an owl, rename it to `Luna`.
+  - Keep all 8 moods (idle, happy, cheer, think, oops, surprise, listen, sleepy), the blink, and the talking animation, which follows the audio.
+  - A moon without a face shows mood through motion and glow instead (a tilt, a bounce, a brighter glow when she cheers).
+  - A moon is moon gold (#F2CF63), the one colour outside the palette, so she reads as a moon in light and dark (Alex, 2026-10-09).
+- **Complete when:** the character the teacher picked appears on every screen that shows Luna, each of the 8 moods looks different, and she only moves her mouth (or glows, for a faceless moon) while a clip is playing.
 
 ---
 
@@ -550,6 +610,12 @@ Story · P2 · S
 - **Fix:** read the word only after the pair is matched.
 - **Complete when:** at tier 2+, flipping a word card makes no speech until its pair is matched.
 
+### GAME-6 · Rename "Feed Luna the Letter"
+Story · P2 · S · needs: DES-2
+- **Why:** the teacher would like the cookie game called something else (2026-10-09). The cookies stay. The round 2 prototype uses "Letter Cookies" as a placeholder until she picks a name.
+- **How:** change `title` in `games/FeedLuna.tsx` to her name, and reword any spoken line that says "Feed Luna" or "feed me" if she wants (the `mission` line). Keep the id `feed-luna` so saved progress carries over. Re-render the changed lines with `npm run voice:render`.
+- **Complete when:** the Play Shelf and the game's start screen show the new name, no screen or spoken line says "Feed Luna", saved progress for the game still shows, and `voice:audit` passes.
+
 ### GAME-5 · Words Off the Page: bigger sentence pool
 Story · P2 · S · needs: CNT-2
 - **Why:** there are only 5–6 sentences per tier, so they repeat quickly.
@@ -611,14 +677,50 @@ Task · P2 · S
 ---
 - **Complete when:** achievements are checked only in `utils/storage.ts`, `TrophyModal` only reads them, and BUG-13 is closed.
 
-### PRG-4 · Secret platinum trophy for a full sticker tin
-Story · P2 · S · needs: PRG-3
-- **Why:** collecting every sticker should feel like a big moment (Alex, 2026-10-09).
+### PRG-4 · Secret platinum trophy for a full squishy shelf
+Story · P2 · S · needs: PRG-3, PRG-5
+- **Why:** collecting every squishy should feel like a big moment (Alex, 2026-10-09).
 - **How:**
-  - A hidden achievement, checked with the others in `utils/storage.ts` (PRG-3), unlocks when every sticker in `engine/stickers.ts` is in the tin. It counts `STICKERS`, so adding a sticker later raises the bar.
-  - Until then it appears nowhere: no locked slot, no silhouette, no "1 to go".
+  - A hidden achievement, checked with the others in `utils/storage.ts` (PRG-3), unlocks when every squishy (PRG-5) is on the shelf in at least one colour. It counts the whole set, so adding a squishy later raises the bar. Rare colours aren't needed (proposal, to confirm with Alex).
+  - **The last squishy (Alex, 2026-10-09):** unlocking it also brings home one extra, one-of-a-kind squishy, "Pearl Moon", which sits at the top of the shelf's arch.
+  - Until then the trophy appears nowhere. The round 2 shelf shows the top spot as a shimmering "?". To confirm with Alex: keep that tease, or leave the spot empty so it stays a complete secret like the trophy.
   - When it unlocks, Luna celebrates with a pre-rendered line, and the trophy shows in the Trophy room from then on.
-- **Complete when:** with one sticker missing, no screen hints at the trophy; collecting the last one unlocks it, Luna says her line, and it stays in the Trophy room after a reload.
+- **Complete when:** with one squishy missing, no screen hints at the trophy; collecting the last one unlocks it, Luna says her line, and it stays in the Trophy room after a reload.
+
+### PRG-5 · Squishies instead of the sticker tin
+Story · P1 · M · needs: DES-2
+- **Why:** the teacher wants the collectible to be squishies rather than emoji stickers (2026-10-09): squish balls, mochi animals, butter blocks and the like, with rare colours too. Today's tin is 18 emoji (`engine/stickers.ts`).
+- **How:**
+  - Replace the emoji with drawn squishies in the DES-2 style, generic shapes with no brand names or logos (round squish ball, mochi cat, bunny and bear, butter block, dumpling, peach, cloud, a little moon, and so on).
+  - Each squishy comes in a usual colour from the palette. Some awards come in a **rare** colour (a soft tint) or a **super rare** one (swirl, shimmer, or glow). Proposal to confirm: 1 in 8 rare, 1 in 40 super rare. Odds live in one place.
+  - The shelf shows each squishy once, with its rarest colour. Under it, a row of colour dots: a found colour is filled in, a usual colour still to find is grey, and a rare one still to find is a "?" (Alex, 2026-10-09).
+  - Squishies not found yet: easier ones show as a greyed shape, harder ones as a "?" slot. Tapping either has Luna say a hint, never the answer to a round.
+  - A new rare or super-rare squishy on the reward screen gets a shimmering, sparkling tag.
+  - **Ways in to the shelf (Alex, 2026-10-09):** a Squishy Shelf card on the library (the last three found, on a little plank, with the count); "See my shelf" on the lesson-done screen; and, if the teacher picks the "a little more" home screen, tapping the squishy there squishes it and pops up a "My shelf" button. The small header pill goes.
+  - Tapping a squishy on the shelf squishes it and Luna says its line (pre-rendered). With reduced motion it gives a small press instead.
+  - Old saves keep their count: each sticker id maps to a squishy, so no child loses anything. The saved field can stay `stickers`.
+  - Lessons and games keep their signature reward (`SIGNATURE_STICKER` in `engine/lessons.ts`, `nextSticker` in `engine/stickers.ts`).
+- **Complete when:**
+  - no emoji appears on the shelf, the reward screen or the home screen;
+  - finishing a lesson or game puts a squishy on the shelf;
+  - over 1,000 seeded awards, rare and super-rare colours come up within 2 points of the set odds;
+  - a save with old stickers loads with the same number of squishies;
+  - every squishy's line has a clip, and `voice:audit` passes.
+
+### PRG-6 · Time per lesson: know it before, see it after
+Story · P1 · M · needs: DES-13
+- **Why:** the teacher wants to know how long a lesson takes before starting, and to see how much time and progress a child took (2026-10-09).
+- **How:**
+  - **Before:** each lesson card on the hub shows an estimate, e.g. "about 5 min", with a small clock. It starts as rounds × a typical round time, then uses the real average once a few plays are saved.
+  - **During:** time only counts while the app is open and on screen (paused when the tab is hidden or the iPad sleeps).
+  - **After:** the lesson-done screen shows the time taken next to the estimate, and the lesson's flower blooming (DES-13).
+  - **On the hub:** a "Today" line: minutes read today and lessons in bloom (e.g. "12 min today · 3 of 6 in bloom").
+  - Saved per lesson: last time, best time and number of plays, in `utils/storage.ts`.
+- **Complete when:**
+  - every lesson card shows an estimate in minutes;
+  - after a lesson, the done screen shows the minutes it took, and the hub's "Today" total goes up by the same amount;
+  - hiding the tab for a minute mid-lesson doesn't add that minute;
+  - the times survive a reload, and older saves load without errors.
 
 ## WRT — Writing & grammar app (Phase 8)
 
@@ -658,6 +760,30 @@ Story · P1 · L · needs: WRT-1, FB-1, FB-2, LVL-1 · split per grade before st
   - the mark never appears in place before the round is solved, and the third miss reveals it (FB-2).
 
 ## OPS — Housekeeping (anytime)
+
+### OPS-4 · Split the backlog into a `kanban/` folder, one file per epic
+Task · P1 · M
+- **Why:** `BACKLOG.md` is one file of about 800 lines (62 KB) holding 65 tickets plus the changelog, and it keeps growing as the app grows (Alex, 2026-10-09).
+- **How:**
+  - New layout:
+    - `kanban/README.md`: how to read it, the completion criteria, the roadmap, Now/Next, and the board table.
+    - `kanban/epics/<EPIC>.md`: one file per epic or initiative (DES, FB, BUG, SET, LVL, CNT, GAME, CUR, PRG, WRT, OPS), holding its goal and every ticket's full section.
+    - `kanban/CHANGELOG.md`: finished and dropped work.
+  - Split **by epic, not by lane**. Status stays only in the board table, so a status change never moves a ticket between files. The `/board` pane already gives the lane view.
+  - Move the content as-is; no ticket text changes.
+  - Update everything that reads `BACKLOG.md`:
+    - the shared parser `.claude/hooks/backlog-lib.mjs`, plus `backlog-guard.mjs`, `backlog-focus.mjs` and `know-how-nudge.mjs`;
+    - the `luna-board` mod (`hooks/backlog.ts`, `register.tsx`, its types and README);
+    - `.claude/skills/app-updates/collect.mjs`;
+    - the `backlog`, `focus` and `luna-design` skill docs.
+  - Delete `BACKLOG.md` at the end, so there's only one source.
+  - **When:** while the teacher reviews round 2. DES-2 goes to Blocked (waiting on her) so OPS-4 can be the one ticket In progress.
+- **Complete when:**
+  - every ticket section from `BACKLOG.md` is in exactly one `kanban/epics/` file, the board and the changelog are unchanged, and `BACKLOG.md` is gone;
+  - the guard still refuses a bad edit in the new files (a second In progress, a deleted ticket with no changelog line, a ticket with no **Complete when**);
+  - the agenda the hook shows with each message, and the `/board` pane, match what they showed before the split;
+  - `/app-updates` still finds the day's changes;
+  - `npm run build` and `npm run lint` are clean.
 
 ### OPS-1 · Delete dead code
 Task · P2 · S
@@ -707,4 +833,8 @@ only record of them. One line each: date, ID, title, and `Done` or
 - **2026-10-09** — BUG-20 Story Corner never reads line 1 — Done. A story opens with its title and then line 1, at every grade.
 - **2026-10-09** — Added the `know-how` skill (`.claude/skills/know-how/`): solved problems written as symptom, cause, fix and check, plus `speech-check.cjs`, a silent browser check that logs and times every clip. A new hook (`.claude/hooks/know-how-nudge.mjs`) reminds Claude to add to it whenever a ticket closes as Done.
 - **2026-10-09** — Added the `app-updates` skill (`.claude/skills/app-updates/`): `/app-updates` writes the day's "App Updates" note for the teacher, in plain words and ready for Apple Notes, from that day's Changelog, new tickets and commits.
+- **2026-10-09** — The teacher's design feedback came in: option A Boho, in light tans and browns instead of the rainbow; a simple home screen with the one Reading app; lessons that grow from seeds to flowers; and a second round of characters (the rounder owl in black glasses, a crescent moon with and without a face). Round 2 of the style sample is published as a new first page on the canvas, and DES-2 waits again, now on the teacher's pick from round 2. Added DES-15 (draw the chosen Luna), PRG-5 (squishies instead of the sticker tin, with rare colours) and PRG-6 (time per lesson, before and after). Updated DES-9, DES-12, DES-13 and PRG-4 to match.
+- **2026-10-09** — Round 2 feedback added to the style sample: light and dark on every screen (a crescent moon and stars on the home screen at night), moon-gold moons, flowers and falling petals for a solved round, a shimmering rare tag, a shelf with greyed and "?" squishies plus a secret last one, and a new Flowers board with six roses. Alex made the prototype the main focus until the teacher approves, so DES-2 is In progress again. Settled the theme question (a real light/dark pair) and added DES-16 (light and dark mode) and GAME-6 (rename Feed Luna). Updated DES-3, DES-11, DES-13, DES-15, PRG-4 and PRG-5 to match.
+- **2026-10-09** — Wrap-up for the teacher's review on 2026-10-10. The prototype now follows the canvas's own light/dark button, "Luna is ready" is gone, the library has a Squishy Shelf card and a spoken greeting, and the home bunny leads to the shelf. Added the `luna-design` skill (`.claude/skills/luna-design/`): the design direction, decisions so far, open questions marked // TODO, and how to change the prototype, with the generator that builds the round 2 boards in `prototype/`. Updated DES-2, DES-8, DES-12 and PRG-5 to match. Added OPS-4: split this file into a `kanban/` folder, one file per epic, next session while the teacher reviews.
+- **2026-10-09** — Added the `wrap-up` skill (`.claude/skills/wrap-up/`): where each kind of learning goes (memory, `know-how`, `luna-design`, the backlog, or nowhere) and an end-of-session checklist. Two new `know-how` entries: a page of raw code popping up in the browser, and the prototype following the canvas's light/dark button. Alex now does all git himself on `main`, so the `backlog` skill suggests commit messages instead of offering to commit.
 - **2026-10-09** — Rebuilt the `luna-board` mod and kept it in the repo this time (`.claude/mods/luna-board/`, installable through `.claude-plugin/marketplace.json`). A ▦ Board button in the prompt footer (or `/board`) toggles a live board (To do with Now and Next first, In progress, Blocked, Done today) that re-reads this file as it changes; the status line shows the current ticket and a toast appears when a ticket is done.
