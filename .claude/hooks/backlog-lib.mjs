@@ -1,6 +1,77 @@
-// Reads BACKLOG.md and checks it against the backlog's own rules. Shared by
-// the agenda hook (backlog-focus.mjs) and the edit guard (backlog-guard.mjs)
-// so both always agree on what the board says.
+// Reads the backlog and checks it against its own rules. Shared by the agenda
+// hook (backlog-focus.mjs), the edit guard (backlog-guard.mjs) and the
+// app-updates collector, so they always agree on what the board says.
+//
+// The backlog lives in kanban/: README.md (how to read it, roadmap, Now/Next
+// and the board), one file per epic in kanban/epics/ (linked from the README,
+// in board order), and CHANGELOG.md. The loader joins them into one text, so
+// the parser and the rules below work on the whole backlog at once. Before the
+// kanban/ folder existed it was a single BACKLOG.md at the repo root; the
+// loader still reads that if kanban/README.md is missing.
+
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
+import { join } from 'node:path';
+
+export const KANBAN = 'kanban';
+export const README = `${KANBAN}/README.md`;
+export const CHANGELOG = `${KANBAN}/CHANGELOG.md`;
+export const LEGACY = 'BACKLOG.md';
+
+/** The epic files the README links to, in order: "epics/DES.md" → "kanban/epics/DES.md". */
+export const epicLinks = readme => [
+  ...new Set([...readme.matchAll(/\]\((?:\.\/)?(epics\/[A-Za-z0-9_-]+\.md)\)/g)].map(m => `${KANBAN}/${m[1]}`))
+];
+
+/**
+ * Joins the backlog's files into one text. `read(path)` returns a file's text
+ * (path relative to the repo root) and throws when it is missing.
+ * Returns the text, the mode ("kanban" or "single"), the files read, and any
+ * linked epic file that is missing.
+ */
+export function assembleBacklog(read) {
+  let readme;
+  try {
+    readme = read(README);
+  } catch {
+    return { text: read(LEGACY), mode: 'single', files: [LEGACY], missing: [] };
+  }
+  const epics = epicLinks(readme);
+  const missing = [];
+  const parts = [readme];
+  for (const file of epics) {
+    try {
+      parts.push(read(file));
+    } catch {
+      missing.push(file);
+    }
+  }
+  let changelog = '';
+  try {
+    changelog = read(CHANGELOG);
+  } catch {
+    missing.push(CHANGELOG);
+  }
+  parts.push(changelog);
+  return { text: parts.join('\n\n'), mode: 'kanban', files: [README, ...epics, CHANGELOG], missing };
+}
+
+/**
+ * The backlog as it is on disk under `root`. `overrides` maps a repo-relative
+ * path to the text it would have after an edit, so the guard can check an edit
+ * before it lands. Also lists epic files that exist but aren't linked.
+ */
+export function loadBacklog(root, overrides = {}) {
+  const read = rel => (rel in overrides ? overrides[rel] : readFileSync(join(root, rel), 'utf8'));
+  const result = assembleBacklog(read);
+  let unlinked = [];
+  if (result.mode === 'kanban') {
+    const dir = join(root, KANBAN, 'epics');
+    const onDisk = existsSync(dir) ? readdirSync(dir).filter(f => f.endsWith('.md')).map(f => `${KANBAN}/epics/${f}`) : [];
+    const pending = Object.keys(overrides).filter(p => p.startsWith(`${KANBAN}/epics/`));
+    unlinked = [...new Set([...onDisk, ...pending])].filter(f => !result.files.includes(f));
+  }
+  return { ...result, unlinked };
+}
 
 const ID = '[A-Z]+-\\d+[a-z]?';
 const STATUSES = ['Todo', 'In progress', 'Blocked'];
@@ -31,11 +102,12 @@ export function parseBacklog(text) {
     .filter(c => c.length >= 6)
     .map(([id, title, type, priority, size, status]) => ({ id, title, type, priority, size, status }));
 
-  // Ticket sections: "### DES-1 · Title" up to the next ## or ### heading
+  // Ticket sections: "### DES-1 · Title" up to the next heading (an epic file
+  // starts with "# ", so a section never runs into the next file)
   const sections = new Map();
   let current = null;
   for (const line of lines) {
-    if (/^#{2,3} /.test(line)) {
+    if (/^#{1,3} /.test(line)) {
       const m = line.match(new RegExp(`^### (${ID}) `));
       current = m ? m[1] : null;
       if (current) sections.set(current, []);
@@ -44,7 +116,7 @@ export function parseBacklog(text) {
     if (current) sections.get(current).push(line);
   }
 
-  const changelogAt = text.search(/^## Changelog\s*$/m);
+  const changelogAt = text.search(/^#{1,2} Changelog\s*$/m);
   const changelog = changelogAt >= 0 ? text.slice(changelogAt) : '';
 
   return { phase, now: field('Now'), next: field('Next'), tickets, sections, changelog };

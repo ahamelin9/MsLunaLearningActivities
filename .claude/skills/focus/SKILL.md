@@ -5,7 +5,7 @@ description: Keeps Ms. Luna work on the most important task. Use when a request 
 
 # Focus check
 
-The agenda lives in `BACKLOG.md`. A hook (`.claude/hooks/backlog-focus.mjs`)
+The agenda lives in `kanban/README.md` (Now/Next and the board). A hook (`.claude/hooks/backlog-focus.mjs`)
 injects the current phase, Now/Next, the in-progress ticket and the open P0
 list with every message, so this check needs no extra reading in the common
 case. Ticket mechanics (statuses, changelog, adding tickets) belong to the
@@ -49,16 +49,15 @@ does. Otherwise, mention where it ranks and still do it.
 ## When Alex changes priorities
 
 If Alex says something like "do X first from now on", "make this P0" or "skip
-DES-5", update `BACKLOG.md` in the same turn:
-- the Now/Next lines;
-- the ticket's priority on the board;
-- a Changelog line with the date and the reason.
+DES-5", update the backlog in the same turn:
+- the Now/Next lines and the ticket's priority on the board, in `kanban/README.md`;
+- a line in `kanban/CHANGELOG.md` with the date and the reason.
 
 The hook then reflects the change on the next message.
 
 ## /focus — on-demand review
 
-When Alex invokes `/focus` or asks if we're on track, read `BACKLOG.md` and
+When Alex invokes `/focus` or asks if we're on track, read `kanban/README.md` and
 answer in at most 6 lines:
 - what's in progress, and how far along it is;
 - whether this session's work matched the agenda, and what drifted;

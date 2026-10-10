@@ -14,7 +14,7 @@ description: Ms. Luna's design direction and how we build and change the style s
 
 | What | Where |
 |---|---|
-| Tickets and decisions | `BACKLOG.md`, the DES epic (and PRG-4/5/6, GAME-6) |
+| Tickets and decisions | `kanban/epics/DES.md` (and PRG-4/5/6 in `PRG.md`, GAME-6 in `GAME.md`); status on the board in `kanban/README.md` |
 | The full written standards | `docs/design-standards.md`. // TODO: still holds round 1 option A (the terracotta palette); update after approval |
 | The style sample (prototype canvas) | <https://claude.ai/artifact/Gr1ngbrVdGS6xE4pALyWsm>, page "Round 2 · Teacher's picks" (the link opens on it). Round 1 (options A–D, 8 Lunas) stays on its own pages |
 | Prototype source | `prototype/` next to this file. See "Changing the prototype" |
@@ -172,7 +172,7 @@ The round 2 boards are built from pieces in `prototype/`, so the shared parts
    - It opens signed out, which is fine. Set the viewport to 1440×1000, then reset it when done.
    - A board takes about 8 seconds to appear after loading. Move between boards with the board's own nav bar (Look, Home, Library…).
    - Use the colour-scheme setting to check dark mode (see the `know-how` entry on light/dark).
-6. Add a note to DES-2's progress in `BACKLOG.md`.
+6. Add a note to DES-2's progress in `kanban/epics/DES.md`.
 
 **What we learned (2026-10-09):**
 - **Light/dark:** the canvas tells each board its theme (`data-theme` on the page, `?theme=` in the URL, and a `__dc_theme` message when its button is pressed). Boards listen for all three plus the device setting. Signed-out viewers don't see the canvas's button, so the prototype keeps its own Light/Dark button too.

@@ -1,22 +1,22 @@
-// Ms. Luna's backlog (BACKLOG.md) as a live task board.
+// Ms. Luna's backlog (kanban/) as a live task board.
 //
 // - A "Board" button in the prompt footer, beside the mode labels, and the
 //   /board command, both toggle the board pane.
-// - The board re-reads BACKLOG.md every few seconds and after every tool call,
-//   so it follows edits made by Claude or by hand.
+// - The board re-reads the backlog every few seconds and after every tool
+//   call, so it follows edits made by Claude or by hand.
 // - The status line shows the ticket being worked on (In progress, else Now).
 // - A toast says when a ticket leaves the board as Done.
 //
-// BACKLOG.md stays the only source of truth: the board only reads it.
+// The backlog files stay the only source of truth: the board only reads them.
 
 import { atom, read, update } from 'claude-code'
 import type { EngineInterface, Register, RenderChildren } from 'claude-code'
 
-import { parseBacklog, closedAs, ticketsIn, todayIn } from './backlog'
+import { loadBacklog, parseBacklog, closedAs, ticketsIn, todayIn } from './backlog'
 import type { Ticket } from './backlog'
 
 const PANE = 'luna-board'
-const FILE = 'BACKLOG.md'
+const MISSING = 'No backlog (kanban/README.md) in this project.'
 const POLL_MS = 3000
 
 const text = atom({ plugin: 'luna-board', key: 'text' } as const, '')
@@ -28,7 +28,7 @@ let onBoard: Set<string> | undefined
 async function refresh($: EngineInterface) {
   let next = ''
   try {
-    next = await $.fs.read(FILE)
+    next = await loadBacklog(async path => String(await $.fs.read(path)))
   } catch {
     next = ''
   }
@@ -69,7 +69,7 @@ async function toggle($: EngineInterface): Promise<{ state: 'opened' | 'closed' 
 
 // The board as Markdown, for apps that place no panes: /board prints it.
 function boardMarkdown(source: string): string {
-  if (!source) return `No ${FILE} in this project.`
+  if (!source) return MISSING
   const b = parseBacklog(source)
   const line = (t: Ticket) => `- **${t.id}** ${t.title} · ${t.type} · ${t.priority}`
   const nowIds = ticketsIn(b.now, b.tickets).map(t => t.id)
@@ -110,7 +110,7 @@ export const register: Register = on => {
   on('session.start', async ($, e, next) => {
     await $.command.register({
       name: 'board',
-      description: "Show or hide Ms. Luna's task board (from BACKLOG.md); /board list prints it in the chat",
+      description: "Show or hide Ms. Luna's task board (from kanban/); /board list prints it in the chat",
     })
     await refresh($)
     $.clock.every(POLL_MS, () => refresh($).catch(() => undefined))
@@ -139,7 +139,7 @@ export const register: Register = on => {
   })
 
   // The Board button, beside the mode labels at the right of the prompt footer.
-  on('ui.render', { component: 'SessionMode' }, async ($, e, next) => {
+  on('ui.render', { component: 'SessionMode' }, async ($, e) => {
     const { Box, Text, Button } = $.ui.resolve(e)
     const modes = e.props.modes
 
@@ -159,7 +159,7 @@ export const register: Register = on => {
     const all = await read($, showAll)
 
     if (!source) {
-      return <Text dimColor>No {FILE} in this project.</Text>
+      return <Text dimColor>{MISSING}</Text>
     }
 
     const b = parseBacklog(source)

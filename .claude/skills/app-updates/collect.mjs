@@ -9,9 +9,7 @@
 //   node .claude/skills/app-updates/collect.mjs 2026-10-09   another day
 
 import { execFileSync } from 'node:child_process';
-import { readFileSync } from 'node:fs';
-import { join } from 'node:path';
-import { parseBacklog } from '../../hooks/backlog-lib.mjs';
+import { assembleBacklog, KANBAN, LEGACY, loadBacklog, parseBacklog } from '../../hooks/backlog-lib.mjs';
 
 const root = process.env.CLAUDE_PROJECT_DIR || process.cwd();
 const git = (...args) => {
@@ -33,8 +31,7 @@ if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
 const [y, m, d] = date.split('-').map(Number);
 const noteTitle = `App Updates ${m}/${d}/${String(y).slice(2)}`;
 
-const backlog = readFileSync(join(root, 'BACKLOG.md'), 'utf8');
-const { tickets, changelog } = parseBacklog(backlog);
+const { tickets, changelog } = parseBacklog(loadBacklog(root).text);
 
 // Changelog lines dated that day: "- **2026-10-09** — BUG-5 … — Done. …"
 const dayLines = changelog
@@ -46,8 +43,21 @@ const dropped = dayLines.filter(l => /Won.t do/i.test(l));
 const notes = dayLines.filter(l => !done.includes(l) && !dropped.includes(l));
 
 // Tickets on the board now that were not on it before that day began
-const base = git('rev-list', '-1', `--before=${date} 00:00`, 'HEAD', '--', 'BACKLOG.md');
-const before = base ? new Set(parseBacklog(git('show', `${base}:BACKLOG.md`)).tickets.map(t => t.id)) : new Set();
+// (the backlog at that commit: the kanban/ files, or the single BACKLOG.md before the split)
+const base = git('rev-list', '-1', `--before=${date} 00:00`, 'HEAD', '--', LEGACY, KANBAN);
+const showAt = rev => path => {
+  const out = git('show', `${rev}:${path}`);
+  if (!out) throw new Error(`${path} not in ${rev}`);
+  return out;
+};
+let before = new Set();
+if (base) {
+  try {
+    before = new Set(parseBacklog(assembleBacklog(showAt(base)).text).tickets.map(t => t.id));
+  } catch {
+    // no backlog at that commit
+  }
+}
 const added = tickets.filter(t => !before.has(t.id));
 
 const commits = git('log', `--since=${date} 00:00`, `--until=${date} 23:59:59`, '--format=%h %ad %s', '--date=format:%H:%M')

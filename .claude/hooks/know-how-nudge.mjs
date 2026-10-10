@@ -1,5 +1,6 @@
 #!/usr/bin/env node
-// PostToolUse hook: when an edit to BACKLOG.md adds a Changelog line closing a
+// PostToolUse hook: when an edit to the backlog's changelog (kanban/CHANGELOG.md,
+// or the old single BACKLOG.md) adds a line closing a
 // ticket as Done, it reminds Claude to write down anything that took
 // troubleshooting in the know-how skill (.claude/skills/know-how/SKILL.md),
 // so the next session doesn't have to work it out again. It never blocks,
@@ -15,7 +16,7 @@ try {
 }
 
 const tool = input.tool_input ?? {};
-if (!/(^|[/\\])BACKLOG\.md$/.test(tool.file_path ?? '')) process.exit(0);
+if (!/(^|[/\\])(BACKLOG\.md|kanban[/\\]CHANGELOG\.md)$/.test(tool.file_path ?? '')) process.exit(0);
 
 // Edit carries one old/new pair, MultiEdit a list of them
 const pairs = Array.isArray(tool.edits)

@@ -1,6 +1,9 @@
 import { expect, test } from 'claude-code/testing'
 
-const backlog = (status: string, done = '') => `# Backlog
+// The backlog as the kanban/ folder: the README (roadmap, Now/Next, the board,
+// links to the epic files), the epic files, and the changelog.
+const backlog = (status: string, done = ''): Record<string, string> => ({
+  'kanban/README.md': `# Ms. Luna — Kanban
 
 | Phase | Focus | Epics | Why |
 |---|---|---|---|
@@ -8,6 +11,11 @@ const backlog = (status: string, done = '') => `# Backlog
 
 - **Now:** BUG-6
 - **Next:** BUG-15, then DES-2
+
+## Epics
+
+- [DES](epics/DES.md)
+- [BUG](epics/BUG.md)
 
 ## Board
 
@@ -17,15 +25,22 @@ const backlog = (status: string, done = '') => `# Backlog
 | DES-3 | One set of design tokens | Story | P0 | M | Todo |
 | BUG-6 | Treasure Path reads the missing word | Bug | P1 | S | ${status} |
 ${done ? '' : '| BUG-15 | Games read the text first | Bug | P1 | S | Todo |\n'}| BUG-9 | Warm-up plays one story twice | Bug | P2 | S | Todo |
-
-## Changelog
-
-${done}
-`
+`,
+  'kanban/epics/DES.md': '# DES — Design\n\n### DES-2 · Write the design standards\n\n### DES-3 · One set of design tokens\n',
+  'kanban/epics/BUG.md': '# BUG — Bugs\n\n### BUG-6 · Treasure Path reads the missing word\n',
+  'kanban/CHANGELOG.md': `# Changelog\n\n${done}\n`,
+})
 
 test('the board follows the backlog, and the footer button opens it', async ($, on) => {
-  let file = backlog('Todo')
-  on('fs.read', async () => ({ value: file }))
+  let files = backlog('Todo')
+  const reads: string[] = []
+  // the engine resolves the board's relative paths, so match on the path's end
+  const fileAt = (path: string) => Object.keys(files).find(k => path === k || path.endsWith(`/${k}`))
+  on('fs.read', async (_$, e) => {
+    const key = fileAt(e.path)
+    if (key) reads.push(key)
+    return { value: key ? files[key] : '' }
+  })
   // The kit has no pane host: keep the open panes here.
   const open = new Set<string>()
   on('ui.open', async (_$, e) => (open.add(e.id), { value: { isPlaced: true } }))
@@ -59,6 +74,11 @@ test('the board follows the backlog, and the footer button opens it', async ($, 
 
   await $.command.run(BOARD)
   expect(open.has('luna-board')).toBe(true)
+  // it read the README, each epic file it links, and the changelog
+  expect(reads).toContain('kanban/README.md')
+  expect(reads).toContain('kanban/epics/DES.md')
+  expect(reads).toContain('kanban/epics/BUG.md')
+  expect(reads).toContain('kanban/CHANGELOG.md')
 
   const ui = await $.ui.mount({ plugin: 'luna-board', surface: 'desktop', ...PANE, requestId: 'luna-board' })
   expect(await ui.find({ type: 'Text', text: /Phase 1 — Design foundation/ })).toBeDefined()
@@ -74,7 +94,7 @@ test('the board follows the backlog, and the footer button opens it', async ($, 
   const pad = (n: number) => String(n).padStart(2, '0')
   const d = new Date()
   const today = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`
-  file = backlog('In progress', `- **${today}** — BUG-15 Games read the text first — Done`)
+  files = backlog('In progress', `- **${today}** — BUG-15 Games read the text first — Done`)
   await $.command.run(BOARD) // closes
   expect(open.has('luna-board')).toBe(false)
   await $.command.run(BOARD) // re-reads and opens

@@ -16,7 +16,7 @@ for an existing entry and update it instead.
 | How Alex wants to work: a preference, a correction, a "do it this way" | **Memory**, type `feedback` (with **Why** and **How to apply**) | Alex does all git himself; Claude only suggests commit messages |
 | Who Alex or the teacher is, or what they like | **Memory**, type `user` or `project` | The teacher's favourite flower is a red rose |
 | A link to something outside the repo | **Memory**, type `reference`, plus the skill that uses it | The style sample canvas URL |
-| Progress, a decision or a new idea for a ticket | **`BACKLOG.md`** through the `backlog` skill (OPS-4 will move it to `kanban/`) | "Teacher (2026-10-09): no rainbow" on DES-2 |
+| Progress, a decision or a new idea for a ticket | **`kanban/`** through the `backlog` skill: the ticket's section in `kanban/epics/<EPIC>.md`, status and Now/Next in `kanban/README.md` | "Teacher (2026-10-09): no rainbow" on DES-2 |
 | A problem that took troubleshooting: symptom, cause, fix, check | **`know-how` skill** | Luna sounds like the browser voice |
 | Design direction, design decisions, how to change the prototype | **`luna-design` skill**; `docs/design-standards.md` once final | Moon gold is the only off-palette colour |
 | A process we will repeat | **A skill**: a section in the closest one, or a new skill if none fits | This wrap-up |

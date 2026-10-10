@@ -1,6 +1,44 @@
-// Reads BACKLOG.md the way the project's own hooks do
+// Reads the backlog the way the project's own hooks do
 // (.claude/hooks/backlog-lib.mjs in the Ms. Luna repo), so the board and the
 // agenda always agree.
+//
+// The backlog lives in kanban/: README.md (roadmap, Now/Next and the board),
+// one file per epic in kanban/epics/ linked from the README, and
+// CHANGELOG.md. They are joined into one text and parsed together. Before
+// kanban/ existed it was a single BACKLOG.md, still read if the README is
+// missing.
+
+export const README = 'kanban/README.md'
+export const CHANGELOG = 'kanban/CHANGELOG.md'
+export const LEGACY = 'BACKLOG.md'
+
+/** The epic files the README links to, in order: "epics/DES.md" → "kanban/epics/DES.md". */
+export const epicLinks = (readme: string): string[] => [
+  ...new Set([...readme.matchAll(/\]\((?:\.\/)?(epics\/[A-Za-z0-9_-]+\.md)\)/g)].map(m => `kanban/${m[1]}`)),
+]
+
+/** The whole backlog as one text; '' when there is none. `read` rejects for a missing file. */
+export async function loadBacklog(read: (path: string) => Promise<string>): Promise<string> {
+  let readme: string
+  try {
+    readme = await read(README)
+  } catch {
+    try {
+      return await read(LEGACY)
+    } catch {
+      return ''
+    }
+  }
+  const parts = [readme]
+  for (const file of [...epicLinks(readme), CHANGELOG]) {
+    try {
+      parts.push(await read(file))
+    } catch {
+      // a missing file: the agenda hook reports it
+    }
+  }
+  return parts.join('\n\n')
+}
 
 export type Ticket = {
   id: string
@@ -55,7 +93,7 @@ export function parseBacklog(text: string): Backlog {
       status,
     }))
 
-  const changelogAt = text.search(/^## Changelog\s*$/m)
+  const changelogAt = text.search(/^#{1,2} Changelog\s*$/m)
   const changelog = changelogAt >= 0 ? text.slice(changelogAt) : ''
 
   return { phase, now: field('Now'), next: field('Next'), tickets, changelog }

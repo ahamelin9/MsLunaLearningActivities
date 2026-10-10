@@ -1,22 +1,22 @@
 #!/usr/bin/env node
-// UserPromptSubmit hook: hands Claude the current agenda from BACKLOG.md with
-// every message, so a request for other work gets a quick priority check
-// (rules in .claude/skills/focus/SKILL.md), plus anything in the backlog that
-// breaks its rules, so a half-finished deletion gets tidied. It never blocks
-// a prompt, and it stays silent if the backlog is missing or unreadable.
+// UserPromptSubmit hook: hands Claude the current agenda from the backlog
+// (kanban/) with every message, so a request for other work gets a quick
+// priority check (rules in .claude/skills/focus/SKILL.md), plus anything in the
+// backlog that breaks its rules, so a half-finished deletion gets tidied. It
+// never blocks a prompt, and it stays silent if the backlog is missing or
+// unreadable.
 
-import { readFileSync } from 'node:fs';
-import { join } from 'node:path';
-import { checkBacklog, parseBacklog } from './backlog-lib.mjs';
+import { checkBacklog, loadBacklog, parseBacklog } from './backlog-lib.mjs';
 
 const root = process.env.CLAUDE_PROJECT_DIR || process.cwd();
 
-let text;
+let backlog;
 try {
-  text = readFileSync(join(root, 'BACKLOG.md'), 'utf8');
+  backlog = loadBacklog(root);
 } catch {
   process.exit(0);
 }
+const { text, mode, missing, unlinked } = backlog;
 
 const { phase, now, next, tickets } = parseBacklog(text);
 const { blocking, warnings } = checkBacklog(text);
@@ -25,10 +25,15 @@ const inProgress = tickets.filter(t => /^in progress/i.test(t.status));
 const blocked = tickets.filter(t => /^blocked/i.test(t.status));
 const openP0 = tickets.filter(t => t.priority === 'P0');
 const list = ts => (ts.length ? ts.map(t => `${t.id} ${t.title}`).join('; ') : 'none');
-const problems = [...blocking, ...warnings];
+const problems = [
+  ...blocking,
+  ...warnings,
+  ...missing.map(f => `${f} is linked from kanban/README.md but doesn't exist.`),
+  ...unlinked.map(f => `${f} isn't linked from kanban/README.md, so it isn't part of the backlog.`)
+];
 
 const context = [
-  'Backlog agenda (BACKLOG.md):',
+  `Backlog agenda (${mode === 'kanban' ? 'kanban/' : 'BACKLOG.md'}):`,
   `- ${phase}`,
   `- Now: ${now} | Next: ${next}`,
   `- In progress: ${list(inProgress)}${blocked.length ? ` | Blocked: ${list(blocked)}` : ''}`,

@@ -175,3 +175,40 @@ the old version either proves nothing.
   set the colour scheme to light, then dark (`resize_window` with
   `colorScheme`). The open board switches without a reload, and after a reload
   it matches the canvas.
+
+## The backlog guard refuses a command that doesn't change the backlog
+
+*2026-10-09 · OPS-4*
+
+- **Symptom:** "Backlog guard: change the backlog (kanban/) with the Edit or
+  Write tool, not the shell" on a command that only reads `kanban/`, or on a
+  script that never touches it.
+- **Cause:** the guard can't see inside a script, so a command that names
+  `kanban/` **and** runs `node`, `python` or `ruby` (or uses `rm`, `mv`, `cp`,
+  `mkdir`, `touch`, `sed -i`, `tee` or a redirect) counts as a write. Putting
+  `ls kanban` and `rm …` in one command trips it too.
+- **Fix:**
+  - Give reads (`grep`, `cat`, `ls`) a command of their own.
+  - Run scripts without naming `kanban/` on the command line: pass the repo
+    root (`"$PWD"`) and let the script build the paths.
+  - Make real changes with Edit or Write, where the guard can check them.
+  - Don't edit the guard to get past it. If it's genuinely wrong, fix the rule
+    and rerun `node .claude/skills/backlog/guard-check.mjs "$PWD"`.
+- **Check:** the split command runs, and the guard check still shows every
+  case as expected.
+
+## A luna-board mod test can't find the file it reads
+
+*2026-10-09 · OPS-4*
+
+- **Symptom:** in `claude plugin test .claude/mods/luna-board`, an `fs.read`
+  mock keyed by `kanban/README.md` returns nothing, so the board is empty and
+  no epic files are read.
+- **Cause:** the test engine hands the mock absolute paths
+  (`<mod folder>/kanban/README.md`). It resolves the mod's relative paths
+  against the mod's own folder; in a real session they resolve against the
+  project.
+- **Fix:** match on the end of the path, as `fileAt` in
+  `tests/board.test.tsx` does.
+- **Check:** `claude plugin test .claude/mods/luna-board` passes, and its
+  assertions show the README, each linked epic file and the changelog were read.
