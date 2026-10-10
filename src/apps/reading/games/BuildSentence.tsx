@@ -25,8 +25,13 @@ function buildRound(tier: 1 | 2 | 3): Round {
 
   const tiles: Tile[] = words.map((w, i) => ({ id: `w-${i}`, word: w, isExtra: false }));
   if (tier === 3) {
-    // the extra tile is never one of the sentence's own words
-    pickWrong(sentence.text, EXTRA_WORDS, 1, { as: textChoice, onScreen: words }).forEach((w, i) =>
+    // the extra tile is never one of the sentence's own words, nor one that
+    // would also make it true in place of one of them
+    pickWrong(sentence.text, EXTRA_WORDS, 1, {
+      as: textChoice,
+      onScreen: words,
+      blank: { alsoFits: sentence.alsoFits }
+    }).forEach((w, i) =>
       tiles.push({ id: `x-${i}`, word: w, isExtra: true })
     );
   }

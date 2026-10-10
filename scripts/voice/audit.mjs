@@ -170,6 +170,27 @@ for (const item of content.SENTENCES) {
   push(parts.map(p => p.text ?? `(${p.pause} ms)`).join(' + '), o => pronunciation.speakSequence(parts, o));
 }
 
+// Treasure Path's passages (GAME-1a): every line and each of its words, the
+// true/false claims, and every blank: read with "what?" in the gap until it is
+// solved, then whole, and a wrong word named in the hint
+for (const passage of content.PASSAGES ?? []) {
+  for (const line of passage.lines) {
+    push(line, o => pronunciation.speakSentence(line, o));
+    for (const word of line.split(/\s+/)) {
+      for (const v of [word.replace(/[.,/#!$%^&*;:{}=\-_`~()?"']/g, ''), word.replace(/[^a-zA-Z0-9]/g, '')]) {
+        if (v) push(v, o => pronunciation.speakWord(v, o));
+      }
+    }
+  }
+  for (const t of passage.truth) push(t.claim, o => pronunciation.speakText(t.claim, o));
+  for (const blank of passage.blanks) {
+    push(blank.text, o => pronunciation.speakSentence(blank.text, o));
+    const parts = content.readWithGap(blank);
+    push(parts.map(p => p.text ?? `(${p.pause} ms)`).join(' + '), o => pronunciation.speakSequence(parts, o));
+    for (const d of blank.decoys) push(d, o => pronunciation.speakWord(d, o));
+  }
+}
+
 // Stickers: the line on its own (tapped in the tin) and after every finish line
 // (the end of a game), which the shell says as two parts
 const finishes = new Set(

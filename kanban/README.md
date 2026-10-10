@@ -72,7 +72,7 @@ be pulled into Phase 1 for a break from styling.
 ### Now / Next
 
 - **Now:** DES-2: the style sample until the teacher gives her final approval (Alex, 2026-10-09: the prototype comes first, since everything else builds on it)
-- **Next:** CNT-1b, then GAME-1a and GAME-1b while DES-2 waits for the teacher (Alex, 2026-10-10: passages instead of single sentences; GAME-1 split so the writing can start now). GAME-1c, the screen, waits on FB-1, which waits on the DES-8/DES-10 layout. Then the rest of DES-2 once she approves, GAME-4
+- **Next:** the teacher's feedback on the new designs (Alex is showing her, 2026-10-10), then the rest of DES-2 once she approves. GAME-1c, Treasure Path's screen, waits on FB-1, which waits on the DES-8/DES-10 layout. Then GAME-4
 
 ## Epics
 
@@ -120,6 +120,7 @@ In board order. A new epic gets its file in `epics/` first, then a link here
 | BUG-7 | Status-bar mute needs two taps to unmute | Bug | P1 | S | Todo |
 | BUG-8 | Story lessons ignore the Beginner speed | Bug | P1 | S | Todo |
 | BUG-21 | Bubble Sounds only ever asks for the first 12 letters | Bug | P1 | S | Todo |
+| BUG-22 | Story Corner says "she reed three books" | Bug | P1 | S | Todo |
 | BUG-9 | Story Corner K warm-up plays one story twice | Bug | P2 | S | Todo |
 | BUG-10 | Settings may loop saving when the voice index fails | Bug | P2 | S | Todo |
 | BUG-11 | Launch and close sounds play twice | Bug | P2 | S | Todo |
@@ -136,13 +137,10 @@ In board order. A new epic gets its file in `epics/` first, then a link here
 | LVL-2 | Remember the chosen difficulty per game | Story | P2 | S | Todo |
 | LVL-3 | Adaptive difficulty from skill mastery | Story | P2 | L | Todo |
 | **CNT** | **One content model** | Epic | **P1** | | |
-| CNT-1b | Fill-in-the-blank: no wrong word that also fits | Story | P1 | M | Todo |
 | CNT-2 | Lessons generated from the content bank | Story | P1 | L | Todo |
 | CNT-3 | Content QA pass | Task | P1 | S | Todo |
 | CNT-4 | Automated content checks in `voice:audit` | Task | P2 | S | Todo |
 | **GAME** | **Games to standard** | Epic | **P1** | | |
-| GAME-1a | Treasure Path passages and questions | Story | P1 | M | Todo |
-| GAME-1b | Treasure Path rounds from passages | Story | P1 | S | Todo |
 | GAME-1c | Treasure Path screen for passages | Story | P1 | M | Todo |
 | GAME-2 | Story Corner: the child reads first | Story | P1 | M | Todo |
 | GAME-3 | Bubble Sounds: smooth, fair bubbles | Story | P1 | S | Todo |
@@ -169,3 +167,4 @@ In board order. A new epic gets its file in `epics/` first, then a link here
 | OPS-1 | Delete dead code | Task | P2 | S | Todo |
 | OPS-2 | README and stale copy | Task | P2 | S | Todo |
 | OPS-3 | Decide the "Coming Soon" apps | Task | P2 | S | Todo |
+| OPS-7 | Drop Treasure Path's leftovers from the sentence bank | Task | P2 | S | Todo |

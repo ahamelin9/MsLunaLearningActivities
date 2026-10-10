@@ -31,6 +31,12 @@ P1 · S
 - **Fix:** spread the rounds over the whole pool (for example, shuffle the pool and take the first 4), keeping no repeats within a play.
 - **Complete when:** over many plays at each grade and dial, every letter in that tier's pool is asked for at least once (counted with a scan like `.claude/skills/know-how/distractor-check.mjs`), and no play asks the same letter twice.
 
+### BUG-22 · Story Corner says "she reed three books" — likely
+P1 · S · likely, from the phonemizer, not yet heard in play
+- **Cause:** Kokoro reads past-tense "read" as "reed" (`ɹˈiːd`): espeak can't tell the tense. Found while writing GAME-1a's passages (2026-10-10). The 2nd-grade story "The Rainy Day Plan" in `engine/content.ts` says "so she read three books instead", and its answer "She read three books" does too.
+- **Fix:** reword the line and answer (for example "so she spent the day with three books"), or respell past-tense "read" as "red" in `speakable()` in `scripts/voice/lexicon.mjs`, only where it is past tense. Then `npm run voice:render`.
+- **Complete when:** no rendered line says "reed" where it means the past ("red"), checked by running every story line and answer through the phonemizer (know-how: "A new line says 'ay' for 'a'"), and `voice:audit` passes.
+
 ### BUG-9 · Story Corner K warm-up plays one story twice
 P2 · S
 - **Cause:** tier 1 has only one story. Resolved properly by GAME-2.

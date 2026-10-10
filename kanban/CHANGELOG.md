@@ -50,3 +50,21 @@ only record of them. One line each: date, ID, title, and `Done` or
 - **2026-10-10** — BUG-3 What's Missing can be solved by elimination — Done, through CNT-1a. Wrong choices now come from words that were never on the desk: 0 of 21,600 sets in the check (every round on the last commit), and 8 rounds played in a real browser at Kindergarten and 2nd grade had no wrong choice on the desk.
 - **2026-10-10** — GAME-1 Treasure Path: real comprehension — Won't do: split in three, so the writing can start before the design work: passages and questions ("a", 6 per grade), rounds ("b"), and the screen ("c", which waits on FB-1).
 - **2026-10-10** — BUG-4 Same-sound letters used as wrong answers — Done, through CNT-1a. Bubble Sounds and Feed Luna no longer offer C with K (737 sets on the last commit, 0 now), and the check's self-test proves the rule also catches W with WH and CK.
+- **2026-10-10** — CNT-1b Fill-in-the-blank: no wrong word that also fits — Done. Every fill-in-the-blank sentence now lists the words that would also make it true (`alsoFits`, written by hand, Alex's call), and Treasure Path and the extra tile in Words Off the Page never offer one as wrong. Wrong but same-type words stay ("The sun is cold"). CNT-3's ambiguous four (frog/fish, hat/cat, beach/bench, under/behind) are gone, along with 17 more wrong words that also fit. `distractor-check.mjs` fails on a wrong word that's on its item's list and on an item with no list (proved with planted items), and passes on the real content.
+- **2026-10-10** — GAME-1a Treasure Path passages and questions — Done. 18 short passages in Ms. Luna's world (`PASSAGES` in `engine/content.ts`), 6 per grade, with 48 true/false and 24 fill-in-the-blank statements, every voice clip rendered. The game still uses the old sentences until GAME-1b switches it over. Also changed "My puppy likes warm milk" to "My kitten likes warm milk" (Alex). Writing rules, checked by the new `.claude/skills/know-how/passage-check.mjs` (proved with planted bad passages):
+
+  | Rule | What it means |
+  |---|---|
+  | Length | Kindergarten 2 sentences, 1st grade 3, 2nd grade 4–5 |
+  | Both kinds | every passage has at least one true/false and one fill-in-the-blank |
+  | Paraphrase | no statement copies 4 or more words in a row from its passage; several need two sentences |
+  | Also fits | every blank lists the words that would also make it true, and no wrong word is on it |
+  | No matching | the words beside a blank never sit beside its answer in the passage |
+  | Picture | the emoji never shows an answer |
+- **2026-10-10** — Added BUG-22: Story Corner's "so she read three books" is said "reed" (found by the phonemizer while writing GAME-1a).
+- **2026-10-10** — GAME-1b Treasure Path rounds from passages — Done. Each stone is now a short passage for the child's grade, with a true/false or fill-in-the-blank statement under it. Every play mixes both kinds and never repeats a passage (2,700 plays checked by `passage-check.mjs`), and nothing can be found by matching words or by "Read it to me" (checked in a browser at all three grades). The passage sits on the stone in a stopgap view in the current style (Alex's call: built to be restyled or replaced in GAME-1c on the DES-2 design), and fits at every iPad size. The difficulty dial doesn't change the passages yet; LVL-1 decides that. Added OPS-7 to clear out the sentence fields the game no longer uses.
+
+  | Grade | Opens with | "Read it to me" before the right answer |
+  |---|---|---|
+  | Kindergarten | True/false: the passage, "Is this true?" and the claim. Fill-in-the-blank: the instruction only. | Any time: the passage, then the claim, or the statement with "what?" in the gap |
+  | 1st and 2nd | The instruction only ("Read the story…") | Greyed out until the first answer; after a miss, the same as Kindergarten |

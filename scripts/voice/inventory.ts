@@ -374,6 +374,11 @@ export function buildInventory(): Clip[] {
   // TreasureRead's "Read it to me" asks "what?" in the gap until the round is solved
   for (const item of content.SENTENCES)
     for (const part of content.readWithGap(item)) if (part.text) prose.add(part.text);
+  // Treasure Path's passages (GAME-1a): `lines` are spoken and tappable,
+  // `claim` and a blank's whole `text` are spoken, `decoys` named in a hint
+  harvest(content.PASSAGES);
+  for (const passage of content.PASSAGES)
+    for (const blank of passage.blanks) for (const part of content.readWithGap(blank)) if (part.text) prose.add(part.text);
   harvest(content.MINI_STORIES);
   harvest(content.LETTERS);
   harvest(content.DIGRAPHS);

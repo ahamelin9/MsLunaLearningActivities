@@ -1,7 +1,8 @@
-// Distractor check (CNT-1a): plays every game at every grade × difficulty
-// many times, reads every lesson question, and holds each set of choices to
-// the rules in src/apps/reading/engine/distractors.ts (ruleBreaks). Exits 1
-// if any rule is broken anywhere.
+// Distractor check (CNT-1a, CNT-1b): plays every game at every grade ×
+// difficulty many times, reads every lesson question and every
+// fill-in-the-blank item in the content, and holds each set of choices to the
+// rules in src/apps/reading/engine/distractors.ts (ruleBreaks). Exits 1 if any
+// rule is broken anywhere.
 //
 //   node .claude/skills/know-how/distractor-check.mjs            # this tree
 //   node .claude/skills/know-how/distractor-check.mjs <src-root> # another copy
@@ -30,6 +31,7 @@ const out = mkdtempSync(join(tmpdir(), 'distractor-check-'));
 const entry = `
   export { GAMES } from ${JSON.stringify(join(root, 'src/apps/reading/games/index.ts'))};
   export { READING_CURRICULUM } from ${JSON.stringify(join(root, 'src/data/readingCurriculum.ts'))};
+  export * as content from ${JSON.stringify(join(root, 'src/apps/reading/engine/content.ts'))};
   export { ruleBreaks } from ${JSON.stringify(join(repo, 'src/apps/reading/engine/distractors.ts'))};
 `;
 await build({
@@ -43,7 +45,7 @@ await build({
   jsx: 'automatic',
   logLevel: 'error'
 });
-const { GAMES, READING_CURRICULUM, ruleBreaks } = await import(pathToFileURL(join(out, 'bundle.mjs')).href);
+const { GAMES, READING_CURRICULUM, content, ruleBreaks } = await import(pathToFileURL(join(out, 'bundle.mjs')).href);
 rmSync(out, { recursive: true, force: true });
 
 // ---- the rules themselves must catch a planted bad choice of every kind ----
@@ -55,11 +57,15 @@ const planted = [
   ['answer twice', { target: { text: 'B' }, wrong: [{ text: 'b' }], letterBy: 'name' }],
   ['on screen', { target: { text: 'cat' }, wrong: [{ text: 'dog' }], onScreen: [{ text: 'dog' }] }],
   ['same picture twice', { target: { text: 'dog', picture: '🐶' }, wrong: [{ text: 'pup', picture: '🐶' }] }],
-  ['first-letter giveaway', { target: { text: 'Boat' }, wrong: [{ text: 'Car' }, { text: 'Plane' }], targetKnown: true }]
+  ['first-letter giveaway', { target: { text: 'Boat' }, wrong: [{ text: 'Car' }, { text: 'Plane' }], targetKnown: true }],
+  ['also fits', { target: { text: 'hot' }, wrong: [{ text: 'Warm' }], blank: { alsoFits: ['warm', 'bright'] } }],
+  ['no list', { target: { text: 'hot' }, wrong: [{ text: 'cold' }], blank: {} }]
 ];
 const fair = [
   { target: { text: 'C' }, wrong: [{ text: 'K' }], letterBy: 'name' }, // names differ: see / kay
-  { target: { text: 'Boat' }, wrong: [{ text: 'Bike' }, { text: 'Car' }], targetKnown: true }
+  { target: { text: 'Boat' }, wrong: [{ text: 'Bike' }, { text: 'Car' }], targetKnown: true },
+  // same-type but false: "The sun is cold" stays a fair wrong word
+  { target: { text: 'hot' }, wrong: [{ text: 'cold' }], blank: { alsoFits: ['warm', 'bright'] } }
 ];
 const selfTest = [
   ...planted.filter(([rule, set]) => !ruleBreaks(set).some(p => p.startsWith(rule))).map(([rule]) => `missed a planted "${rule}"`),
@@ -112,23 +118,30 @@ const GAME_CHOICES = {
       onScreen: r.items.filter(i => i.word !== r.missing.word).map(word)
     }
   ],
-  // the extra tile must not be one of the sentence's own words
-  'build-sentence': r => [
-    {
-      target: text(r.sentence.text),
-      wrong: r.tiles.filter(t => t.isExtra).map(t => text(t.word)),
-      onScreen: r.words.map(w => text(w.replace(/[^a-zA-Z']/g, '')))
-    }
-  ],
-  // a fill-in-the-blank: the wrong words are not in the sentence already
-  // (whether a wrong word also fits the sentence is CNT-1b)
+  // the extra tile must not be one of the sentence's own words, nor make it
+  // true in place of one of them
+  'build-sentence': r => {
+    const extra = r.tiles.filter(t => t.isExtra).map(t => text(t.word));
+    return [
+      {
+        target: text(r.sentence.text),
+        wrong: extra,
+        onScreen: r.words.map(w => text(w.replace(/[^a-zA-Z']/g, ''))),
+        ...(extra.length > 0 && { blank: { alsoFits: r.sentence.alsoFits } })
+      }
+    ];
+  },
+  // a fill-in-the-blank about a passage: the wrong words are not in the
+  // statement already, and not on its list of words that also fit. Words of
+  // the passage are fair wrong words: finding the right one is the reading.
   'treasure-read': r =>
     r.kind === 'cloze'
       ? [
           {
             target: text(r.answer),
             wrong: r.options.filter(o => o !== r.answer).map(text),
-            onScreen: r.masked.split(/\s+/).map(w => text(w.replace(/[^a-zA-Z']/g, '')))
+            onScreen: r.statement.split(/\s+/).map(w => text(w.replace(/[^a-zA-Z']/g, ''))),
+            blank: { alsoFits: r.blank?.alsoFits }
           }
         ]
       : [],
@@ -217,6 +230,27 @@ for (const grade of GRADES) {
       }
     }
   }
+}
+
+// ---- every fill-in-the-blank item, played or not: its list, and its own wrong words ----
+
+const FILL_INS = [
+  ...(content.SENTENCES ?? []).map(s => [`sentence "${s.text}"`, s]),
+  // Treasure Path's passages (GAME-1a)
+  ...(content.PASSAGES ?? []).flatMap(p => p.blanks.map(b => [`passage ${p.id} "${b.text}"`, b]))
+];
+for (const [where, { text: said, key, decoys, alsoFits }] of FILL_INS) {
+  note(where, {
+    target: text(key),
+    wrong: (decoys ?? []).map(text),
+    // the statement's other words are on screen around the gap
+    onScreen: said
+      .split(/\s+/)
+      .map(w => w.replace(/[^a-zA-Z']/g, ''))
+      .filter(w => w.toLowerCase() !== key.toLowerCase())
+      .map(text),
+    blank: { alsoFits }
+  });
 }
 
 console.log(`Checked ${sets} sets of choices from ${root === repo ? 'this tree' : root}.`);

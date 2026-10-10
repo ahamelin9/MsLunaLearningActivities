@@ -90,8 +90,13 @@ build, or a tool that misbehaved. Skip routine fixes.
   - A longer pause: say the line as parts with `{ pause: ms }` between them
     (`SpeechPart`, played by `speakSequence`). Treasure Path's gap is the
     example: `readWithGap` in `engine/content.ts`.
+- **Past-tense "read" says "reed"** (*2026-10-10, GAME-1a*): espeak can't
+  tell the tense, so "Luna read until…" comes out `ɹˈiːd`. Reword the line
+  ("Luna kept reading…", "Luna learned about…"). The old story line "so she
+  read three books" is BUG-22.
 - **Check:** before rendering, run each line through the phonemizer that
-  kokoro-js uses, and look for `ˈeɪ` where you meant "a":
+  kokoro-js uses, and look for `ˈeɪ` where you meant "a", and `ɹˈiːd` where
+  you meant the past:
 
   ```bash
   node --input-type=module -e "import { phonemize } from 'phonemizer'; for (const t of ['I see a...','I see uh...']) console.log(t, (await phonemize(t,'en-us')).join(' | '))"
@@ -155,6 +160,21 @@ and serve your own response. `stale-index-check.cjs` is the example.
 
 Pitfalls that cost time:
 
+- **A puppeteer run prints its result but never exits** (*2026-10-10,
+  GAME-1b*): copies of `speech-check.cjs`, and `npm run ui:shots` itself,
+  sometimes keep running after "Done" or the ✅ line. Their output is complete
+  by then. Stop just that process by its script path
+  (`pkill -f "scratchpad/<name>.cjs"`, or its pid for `shots.mjs`), and never
+  with a bare `pkill -f vite`: that would also stop Alex's server on 5173.
+  Cause not tracked down yet.
+- **"Does it still fit?"** for a screen whose content grows by grade (Treasure
+  Path's 2nd-grade passages): `ui:shots` only plays Kindergarten. Play the game
+  at 2nd grade at 1024×768 (the smallest landscape iPad) and compare the
+  stones' and choices' `getBoundingClientRect()` with the stage's.
+  `treasure-fit.cjs` in this folder does that for Treasure Path, and
+  `treasure-check.cjs` plays it at one grade and reports anything said or
+  shown that gives an answer away.
+
 - `.round-pips` disappears when a lesson ends, so treat a missing one as
   finished.
 - A round advances only after the win delay. Detect a right answer from state
@@ -214,6 +234,24 @@ the old version either proves nothing.
 - **Pitfall:** a rule that never fires may mean the game never builds that
   round. W/WH never showed up because Bubble Sounds only asks for the first 12
   letters (BUG-21).
+- **A wrong word that also fits a blank** (*CNT-1b*): code can't judge that,
+  so every fill-in-the-blank item carries `alsoFits`, the words that would also
+  make it true, written by hand. Pass it to `pickWrong` as
+  `blank: { alsoFits }`. Same-type false words stay ("The sun is cold"). The
+  check scans every item directly as well as playing the games, because
+  `pickWrong` quietly skips a decoy that's on the list, so plays alone would
+  never show a bad decoy in the data. A new kind of fill-in-the-blank goes in
+  `FILL_INS` in the check. To prove it can fail, copy `src` to the scratchpad,
+  put one decoy on its item's list and delete another item's list, and pass
+  that folder. Make sure the planting script actually writes the file: a
+  planted copy that passes usually means it didn't.
+- **Treasure Path's passages** (*GAME-1a*): `node .claude/skills/know-how/passage-check.mjs`
+  holds `PASSAGES` to their writing rules (6 per grade, sentences per grade,
+  both statement types, no 4 words copied in a row, every blank's list, and
+  no blank whose neighbouring words sit beside its answer in the passage). It
+  takes a `<src-root>` the same way. Writing a blank, the easy trap is "the":
+  "in the ___" beside "in the garden" gives the answer away, so put a
+  different word next to the gap ("in her ___", "Luna's ___").
 
 ## A page of raw code pops up in Alex's browser
 

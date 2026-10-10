@@ -794,6 +794,26 @@
 
     .scroll-emoji { font-size: 2.6rem; display: block; }
 
+    // GAME-1b stopgap, in the current style until GAME-1c redraws the stone
+    // on the DES-2 design: the passage the child reads, above the statement.
+    // A 2nd-grade passage runs to 5 sentences, so the scroll gets wider and
+    // its picture smaller to keep the stones and choices on screen.
+    &.has-passage {
+      max-width: 720px;
+      padding: 0.7rem 1.4rem;
+
+      .scroll-emoji { font-size: 1.8rem; }
+    }
+
+    .treasure-passage {
+      margin: 0.3rem 0 0.5rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px dashed rgba(122, 74, 36, 0.35);
+      font-size: 1.15rem;
+      line-height: 1.45;
+      text-align: left;
+    }
+
     .scroll-sentence {
       font-size: 1.45rem;
       font-weight: 500;
@@ -973,4 +993,5 @@
   .story .storybook { flex-direction: column; }
   .story .book-spine { display: none; }
   .treasure .treasure-scroll .scroll-sentence { font-size: 1.15rem; }
+  .treasure .treasure-scroll .treasure-passage { font-size: 1.05rem; }
 }
