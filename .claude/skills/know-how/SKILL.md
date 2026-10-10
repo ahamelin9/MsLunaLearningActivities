@@ -35,13 +35,23 @@ build, or a tool that misbehaved. Skip routine fixes.
   **A ping or pop right after a voice:render means a stale tab, not a bad clip:**
   don't go analysing the audio files (2026-10-10, BUG-6 lost an hour to that).
 - **Cause 1, the most common:** a stale tab. The app loads the voice index
-  (`public/voice/af_heart/manifest.json`) once per page load. Vite hot-reloads
+  (`public/voice/af_heart/manifest.json`) when the page loads. Vite hot-reloads
   changed text into an open tab but not the index, so every new or changed line
   has no clip there. `voice:render` also prunes clips for old lines, so those
   404 in a stale tab too.
-  - **Fix:** reload the tab. After any `voice:render`, tell Alex to reload,
-    plainly and first, before asking him to listen to anything. Alex usually
-    has `npm run dev` open on port 5173, in Firefox.
+  - **Since OPS-6 (2026-10-10)** a line missing from the index makes
+    `voiceClips.get()` fetch the index again (at most once every 5 s per
+    voice), so a stale tab picks up new lines by itself. A line tapped in
+    the first 5 s after the tab loaded, or again within 5 s of the last
+    refetch, can still fall back once. Pruned clips are still a stale-tab
+    problem: their keys are in the old index, so nothing refetches.
+  - **Fix:** if it still falls back, reload the tab. After any
+    `voice:render`, tell Alex to reload, plainly and first, before asking him
+    to listen to anything. Alex usually has `npm run dev` open on port 5173,
+    in Firefox.
+  - **Check:** `stale-index-check.cjs` in this folder serves an old index
+    (one line removed) and then the real one, and proves the line plays a
+    clip without a reload. It runs against Vite on port 5198.
 - **Cause 2:** a speech path that neither `scripts/voice/inventory.ts` nor
   `scripts/voice/audit.mjs` reads, so the line never got a clip and the audit
   still passes. Seen so far:

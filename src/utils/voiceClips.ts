@@ -15,6 +15,10 @@ import { keyOf, type ClipKind, type RateBucket } from './voiceKeys';
 
 const MEMORY_LIMIT = 320;
 
+// How long a fresh copy of the index is trusted before a missing key may
+// fetch it again.
+const REFRESH_INTERVAL_MS = 5000;
+
 /**
  * decodeAudioData both ways round.
  *
@@ -43,7 +47,8 @@ export class VoiceClipLibrary {
   private manifests = new Map<string, Promise<ClipManifest | null>>();
   private buffers = new Map<string, AudioBuffer>();
   private inflight = new Map<string, Promise<AudioBuffer | null>>();
-  private missing = new Set<string>();
+  private fetchedAt = new Map<string, number>();
+  private refreshing = new Map<string, Promise<ClipManifest | null>>();
 
   // optional chaining on purpose: import.meta.env does not exist outside
   // Vite, and this module is bundled by the build scripts too
@@ -63,21 +68,48 @@ export class VoiceClipLibrary {
     const existing = this.manifests.get(voice);
     if (existing) return existing;
 
-    // The index is checked with the server on every app start (a 304 when
-    // nothing changed). force-cache here would keep a stale index forever:
-    // the browser would go on playing clips from before the last re-render.
-    // The clips themselves can be cached hard, because a clip's file name
-    // changes whenever its audio does.
-    const load = fetch(`${this.base}/${voice}/manifest.json`, { cache: 'no-cache' })
-      .then(r => (r.ok ? (r.json() as Promise<ClipManifest>) : null))
-      .catch(() => null)
-      .then(manifest => {
-        if (!manifest) this.manifests.delete(voice);
-        return manifest;
-      });
+    const load = this.fetchManifest(voice).then(manifest => {
+      if (!manifest) this.manifests.delete(voice);
+      return manifest;
+    });
 
     this.manifests.set(voice, load);
     return load;
+  }
+
+  private fetchManifest(voice: string): Promise<ClipManifest | null> {
+    this.fetchedAt.set(voice, Date.now());
+    // The index is checked with the server every time (a 304 when nothing
+    // changed). force-cache here would keep a stale index forever: the
+    // browser would go on playing clips from before the last re-render. The
+    // clips themselves can be cached hard, because a clip's file name changes
+    // whenever its audio does.
+    return fetch(`${this.base}/${voice}/manifest.json`, { cache: 'no-cache' })
+      .then(r => (r.ok ? (r.json() as Promise<ClipManifest>) : null))
+      .catch(() => null);
+  }
+
+  /**
+   * The index again, for a key the copy in hand does not have.
+   *
+   * A tab opened before a `voice:render` keeps the old index while Vite
+   * hot-reloads the new lines into it, so without this every new line would
+   * fall back to the browser voice until a reload. At most one fetch every
+   * few seconds per voice, shared by every lookup waiting on it, so a line
+   * that truly has no clip does not refetch on every tap. A failed refetch
+   * keeps the copy that was already there.
+   */
+  private async refresh(voice: string, stale: ClipManifest): Promise<ClipManifest> {
+    const pending = this.refreshing.get(voice);
+    if (pending) return (await pending) ?? stale;
+    if (Date.now() - (this.fetchedAt.get(voice) ?? 0) < REFRESH_INTERVAL_MS) return stale;
+
+    const load = this.fetchManifest(voice).finally(() => this.refreshing.delete(voice));
+    this.refreshing.set(voice, load);
+    const fresh = await load;
+    if (!fresh) return stale;
+    this.manifests.set(voice, Promise.resolve(fresh));
+    return fresh;
   }
 
   /** Which voices actually have audio on disk, so the picker can hide the rest. */
@@ -108,17 +140,14 @@ export class VoiceClipLibrary {
     bucket: RateBucket
   ): Promise<AudioBuffer | null> {
     const key = keyOf(kind, value, bucket);
-    const id = `${voice}|${key}`;
-    if (this.missing.has(id)) return null;
 
-    // no index yet: this key is not known to be missing, so do not remember
-    // it as such — the next tap should try again
+    // no index yet: the next tap tries again
     const manifest = await this.manifest(voice);
     if (!manifest) return null;
 
-    const file = manifest.clips[key];
+    // not in this copy of the index: it may be older than the clip
+    const file = manifest.clips[key] ?? (await this.refresh(voice, manifest)).clips[key];
     if (!file) {
-      this.missing.add(id);
       if (import.meta.env?.DEV) console.warn(`[voice] not rendered: ${key}`);
       return null;
     }
@@ -195,7 +224,6 @@ export class VoiceClipLibrary {
 
   clear() {
     this.buffers.clear();
-    this.missing.clear();
   }
 }
 

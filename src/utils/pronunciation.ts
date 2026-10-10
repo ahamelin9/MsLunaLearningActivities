@@ -377,6 +377,9 @@ class PronunciationService {
 
       let buffer: AudioBuffer | null = null;
       try {
+        // a clip missing from the index makes this refetch the index once
+        // first (a tab older than the last voice:render), so a null here
+        // really means the line was never rendered
         buffer = await this.fetchClip(req);
       } finally {
         this.liveRequests -= 1;
