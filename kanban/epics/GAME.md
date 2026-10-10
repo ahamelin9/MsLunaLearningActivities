@@ -27,7 +27,7 @@ Story · P1 · M · needs: FB-1
   - At least 3 stories per tier.
   - Questions can't be answered by copying a line from the story.
   - Resolves BUG-9.
-  - (Lines no longer reading themselves aloud moved to BUG-15.)
+  - (Lines no longer reading themselves aloud: done in BUG-15, 2026-10-10.)
 - **Complete when:** each tier has at least 3 stories, no answer is copied word for word from a line, and BUG-9 is closed.
 
 ### GAME-3 · Bubble Sounds: smooth, fair bubbles

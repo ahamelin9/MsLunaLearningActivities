@@ -30,20 +30,31 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
   const [foundWord, setFoundWord] = useState(false);
   const [wrongAnswer, setWrongAnswer] = useState<string | null>(null);
   const [answered, setAnswered] = useState(false);
+  const [missedQuestion, setMissedQuestion] = useState(false);
 
   const story = round.story;
   const allRevealed = revealed >= story.lines.length;
 
   const answers = useMemo(() => shuffle(story.answers), [story]);
 
-  // The book opens on line 1, so it is read with the title, the way "Next
-  // line" reads every line after it.
+  // Kindergarten is a read-along: every line is read as it appears. From 1st
+  // grade the story is the child's to read, as in the lessons: lines stay
+  // silent until they have answered the question once, and a wrong answer
+  // unlocks them. (A miss in the word hunt doesn't count: nearly every hunt
+  // has one, and the question would be a listening one again.) A single word
+  // can always be tapped, the way a child would ask the teacher.
+  const readAlong = api.ctx.grade === 'kindergarten';
+  const tried = answered || missedQuestion;
+  const canHearLines = phase !== 'hunt' && (readAlong || tried);
+
+  // The book opens on line 1, so a read-along reads it with the title, the
+  // way "Next line" reads every line after it.
   useEffect(() => {
     const t = window.setTimeout(() => {
-      pronunciation.speakSequence([{ text: story.title }, { text: story.lines[0] }]);
+      pronunciation.speakSequence(readAlong ? [{ text: story.title }, { text: story.lines[0] }] : [{ text: story.title }]);
     }, 500);
     return () => window.clearTimeout(t);
-  }, [story]);
+  }, [story, readAlong]);
 
   const readLine = (index: number) => {
     soundManager.playLetterTap();
@@ -64,7 +75,7 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
     const next = revealed + 1;
     setRevealed(next);
     soundManager.playPop();
-    readLine(next - 1);
+    if (readAlong) readLine(next - 1);
   };
 
   const tapWord = (raw: string) => {
@@ -96,6 +107,7 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
       api.win({ delay: 2100 });
     } else {
       setWrongAnswer(text);
+      setMissedQuestion(true);
       window.setTimeout(() => setWrongAnswer(null), 600);
       api.miss({ hint: [{ text: 'Peek back at the story — the answer is hiding in one of the lines.' }] });
     }
@@ -140,7 +152,7 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
             <p
               key={i}
               className={`story-line ${phase === 'hunt' ? 'is-huntable' : ''}`}
-              onClick={() => phase === 'read' && readLine(i)}
+              onClick={() => canHearLines && readLine(i)}
             >
               {line.split(' ').map((word, wi) => {
                 const clean = word.replace(/[^a-zA-Z]/g, '').toLowerCase();
@@ -150,9 +162,14 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
                     key={wi}
                     className={`story-word ${isFound ? 'is-found' : ''}`}
                     onClick={e => {
-                      if (phase !== 'hunt') return;
-                      e.stopPropagation();
-                      tapWord(word);
+                      if (phase === 'hunt') {
+                        e.stopPropagation();
+                        tapWord(word);
+                      } else if (!canHearLines) {
+                        // the line is still the child's to read; one word is fine
+                        e.stopPropagation();
+                        pronunciation.speakWord(word.replace(/[^a-zA-Z']/g, ''));
+                      }
                     }}
                   >
                     {word}{' '}
@@ -161,6 +178,21 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
               })}
             </p>
           ))}
+
+          {phase === 'question' && (
+            <button
+              className="speak-chip"
+              disabled={!canHearLines}
+              title={canHearLines ? 'Hear the story' : 'Try it first!'}
+              onClick={() => {
+                soundManager.playLetterTap();
+                // line by line: each line is a clip, the whole story glued together is not
+                pronunciation.speakSequence(story.lines.map(text => ({ text })));
+              }}
+            >
+              🔊 Read me the story
+            </button>
+          )}
 
           {phase === 'read' && (
             <button className="page-turn" onClick={turnPage}>

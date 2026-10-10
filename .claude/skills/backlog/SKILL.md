@@ -25,6 +25,9 @@ files when its status changes; the status changes in the board row only. The
 2. Otherwise, take the first `Todo` ticket in the current phase (see **Roadmap**).
    Within a phase, go in board order, and skip any ticket whose `needs:` are
    still on the board. A ticket that's no longer on the board is done.
+   `needs:` chain, so follow them down before naming a ticket as startable:
+   GAME-1 needs FB-1, which needs DES-8/DES-10, which wait on the design.
+   Name the first ticket in the chain that can actually start.
 3. Suggest the ticket with its ID, title, size and a one-line plan, then wait for
    the go-ahead. The user sets priorities. Don't reorder phases or priorities
    unless they ask.
@@ -54,6 +57,11 @@ files when its status changes; the status changes in the board row only. The
 6. **Delete the finished ticket**, in this order (the guard checks each step):
    1. Add the line to `kanban/CHANGELOG.md`, e.g.
       `- **2026-10-12** — DES-1 Screenshot harness for design review — Done`.
+      The section is about to be deleted, so the changelog entry is all that
+      remains. If the ticket set a rule someone will need later (what each
+      grade hears, when a button unlocks), say why in the line and put the
+      rule under it as a short table, indented two spaces (Alex,
+      2026-10-10; BUG-15's entry is the example).
    2. Remove its board row in `kanban/README.md`. The guard runs the build and
       lint first.
    3. Remove its `###` section from its epic file.
@@ -74,6 +82,24 @@ files when its status changes; the status changes in the board row only. The
 9. **Finishing a phase:** when a phase has nothing left, move `— now` in the
    Roadmap table to the next phase (the hook reads that marker).
 10. Refresh **Now / Next** and **Last updated** in the README.
+
+## Two chats at once
+
+Alex sometimes runs a second chat on a small ticket while the first works on
+another. When writing the prompt for the second chat, give it these rules
+(OPS-6 ran alongside BUG-15 this way, 2026-10-10):
+
+- The board allows one `In progress`, so the second ticket stays `Todo`
+  while it's worked on, then closes as usual.
+- Name the files or folders each chat owns, and tell the second chat not to
+  touch the first one's.
+- Each chat runs its own Vite for browser checks: 5199 for the first, 5198
+  for the second. 5173 is Alex's. Each stops its own server afterwards.
+- When suggesting a commit, list the exact paths (`git add <paths>`), since
+  the working tree holds the other chat's unfinished work too.
+- To pick up or finish the other chat's ticket, read where it left off
+  first (`list_sessions`, then `list_events` on that session). It may only be
+  waiting on Alex's OK.
 
 Status lives **only** in the board table, so update it in one place. Finished
 work doesn't stay on the board: the changelog is its only record.

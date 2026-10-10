@@ -72,7 +72,7 @@ be pulled into Phase 1 for a break from styling.
 ### Now / Next
 
 - **Now:** DES-2: the style sample until the teacher gives her final approval (Alex, 2026-10-09: the prototype comes first, since everything else builds on it)
-- **Next:** BUG-15 while DES-2 waits for the teacher, then GAME-1 (Alex, 2026-10-10: passages instead of single sentences), then the rest of DES-2 once she approves, GAME-4, BUG-3
+- **Next:** GAME-1 while DES-2 waits for the teacher (Alex, 2026-10-10: passages instead of single sentences). It needs CNT-1 and FB-1 first: CNT-1 can start now, and FB-1 waits on the DES-8/DES-10 layout. Then the rest of DES-2 once she approves, GAME-4, BUG-3
 
 ## Epics
 
@@ -121,7 +121,6 @@ In board order. A new epic gets its file in `epics/` first, then a link here
 | BUG-4 | Same-sound letters used as wrong answers (C/K) | Bug | P0 | S | Todo |
 | BUG-7 | Status-bar mute needs two taps to unmute | Bug | P1 | S | Todo |
 | BUG-8 | Story lessons ignore the Beginner speed | Bug | P1 | S | Todo |
-| BUG-15 | Games read the text before the child tries | Bug | P1 | S | Todo |
 | BUG-9 | Story Corner K warm-up plays one story twice | Bug | P2 | S | Todo |
 | BUG-10 | Settings may loop saving when the voice index fails | Bug | P2 | S | Todo |
 | BUG-11 | Launch and close sounds play twice | Bug | P2 | S | Todo |

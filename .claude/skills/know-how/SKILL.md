@@ -56,7 +56,9 @@ build, or a tool that misbehaved. Skip routine fixes.
   `scripts/voice/audit.mjs` reads, so the line never got a clip and the audit
   still passes. Seen so far:
   - `lunaLine: '…'` literals handed to `api.win/miss/tick` (BUG-18);
-  - bare `string[]` answers under `comprehensionQuestion.options` (BUG-5).
+  - bare `string[]` answers under `comprehensionQuestion.options` (BUG-5);
+  - a fixed line handed straight to `speakText('…')`, `speakSentence('…')`
+    or `soundManager.speak('…')` (BUG-15, 2026-10-10).
   - **Fix, in this order:** teach the audit to see the path and watch it
     **fail**, then add it to the inventory, `npm run voice:render`, and
     `npm run voice:audit` passes. Fixing the inventory first proves nothing.
@@ -126,6 +128,7 @@ Copy `speech-check.cjs` from this folder and edit its scenario. It already:
 - starts nothing itself. Run your own server on **port 5199**
   (`node_modules/.bin/vite --port 5199 --strictPort`, in the background) and
   leave Alex's 5173 alone. Stop it afterwards with `pkill -f "vite --port 5199"`.
+  A second chat working at the same time uses **5198** instead.
 - launches the installed Chrome via `puppeteer-core` with `--mute-audio` and
   **stubs `speechSynthesis`**. Without that, the macOS voice talks over Alex
   and any fallback goes unnoticed. With it, fallbacks land in
@@ -141,6 +144,14 @@ Selectors that work: `.ipad-reading-app-card`; `.grade-card-item` (0 K, 1 1st,
 `.hub-rug .game-thing:not(.nook)`, both named by `.thing-title`;
 `.play-button`; `.game-shell.phase-play` / `.phase-reward`; and
 `.round-pips[aria-label]`, which changes each round.
+
+Prove the check can fail: switch the fix off for a moment (for example, set
+its constant to something huge), rerun, and watch it go ❌, then put the fix
+back. A check that passes either way proves nothing. OPS-6 did this.
+
+To test something the app can't trigger on demand, such as an old voice
+index, intercept the request in puppeteer (`page.setRequestInterception`)
+and serve your own response. `stale-index-check.cjs` is the example.
 
 Pitfalls that cost time:
 

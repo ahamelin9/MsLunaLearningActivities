@@ -41,6 +41,13 @@ function buildRound(tier: 1 | 2 | 3): Round {
   };
 }
 
+/** A true/false round read aloud: the sentence, then the claim to judge. */
+const trueFalseRead = (round: Round): SpeechPart[] => [
+  { text: round.sentence.text },
+  { text: 'Is this true?' },
+  { text: round.claim ?? '' }
+];
+
 const STONE_LABELS = ['🌿', '🪨', '🌴', '🦜', '⛰️', '🏝️'];
 
 const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
@@ -48,21 +55,31 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
   const [wrong, setWrong] = useState<string | null>(null);
   const step = api.ctx.roundIndex;
   const total = api.ctx.totalRounds;
+  // Kindergarten is a read-along. From 1st grade the sentence is the child's
+  // to read first, as in the lessons: it stays silent until they have
+  // answered once, and a wrong answer unlocks "Read it to me".
+  const readAlong = api.ctx.grade === 'kindergarten';
+  const tried = solved || api.attempts > 0;
 
   useEffect(() => {
     const t = window.setTimeout(() => {
-      if (round.kind === 'truefalse') {
-        pronunciation.speakSequence([
-          { text: round.sentence.text },
-          { text: 'Is this true?' },
-          { text: round.claim ?? '' }
-        ]);
+      if (round.kind === 'truefalse' && readAlong) {
+        pronunciation.speakSequence(trueFalseRead(round));
+      } else if (round.kind === 'truefalse') {
+        pronunciation.speakText('Read the sentence. Is it true or false?');
       } else {
         pronunciation.speakText('Read the sentence and choose the missing word.');
       }
     }, 600);
     return () => window.clearTimeout(t);
-  }, [round]);
+  }, [round, readAlong]);
+
+  const readToMe = () => {
+    if (solved) pronunciation.speakSentence(round.sentence.text);
+    // until the gap is filled, reading the whole sentence would say the answer
+    else if (round.gapRead) pronunciation.speakSequence(round.gapRead);
+    else pronunciation.speakSequence(trueFalseRead(round));
+  };
 
   const choose = (option: string) => {
     if (api.locked || solved) return;
@@ -124,12 +141,9 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
 
         <button
           className="speak-chip"
-          onClick={() =>
-            // until the gap is filled, reading the whole sentence would say the answer
-            round.gapRead && !solved
-              ? pronunciation.speakSequence(round.gapRead)
-              : pronunciation.speakSentence(round.sentence.text)
-          }
+          onClick={readToMe}
+          disabled={!readAlong && !tried}
+          title={readAlong || tried ? 'Hear the sentence' : 'Try it first!'}
         >
           🔊 Read it to me
         </button>

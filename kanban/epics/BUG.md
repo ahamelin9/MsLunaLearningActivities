@@ -37,17 +37,6 @@ P1 · S
 - **Fix:** remove the overrides, or scale them relative to the user's speed setting.
 - **Complete when:** with Beginner selected, story lines and words play the slow clips (checked with clip logging).
 
-### BUG-15 · Games read the text before the child tries
-P1 · S · confirmed (code read, 2026-10-09)
-- **Cause:**
-  - Treasure Path true/false rounds open by reading the sentence and the claim aloud (`games/TreasureRead.tsx:58`), so the child listens instead of reading.
-  - Story Corner reads each new line aloud as it appears (`games/StoryTime.tsx:62`), and any line on tap.
-- **Fix:** it depends on the grade (Alex, 2026-10-09):
-  - **Kindergarten:** a read-along. Every line is read aloud as it appears, line 1 included.
-  - **1st and 2nd grade:** the lessons' rule (`useAnswer`'s `tried` in `components/lessonHooks.ts`). The text stays silent until the child has answered once, and a wrong answer unlocks the read-aloud. Single words can always be tapped.
-  - This is taken out of GAME-1 and GAME-2, which keep the rest of their work.
-- **Complete when:** in the browser, at Kindergarten every Story Corner line (line 1 included) is read as it appears; at 1st and 2nd grade, no Treasure Path or Story Corner round reads its sentence, claim or lines before the child's first answer, and the text can be heard after a wrong one.
-
 ### BUG-9 · Story Corner K warm-up plays one story twice
 P2 · S
 - **Cause:** tier 1 has only one story. Resolved properly by GAME-2.

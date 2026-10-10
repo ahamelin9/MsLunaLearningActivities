@@ -477,8 +477,13 @@
   color: $ink;
   cursor: pointer;
 
-  &:hover { background: #FFF6E6; }
-  &:active { transform: scale(0.96); }
+  &:hover:not(:disabled) { background: #FFF6E6; }
+  &:active:not(:disabled) { transform: scale(0.96); }
+  // locked until the child has tried (the text is theirs to read first)
+  &:disabled {
+    cursor: default;
+    opacity: 0.45;
+  }
 }
 
 @keyframes stageShake {

@@ -927,6 +927,11 @@
     animation: foundPop 0.5s ease;
   }
 
+  .book-page.right .speak-chip {
+    align-self: flex-start;
+    margin-top: 0.4rem;
+  }
+
   .page-turn {
     @include chunky($amber, $amber-deep, #46280A);
     align-self: flex-start;

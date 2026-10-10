@@ -231,6 +231,11 @@ for (const { src } of sources) {
     const text = m[1].replace(/\\(['"`\\])/g, '$1').trim();
     if (/[a-zA-Z]/.test(text)) push(text, o => pronunciation.speakText(text, o));
   }
+  // a fixed line handed straight to speech: speakText('Read the sentence…')
+  for (const m of src.matchAll(/\b(?:soundManager\.speak|speakText|speakSentence)\s*\(\s*'((?:[^'\\\n]|\\.)*)'/g)) {
+    const text = m[1].replace(/\\(['"`\\])/g, '$1').trim();
+    if (/[a-zA-Z]/.test(text)) push(text, o => pronunciation.speakText(text, o));
+  }
   // a game's own line for Luna, handed to api.win/miss/tick and said by the shell
   for (const m of src.matchAll(/\blunaLine\s*:\s*'((?:[^'\\\n]|\\.)*)'/g)) {
     const text = m[1].replace(/\\(['"`\\])/g, '$1').trim();
