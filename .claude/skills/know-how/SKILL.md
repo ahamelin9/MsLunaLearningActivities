@@ -194,6 +194,27 @@ skills → lessons → questions. Run the scan against the last commit too
 (`git show HEAD:src/data/readingCurriculum.ts`): a scan that finds nothing in
 the old version either proves nothing.
 
+## A wrong answer is also right, or gives the answer away
+
+*2026-10-10 · CNT-1a (BUG-3, BUG-4)*
+
+- **Symptom:** K is "wrong" when Luna says the C sound; What's Missing offers
+  something still on the desk; BOAT with ⛵ 🚗 ✈️ is solved by its first letter.
+- **Cause:** each game picked its wrong answers its own way.
+- **Fix:** pick them with `pickWrong` in `src/apps/reading/engine/distractors.ts`.
+  Its `ruleBreaks` is the one list of rules (same sound, answer twice, on
+  screen, same picture, first letter).
+- **Check:** `node .claude/skills/know-how/distractor-check.mjs` plays every
+  game 300 times at each grade and dial (seeded, so a failure repeats), reads
+  every lesson, and exits 1 on any broken rule. Give it a folder holding
+  another `src/` to judge older code by today's rules:
+  `git archive HEAD src | tar -x -C <scratch>/head`, then pass `<scratch>/head`.
+  A new game or lesson type fails until it has an adapter in the script. Its
+  self-test plants one bad set per rule, so a rule that stops working fails too.
+- **Pitfall:** a rule that never fires may mean the game never builds that
+  round. W/WH never showed up because Bubble Sounds only asks for the first 12
+  letters (BUG-21).
+
 ## A page of raw code pops up in Alex's browser
 
 *2026-10-09 · DES-2*
@@ -248,6 +269,11 @@ the old version either proves nothing.
     and rerun `node .claude/skills/backlog/guard-check.mjs "$PWD"`.
 - **Check:** the split command runs, and the guard check still shows every
   case as expected.
+- **Splitting a ticket (2026-10-10, CNT-1):** the old ID leaves the board, so
+  it needs a changelog line ("Won't do: split in two…"). That line must not
+  name the new IDs (`CNT-1a`), or adding their board rows is refused as
+  "already used in the Changelog". Order: new sections, the changelog line,
+  the board rows, then delete the old section.
 
 ## Lint suddenly fails with dozens of errors in `.d.ts` files nobody wrote
 

@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import type { GameApi, GameDef } from '../engine/types';
-import { distinctByEmoji, lettersFor, sample, shuffle, tierFor, wordsUpTo } from '../engine/content';
+import { lettersFor, sample, shuffle, tierFor, wordsUpTo } from '../engine/content';
+import { distinctByEmoji } from '../engine/distractors';
 import { soundManager } from '../../../utils/audio';
 import { pronunciation, type SpeechPart } from '../../../utils/pronunciation';
 

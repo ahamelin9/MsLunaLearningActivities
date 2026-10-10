@@ -214,7 +214,7 @@ export const READING_CURRICULUM: Record<GradeLevel, ReadingSkill[]> = {
               hint: 'It’s a furry pet that purrs!',
               options: [
                 { id: 'opt-cat', text: 'Cat', imageEmoji: '🐱', isCorrect: true },
-                { id: 'opt-sun', text: 'Sun', imageEmoji: '☀️', isCorrect: false },
+                { id: 'opt-cap', text: 'Cap', imageEmoji: '🧢', isCorrect: false },
                 { id: 'opt-pig', text: 'Pig', imageEmoji: '🐷', isCorrect: false }
               ]
             },
@@ -231,7 +231,7 @@ export const READING_CURRICULUM: Record<GradeLevel, ReadingSkill[]> = {
               ],
               hint: 'An oinking farm friend!',
               options: [
-                { id: 'opt-bed', text: 'Bed', imageEmoji: '🛏️', isCorrect: false },
+                { id: 'opt-pen', text: 'Pen', imageEmoji: '🖊️', isCorrect: false },
                 { id: 'opt-pig', text: 'Pig', imageEmoji: '🐷', isCorrect: true },
                 { id: 'opt-dog', text: 'Dog', imageEmoji: '🐶', isCorrect: false }
               ]
@@ -251,7 +251,7 @@ export const READING_CURRICULUM: Record<GradeLevel, ReadingSkill[]> = {
               options: [
                 { id: 'opt-dog', text: 'Dog', imageEmoji: '🐶', isCorrect: true },
                 { id: 'opt-fox', text: 'Fox', imageEmoji: '🦊', isCorrect: false },
-                { id: 'opt-cup', text: 'Cup', imageEmoji: '🥤', isCorrect: false }
+                { id: 'opt-duck', text: 'Duck', imageEmoji: '🦆', isCorrect: false }
               ]
             }
           ]
@@ -281,7 +281,7 @@ export const READING_CURRICULUM: Record<GradeLevel, ReadingSkill[]> = {
               options: [
                 { id: 'opt-sun', text: 'Sun', imageEmoji: '☀️', isCorrect: true },
                 { id: 'opt-moon', text: 'Moon', imageEmoji: '🌙', isCorrect: false },
-                { id: 'opt-hat', text: 'Hat', imageEmoji: '🎩', isCorrect: false }
+                { id: 'opt-sock', text: 'Sock', imageEmoji: '🧦', isCorrect: false }
               ]
             },
             {
@@ -298,7 +298,7 @@ export const READING_CURRICULUM: Record<GradeLevel, ReadingSkill[]> = {
               hint: 'Where you sleep with a cozy pillow!',
               options: [
                 { id: 'opt-bed', text: 'Bed', imageEmoji: '🛏️', isCorrect: true },
-                { id: 'opt-car', text: 'Car', imageEmoji: '🚗', isCorrect: false },
+                { id: 'opt-bug', text: 'Bug', imageEmoji: '🐛', isCorrect: false },
                 { id: 'opt-cup', text: 'Cup', imageEmoji: '🥤', isCorrect: false }
               ]
             },
@@ -316,7 +316,7 @@ export const READING_CURRICULUM: Record<GradeLevel, ReadingSkill[]> = {
               hint: 'Used to drink warm milk or cold juice!',
               options: [
                 { id: 'opt-cup', text: 'Cup', imageEmoji: '🥤', isCorrect: true },
-                { id: 'opt-apple', text: 'Apple', imageEmoji: '🍎', isCorrect: false },
+                { id: 'opt-cap', text: 'Cap', imageEmoji: '🧢', isCorrect: false },
                 { id: 'opt-box', text: 'Box', imageEmoji: '📦', isCorrect: false }
               ]
             }
@@ -484,7 +484,7 @@ export const READING_CURRICULUM: Record<GradeLevel, ReadingSkill[]> = {
               hint: 'A large boat that sails on the ocean!',
               options: [
                 { id: 'opt-ship', text: 'Ship', imageEmoji: '🚢', isCorrect: true },
-                { id: 'opt-car', text: 'Car', imageEmoji: '🚗', isCorrect: false },
+                { id: 'opt-shell', text: 'Shell', imageEmoji: '🐚', isCorrect: false },
                 { id: 'opt-plane', text: 'Plane', imageEmoji: '✈️', isCorrect: false }
               ]
             },
@@ -567,7 +567,7 @@ export const READING_CURRICULUM: Record<GradeLevel, ReadingSkill[]> = {
               options: [
                 { id: 'opt-kite', text: 'Kite', imageEmoji: '🪁', isCorrect: true },
                 { id: 'opt-balloon', text: 'Balloon', imageEmoji: '🎈', isCorrect: false },
-                { id: 'opt-plane', text: 'Plane', imageEmoji: '✈️', isCorrect: false }
+                { id: 'opt-key', text: 'Key', imageEmoji: '🔑', isCorrect: false }
               ]
             },
             {
@@ -677,7 +677,7 @@ export const READING_CURRICULUM: Record<GradeLevel, ReadingSkill[]> = {
               options: [
                 { id: 'opt-boat', text: 'Boat', imageEmoji: '⛵', isCorrect: true },
                 { id: 'opt-car', text: 'Car', imageEmoji: '🚗', isCorrect: false },
-                { id: 'opt-plane', text: 'Plane', imageEmoji: '✈️', isCorrect: false }
+                { id: 'opt-bike', text: 'Bike', imageEmoji: '🚲', isCorrect: false }
               ]
             },
             {
@@ -690,7 +690,7 @@ export const READING_CURRICULUM: Record<GradeLevel, ReadingSkill[]> = {
               options: [
                 { id: 'opt-beach', text: 'Beach', imageEmoji: '🏖️', isCorrect: true },
                 { id: 'opt-forest', text: 'Forest', imageEmoji: '🌲', isCorrect: false },
-                { id: 'opt-city', text: 'City', imageEmoji: '🏙️', isCorrect: false }
+                { id: 'opt-bread', text: 'Bread', imageEmoji: '🥖', isCorrect: false }
               ]
             }
           ]
@@ -723,7 +723,7 @@ export const READING_CURRICULUM: Record<GradeLevel, ReadingSkill[]> = {
               hint: 'Colorful arc of light in the sky after rain!',
               options: [
                 { id: 'opt-rainbow', text: 'Rainbow', imageEmoji: '🌈', isCorrect: true },
-                { id: 'opt-umbrella', text: 'Umbrella', imageEmoji: '☂️', isCorrect: false },
+                { id: 'opt-rose', text: 'Rose', imageEmoji: '🌹', isCorrect: false },
                 { id: 'opt-cloud', text: 'Cloud', imageEmoji: '☁️', isCorrect: false }
               ]
             },
@@ -737,7 +737,7 @@ export const READING_CURRICULUM: Record<GradeLevel, ReadingSkill[]> = {
               options: [
                 { id: 'opt-cupcake', text: 'Cupcake', imageEmoji: '🧁', isCorrect: true },
                 { id: 'opt-donut', text: 'Donut', imageEmoji: '🍩', isCorrect: false },
-                { id: 'opt-icecream', text: 'Ice Cream', imageEmoji: '🍦', isCorrect: false }
+                { id: 'opt-cookie', text: 'Cookie', imageEmoji: '🍪', isCorrect: false }
               ]
             }
           ]

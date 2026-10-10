@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import type { GameApi, GameDef } from '../engine/types';
-import { distinctByEmoji, sample, shuffle, tierFor, wordsUpTo, type WordItem } from '../engine/content';
+import { shuffle, tierFor, wordsUpTo, type WordItem } from '../engine/content';
+import { distinctByEmoji, pickWrong, wordChoice } from '../engine/distractors';
 import { soundManager } from '../../../utils/audio';
 import { pronunciation } from '../../../utils/pronunciation';
 
@@ -17,7 +18,11 @@ function buildRound(tier: 1 | 2 | 3): Round {
   const count = tier === 1 ? 4 : tier === 2 ? 5 : 6;
   const items = distinctByEmoji(wordsUpTo(tier), count);
   const missing = items[Math.floor(Math.random() * items.length)];
-  const distractors = sample(items.filter(i => i.word !== missing.word), 2);
+  // never something still on the desk, or the answer is just "the one I can't see"
+  const distractors = pickWrong(missing, wordsUpTo(tier), 2, {
+    as: wordChoice,
+    onScreen: items.filter(i => i.word !== missing.word)
+  });
 
   return {
     items,

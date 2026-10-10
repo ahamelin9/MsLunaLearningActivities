@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import type { GameApi, GameDef } from '../engine/types';
-import { GAP, maskKey, pick, readWithGap, sample, sentencesFor, shuffle, tierFor, type SentenceItem } from '../engine/content';
+import { GAP, maskKey, pick, readWithGap, sentencesFor, shuffle, tierFor, type SentenceItem } from '../engine/content';
+import { pickWrong, textChoice } from '../engine/distractors';
 import { pronunciation, type SpeechPart } from '../../../utils/pronunciation';
 
 interface Round {
@@ -31,12 +32,19 @@ function buildRound(tier: 1 | 2 | 3): Round {
     };
   }
 
+  const masked = maskKey(sentence);
+  // a wrong word already in the sentence is no choice at all; whether one
+  // also fits the gap is for CNT-1b
+  const decoys = pickWrong(sentence.key, sentence.decoys, 2, {
+    as: textChoice,
+    onScreen: masked.split(/\s+/).map(w => w.replace(/[^a-zA-Z']/g, ''))
+  });
   return {
     kind: 'cloze',
     sentence,
-    masked: maskKey(sentence),
+    masked,
     gapRead: readWithGap(sentence),
-    options: shuffle([sentence.key, ...sample(sentence.decoys, 2)]),
+    options: shuffle([sentence.key, ...decoys]),
     answer: sentence.key
   };
 }

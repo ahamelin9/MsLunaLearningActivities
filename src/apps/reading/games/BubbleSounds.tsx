@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import type { GameApi, GameDef } from '../engine/types';
-import { lettersFor, pick, sample, tierFor, type LetterItem } from '../engine/content';
+import { lettersFor, pick, tierFor, type LetterItem } from '../engine/content';
+import { pickWrong, textChoice } from '../engine/distractors';
 import { soundManager } from '../../../utils/audio';
 import { pronunciation } from '../../../utils/pronunciation';
 
@@ -193,10 +194,7 @@ export const bubbleSounds: GameDef<Round> = {
 
     for (let i = 0; i < count; i++) {
       const letter = pool[(i * 3 + Math.floor(Math.random() * 3)) % pool.length];
-      const decoys = sample(
-        pool.filter(l => l.letter !== letter.letter).map(l => l.letter),
-        10
-      );
+      const decoys = pickWrong(letter.letter, pool.map(l => l.letter), 10, { as: textChoice, letterBy: 'sound' });
 
       rounds.push({
         letter,

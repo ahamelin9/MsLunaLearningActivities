@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import type { GameApi, GameDef } from '../engine/types';
 import { lettersFor, pick, shuffle, tierFor } from '../engine/content';
+import { pickWrong, textChoice } from '../engine/distractors';
 import { soundManager } from '../../../utils/audio';
 import { pronunciation } from '../../../utils/pronunciation';
 
@@ -47,8 +48,10 @@ function buildRound(tier: 1 | 2 | 3): Round {
   const targetCount = tier === 1 ? 3 : tier === 2 ? 4 : 5;
   const decoyCount = tier === 1 ? 9 : tier === 2 ? 13 : 17;
 
-  const lookalikes = LOOKALIKES[target] ?? [];
-  const others = letters.map(l => l.letter).filter(l => l !== target);
+  // wrong bugs: the target's look-alikes and the other letters, never the target itself
+  const wrongFrom = (pool: string[]) => pickWrong(target, pool, pool.length, { as: textChoice, letterBy: 'name' });
+  const lookalikes = wrongFrom(LOOKALIKES[target] ?? []);
+  const others = wrongFrom(letters.map(l => l.letter));
 
   const total = targetCount + decoyCount;
   // Lay the letters on a jittered grid so they never sit on top of each other.

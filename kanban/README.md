@@ -72,7 +72,7 @@ be pulled into Phase 1 for a break from styling.
 ### Now / Next
 
 - **Now:** DES-2: the style sample until the teacher gives her final approval (Alex, 2026-10-09: the prototype comes first, since everything else builds on it)
-- **Next:** GAME-1 while DES-2 waits for the teacher (Alex, 2026-10-10: passages instead of single sentences). It needs CNT-1 and FB-1 first: CNT-1 can start now, and FB-1 waits on the DES-8/DES-10 layout. Then the rest of DES-2 once she approves, GAME-4, BUG-3
+- **Next:** CNT-1b, then GAME-1a and GAME-1b while DES-2 waits for the teacher (Alex, 2026-10-10: passages instead of single sentences; GAME-1 split so the writing can start now). GAME-1c, the screen, waits on FB-1, which waits on the DES-8/DES-10 layout. Then the rest of DES-2 once she approves, GAME-4
 
 ## Epics
 
@@ -117,10 +117,9 @@ In board order. A new epic gets its file in `epics/` first, then a link here
 | **BUG** | **Bugs** | | | | |
 | BUG-1 | Game speech is cut off by Luna's reaction | Bug | P0 | — | Todo (via FB-1) |
 | BUG-2 | Feed Luna: one wrong tap counts as two misses | Bug | P0 | S | Todo |
-| BUG-3 | What's Missing can be solved by elimination | Bug | P0 | S | Todo |
-| BUG-4 | Same-sound letters used as wrong answers (C/K) | Bug | P0 | S | Todo |
 | BUG-7 | Status-bar mute needs two taps to unmute | Bug | P1 | S | Todo |
 | BUG-8 | Story lessons ignore the Beginner speed | Bug | P1 | S | Todo |
+| BUG-21 | Bubble Sounds only ever asks for the first 12 letters | Bug | P1 | S | Todo |
 | BUG-9 | Story Corner K warm-up plays one story twice | Bug | P2 | S | Todo |
 | BUG-10 | Settings may loop saving when the voice index fails | Bug | P2 | S | Todo |
 | BUG-11 | Launch and close sounds play twice | Bug | P2 | S | Todo |
@@ -137,14 +136,17 @@ In board order. A new epic gets its file in `epics/` first, then a link here
 | LVL-2 | Remember the chosen difficulty per game | Story | P2 | S | Todo |
 | LVL-3 | Adaptive difficulty from skill mastery | Story | P2 | L | Todo |
 | **CNT** | **One content model** | Epic | **P1** | | |
-| CNT-1 | Shared wrong-answer (distractor) rules | Story | P1 | M | Todo |
+| CNT-1b | Fill-in-the-blank: no wrong word that also fits | Story | P1 | M | Todo |
 | CNT-2 | Lessons generated from the content bank | Story | P1 | L | Todo |
 | CNT-3 | Content QA pass | Task | P1 | S | Todo |
 | CNT-4 | Automated content checks in `voice:audit` | Task | P2 | S | Todo |
 | **GAME** | **Games to standard** | Epic | **P1** | | |
-| GAME-1 | Treasure Path: real comprehension | Story | P1 | L | Todo |
+| GAME-1a | Treasure Path passages and questions | Story | P1 | M | Todo |
+| GAME-1b | Treasure Path rounds from passages | Story | P1 | S | Todo |
+| GAME-1c | Treasure Path screen for passages | Story | P1 | M | Todo |
 | GAME-2 | Story Corner: the child reads first | Story | P1 | M | Todo |
 | GAME-3 | Bubble Sounds: smooth, fair bubbles | Story | P1 | S | Todo |
+| GAME-7 | Bubble Sounds: fewer answer bubbles, fewer still at higher grades | Story | P1 | S | Todo |
 | GAME-4 | Muddled Cards: reading required at tier 2+ | Story | P2 | S | Todo |
 | GAME-5 | Words Off the Page: bigger sentence pool | Story | P2 | S | Todo |
 | GAME-6 | Rename "Feed Luna the Letter" | Story | P2 | S | Todo |

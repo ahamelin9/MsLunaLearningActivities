@@ -37,3 +37,16 @@ only record of them. One line each: date, ID, title, and `Done` or
   | 1st and 2nd | Rounds open with only the instruction ("Read the sentence. Is it true or false?"). "Read it to me" is greyed out until the child answers. After a wrong answer it reads the sentence and claim; a fill-in-the-blank still says "what?" in the gap. | Reads only the title, and new lines appear silently. Tapping a single word says that word. "Read me the story" is greyed out until the question is answered wrong once. Wrong taps in the word hunt don't unlock it, because nearly every hunt has one. |
 
   Fill-in-the-blank rounds open with only the instruction at every grade.
+- **2026-10-10** — CNT-1 Shared wrong-answer (distractor) rules — Won't do: split in two, an "a" ticket for sounds, screen, pictures and first letters with the check (started now) and a "b" ticket for fill-in-the-blank, built with GAME-1. Code can't tell on its own whether a wrong word also fits a sentence, so each fill-in-the-blank will record the words that would also be true (Alex's call).
+- **2026-10-10** — CNT-1a Shared wrong-answer rules: sounds, screen, pictures, first letters — Done. Every game now picks its wrong answers through `engine/distractors.ts` (`pickWrong`). `distractor-check.mjs` in the know-how skill holds every game at every grade and dial (300 plays each), and every lesson, to the same `ruleBreaks`: 22,349 broken on the last commit, 0 now. 12 lesson questions got one new wrong picture each (cat: Cap; boat: Bike; beach: Bread…), so the first letter no longer gives the answer away. New games and lessons follow these rules:
+
+  | Rule | Applies when | What it stops |
+  |---|---|---|
+  | Same sound | a letter is asked for by its sound | K as a wrong bubble for the C sound; W with WH |
+  | Answer twice | always | big B and little b both offered, one of them "wrong" |
+  | On screen | the game shows things besides the choices | What's Missing offering an item still on the desk |
+  | Same picture | the choices have pictures | two dog pictures, for dog and pup |
+  | First letter | the child reads or hears the target word | BOAT with ⛵ 🚗 ✈️: only one starts with B |
+- **2026-10-10** — BUG-3 What's Missing can be solved by elimination — Done, through CNT-1a. Wrong choices now come from words that were never on the desk: 0 of 21,600 sets in the check (every round on the last commit), and 8 rounds played in a real browser at Kindergarten and 2nd grade had no wrong choice on the desk.
+- **2026-10-10** — GAME-1 Treasure Path: real comprehension — Won't do: split in three, so the writing can start before the design work: passages and questions ("a", 6 per grade), rounds ("b"), and the screen ("c", which waits on FB-1).
+- **2026-10-10** — BUG-4 Same-sound letters used as wrong answers — Done, through CNT-1a. Bubble Sounds and Feed Luna no longer offer C with K (737 sets on the last commit, 0 now), and the check's self-test proves the rule also catches W with WH and CK.

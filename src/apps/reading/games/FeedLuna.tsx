@@ -1,15 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import type { GameApi, GameDef } from '../engine/types';
-import {
-  lettersFor,
-  pick,
-  sample,
-  shuffle,
-  tierFor,
-  wordsUpTo,
-  type LetterItem,
-  type WordItem
-} from '../engine/content';
+import { lettersFor, pick, shuffle, tierFor, wordsUpTo, type LetterItem, type WordItem } from '../engine/content';
+import { pickWrong, textChoice } from '../engine/distractors';
 import { LunaOwl } from '../engine/LunaOwl';
 import { soundManager } from '../../../utils/audio';
 import { pronunciation, type SpeechPart } from '../../../utils/pronunciation';
@@ -43,18 +35,20 @@ function buildRound(tier: 1 | 2 | 3): Round {
 
   const mode = pick(modes);
   const letter: LetterItem = pick(letters);
-  const others = letters.filter(l => l.letter !== letter.letter);
   const decoyCount = tier === 1 ? 2 : 3;
+  /** wrong cookies: never the same letter, nor one that makes the same sound when sounds are asked for */
+  const wrongCookies = (answer: string, cased: (letter: string) => string, letterBy: 'sound' | 'name') =>
+    pickWrong(answer, letters.map(l => cased(l.letter)), decoyCount, { as: textChoice, letterBy });
+  const lower = (l: string) => l.toLowerCase();
+  const upper = (l: string) => l;
 
   if (mode === 'byWord') {
     const word: WordItem = pick(
       wordsUpTo(tier).filter(w => w.initial.length === 1 && letters.some(l => l.letter.toLowerCase() === w.initial))
     );
     const answer = word.initial.toLowerCase();
-    const decoys = sample(
-      letters.map(l => l.letter.toLowerCase()).filter(c => c !== answer),
-      decoyCount
-    );
+    // "cat" starts with the sound k makes too, so k can't be a wrong cookie
+    const decoys = wrongCookies(answer, lower, 'sound');
     return {
       mode,
       ask: 'first letter?',
@@ -67,11 +61,9 @@ function buildRound(tier: 1 | 2 | 3): Round {
   }
 
   if (mode === 'bySound') {
-    const answer = tier === 1 ? letter.letter : letter.letter.toLowerCase();
-    const decoys = sample(
-      others.map(l => (tier === 1 ? l.letter : l.letter.toLowerCase())),
-      decoyCount
-    );
+    const cased = tier === 1 ? upper : lower;
+    const answer = cased(letter.letter);
+    const decoys = wrongCookies(answer, cased, 'sound');
     return {
       mode,
       ask: 'the letter for this sound',
@@ -89,10 +81,7 @@ function buildRound(tier: 1 | 2 | 3): Round {
   const cueParts: SpeechPart[] = toLower
     ? [{ text: 'Find the little' }, { name: letter.letter }]
     : [{ text: 'Find the big' }, { name: letter.letter }];
-  const decoys = sample(
-    others.map(l => (toLower ? l.letter.toLowerCase() : l.letter)),
-    decoyCount
-  );
+  const decoys = wrongCookies(answer, toLower ? lower : upper, 'name');
 
   return {
     mode,

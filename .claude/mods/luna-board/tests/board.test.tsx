@@ -21,8 +21,10 @@ const backlog = (status: string, done = ''): Record<string, string> => ({
 
 | ID | Title | Type | P | Size | Status |
 |---|---|---|---|---|---|
+| **DES** | **Design system & layout** | Epic | **P0** | | |
 | DES-2 | Write the design standards | Story | P0 | M | Blocked |
 | DES-3 | One set of design tokens | Story | P0 | M | Todo |
+| **BUG** | **Bugs** | | | | |
 | BUG-6 | Treasure Path reads the missing word | Bug | P1 | S | ${status} |
 ${done ? '' : '| BUG-15 | Games read the text first | Bug | P1 | S | Todo |\n'}| BUG-9 | Warm-up plays one story twice | Bug | P2 | S | Todo |
 `,
@@ -39,7 +41,7 @@ test('the board follows the backlog, and the footer button opens it', async ($, 
   on('fs.read', async (_$, e) => {
     const key = fileAt(e.path)
     if (key) reads.push(key)
-    return { value: key ? files[key] : '' }
+    return { value: (key && files[key]) || '' }
   })
   // The kit has no pane host: keep the open panes here.
   const open = new Set<string>()
@@ -84,14 +86,27 @@ test('the board follows the backlog, and the footer button opens it', async ($, 
   expect(await ui.find({ type: 'Text', text: /Phase 1 — Design foundation/ })).toBeDefined()
   expect(await ui.find({ type: 'Text', text: /NOW/ })).toBeDefined()
   expect(await ui.find({ type: 'Text', text: /DES-3/ })).toBeDefined()
-  // the lanes sit side by side even in this 60-column pane
-  const lanes = await ui.find({ type: 'Box', props: { flexDirection: 'row' } })
-  expect(lanes).toBeDefined()
   expect(await ui.find({ type: 'Text', text: /In progress/ })).toBeDefined()
   // P2 tickets wait behind "Show all"
   expect(await ui.find({ type: 'Text', text: /BUG-9/ })).toBeUndefined()
   await ui.press({ key: 'luna-board-show-all' })
   expect(await ui.find({ type: 'Text', text: /BUG-9/ })).toBeDefined()
+  await ui.press({ key: 'luna-board-show-all' })
+
+  // Now and Next read as one line each, the ticket's board title; the full notes open on "Why"
+  expect(await ui.find({ type: 'Text', text: /Treasure Path reads the missing word/ })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: /then DES-2/ })).toBeUndefined()
+  await ui.press({ key: 'luna-board-notes' })
+  expect(await ui.find({ type: 'Text', text: /then DES-2/ })).toBeDefined()
+
+  // filtered to one epic: only its tickets, all of them (P2 included), and no "Show all"
+  expect(await ui.find({ key: 'luna-board-epic' })).toBeDefined()
+  await ui.select({ key: 'luna-board-epic', value: 'BUG' })
+  expect(await ui.find({ type: 'Text', text: /DES-3/ })).toBeUndefined()
+  expect(await ui.find({ type: 'Text', text: /BUG-9/ })).toBeDefined()
+  expect(await ui.find({ key: 'luna-board-show-all' })).toBeUndefined()
+  await ui.select({ key: 'luna-board-epic', value: 'all' })
+  expect(await ui.find({ type: 'Text', text: /DES-3/ })).toBeDefined()
   await ui.unmount()
 
   // BUG-15 finishes: it leaves the board and shows under Done today

@@ -12,7 +12,7 @@
 import { atom, read, update } from 'claude-code'
 import type { EngineInterface, Register, RenderChildren } from 'claude-code'
 
-import { loadBacklog, parseBacklog, closedAs, ticketsIn, todayIn } from './backlog'
+import { loadBacklog, parseBacklog, closedAs, epicOf, ticketsIn, todayIn } from './backlog'
 import type { Ticket } from './backlog'
 
 const PANE = 'luna-board'
@@ -21,6 +21,8 @@ const POLL_MS = 3000
 
 const text = atom({ plugin: 'luna-board', key: 'text' } as const, '')
 const showAll = atom({ plugin: 'luna-board', key: 'showAll' } as const, false)
+const epicFilter = atom({ plugin: 'luna-board', key: 'epic' } as const, 'all')
+const showNotes = atom({ plugin: 'luna-board', key: 'notes' } as const, false)
 
 // Ticket IDs on the board at the last read, to notice one that leaves.
 let onBoard: Set<string> | undefined
@@ -154,26 +156,36 @@ export const register: Register = on => {
   })
 
   on('ui.render', { component: 'Pane', requestId: PANE }, async ($, e) => {
-    const { Box, Text, Button } = $.ui.resolve(e)
+    const els = $.ui.resolve(e)
+    const { Box, Text, Button } = els
     const source = await read($, text)
     const all = await read($, showAll)
+    const notes = await read($, showNotes)
 
     if (!source) {
       return <Text dimColor>{MISSING}</Text>
     }
 
     const b = parseBacklog(source)
-    const nowIds = ticketsIn(b.now, b.tickets).map(t => t.id)
-    const nextIds = ticketsIn(b.next, b.tickets).map(t => t.id)
-    const inProgress = b.tickets.filter(t => t.status.startsWith('In progress'))
-    const blocked = b.tickets.filter(t => t.status.startsWith('Blocked'))
-    const todo = b.tickets.filter(t => t.status.startsWith('Todo'))
+    // only epics with tickets on the board can be picked; a stale pick shows all
+    const epics = b.epics.filter(ep => b.tickets.some(t => epicOf(t.id) === ep.id))
+    const picked = await read($, epicFilter)
+    const epic = epics.some(ep => ep.id === picked) ? picked : 'all'
+    const inEpic = (id: string) => epic === 'all' || epicOf(id) === epic
+    const tickets = b.tickets.filter(t => inEpic(t.id))
+
+    const nowIds = ticketsIn(b.now, tickets).map(t => t.id)
+    const nextIds = ticketsIn(b.next, tickets).map(t => t.id)
+    const inProgress = tickets.filter(t => t.status.startsWith('In progress'))
+    const blocked = tickets.filter(t => t.status.startsWith('Blocked'))
+    const todo = tickets.filter(t => t.status.startsWith('Todo'))
     const upNext = [...nowIds, ...nextIds]
       .map(id => todo.find(t => t.id === id))
       .filter((t): t is Ticket => t !== undefined)
     const rest = todo.filter(t => !upNext.includes(t))
-    const restShown = all ? rest : rest.filter(t => t.priority === 'P0')
-    const done = todayIn(b.changelog, new Date())
+    // one epic is a short list, so it shows whole
+    const restShown = all || epic !== 'all' ? rest : rest.filter(t => t.priority === 'P0')
+    const done = todayIn(b.changelog, new Date()).filter(d => inEpic(d.id))
     const width = e.props.bodyColumns ?? e.viewport?.columns ?? 40
     // Lanes always sit side by side, like a Jira board. In a narrow pane each
     // card shrinks to its ID, priority and title.
@@ -206,17 +218,68 @@ export const register: Register = on => {
       </Box>
     )
 
+    // Now and Next in one line each: the first ticket the line names, by its
+    // board title. The full notes (the why, the order after it) open on "Why".
+    const headline = (label: string, line: string) => {
+      const [first] = ticketsIn(line, b.tickets)
+      return (
+        <Text key={label} wrap="wrap">
+          <Text bold color={label === 'Now' ? 'success' : 'warning'}>
+            {label.toUpperCase()}
+          </Text>{' '}
+          {first ? (
+            <Text>
+              <Text bold>{first.id}</Text> {first.title}
+            </Text>
+          ) : (
+            line
+          )}
+        </Text>
+      )
+    }
+
+    const pickEpic = (value: string) => update($, epicFilter, () => value)
+    const epicOptions = [
+      { value: 'all', label: `All epics (${b.tickets.length})` },
+      ...epics.map(ep => ({
+        value: ep.id,
+        label: `${ep.id} · ${ep.name} (${b.tickets.filter(t => epicOf(t.id) === ep.id).length})`,
+      })),
+    ]
+
     return (
       <Box flexDirection="column" gap={1}>
         <Box flexDirection="column">
           <Text dimColor>{b.phase}</Text>
-          <Text>
-            <Text bold>Now:</Text> {b.now}
-          </Text>
-          <Text wrap="wrap">
-            <Text bold>Next:</Text> {b.next}
-          </Text>
+          {headline('Now', b.now)}
+          {headline('Next', b.next)}
+          <Button key="luna-board-notes" plain dimColor hotkey="w" onPress={() => update($, showNotes, v => !v)}>
+            {notes ? 'Why ▾' : 'Why ▸'}
+          </Button>
+          {notes && (
+            <Box flexDirection="column" paddingLeft={2}>
+              <Text wrap="wrap" dimColor>
+                <Text bold>Now:</Text> {b.now}
+              </Text>
+              <Text wrap="wrap" dimColor>
+                <Text bold>Next:</Text> {b.next}
+              </Text>
+            </Box>
+          )}
         </Box>
+
+        {'Select' in els ? (
+          <els.Select key="luna-board-epic" label="Epic" options={epicOptions} value={epic} onSelect={pickEpic} />
+        ) : (
+          // the mobile app draws no Select: one chip per epic instead
+          <Box flexDirection="row" gap={1} flexWrap="wrap">
+            {epicOptions.map(o => (
+              <Button key={`luna-board-epic-${o.value}`} plain dimColor={o.value !== epic} onPress={() => pickEpic(o.value)}>
+                {o.value === 'all' ? 'All' : o.value}
+              </Button>
+            ))}
+          </Box>
+        )}
 
         <Box flexDirection="row" gap={compact ? 1 : 2}>
           {column(
@@ -225,7 +288,7 @@ export const register: Register = on => {
             <Box flexDirection="column">
               {upNext.map(t => card(t, nowIds.includes(t.id) ? 'NOW' : 'NEXT'))}
               {restShown.map(t => card(t))}
-              {rest.length > 0 && (
+              {epic === 'all' && rest.length > 0 && (
                 <Button
                   key="luna-board-show-all"
                   plain

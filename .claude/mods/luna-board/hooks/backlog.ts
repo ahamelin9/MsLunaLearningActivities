@@ -49,13 +49,22 @@ export type Ticket = {
   status: string
 }
 
+export type Epic = {
+  id: string
+  name: string
+}
+
 export type Backlog = {
   phase: string
   now: string
   next: string
+  epics: Epic[]
   tickets: Ticket[]
   changelog: string
 }
+
+/** The epic a ticket belongs to: its ID's prefix ("CNT-1b" → "CNT"). */
+export const epicOf = (id: string): string => id.split('-')[0] ?? id
 
 const ID = '[A-Z]+-\\d+[a-z]?'
 
@@ -72,9 +81,9 @@ export function parseBacklog(text: string): Backlog {
   const lines = text.split('\n')
 
   const phaseRow = lines.find(l => /^\|\s*\*{0,2}\d+\s*—\s*now/i.test(l))
-  const [phaseCell, focus, epics] = phaseRow ? cells(phaseRow) : []
+  const [phaseCell, focus, phaseEpics] = phaseRow ? cells(phaseRow) : []
   const phase = phaseCell
-    ? `Phase ${phaseCell.replace(/\s*—\s*now/i, '')} — ${focus} (${epics})`
+    ? `Phase ${phaseCell.replace(/\s*—\s*now/i, '')} — ${focus} (${phaseEpics})`
     : ''
 
   const field = (name: string) =>
@@ -93,10 +102,16 @@ export function parseBacklog(text: string): Backlog {
       status,
     }))
 
+  // the board's epic header rows: "| **DES** | **Design system & layout** | Epic | ..."
+  const epics = lines
+    .map(l => l.match(/^\|\s*\*\*([A-Z]+)\*\*\s*\|\s*\*\*(.+?)\*\*\s*\|/))
+    .filter((m): m is RegExpMatchArray => m !== null)
+    .map(([, id = '', name = '']) => ({ id, name }))
+
   const changelogAt = text.search(/^#{1,2} Changelog\s*$/m)
   const changelog = changelogAt >= 0 ? text.slice(changelogAt) : ''
 
-  return { phase, now: field('Now'), next: field('Next'), tickets, changelog }
+  return { phase, now: field('Now'), next: field('Next'), epics, tickets, changelog }
 }
 
 /** The board's tickets named in a Now or Next line, in the order named. */

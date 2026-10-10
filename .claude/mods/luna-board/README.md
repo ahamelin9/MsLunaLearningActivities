@@ -5,6 +5,9 @@ Ms. Luna's backlog (`kanban/`) as a live task board inside Claude Code.
 - **▦ Board** button at the right of the prompt footer (or `/board`) shows and
   hides the board: To do (Now and Next first, then P0; "Show all" for P1/P2),
   In progress, Blocked, and Done today.
+- Above the lanes, Now and Next read as one line each (the ticket and its
+  title); **Why ▸** opens the full notes. The **Epic** dropdown filters every
+  lane to one epic, and shows all of that epic's tickets, P1/P2 included.
 - `/board list` prints the board in the chat, in any app.
 - The board re-reads the backlog every few seconds and after every tool call,
   so it follows changes made by Claude or by hand: `kanban/README.md` (the

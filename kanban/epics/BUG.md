@@ -13,18 +13,6 @@ P0 · S
 - **Effect:** the hint plays after the first mistake.
 - **Complete when:** one wrong tap counts as one miss, and drag, tap and keyboard each still work.
 
-### BUG-3 · What's Missing can be solved by elimination
-P0 · S
-- **Cause:** the wrong choices are items still on the desk (`games/WhatsMissing.tsx:20`), so the answer is just "the one I can't see".
-- **Fix:** take the wrong choices from words that were never on the desk.
-- **Complete when:** none of the wrong choices is visible on the desk.
-
-### BUG-4 · Same-sound letters used as wrong answers
-P0 · S
-- **Cause:** in Bubble Sounds and Feed Luna's sound rounds, K can be a "wrong" choice when the target is C. Both use the same audio file. W and WH have the same problem at tier 3.
-- **Fix:** filter out wrong choices that share the target's sound, ideally using the same rule as CNT-1.
-- **Complete when:** no round ever offers two letters with the same sound.
-
 ### BUG-7 · Status-bar mute needs two taps to unmute
 P1 · S
 - **Cause:** the icon treats sound as "on" only when *both* sound and narration are on, but the toggle (`utils/storage.ts:111`) treats *either* as on.
@@ -36,6 +24,12 @@ P1 · S
 - **Cause:** `components/StoryReader.tsx:29` and `:35` hard-code `rate: 0.9` and `0.85`, which always lands on Normal.
 - **Fix:** remove the overrides, or scale them relative to the user's speed setting.
 - **Complete when:** with Beginner selected, story lines and words play the slow clips (checked with clip logging).
+
+### BUG-21 · Bubble Sounds only ever asks for the first 12 letters — confirmed
+P1 · S
+- **Cause:** `games/BubbleSounds.tsx` picks round *i*'s letter from pool slots `i*3` to `i*3+2`, and a play has 4 rounds, so only the first 12 letters of the pool can come up. At tier 1 (Kindergarten on the easiest dial) T and W never come up; at tiers 2 and 3, M to Z and the digraphs (SH, CH, TH, WH) never do. Found while building the wrong-answer rules (2026-10-10): over 300 plays at every grade and dial, the distractor check never saw W or WH as the target.
+- **Fix:** spread the rounds over the whole pool (for example, shuffle the pool and take the first 4), keeping no repeats within a play.
+- **Complete when:** over many plays at each grade and dial, every letter in that tier's pool is asked for at least once (counted with a scan like `.claude/skills/know-how/distractor-check.mjs`), and no play asks the same letter twice.
 
 ### BUG-9 · Story Corner K warm-up plays one story twice
 P2 · S

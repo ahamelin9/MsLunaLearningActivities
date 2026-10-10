@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import type { GameApi, GameDef } from '../engine/types';
-import { pick, sample, sentencesFor, shuffle, tierFor, type SentenceItem } from '../engine/content';
+import { pick, sentencesFor, shuffle, tierFor, type SentenceItem } from '../engine/content';
+import { pickWrong, textChoice } from '../engine/distractors';
 import { soundManager } from '../../../utils/audio';
 import { pronunciation } from '../../../utils/pronunciation';
 
@@ -24,7 +25,10 @@ function buildRound(tier: 1 | 2 | 3): Round {
 
   const tiles: Tile[] = words.map((w, i) => ({ id: `w-${i}`, word: w, isExtra: false }));
   if (tier === 3) {
-    sample(EXTRA_WORDS, 1).forEach((w, i) => tiles.push({ id: `x-${i}`, word: w, isExtra: true }));
+    // the extra tile is never one of the sentence's own words
+    pickWrong(sentence.text, EXTRA_WORDS, 1, { as: textChoice, onScreen: words }).forEach((w, i) =>
+      tiles.push({ id: `x-${i}`, word: w, isExtra: true })
+    );
   }
 
   return { sentence, words, tiles: shuffle(tiles) };

@@ -433,19 +433,6 @@ export function sample<T>(items: T[], count: number): T[] {
   return shuffle(items).slice(0, count);
 }
 
-/** Two options must never show the same picture, or the answer is ambiguous. */
-export function distinctByEmoji(items: WordItem[], count: number, avoid: string[] = []): WordItem[] {
-  const seen = new Set(avoid);
-  const out: WordItem[] = [];
-  for (const item of shuffle(items)) {
-    if (seen.has(item.emoji)) continue;
-    seen.add(item.emoji);
-    out.push(item);
-    if (out.length === count) break;
-  }
-  return out;
-}
-
 /** Grade sets the baseline tier; the difficulty dial nudges it up or down. */
 export function tierFor(grade: GradeLevel, difficulty: Difficulty): Difficulty {
   const base = grade === 'kindergarten' ? 1 : grade === 'grade1' ? 2 : 3;
