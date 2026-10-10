@@ -28,3 +28,6 @@ dist-ssr
 
 # design-review screenshots (npm run ui:shots)
 screenshots/
+
+# Written by Claude Code when it loads a mod from its folder
+.claude/mods/*/.claude-plugin/types/

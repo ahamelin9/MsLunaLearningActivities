@@ -6,7 +6,8 @@ import tseslint from 'typescript-eslint'
 import { defineConfig, globalIgnores } from 'eslint/config'
 
 export default defineConfig([
-  globalIgnores(['dist']),
+  // the mods' .claude-plugin/types are written by Claude Code when it loads a mod
+  globalIgnores(['dist', '.claude/mods/*/.claude-plugin/types']),
   {
     files: ['**/*.{ts,tsx}'],
     extends: [

@@ -84,6 +84,10 @@ test('the board follows the backlog, and the footer button opens it', async ($, 
   expect(await ui.find({ type: 'Text', text: /Phase 1 — Design foundation/ })).toBeDefined()
   expect(await ui.find({ type: 'Text', text: /NOW/ })).toBeDefined()
   expect(await ui.find({ type: 'Text', text: /DES-3/ })).toBeDefined()
+  // the lanes sit side by side even in this 60-column pane
+  const lanes = await ui.find({ type: 'Box', props: { flexDirection: 'row' } })
+  expect(lanes).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: /In progress/ })).toBeDefined()
   // P2 tickets wait behind "Show all"
   expect(await ui.find({ type: 'Text', text: /BUG-9/ })).toBeUndefined()
   await ui.press({ key: 'luna-board-show-all' })

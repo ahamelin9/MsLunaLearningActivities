@@ -197,6 +197,20 @@ the old version either proves nothing.
 - **Check:** the split command runs, and the guard check still shows every
   case as expected.
 
+## Lint suddenly fails with dozens of errors in `.d.ts` files nobody wrote
+
+*2026-10-10 · OPS-5*
+
+- **Symptom:** `npm run lint` (or the guard closing a ticket) fails with ~49
+  `no-empty-object-type` errors in `.claude/mods/luna-board/.claude-plugin/types/…/index.d.ts`.
+- **Cause:** since the board loads straight from its repo folder
+  (`CLAUDE_CODE_PLUGIN_DIRS`), Claude Code writes its API typings into the
+  mod's `.claude-plugin/types/` on every load, and ESLint lints them.
+- **Fix:** `eslint.config.js` ignores `.claude/mods/*/.claude-plugin/types`,
+  and `.gitignore` does too. The mod's small `tsconfig.json` that extends them
+  is also written by the load and is harmless.
+- **Check:** `npm run lint` is clean.
+
 ## A luna-board mod test can't find the file it reads
 
 *2026-10-09 · OPS-4*

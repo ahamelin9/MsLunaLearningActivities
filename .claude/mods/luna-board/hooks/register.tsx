@@ -175,7 +175,9 @@ export const register: Register = on => {
     const restShown = all ? rest : rest.filter(t => t.priority === 'P0')
     const done = todayIn(b.changelog, new Date())
     const width = e.props.bodyColumns ?? e.viewport?.columns ?? 40
-    const isWide = width >= 110
+    // Lanes always sit side by side, like a Jira board. In a narrow pane each
+    // card shrinks to its ID, priority and title.
+    const compact = width < 110
 
     const card = (t: Ticket, tag?: string) => (
       <Box key={t.id} flexDirection="column" borderStyle="round" borderDimColor paddingX={1}>
@@ -185,8 +187,8 @@ export const register: Register = on => {
           </Text>
           <Text dimColor>
             {' '}
-            {t.type} · {t.priority}
-            {t.size && t.size !== '—' ? ` · ${t.size}` : ''}
+            {compact ? t.priority : `${t.type} · ${t.priority}`}
+            {!compact && t.size && t.size !== '—' ? ` · ${t.size}` : ''}
           </Text>
           {tag && <Text color="success"> {tag}</Text>}
         </Text>
@@ -195,7 +197,7 @@ export const register: Register = on => {
     )
 
     const column = (title: string, count: number, children: RenderChildren) => (
-      <Box key={title} flexDirection="column" flexGrow={1} flexShrink={1} width={isWide ? '25%' : '100%'} gap={0}>
+      <Box key={title} flexDirection="column" flexGrow={1} flexShrink={1} width="25%" gap={0}>
         <Text bold>
           {title} <Text dimColor>{count}</Text>
         </Text>
@@ -216,7 +218,7 @@ export const register: Register = on => {
           </Text>
         </Box>
 
-        <Box flexDirection={isWide ? 'row' : 'column'} gap={isWide ? 2 : 1}>
+        <Box flexDirection="row" gap={compact ? 1 : 2}>
           {column(
             'To do',
             todo.length,
@@ -230,7 +232,7 @@ export const register: Register = on => {
                   hotkey="a"
                   onPress={() => update($, showAll, v => !v)}
                 >
-                  {all ? 'Show only P0' : `Show all (${rest.length - restShown.length} more P1/P2)`}
+                  {all ? 'Only P0' : `+${rest.length - restShown.length} P1/P2`}
                 </Button>
               )}
             </Box>,

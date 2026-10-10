@@ -25,6 +25,23 @@ In a terminal session of Claude Code:
 Answer `y` to add the marketplace, then pick the user scope. It then loads in
 every session, the desktop app's Code tab included.
 
+## Always up to date (Alex's setup, 2026-10-10)
+
+Instead of the installed copy, Claude loads the board straight from this folder,
+so every edit shows without reinstalling. In `~/.claude/settings.json`:
+
+```json
+"env": {
+  "CLAUDE_CODE_PLUGIN_DIRS": "/Users/alex/Random Projects/MsLunaLearningActivities/.claude/mods/luna-board",
+  "CLAUDE_CODE_PLUGIN_DIR_WATCH": "1"
+},
+"enabledPlugins": { "luna-board@ms-luna": false }
+```
+
+The second setting makes sessions the desktop app starts reload the board when
+the folder changes. The installed copy stays switched off so there's only one
+board; to go back, flip it to `true` and remove the two `env` lines.
+
 ## Develop
 
 ```
