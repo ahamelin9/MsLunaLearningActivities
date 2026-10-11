@@ -124,7 +124,7 @@ build, or a tool that misbehaved. Skip routine fixes.
 - **Fix:** take turns. Say the game's line, then call `api.win/miss` from its
   `onEnd`, with a watchdog timer (in case `onEnd` never fires) and a busy ref
   that ignores taps meanwhile. Two working examples: `useAnswer` in
-  `components/lessonHooks.ts` and `feed()` in `games/FeedLuna.tsx`. FB-1 will
+  `components/lessonHooks.ts` and `feed()` in `games/FeedLuna/FeedLuna.tsx`. FB-1 will
   move every game onto one `api.answer()`.
 - **Check:** measure, don't guess. `speech-check.cjs` in this folder times
   every clip and marks the ones that were cut. Fixed looks like
@@ -269,6 +269,8 @@ Pitfalls that cost time:
   and nobody noticed because no speech had changed. They now carry the same
   alias as `vite.config.ts`. After any move or new import style, run
   `npm run voice:audit` and the two checks too, not only build and lint.
+  The audit's utterance count moves by a few dozen between runs (it samples
+  random rounds), so a different count alone isn't a change.
 - **Check:** three things.
   - `ui:shots --diff before after`: 0 changed screens, after the in-place
     conversion and again after the move into folders.

@@ -1,10 +1,13 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import type { GameApi, GameDef } from '../engine/types';
-import { MINI_STORIES, pick, shuffle, tierFor, type MiniStory } from '../engine/content';
-import { soundManager } from '../../../utils/audio';
-import { pronunciation } from '../../../utils/pronunciation';
-import { SpeakChip } from './shared/SpeakChip/SpeakChip';
-import { StagePrompt } from './shared/StagePrompt/StagePrompt';
+import type { GameApi, GameDef } from '../../engine/types';
+import { MINI_STORIES, pick, shuffle, tierFor, type MiniStory } from '../../engine/content';
+import { soundManager } from '@/utils/audio';
+import { pronunciation } from '@/utils/pronunciation';
+import { SpeakChip } from '../shared/SpeakChip/SpeakChip';
+import { StagePrompt } from '../shared/StagePrompt/StagePrompt';
+import { GameSurface } from '../shared/GameSurface/GameSurface';
+import { cx, dataState } from '@/utils/cx';
+import styles from './StoryTime.module.scss';
 
 interface Round {
   story: MiniStory;
@@ -116,17 +119,17 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
   };
 
   return (
-    <div className="game-surface story">
-      <div className="storybook">
-        <div className="book-spine" aria-hidden="true" />
+    <GameSurface className={styles.story}>
+      <div className={styles.storybook}>
+        <div className={styles.bookSpine} aria-hidden="true" />
 
-        <div className="book-page left">
-          <span className="story-emoji">{story.emoji}</span>
-          <h3 className="story-title">{story.title}</h3>
+        <div className={cx(styles.bookPage, styles.left)}>
+          <span className={styles.storyEmoji}>{story.emoji}</span>
+          <h3 className={styles.storyTitle}>{story.title}</h3>
           {/* the word is heard, not shown: written here, the hunt is matching
               letters rather than reading the story */}
           {phase === 'hunt' && (
-            <p className="hunt-task">
+            <p className={styles.huntTask}>
               {foundWord ? (
                 <>
                   Found it: <strong>{round.hunt}</strong>
@@ -148,11 +151,12 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
           )}
         </div>
 
-        <div className="book-page right">
+        <div className={cx(styles.bookPage, styles.right)}>
           {story.lines.slice(0, revealed).map((line, i) => (
             <p
               key={i}
-              className={`story-line ${phase === 'hunt' ? 'is-huntable' : ''}`}
+              className={styles.storyLine}
+              data-state={phase === 'hunt' ? 'huntable' : undefined}
               onClick={() => canHearLines && readLine(i)}
             >
               {line.split(' ').map((word, wi) => {
@@ -161,7 +165,8 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
                 return (
                   <span
                     key={wi}
-                    className={`story-word ${isFound ? 'is-found' : ''}`}
+                    className={styles.storyWord}
+                    data-state={isFound ? 'found' : undefined}
                     onClick={e => {
                       if (phase === 'hunt') {
                         e.stopPropagation();
@@ -182,7 +187,7 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
 
           {phase === 'question' && (
             <SpeakChip
-              className="page-chip"
+              className={styles.pageChip}
               disabled={!canHearLines}
               title={canHearLines ? 'Hear the story' : 'Try it first!'}
               onClick={() => {
@@ -196,7 +201,7 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
           )}
 
           {phase === 'read' && (
-            <button className="page-turn" onClick={turnPage}>
+            <button className={styles.pageTurn} onClick={turnPage}>
               {allRevealed ? 'I have read it! →' : 'Next line →'}
             </button>
           )}
@@ -204,15 +209,14 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
       </div>
 
       {phase === 'question' && (
-        <div className="story-question">
+        <div className={styles.storyQuestion}>
           <StagePrompt>{story.question}</StagePrompt>
-          <div className="story-answers">
+          <div className={styles.storyAnswers}>
             {answers.map(a => (
               <button
                 key={a.text}
-                className={`story-answer ${wrongAnswer === a.text ? 'is-wrong' : ''} ${
-                  answered && a.correct ? 'is-right' : ''
-                }`}
+                className={styles.storyAnswer}
+                data-state={dataState(wrongAnswer === a.text ? 'wrong' : false, answered && a.correct ? 'right' : false)}
                 onClick={() => answer(a.text, a.correct)}
               >
                 {a.text}
@@ -221,7 +225,7 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
           </div>
         </div>
       )}
-    </div>
+    </GameSurface>
   );
 };
 

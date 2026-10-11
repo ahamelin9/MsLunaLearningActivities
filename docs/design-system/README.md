@@ -139,7 +139,7 @@ Each ticket updates its row when it closes (Completion criteria B7 in
 | Standards (these docs, the skill) | `docs/design-system/`, `luna-design` | Done (Alex approved, 2026-10-10) | DES-2 |
 | Hooks at the moment of editing | `.claude/hooks/`, `.githooks/` | Before-edit hook and pre-commit check built (DES-25, 2026-10-10); the after-edit check comes with DES-19 | DES-25, DES-19 |
 | Screenshots you can compare | `scripts/ui/shots.mjs` | Done (DES-18a, 2026-10-11): same pixels every run on a page clock, `--diff` with red overlays, found by `data-shot` | DES-18a |
-| Source tree and CSS modules | `src/` | In progress: module setup and the tablet shell (DES-18b), then Grade Select, the library hub, GameShell, LunaOwl, SpeakChip and StagePrompt (DES-18c), as modules in folders, 2026-10-11; the games and lessons next | DES-18b–e |
+| Source tree and CSS modules | `src/` | In progress: module setup and the tablet shell (DES-18b); Grade Select, the library hub, GameShell, LunaOwl, SpeakChip and StagePrompt (DES-18c); all 8 games and GameSurface, `games.scss` gone (DES-18d); as modules in folders, 2026-10-11. The lessons next | DES-18b–e |
 | Tokens | `src/styles/tokens/` | Planned | DES-3 |
 | Design check and contrast check | `scripts/design/` | Planned | DES-19 |
 | Kit page | `src/dev/KitPage/` | Planned | DES-20 |

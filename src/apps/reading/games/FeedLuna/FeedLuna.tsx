@@ -1,10 +1,13 @@
 import React, { useEffect, useRef, useState } from 'react';
-import type { GameApi, GameDef } from '../engine/types';
-import { lettersFor, pick, shuffle, tierFor, wordsUpTo, type LetterItem, type WordItem } from '../engine/content';
-import { pickWrong, textChoice } from '../engine/distractors';
-import { LunaOwl } from '../engine/LunaOwl/LunaOwl';
-import { soundManager } from '../../../utils/audio';
-import { pronunciation, type SpeechPart } from '../../../utils/pronunciation';
+import type { GameApi, GameDef } from '../../engine/types';
+import { lettersFor, pick, shuffle, tierFor, wordsUpTo, type LetterItem, type WordItem } from '../../engine/content';
+import { pickWrong, textChoice } from '../../engine/distractors';
+import { LunaOwl } from '../../engine/LunaOwl/LunaOwl';
+import { soundManager } from '@/utils/audio';
+import { pronunciation, type SpeechPart } from '@/utils/pronunciation';
+import { GameSurface } from '../shared/GameSurface/GameSurface';
+import { cx, dataState } from '@/utils/cx';
+import styles from './FeedLuna.module.scss';
 
 type Mode = 'toLower' | 'toUpper' | 'bySound' | 'byWord';
 
@@ -195,39 +198,40 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
   };
 
   return (
-    <div
-      className="game-surface feed"
+    <GameSurface
+      className={styles.feed}
       ref={surfaceRef}
       onPointerMove={onPointerMove}
       onPointerUp={onPointerUp}
       onPointerCancel={() => setDragging(null)}
     >
-      <div className="feed-top">
-        <div className="feed-luna">
+      <div className={styles.feedTop}>
+        <div className={styles.feedLuna}>
           <LunaOwl mood={chewing ? 'cheer' : spat ? 'oops' : 'happy'} size={152} talking={chewing} />
-          <div ref={beakRef} className={`beak-zone ${dragging ? 'is-armed' : ''} ${chewing ? 'is-chewing' : ''}`}>
+          <div ref={beakRef} className={styles.beakZone}
+            data-state={dataState(dragging ? 'armed' : false, chewing ? 'chewing' : false)}>
             <span aria-hidden="true">{chewing ? '😋' : 'drop here'}</span>
           </div>
         </div>
 
-        <button className="feed-sign" onClick={sayCue}>
-          <span className="sign-kicker">Luna wants…</span>
+        <button className={styles.feedSign} onClick={sayCue}>
+          <span className={styles.signKicker}>Luna wants…</span>
           {round.cueEmoji ? (
-            <span className="sign-picture">
-              <span className="sign-emoji">{round.cueEmoji}</span>
-              <span className="sign-hint">{round.ask}</span>
+            <span className={styles.signPicture}>
+              <span className={styles.signEmoji}>{round.cueEmoji}</span>
+              <span className={styles.signHint}>{round.ask}</span>
             </span>
           ) : (
             <>
-              <span className="sign-char" aria-hidden="true">?</span>
-              <span className="sign-hint">{round.ask}</span>
+              <span className={styles.signChar} aria-hidden="true">?</span>
+              <span className={styles.signHint}>{round.ask}</span>
             </>
           )}
-          <span className="sign-tap">🔊 tap to hear</span>
+          <span className={styles.signTap}>🔊 tap to hear</span>
         </button>
       </div>
 
-      <div className="cookie-tray">
+      <div className={styles.cookieTray}>
         {round.options.map(char => {
           const isEaten = eaten.includes(char);
           const isSpat = spat === char;
@@ -235,9 +239,8 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
           return (
             <button
               key={char}
-              className={`cookie ${isEaten ? 'is-eaten' : ''} ${isSpat ? 'is-spat' : ''} ${
-                isDragged ? 'is-dragged' : ''
-              }`}
+              className={styles.cookie}
+              data-state={dataState(isEaten ? 'eaten' : false, isSpat ? 'spat' : false, isDragged ? 'dragged' : false)}
               onPointerDown={e => onPointerDown(e, char)}
               onClick={() => {
                 // keyboard and assistive clicks never produce a drag
@@ -246,20 +249,20 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
               disabled={isEaten}
               aria-label={`letter ${char}`}
             >
-              <span className="cookie-char">{char}</span>
+              <span className={styles.cookieChar}>{char}</span>
             </button>
           );
         })}
       </div>
 
       {dragging && (
-        <span className="cookie floating" style={{ left: dragging.x, top: dragging.y }} aria-hidden="true">
-          <span className="cookie-char">{dragging.char}</span>
+        <span className={cx(styles.cookie, styles.floating)} style={{ left: dragging.x, top: dragging.y }} aria-hidden="true">
+          <span className={styles.cookieChar}>{dragging.char}</span>
         </span>
       )}
 
-      <p className="feed-note">Drag a cookie to Luna — or just tap it.</p>
-    </div>
+      <p className={styles.feedNote}>Drag a cookie to Luna — or just tap it.</p>
+    </GameSurface>
   );
 };
 

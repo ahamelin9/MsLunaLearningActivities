@@ -1,9 +1,12 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import type { GameApi, GameDef } from '../engine/types';
-import { lettersFor, pick, tierFor, type LetterItem } from '../engine/content';
-import { pickWrong, textChoice } from '../engine/distractors';
-import { soundManager } from '../../../utils/audio';
-import { pronunciation } from '../../../utils/pronunciation';
+import type { GameApi, GameDef } from '../../engine/types';
+import { lettersFor, pick, tierFor, type LetterItem } from '../../engine/content';
+import { pickWrong, textChoice } from '../../engine/distractors';
+import { soundManager } from '@/utils/audio';
+import { pronunciation } from '@/utils/pronunciation';
+import { cx } from '@/utils/cx';
+import { GameSurface } from '../shared/GameSurface/GameSurface';
+import styles from './BubbleSounds.module.scss';
 
 interface Bubble {
   id: number;
@@ -132,47 +135,48 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
   };
 
   return (
-    <div className="game-surface bubbles">
-      <div className="bubble-header">
+    <GameSurface className={styles.bubbles}>
+      <div className={styles.bubbleHeader}>
         {/* the sound is only ever heard: written here, it would name the bubble to pop */}
-        <button className="sound-horn small" onClick={sayTarget} title="Hear the sound again">
-          <span className="horn-icon" aria-hidden="true">🫧</span>
-          <span className="horn-sound">Listen</span>
+        <button className={cx(styles.soundHorn, styles.small)} onClick={sayTarget} title="Hear the sound again">
+          <span className={styles.hornIcon} aria-hidden="true">🫧</span>
+          <span className={styles.hornSound}>Listen</span>
         </button>
-        <div className="bubble-tally" aria-label={`${popped} of ${round.needed} popped`}>
+        <div className={styles.bubbleTally} aria-label={`${popped} of ${round.needed} popped`}>
           {Array.from({ length: round.needed }).map((_, i) => (
-            <span key={i} className={`tally-dot ${i < popped ? 'lit' : ''}`} />
+            <span key={i} className={styles.tallyDot} data-state={i < popped ? 'lit' : undefined} />
           ))}
         </div>
       </div>
 
-      <div className="bubble-tank">
+      <div className={styles.bubbleTank}>
         {bubbles.map(b => (
           <button
             key={b.id}
-            className={`bubble ${b.popped ? 'is-popped' : ''}`}
+            className={styles.bubble}
+            data-state={b.popped ? 'popped' : undefined}
             style={{ left: `${b.x}%`, top: `${b.y}%`, '--size': b.size } as React.CSSProperties}
             onClick={() => pop(b)}
             aria-label={`bubble ${b.char}`}
           >
-            <span className="bubble-shine" aria-hidden="true" />
-            <span className="bubble-char">{b.char}</span>
+            <span className={styles.bubbleShine} aria-hidden="true" />
+            <span className={styles.bubbleChar}>{b.char}</span>
           </button>
         ))}
 
         {splash && (
-          <span className={`bubble-splash ${splash.ok ? 'ok' : 'no'}`} aria-hidden="true">
+          <span className={styles.bubbleSplash} data-state={splash.ok ? 'ok' : 'no'} aria-hidden="true">
             {splash.ok ? '✦' : '💧'}
           </span>
         )}
 
-        <div className="tank-floor" aria-hidden="true">
+        <div className={styles.tankFloor} aria-hidden="true">
           <span>🐠</span>
           <span>🪸</span>
           <span>🐚</span>
         </div>
       </div>
-    </div>
+    </GameSurface>
   );
 };
 

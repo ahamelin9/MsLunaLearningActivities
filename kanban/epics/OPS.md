@@ -1,7 +1,7 @@
 # OPS — Housekeeping (anytime)
 
 ### OPS-9 · Know-how browser checks find things by `data-shot`
-Task · P1 · S · needs: DES-18d
+Task · P1 · S · needs: —
 - **Why:** found while closing DES-18a (2026-10-11). `speech-check.cjs`, `treasure-check.cjs` and `treasure-fit.cjs` in `.claude/skills/know-how/` find everything by class name (`.ipad-reading-app-card`, `.game-thing`, `.cookie.is-eaten`, `.treasure-option.is-right`…). DES-18b–d turn those into CSS-module names, so the checks stop finding anything partway through the stage. `ui:shots` already moved to `data-shot` names (DES-18a).
 - **How:**
   - the walk from home to a game uses the `data-shot` names that exist since DES-18a (`open-reading`, `grade-card`, `hub`, `lesson-tile`, `game-tile`, `tile-title`, `play`, `shell-play`, `round-pips`);

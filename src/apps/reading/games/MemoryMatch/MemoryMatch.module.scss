@@ -1,0 +1,91 @@
+@use 'apps/reading/engine/world' as *;
+
+.memory {
+  .memory-prompt { font-size: 1rem; color: $ink-soft; }
+
+  .memory-board {
+    display: grid;
+    gap: 0.6rem;
+    grid-template-columns: repeat(4, minmax(62px, 92px));
+
+    &[data-cols="5"] { grid-template-columns: repeat(5, minmax(58px, 84px)); }
+  }
+
+  .memory-card {
+    aspect-ratio: 3 / 4;
+    perspective: 700px;
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+
+    .card-inner {
+      position: relative;
+      display: block;
+      width: 100%;
+      height: 100%;
+      transform-style: preserve-3d;
+      transition: transform 0.45s cubic-bezier(0.34, 1.3, 0.5, 1);
+    }
+
+    .card-back,
+    .card-face {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      border-radius: 12px;
+      backface-visibility: hidden;
+      border: 3px solid rgba(58, 42, 31, 0.25);
+    }
+
+    .card-back {
+      background:
+        repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.14) 0 6px, transparent 6px 12px),
+        linear-gradient(160deg, $plum, $plum-deep);
+      .back-mark { font-size: 1.6rem; opacity: 0.9; }
+    }
+
+    .card-face {
+      background: #FFFDF6;
+      transform: rotateY(180deg);
+
+      .face-emoji { font-size: 2.2rem; }
+      .face-text {
+        font-family: 'Fredoka', sans-serif;
+        font-size: 1.05rem;
+        font-weight: 600;
+        &[data-state="letter"] { font-size: 2.1rem; }
+      }
+    }
+
+    &[data-state~="open"] .card-inner { transform: rotateY(180deg); }
+
+    &[data-state~="matched"] {
+      .card-face { border-color: $moss; box-shadow: 0 0 0 3px rgba(74, 160, 90, 0.35); background: #F2FBF0; }
+      animation: matchedPop 0.5s ease;
+    }
+
+    &[data-state~="wobble"] .card-inner { animation: cardWobble 0.45s ease; }
+    &:hover:not([data-state~="matched"]) .card-inner { transform: rotateY(var(--flip, 0deg)) translateY(-3px); }
+    &[data-state~="open"]:hover .card-inner { transform: rotateY(180deg) translateY(-3px); }
+  }
+
+  .memory-tally { display: flex; gap: 0.25rem; font-size: 1.2rem; }
+}
+
+@keyframes matchedPop {
+  0% { transform: scale(1); }
+  45% { transform: scale(1.12); }
+  100% { transform: scale(1); }
+}
+
+@keyframes cardWobble {
+  0%, 100% { transform: rotateY(180deg) translateX(0); }
+  30% { transform: rotateY(180deg) translateX(-7px); }
+  70% { transform: rotateY(180deg) translateX(7px); }
+}
+
+@media (max-width: 700px) {
+  .memory .memory-board { grid-template-columns: repeat(4, minmax(56px, 74px)); }
+}

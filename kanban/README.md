@@ -72,8 +72,8 @@ be pulled into Phase 1 for a break from styling.
 
 ### Now / Next
 
-- **Now:** DES-18d: one folder per game, `games.scss` gone (the shell, the hub and GameShell are modules, DES-18b–c)
-- **Next:** follow "Order to finish the epic" at the top of `epics/DES.md`: DES-18e (a pure refactor, proven by `ui:shots --diff`), then DES-3, DES-19 and DES-20. OPS-9 (know-how checks onto `data-shot`) fits straight after DES-18d. PRG-7 and SET-1 are pulled in where DES-13 and DES-16 need them. GAME-1c, Treasure Path's screen, waits on FB-1, which waits on the DES-8/DES-10 layout
+- **Now:** DES-18e: one folder per lesson type, the last of the structure (the shell, the hub, GameShell and all 8 games are modules, DES-18b–d)
+- **Next:** follow "Order to finish the epic" at the top of `epics/DES.md`: DES-3, DES-19 and DES-20. OPS-9 (know-how checks onto `data-shot`) can start now: DES-18d took the last game classes its checks used. PRG-7 and SET-1 are pulled in where DES-13 and DES-16 need them. GAME-1c, Treasure Path's screen, waits on FB-1, which waits on the DES-8/DES-10 layout
 
 ## Epics
 
@@ -97,7 +97,6 @@ In board order. A new epic gets its file in `epics/` first, then a link here
 | ID | Title | Type | P | Size | Status |
 |---|---|---|---|---|---|
 | **DES** | **Design system & layout** | Epic | **P0** | | |
-| DES-18d | One folder per game; `games.scss` gone | Task | P0 | M | Todo |
 | DES-18e | One folder per lesson type | Task | P0 | S | Todo |
 | DES-3 | One set of design tokens | Story | P0 | M | Todo |
 | DES-19 | Design check and contrast check in `npm run lint`, and after every edit | Task | P0 | M | Todo |

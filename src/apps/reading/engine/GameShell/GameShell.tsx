@@ -12,7 +12,7 @@ import { warmGameIntro } from '../warmup';
 import { storageService } from '@/utils/storage';
 import { launchConfetti } from '@/utils/confetti';
 import { ArrowLeftIcon, StarIcon } from '@/components/ui/Icons/Icons';
-import { cx } from '@/utils/cx';
+import { cx, dataState } from '@/utils/cx';
 import styles from './GameShell.module.scss';
 
 type Phase = 'intro' | 'play' | 'reward';
@@ -410,7 +410,7 @@ export const GameShell: React.FC<GameShellProps> = ({
               key={i}
               className={styles.pip}
               // a pip can be both: the round just won, before the next one starts
-              data-state={[i < roundsWon && 'done', i === roundIndex && 'current'].filter(Boolean).join(' ') || undefined}
+              data-state={dataState(i < roundsWon && 'done', i === roundIndex && 'current')}
             />
           ))}
         </div>

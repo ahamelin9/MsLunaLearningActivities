@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import type { GameApi, GameDef } from '../engine/types';
-import { lettersFor, pick, shuffle, tierFor } from '../engine/content';
-import { pickWrong, textChoice } from '../engine/distractors';
-import { soundManager } from '../../../utils/audio';
-import { pronunciation } from '../../../utils/pronunciation';
-import { SpeakChip } from './shared/SpeakChip/SpeakChip';
+import type { GameApi, GameDef } from '../../engine/types';
+import { lettersFor, pick, shuffle, tierFor } from '../../engine/content';
+import { pickWrong, textChoice } from '../../engine/distractors';
+import { soundManager } from '@/utils/audio';
+import { pronunciation } from '@/utils/pronunciation';
+import { SpeakChip } from '../shared/SpeakChip/SpeakChip';
+import { GameSurface } from '../shared/GameSurface/GameSurface';
+import { dataState } from '@/utils/cx';
+import styles from './LetterHunt.module.scss';
 
 interface Bug {
   id: string;
@@ -143,25 +146,26 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
   const remaining = round.targetCount - caught.length;
 
   return (
-    <div className="game-surface hunt">
-      <div className="hunt-header">
+    <GameSurface className={styles.hunt}>
+      <div className={styles.huntHeader}>
         {/* the letter is only ever heard: shown here, the hunt is just matching shapes */}
-        <div className="hunt-target">
-          <span className="hunt-label">Catch every letter I say</span>
-          <span className="hunt-char" aria-hidden="true">?</span>
+        <div className={styles.huntTarget}>
+          <span className={styles.huntLabel}>Catch every letter I say</span>
+          <span className={styles.huntChar} aria-hidden="true">?</span>
         </div>
         <SpeakChip onClick={announce}>
           🔊 Say it again
         </SpeakChip>
       </div>
 
-      <div className="hunt-field">
+      <div className={styles.huntField}>
         {round.bugs.map(bug => {
           const isCaught = caught.includes(bug.id);
           return (
             <button
               key={bug.id}
-              className={`hunt-bug ${isCaught ? 'is-caught' : ''} ${missId === bug.id ? 'is-miss' : ''}`}
+              className={styles.huntBug}
+              data-state={dataState(isCaught ? 'caught' : false, missId === bug.id ? 'miss' : false)}
               style={{
                 left: `${bug.x}%`,
                 top: `${bug.y}%`,
@@ -179,18 +183,18 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
         })}
       </div>
 
-      <div className="hunt-jar">
-        <div className="jar-glass">
-          <div className="jar-fill" style={{ height: `${(caught.length / round.targetCount) * 100}%` }} />
-          <span className="jar-count">
+      <div className={styles.huntJar}>
+        <div className={styles.jarGlass}>
+          <div className={styles.jarFill} style={{ height: `${(caught.length / round.targetCount) * 100}%` }} />
+          <span className={styles.jarCount}>
             {caught.length}/{round.targetCount}
           </span>
         </div>
-        <p className="jar-note">
+        <p className={styles.jarNote}>
           {remaining > 0 ? `${remaining} still loose!` : 'All safe in the jar!'}
         </p>
       </div>
-    </div>
+    </GameSurface>
   );
 };
 

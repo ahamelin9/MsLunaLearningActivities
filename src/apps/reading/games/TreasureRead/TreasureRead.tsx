@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import type { GameApi, GameDef } from '../engine/types';
+import type { GameApi, GameDef } from '../../engine/types';
 import {
   GAP,
   maskKey,
@@ -9,10 +9,13 @@ import {
   shuffle,
   type BlankItem,
   type PassageItem
-} from '../engine/content';
-import { pickWrong, textChoice } from '../engine/distractors';
-import { pronunciation, type SpeechPart } from '../../../utils/pronunciation';
-import { SpeakChip } from './shared/SpeakChip/SpeakChip';
+} from '../../engine/content';
+import { pickWrong, textChoice } from '../../engine/distractors';
+import { pronunciation, type SpeechPart } from '@/utils/pronunciation';
+import { SpeakChip } from '../shared/SpeakChip/SpeakChip';
+import { GameSurface } from '../shared/GameSurface/GameSurface';
+import { cx, dataState } from '@/utils/cx';
+import styles from './TreasureRead.module.scss';
 
 interface Round {
   kind: 'cloze' | 'truefalse';
@@ -76,7 +79,7 @@ const STONE_LABELS = ['🌿', '🪨', '🌴', '🦜', '⛰️', '🏝️'];
  * its look lives in `.treasure-passage` in games.scss.
  */
 const TreasurePassage: React.FC<{ lines: string[] }> = ({ lines }) => (
-  <p className="treasure-passage">{lines.join(' ')}</p>
+  <p className={styles.treasurePassage}>{lines.join(' ')}</p>
 );
 
 const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
@@ -125,32 +128,32 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
   };
 
   return (
-    <div className="game-surface treasure">
-      <div className="treasure-path" aria-label={`Stone ${step + 1} of ${total}`}>
+    <GameSurface className={styles.treasure}>
+      <div className={styles.treasurePath} aria-label={`Stone ${step + 1} of ${total}`}>
         {Array.from({ length: total }).map((_, i) => (
-          <span key={i} className={`stone ${i < step ? 'passed' : ''} ${i === step ? 'current' : ''}`}>
-            <span className="stone-face">{STONE_LABELS[i % STONE_LABELS.length]}</span>
-            {i === step && <span className={`walker ${solved ? 'is-hopping' : ''}`}>🦉</span>}
+          <span key={i} className={styles.stone} data-state={dataState(i < step ? 'passed' : false, i === step ? 'current' : false)}>
+            <span>{STONE_LABELS[i % STONE_LABELS.length]}</span>
+            {i === step && <span className={styles.walker} data-state={solved ? 'hopping' : undefined}>🦉</span>}
           </span>
         ))}
-        <span className={`chest ${solved && step === total - 1 ? 'is-open' : ''}`}>
+        <span className={styles.chest} data-state={solved && step === total - 1 ? 'open' : undefined}>
           {solved && step === total - 1 ? '💎' : '🧰'}
         </span>
       </div>
 
-      <div className="treasure-scroll has-passage">
-        <span className="scroll-emoji">{round.passage.emoji}</span>
+      <div className={cx(styles.treasureScroll, styles.hasPassage)}>
+        <span className={styles.scrollEmoji}>{round.passage.emoji}</span>
         <TreasurePassage lines={round.passage.lines} />
 
         {round.kind === 'truefalse' ? (
-          <p className="scroll-claim">“{round.statement}”</p>
+          <p className={styles.scrollClaim}>“{round.statement}”</p>
         ) : (
-          <p className="scroll-sentence">
+          <p className={styles.scrollSentence}>
             {round.statement.split(GAP).map((chunk, i, arr) => (
               <React.Fragment key={i}>
                 {chunk}
                 {i < arr.length - 1 && (
-                  <span className={`gap ${solved ? 'is-filled' : ''}`}>{solved ? round.answer : '?'}</span>
+                  <span className={styles.gap} data-state={solved ? 'filled' : undefined}>{solved ? round.answer : '?'}</span>
                 )}
               </React.Fragment>
             ))}
@@ -166,21 +169,20 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
         </SpeakChip>
       </div>
 
-      <div className={`treasure-options ${round.kind === 'truefalse' ? 'is-binary' : ''}`}>
+      <div className={styles.treasureOptions} data-state={round.kind === 'truefalse' ? 'binary' : undefined}>
         {round.options.map(option => (
           <button
             key={option}
-            className={`treasure-option ${wrong === option ? 'is-wrong' : ''} ${
-              solved && option === round.answer ? 'is-right' : ''
-            }`}
+            className={styles.treasureOption}
+            data-state={dataState(wrong === option ? 'wrong' : false, solved && option === round.answer ? 'right' : false)}
             onClick={() => choose(option)}
           >
-            {round.kind === 'truefalse' && <span className="tf-icon">{option === 'True' ? '✅' : '❌'}</span>}
+            {round.kind === 'truefalse' && <span>{option === 'True' ? '✅' : '❌'}</span>}
             {option}
           </button>
         ))}
       </div>
-    </div>
+    </GameSurface>
   );
 };
 

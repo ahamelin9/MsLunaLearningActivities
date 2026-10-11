@@ -1,13 +1,12 @@
 import type { AnyGameDef } from '../engine/types';
-import { letterHunt } from './LetterHunt';
-import { bubbleSounds } from './BubbleSounds';
-import { feedLuna } from './FeedLuna';
-import { memoryMatch } from './MemoryMatch';
-import { buildSentence } from './BuildSentence';
-import { whatsMissing } from './WhatsMissing';
-import { treasureRead } from './TreasureRead';
-import { storyTime } from './StoryTime';
-import './games.scss';
+import { letterHunt } from './LetterHunt/LetterHunt';
+import { bubbleSounds } from './BubbleSounds/BubbleSounds';
+import { feedLuna } from './FeedLuna/FeedLuna';
+import { memoryMatch } from './MemoryMatch/MemoryMatch';
+import { buildSentence } from './BuildSentence/BuildSentence';
+import { whatsMissing } from './WhatsMissing/WhatsMissing';
+import { treasureRead } from './TreasureRead/TreasureRead';
+import { storyTime } from './StoryTime/StoryTime';
 
 /**
  * Every mini-game in Luna's library. Adding a game is one import plus one

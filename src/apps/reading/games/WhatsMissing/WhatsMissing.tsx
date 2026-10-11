@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import type { GameApi, GameDef } from '../engine/types';
-import { shuffle, tierFor, wordsUpTo, type WordItem } from '../engine/content';
-import { distinctByEmoji, pickWrong, wordChoice } from '../engine/distractors';
-import { soundManager } from '../../../utils/audio';
-import { pronunciation } from '../../../utils/pronunciation';
-import { StagePrompt } from './shared/StagePrompt/StagePrompt';
+import type { GameApi, GameDef } from '../../engine/types';
+import { shuffle, tierFor, wordsUpTo, type WordItem } from '../../engine/content';
+import { distinctByEmoji, pickWrong, wordChoice } from '../../engine/distractors';
+import { soundManager } from '@/utils/audio';
+import { pronunciation } from '@/utils/pronunciation';
+import { StagePrompt } from '../shared/StagePrompt/StagePrompt';
+import { GameSurface } from '../shared/GameSurface/GameSurface';
+import { cx, dataState } from '@/utils/cx';
+import styles from './WhatsMissing.module.scss';
 
 interface Round {
   items: WordItem[];
@@ -76,57 +79,57 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
   const visible = phase === 'guess' && !found ? round.items.filter(i => i.word !== round.missing.word) : round.items;
 
   return (
-    <div className="game-surface missing">
-      <div className="desk-scene">
-        <div className={`desk-curtain ${phase === 'curtain' ? 'is-sweeping' : ''} ${phase === 'guess' ? 'is-gone' : ''}`}>
+    <GameSurface className={styles.missing}>
+      <div className={styles.deskScene}>
+        <div className={styles.deskCurtain}
+          data-state={dataState(phase === 'curtain' ? 'sweeping' : false, phase === 'guess' ? 'gone' : false)}>
           <span aria-hidden="true">✨</span>
         </div>
 
-        <div className="desk-top">
+        <div className={styles.deskTop}>
           {visible.map(item => (
-            <span key={item.word} className="desk-item" title={item.word}>
-              <span className="item-emoji">{item.emoji}</span>
-              {phase === 'look' && <span className="item-word">{item.word}</span>}
+            <span key={item.word} className={styles.deskItem} title={item.word}>
+              <span className={styles.itemEmoji}>{item.emoji}</span>
+              {phase === 'look' && <span className={styles.itemWord}>{item.word}</span>}
             </span>
           ))}
           {found && (
-            <span className="desk-item is-returned">
-              <span className="item-emoji">{round.missing.emoji}</span>
-              <span className="item-word">{round.missing.word}</span>
+            <span className={styles.deskItem} data-state="returned">
+              <span className={styles.itemEmoji}>{round.missing.emoji}</span>
+              <span className={styles.itemWord}>{round.missing.word}</span>
             </span>
           )}
         </div>
 
-        <div className="desk-edge" aria-hidden="true" />
+        <div className={styles.deskEdge} aria-hidden="true" />
       </div>
 
       {phase === 'look' && (
-        <div className="look-timer">
-          <span className="timer-label">Memorise!</span>
-          <span className="timer-count">{Math.max(1, countdown)}</span>
+        <div className={styles.lookTimer}>
+          <span className={styles.timerLabel}>Memorise!</span>
+          <span className={styles.timerCount}>{Math.max(1, countdown)}</span>
         </div>
       )}
 
       {phase === 'curtain' && <StagePrompt>Luna is taking something…</StagePrompt>}
 
       {phase === 'guess' && (
-        <div className="missing-choices">
+        <div className={styles.missingChoices}>
           <StagePrompt>What disappeared?</StagePrompt>
-          <div className="choice-row">
+          <div className={styles.choiceRow}>
             {round.options.map(opt => (
               <button
                 key={opt.word}
-                className={`missing-choice ${wrong === opt.word ? 'is-wrong' : ''} ${
-                  found && opt.word === round.missing.word ? 'is-right' : ''
-                }`}
+                className={styles.missingChoice}
+                data-state={dataState(wrong === opt.word ? 'wrong' : false, found && opt.word === round.missing.word ? 'right' : false)}
                 onClick={() => guess(opt)}
               >
                 {round.wordChoices ? (
-                  <span className="choice-word">{opt.word}</span>
+                  <span className={styles.choiceWord}>{opt.word}</span>
                 ) : (
                   <>
-                    <span className="choice-emoji">{opt.emoji}</span>
-                    <span className="choice-word small">{opt.word}</span>
+                    <span className={styles.choiceEmoji}>{opt.emoji}</span>
+                    <span className={cx(styles.choiceWord, styles.small)}>{opt.word}</span>
                   </>
                 )}
               </button>
@@ -134,7 +137,7 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
           </div>
         </div>
       )}
-    </div>
+    </GameSurface>
   );
 };
 

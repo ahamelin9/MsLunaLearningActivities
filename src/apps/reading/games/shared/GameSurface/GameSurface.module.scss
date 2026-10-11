@@ -1,0 +1,16 @@
+@use 'apps/reading/engine/world' as *;
+
+.game-surface {
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.8rem;
+  position: relative;
+  font-family: 'Fredoka', sans-serif;
+  color: $ink;
+}

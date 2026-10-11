@@ -1,0 +1,130 @@
+@use 'apps/reading/engine/world' as *;
+
+.feed {
+  justify-content: center;
+  gap: 1.6rem;
+  padding: 0.4rem 0;
+
+  .feed-top {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 2rem;
+    flex-wrap: wrap;
+  }
+
+  .feed-luna { position: relative; display: flex; flex-direction: column; align-items: center; }
+
+  .beak-zone {
+    margin-top: -0.6rem;
+    width: 118px;
+    padding: 0.35rem;
+    text-align: center;
+    border-radius: 14px;
+    border: 3px dashed rgba(122, 74, 36, 0.45);
+    background: rgba(255, 255, 255, 0.6);
+    font-size: 0.8rem;
+    color: $ink-soft;
+    transition: all 0.2s ease;
+
+    &[data-state~="armed"] {
+      border-color: $moss-deep;
+      background: rgba(74, 160, 90, 0.18);
+      transform: scale(1.08);
+    }
+
+    &[data-state~="chewing"] { border-style: solid; border-color: $moss; font-size: 1.6rem; }
+  }
+
+  .feed-sign {
+    @include paper-card(#FFFFFF);
+    padding: 0.7rem 1.2rem;
+    text-align: center;
+    cursor: pointer;
+    transform: rotate(-2deg);
+
+    .sign-kicker { display: block; font-size: 0.8rem; color: $ink-soft; }
+    .sign-char { display: block; font-size: 3.4rem; font-weight: 600; color: $plum-deep; line-height: 1.05; }
+    .sign-picture { display: block; }
+    .sign-emoji { display: block; font-size: 2.6rem; }
+    .sign-word { display: block; font-size: 1.2rem; font-weight: 600; }
+    .sign-hint { display: block; font-size: 0.75rem; color: $berry-deep; }
+    .sign-tap { display: block; font-size: 0.7rem; color: $ink-soft; margin-top: 0.2rem; }
+
+    &:active { transform: rotate(-2deg) scale(0.97); }
+  }
+
+  .cookie-tray {
+    display: flex;
+    gap: 0.9rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    padding: 0.6rem 1rem;
+    border-radius: 20px 20px 8px 8px;
+    background: linear-gradient(180deg, rgba(169, 113, 63, 0.25), rgba(122, 74, 36, 0.4));
+    box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.35);
+  }
+
+  .cookie {
+    width: 78px;
+    height: 78px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 34% 30%, #E8B978, #C98A45);
+    border: 3px solid #A9713F;
+    box-shadow: 0 5px 0 #8A5A2E, 0 8px 14px rgba(58, 42, 31, 0.3);
+    display: grid;
+    place-items: center;
+    cursor: grab;
+    touch-action: none;
+    position: relative;
+
+    &::after {
+      content: '';
+      position: absolute;
+      inset: 12px;
+      border-radius: 50%;
+      background:
+        radial-gradient(circle at 30% 40%, rgba(74, 46, 16, 0.55) 0 3px, transparent 4px),
+        radial-gradient(circle at 70% 62%, rgba(74, 46, 16, 0.45) 0 3px, transparent 4px);
+      pointer-events: none;
+    }
+
+    .cookie-char {
+      font-family: 'Fredoka', sans-serif;
+      font-size: 2.2rem;
+      font-weight: 600;
+      color: #4A2E10;
+      position: relative;
+      z-index: 1;
+    }
+
+    &:active { cursor: grabbing; transform: translateY(3px); }
+    &[data-state~="dragged"] { opacity: 0.35; }
+    &[data-state~="eaten"] { animation: cookieEaten 0.5s ease forwards; }
+    &[data-state~="spat"] { animation: cookieSpat 0.7s ease; }
+
+    &.floating {
+      position: absolute;
+      transform: translate(-50%, -50%) scale(1.12) rotate(-6deg);
+      pointer-events: none;
+      z-index: 20;
+      box-shadow: 0 12px 20px rgba(58, 42, 31, 0.4);
+    }
+  }
+
+  .feed-note { font-size: 0.8rem; color: $ink-soft; }
+}
+
+@keyframes cookieEaten {
+  to { transform: translateY(-120px) scale(0.2) rotate(40deg); opacity: 0; }
+}
+
+@keyframes cookieSpat {
+  0% { transform: translate(0, 0) rotate(0); }
+  30% { transform: translate(0, -60px) rotate(-20deg); }
+  100% { transform: translate(0, 0) rotate(0); }
+}
+
+@media (max-width: 700px) {
+  .feed .cookie { width: 64px; height: 64px; .cookie-char { font-size: 1.8rem; } }
+}

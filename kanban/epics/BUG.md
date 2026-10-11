@@ -9,7 +9,7 @@ P0 · fixed by FB-1. Examples:
 
 ### BUG-2 · Feed Luna: one wrong tap counts as two misses — confirmed
 P0 · S
-- **Cause:** a tap feeds the cookie on pointer-up (`games/FeedLuna.tsx:187`), and then the button's `onClick` feeds it again (`:238`).
+- **Cause:** a tap feeds the cookie on pointer-up (`onPointerUp` in `games/FeedLuna/FeedLuna.tsx`), and then the button's `onClick` feeds it again.
 - **Effect:** the hint plays after the first mistake.
 - **Complete when:** one wrong tap counts as one miss, and drag, tap and keyboard each still work.
 
@@ -27,7 +27,7 @@ P1 · S
 
 ### BUG-21 · Bubble Sounds only ever asks for the first 12 letters — confirmed
 P1 · S
-- **Cause:** `games/BubbleSounds.tsx` picks round *i*'s letter from pool slots `i*3` to `i*3+2`, and a play has 4 rounds, so only the first 12 letters of the pool can come up. At tier 1 (Kindergarten on the easiest dial) T and W never come up; at tiers 2 and 3, M to Z and the digraphs (SH, CH, TH, WH) never do. Found while building the wrong-answer rules (2026-10-10): over 300 plays at every grade and dial, the distractor check never saw W or WH as the target.
+- **Cause:** `games/BubbleSounds/BubbleSounds.tsx` picks round *i*'s letter from pool slots `i*3` to `i*3+2`, and a play has 4 rounds, so only the first 12 letters of the pool can come up. At tier 1 (Kindergarten on the easiest dial) T and W never come up; at tiers 2 and 3, M to Z and the digraphs (SH, CH, TH, WH) never do. Found while building the wrong-answer rules (2026-10-10): over 300 plays at every grade and dial, the distractor check never saw W or WH as the target.
 - **Fix:** spread the rounds over the whole pool (for example, shuffle the pool and take the first 4), keeping no repeats within a play.
 - **Complete when:** over many plays at each grade and dial, every letter in that tier's pool is asked for at least once (counted with a scan like `.claude/skills/know-how/distractor-check.mjs`), and no play asks the same letter twice.
 

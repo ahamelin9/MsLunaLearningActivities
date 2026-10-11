@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import type { GameApi, GameDef } from '../engine/types';
-import { pick, sentencesFor, shuffle, tierFor, type SentenceItem } from '../engine/content';
-import { pickWrong, textChoice } from '../engine/distractors';
-import { soundManager } from '../../../utils/audio';
-import { pronunciation } from '../../../utils/pronunciation';
-import { SpeakChip } from './shared/SpeakChip/SpeakChip';
+import type { GameApi, GameDef } from '../../engine/types';
+import { pick, sentencesFor, shuffle, tierFor, type SentenceItem } from '../../engine/content';
+import { pickWrong, textChoice } from '../../engine/distractors';
+import { soundManager } from '@/utils/audio';
+import { pronunciation } from '@/utils/pronunciation';
+import { SpeakChip } from '../shared/SpeakChip/SpeakChip';
+import { GameSurface } from '../shared/GameSurface/GameSurface';
+import { dataState } from '@/utils/cx';
+import styles from './BuildSentence.module.scss';
 
 interface Tile {
   id: string;
@@ -126,9 +129,9 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
   };
 
   return (
-    <div className="game-surface sentence">
-      <div className="sentence-scene">
-        <span className="scene-emoji">{round.sentence.emoji}</span>
+    <GameSurface className={styles.sentence}>
+      <div className={styles.sentenceScene}>
+        <span className={styles.sceneEmoji}>{round.sentence.emoji}</span>
         <SpeakChip
           onClick={() => pronunciation.speakSentence(round.sentence.text)}
           disabled={!solved && api.hintLevel < 1}
@@ -138,29 +141,30 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
         </SpeakChip>
       </div>
 
-      <div className={`sentence-track ${shakeSlot ? 'is-shaking' : ''} ${solved ? 'is-solved' : ''}`}>
+      <div className={styles.sentenceTrack} data-state={dataState(shakeSlot ? 'shaking' : false, solved ? 'solved' : false)}>
         {slots.map((slot, i) => (
           <button
             key={i}
-            className={`sentence-slot ${slot ? 'is-filled' : ''} ${readingIndex === i ? 'is-reading' : ''}`}
+            className={styles.sentenceSlot}
+            data-state={dataState(slot ? 'filled' : false, readingIndex === i ? 'reading' : false)}
             onClick={() => slot && removeTile(i)}
             aria-label={slot ? `${slot.word}, tap to take back` : `empty space ${i + 1}`}
           >
-            {slot ? slot.word : <span className="slot-line" />}
+            {slot ? slot.word : <span className={styles.slotLine} />}
           </button>
         ))}
-        {solved && <span className="sentence-period">.</span>}
+        {solved && <span className={styles.sentencePeriod}>.</span>}
       </div>
 
-      <div className="word-shelf">
+      <div className={styles.wordShelf}>
         {available.map(tile => (
-          <button key={tile.id} className="word-tile" onClick={() => placeTile(tile)}>
+          <button key={tile.id} className={styles.wordTile} onClick={() => placeTile(tile)}>
             {tile.word}
           </button>
         ))}
-        {available.length === 0 && !solved && <span className="shelf-empty">Tap a word above to take it back</span>}
+        {available.length === 0 && !solved && <span className={styles.shelfEmpty}>Tap a word above to take it back</span>}
       </div>
-    </div>
+    </GameSurface>
   );
 };
 
