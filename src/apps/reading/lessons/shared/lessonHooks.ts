@@ -4,7 +4,7 @@
 // shell's.
 
 import { useEffect, useRef, useState } from 'react';
-import type { GameApi } from '../engine/types';
+import type { GameApi } from '../../engine/types';
 
 /** Says the question's prompt once, a moment after it appears. */
 export function usePrompt(say: () => void) {

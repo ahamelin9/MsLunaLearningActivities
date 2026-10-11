@@ -2,23 +2,23 @@
 // the behaviour they share).
 
 import React from 'react';
-import './lesson.scss';
+import styles from './LessonKit.module.scss';
 
 /**
  * The thing to listen for: a letter, a sound or a word that is heard, not
  * shown, until it has been found.
  */
 export const ListenCue: React.FC<{ onClick: () => void; answer: string | null }> = ({ onClick, answer }) => (
-  <button className={`lesson-listen ${answer ? 'is-found' : ''}`} onClick={onClick} title="Hear it again">
-    <span className="listen-icon" aria-hidden="true">{answer ? '✨' : '👂'}</span>
-    <span className="listen-answer">{answer ?? '?'}</span>
-    <span className="listen-label">{answer ? 'found it!' : 'tap to listen'}</span>
+  <button className={styles.lessonListen} data-state={answer ? 'found' : undefined} onClick={onClick} title="Hear it again">
+    <span className={styles.listenIcon} aria-hidden="true">{answer ? '✨' : '👂'}</span>
+    <span className={styles.listenAnswer}>{answer ?? '?'}</span>
+    <span className={styles.listenLabel}>{answer ? 'found it!' : 'tap to listen'}</span>
   </button>
 );
 
 /** The question in writing, said aloud on tap. */
 export const PromptChip: React.FC<{ text: string; onClick: () => void }> = ({ text, onClick }) => (
-  <button className="lesson-prompt" onClick={onClick}>
+  <button className={styles.lessonPrompt} onClick={onClick}>
     <span aria-hidden="true">🔊</span> {text}
   </button>
 );

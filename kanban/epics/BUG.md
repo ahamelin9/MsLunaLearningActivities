@@ -21,7 +21,7 @@ P1 · S
 
 ### BUG-8 · Story lessons ignore the Beginner speed
 P1 · S
-- **Cause:** `components/StoryReader.tsx:29` and `:35` hard-code `rate: 0.9` and `0.85`, which always lands on Normal.
+- **Cause:** `lessons/StoryReader/StoryReader.tsx` (its line and word readers) hard-code `rate: 0.9` and `0.85`, which always lands on Normal.
 - **Fix:** remove the overrides, or scale them relative to the user's speed setting.
 - **Complete when:** with Beginner selected, story lines and words play the slow clips (checked with clip logging).
 

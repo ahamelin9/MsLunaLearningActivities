@@ -1,14 +1,14 @@
 import React from 'react';
-import type { LessonQuestion } from '../../../types/reading';
-import type { GameApi } from '../engine/types';
-import { SoundToLetterMatch } from './SoundToLetterMatch';
-import { LetterHunter } from './LetterHunter';
-import { BlendAndRead } from './BlendAndRead';
-import { ReadAndMatch } from './ReadAndMatch';
-import { SightWordReader } from './SightWordReader';
-import { RhymeMatch } from './RhymeMatch';
-import { SentenceReader } from './SentenceReader';
-import { StoryReader } from './StoryReader';
+import type { LessonQuestion } from '@/types/reading';
+import type { GameApi } from '../../engine/types';
+import { SoundToLetterMatch } from '../SoundToLetterMatch/SoundToLetterMatch';
+import { LetterHunter } from '../LetterHunter/LetterHunter';
+import { BlendAndRead } from '../BlendAndRead/BlendAndRead';
+import { ReadAndMatch } from '../ReadAndMatch/ReadAndMatch';
+import { SightWordReader } from '../SightWordReader/SightWordReader';
+import { RhymeMatch } from '../RhymeMatch/RhymeMatch';
+import { SentenceReader } from '../SentenceReader/SentenceReader';
+import { StoryReader } from '../StoryReader/StoryReader';
 
 /** One question of a guided lesson, played as a round in the game shell. */
 export const LessonRound: React.FC<{ round: LessonQuestion; api: GameApi }> = ({ round, api }) => {

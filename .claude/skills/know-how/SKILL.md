@@ -124,7 +124,7 @@ build, or a tool that misbehaved. Skip routine fixes.
 - **Fix:** take turns. Say the game's line, then call `api.win/miss` from its
   `onEnd`, with a watchdog timer (in case `onEnd` never fires) and a busy ref
   that ignores taps meanwhile. Two working examples: `useAnswer` in
-  `components/lessonHooks.ts` and `feed()` in `games/FeedLuna/FeedLuna.tsx`. FB-1 will
+  `lessons/shared/lessonHooks.ts` and `feed()` in `games/FeedLuna/FeedLuna.tsx`. FB-1 will
   move every game onto one `api.answer()`.
 - **Check:** measure, don't guess. `speech-check.cjs` in this folder times
   every clip and marks the ones that were cut. Fixed looks like

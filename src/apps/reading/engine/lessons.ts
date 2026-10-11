@@ -7,7 +7,7 @@
 
 import type { GradeLevel, Lesson, LessonQuestion, QuestionType, ReadingSkill } from '../../../types/reading';
 import { READING_CURRICULUM } from '../../../data/readingCurriculum';
-import { LessonRound } from '../components/LessonRound';
+import { LessonRound } from '../lessons/shared/LessonRound';
 import type { AnyGameDef, GameDef, SkillArea } from './types';
 
 /** Where a lesson sits among the library's skills, by what its questions ask. */

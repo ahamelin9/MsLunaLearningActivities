@@ -29,7 +29,8 @@ const problem = line => {
   problems++;
 };
 
-for (const f of files.filter(f => f.endsWith('.scss') && !f.endsWith('.module.scss'))) {
+// a partial (`_world.scss`) outputs no CSS, so it can't hold a global class
+for (const f of files.filter(f => f.endsWith('.scss') && !f.endsWith('.module.scss') && !/(^|\/)_[^/]+$/.test(f))) {
   problem(`PLAIN    ${rel(f)} (not a module)`);
 }
 

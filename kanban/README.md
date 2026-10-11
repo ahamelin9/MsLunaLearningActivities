@@ -72,8 +72,8 @@ be pulled into Phase 1 for a break from styling.
 
 ### Now / Next
 
-- **Now:** DES-18e: one folder per lesson type, the last of the structure (the shell, the hub, GameShell and all 8 games are modules, DES-18b–d)
-- **Next:** follow "Order to finish the epic" at the top of `epics/DES.md`: DES-3, DES-19 and DES-20. OPS-9 (know-how checks onto `data-shot`) can start now: DES-18d took the last game classes its checks used. PRG-7 and SET-1 are pulled in where DES-13 and DES-16 need them. GAME-1c, Treasure Path's screen, waits on FB-1, which waits on the DES-8/DES-10 layout
+- **Now:** DES-3: one set of design tokens, the start of Stage 3 (Stage 2 is done: every page, game and lesson is a module in its own folder, DES-18a–e)
+- **Next:** follow "Order to finish the epic" at the top of `epics/DES.md`: DES-19, DES-20, DES-4, DES-5, DES-6. OPS-9 (know-how checks onto `data-shot`) can start any time: the checks lost their last class names with DES-18d. PRG-7 and SET-1 are pulled in where DES-13 and DES-16 need them. GAME-1c, Treasure Path's screen, waits on FB-1, which waits on the DES-8/DES-10 layout
 
 ## Epics
 
@@ -97,7 +97,6 @@ In board order. A new epic gets its file in `epics/` first, then a link here
 | ID | Title | Type | P | Size | Status |
 |---|---|---|---|---|---|
 | **DES** | **Design system & layout** | Epic | **P0** | | |
-| DES-18e | One folder per lesson type | Task | P0 | S | Todo |
 | DES-3 | One set of design tokens | Story | P0 | M | Todo |
 | DES-19 | Design check and contrast check in `npm run lint`, and after every edit | Task | P0 | M | Todo |
 | DES-20 | Kit page (dev only) and its screenshots | Task | P0 | M | Todo |

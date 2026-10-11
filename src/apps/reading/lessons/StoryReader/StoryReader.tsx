@@ -1,11 +1,14 @@
 import React, { useMemo, useState } from 'react';
-import type { StoryReadQuestion } from '../../../types/reading';
-import type { GameApi } from '../engine/types';
-import { shuffle } from '../engine/content';
-import { soundManager } from '../../../utils/audio';
-import { pronunciation } from '../../../utils/pronunciation';
-import { PromptChip } from './LessonKit';
-import { useAnswer, usePrompt } from './lessonHooks';
+import type { StoryReadQuestion } from '@/types/reading';
+import type { GameApi } from '../../engine/types';
+import { shuffle } from '../../engine/content';
+import { soundManager } from '@/utils/audio';
+import { pronunciation } from '@/utils/pronunciation';
+import { PromptChip } from '../shared/LessonKit';
+import { useAnswer, usePrompt } from '../shared/lessonHooks';
+import { cx, dataState } from '@/utils/cx';
+import kit from '../shared/LessonKit.module.scss';
+import styles from './StoryReader.module.scss';
 
 /** Said from the second wrong answer when a story has no hint of its own. */
 const STORY_HINT = { text: 'Peek back at the story. Tap a line and I will read it to you.' };
@@ -42,13 +45,13 @@ export const StoryReader: React.FC<{ question: StoryReadQuestion; api: GameApi }
   const sayQuestion = () => pronunciation.speakSentence(quiz.question);
 
   return (
-    <div className="lesson">
-      <div className="lesson-story">
-        <div className="story-head">
-          <span className="story-emoji">{question.imageEmoji}</span>
-          <span className="story-title">{question.title}</span>
+    <div className={kit.lesson}>
+      <div className={styles.lessonStory}>
+        <div className={styles.storyHead}>
+          <span className={styles.storyEmoji}>{question.imageEmoji}</span>
+          <span className={styles.storyTitle}>{question.title}</span>
           <button
-            className="lesson-action"
+            className={kit.lessonAction}
             disabled={!tried}
             onClick={() => {
               soundManager.playPop();
@@ -62,9 +65,9 @@ export const StoryReader: React.FC<{ question: StoryReadQuestion; api: GameApi }
         </div>
 
         {question.sentences.map((sentence, s) => (
-          <div key={sentence.id} className={`story-line ${activeLine === s ? 'is-active' : ''}`}>
+          <div key={sentence.id} className={styles.storyLine} data-state={activeLine === s ? 'active' : undefined}>
             <button
-              className="line-play"
+              className={styles.linePlay}
               disabled={!tried}
               onClick={() => readLine(s)}
               title="Read this line"
@@ -72,13 +75,14 @@ export const StoryReader: React.FC<{ question: StoryReadQuestion; api: GameApi }
             >
               🔊
             </button>
-            <span className="lesson-sentence">
+            <span className={cx(kit.lessonSentence, styles.lessonSentence)}>
               {sentence.text.split(' ').map((word, w) => {
                 const key = `${s}-${w}`;
                 return (
                   <button
                     key={key}
-                    className={`lesson-word-chip ${activeWord === key ? 'is-active' : ''}`}
+                    className={kit.lessonWordChip}
+                    data-state={activeWord === key ? 'active' : undefined}
                     onClick={() => readWord(word, key)}
                   >
                     {word}
@@ -92,14 +96,13 @@ export const StoryReader: React.FC<{ question: StoryReadQuestion; api: GameApi }
 
       <PromptChip text={quiz.question} onClick={sayQuestion} />
 
-      <div className="lesson-answers">
+      <div className={styles.lessonAnswers}>
         {answers.map(answer => (
           <button
             key={answer.id}
             data-shot="lesson-choice"
-            className={`lesson-answer ${wrongId === answer.id ? 'is-wrong' : ''} ${
-              solved && answer.isCorrect ? 'is-right' : ''
-            }`}
+            className={styles.lessonAnswer}
+            data-state={dataState(wrongId === answer.id ? 'wrong' : false, solved && answer.isCorrect ? 'right' : false)}
             disabled={solved}
             onClick={() =>
               choose(answer.id, answer.isCorrect, onEnd =>

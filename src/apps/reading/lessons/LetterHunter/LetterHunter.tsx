@@ -1,11 +1,13 @@
 import React, { useMemo } from 'react';
-import type { FindLetterQuestion } from '../../../types/reading';
-import type { GameApi } from '../engine/types';
-import { shuffle } from '../engine/content';
-import { soundManager } from '../../../utils/audio';
-import { pronunciation } from '../../../utils/pronunciation';
-import { ListenCue, PromptChip } from './LessonKit';
-import { useAnswer, usePrompt } from './lessonHooks';
+import type { FindLetterQuestion } from '@/types/reading';
+import type { GameApi } from '../../engine/types';
+import { shuffle } from '../../engine/content';
+import { soundManager } from '@/utils/audio';
+import { pronunciation } from '@/utils/pronunciation';
+import { ListenCue, PromptChip } from '../shared/LessonKit';
+import { useAnswer, usePrompt } from '../shared/lessonHooks';
+import { dataState } from '@/utils/cx';
+import kit from '../shared/LessonKit.module.scss';
 
 /** Hear a letter's name, find it among letters that look alike. */
 export const LetterHunter: React.FC<{ question: FindLetterQuestion; api: GameApi }> = ({ question, api }) => {
@@ -20,7 +22,7 @@ export const LetterHunter: React.FC<{ question: FindLetterQuestion; api: GameApi
   usePrompt(sayPrompt);
 
   return (
-    <div className="lesson">
+    <div className={kit.lesson}>
       <ListenCue
         answer={solved ? question.targetLetter : null}
         onClick={() => {
@@ -30,14 +32,13 @@ export const LetterHunter: React.FC<{ question: FindLetterQuestion; api: GameApi
       />
       <PromptChip text={question.prompt} onClick={sayPrompt} />
 
-      <div className="lesson-choices">
+      <div className={kit.lessonChoices}>
         {options.map(option => (
           <button
             key={option.id}
             data-shot="lesson-choice"
-            className={`lesson-choice ${wrongId === option.id ? 'is-wrong' : ''} ${
-              solved && option.isCorrect ? 'is-right' : ''
-            }`}
+            className={kit.lessonChoice}
+            data-state={dataState(wrongId === option.id ? 'wrong' : false, solved && option.isCorrect ? 'right' : false)}
             disabled={solved}
             onClick={() =>
               choose(option.id, option.isCorrect, onEnd =>
@@ -46,7 +47,7 @@ export const LetterHunter: React.FC<{ question: FindLetterQuestion; api: GameApi
             }
             aria-label={`letter ${option.letter}`}
           >
-            <span className="choice-letter">{option.letter}</span>
+            <span className={kit.choiceLetter}>{option.letter}</span>
           </button>
         ))}
       </div>

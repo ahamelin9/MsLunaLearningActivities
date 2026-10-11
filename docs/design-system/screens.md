@@ -36,9 +36,11 @@ src/
       engine/GameShell/            the frame every game and lesson plays in:
                                    start, stage, perch, reward
       games/<Game>/                one folder per game (BubbleSounds, FeedLuna, LetterHunt…)
-      games/shared/                pieces several games share (SpeakChip, StagePrompt…)
-      lessons/<Type>/              one folder per lesson type (BlendAndRead, StoryReader…)
-      lessons/shared/              LessonKit, LessonRound, lessonHooks
+      games/shared/                pieces several games share (GameSurface, SpeakChip, StagePrompt)
+      lessons/<Type>/              one folder per lesson type (BlendAndRead, StoryReader…); a type
+                                   with no styles of its own has only its .tsx
+      lessons/shared/              LessonKit (+ the module every lesson type uses), LessonRound,
+                                   lessonHooks
     writing/                       the Writing app (WRT), the same shape
 ```
 
@@ -54,7 +56,10 @@ GAME ticket.
 2. **Make its folder** with `<Name>.tsx` and `<Name>.module.scss`. Take class
    names from the module (`styles.card`) and join them with `cx()` from
    `src/utils/cx.ts`. A stylesheet loads partials from `src/`
-   (`@use 'styles/mixins'`), and TypeScript can import from `@/`.
+   (`@use 'styles/mixins'`), and TypeScript can import from `@/`. A state is
+   `data-state="wrong"`. When several can be on at once, build the value with
+   `dataState(isOpen && 'open', isMatched && 'matched')` from the same file and
+   match each with `[data-state~="open"]`.
 3. **Lay it out from kit components.** Write styles only for layout and for
    what's truly this screen's own, using roles, the space scale and the
    breakpoint mixin.

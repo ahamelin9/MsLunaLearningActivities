@@ -1,11 +1,13 @@
 import React, { useMemo } from 'react';
-import type { SightWordReaderQuestion } from '../../../types/reading';
-import type { GameApi } from '../engine/types';
-import { shuffle } from '../engine/content';
-import { soundManager } from '../../../utils/audio';
-import { pronunciation } from '../../../utils/pronunciation';
-import { ListenCue, PromptChip } from './LessonKit';
-import { useAnswer, usePrompt } from './lessonHooks';
+import type { SightWordReaderQuestion } from '@/types/reading';
+import type { GameApi } from '../../engine/types';
+import { shuffle } from '../../engine/content';
+import { soundManager } from '@/utils/audio';
+import { pronunciation } from '@/utils/pronunciation';
+import { ListenCue, PromptChip } from '../shared/LessonKit';
+import { useAnswer, usePrompt } from '../shared/lessonHooks';
+import { dataState } from '@/utils/cx';
+import kit from '../shared/LessonKit.module.scss';
 
 /**
  * Hear a sight word, read it among others. It is not shown until found: the
@@ -33,7 +35,7 @@ export const SightWordReader: React.FC<{ question: SightWordReaderQuestion; api:
   }));
 
   return (
-    <div className="lesson">
+    <div className={kit.lesson}>
       <ListenCue
         answer={solved ? question.word : null}
         onClick={() => {
@@ -43,40 +45,39 @@ export const SightWordReader: React.FC<{ question: SightWordReaderQuestion; api:
       />
       <PromptChip text={question.prompt} onClick={sayPrompt} />
 
-      <div className="lesson-choices">
+      <div className={kit.lessonChoices}>
         {options.map(option => (
           <button
             key={option.id}
             data-shot="lesson-choice"
-            className={`lesson-choice ${wrongId === option.id ? 'is-wrong' : ''} ${
-              solved && option.isCorrect ? 'is-right' : ''
-            }`}
+            className={kit.lessonChoice}
+            data-state={dataState(wrongId === option.id ? 'wrong' : false, solved && option.isCorrect ? 'right' : false)}
             disabled={solved}
             onClick={() =>
               choose(option.id, option.isCorrect, onEnd => pronunciation.speakWord(option.word, { onEnd }))
             }
           >
-            <span className="choice-word">{option.word}</span>
+            <span className={kit.choiceWord}>{option.word}</span>
           </button>
         ))}
       </div>
 
       {solved && question.exampleSentence && (
         <button
-          className="lesson-card is-button"
+          className={kit.lessonCard} data-state="button"
           onClick={() => {
             soundManager.playPop();
             pronunciation.speakSentence(question.exampleSentence);
           }}
         >
-          <span className="lesson-sentence">
+          <span className={kit.lessonSentence}>
             {sentence.map(({ token, isKey, i }) => (
-              <span key={i} className={`lesson-word-chip ${isKey ? 'is-key' : ''}`}>
+              <span key={i} className={kit.lessonWordChip} data-state={isKey ? 'key' : undefined}>
                 {token}
               </span>
             ))}
           </span>
-          <span className="card-tap">tap to hear it</span>
+          <span className={kit.cardTap}>tap to hear it</span>
         </button>
       )}
     </div>

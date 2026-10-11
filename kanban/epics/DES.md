@@ -46,7 +46,7 @@ them in.
 | # | Stage | Tickets | What you have at the end |
 |---|---|---|---|
 | 1 | Guardrails | DES-25 (done 2026-10-10) | Claude gets the right standards before any UI edit; people get a pre-commit check |
-| 2 | Structure (pure refactors, nothing looks different) | DES-18a, DES-18b, DES-18c, DES-18d (done 2026-10-11) → DES-18e | Screenshots you can compare; one folder per page, game and lesson; CSS modules; `games.scss` gone |
+| 2 | Structure (pure refactors, nothing looks different) | DES-18a–e (done 2026-10-11) | Screenshots you can compare; one folder per page, game and lesson; CSS modules; `games.scss` gone |
 | 3 | Foundations | DES-3 → DES-19 → DES-20 → DES-4 → DES-5 → DES-6 | Tokens in light and dark; lint enforces the rules after every edit; the Kit page; Andika and Fraunces offline; shared motion; reduced motion |
 | 4 | The kit | DES-7a → DES-7b, DES-7c → DES-15 | Every kit component on the Kit page in every state, and the new Luna |
 | 5 | Frame and shell | DES-8 → DES-10 → DES-9a → DES-9b → DES-9c → DES-12 | One header, the layout grid, the restyled home, Settings, trophies and Grade Select; one Luna per screen |
@@ -66,17 +66,6 @@ them in.
 - **DES-14** (P2) touches the same folder as DES-22b and can slot in straight after it.
 - **P0 bugs** can still be pulled in between tickets for a break from styling.
 
-### DES-18e · One folder per lesson type
-Task · P0 · S · needs: —
-- **How:**
-  - `apps/reading/components/` becomes `apps/reading/lessons/`: one folder per lesson type (`lessons/BlendAndRead/` …).
-  - `lessons/shared/` holds `LessonKit`, `LessonRound`, `lessonHooks` and the shared `lesson-*` pieces as a module.
-  - Story Corner's lesson block goes to `lessons/StoryReader/`.
-- **Complete when:**
-  - `--diff before after` shows 0 differing screens at 4 sizes;
-  - `lesson.scss` and `apps/reading/components/` are gone;
-  - build and lint pass.
-
 ### DES-3 · One set of design tokens
 Story · P0 · M · needs: —
 - **Why:** values must live in one place, and light/dark must come from roles alone (DES-2, `docs/design-system/colour.md`).
@@ -91,7 +80,7 @@ Story · P0 · M · needs: —
   - **`_illustration.scss`:** `--illo-*` colours. Luna, moon gold, squishies, cookies, roses and petals are fixed in both modes; the home scenery (sky, dunes, pampas) has a day and a night value.
   - **`src/styles/global.scss`:** the one entry, imported by `main.tsx`. It loads roles, illustration and `base/` (reset, ground with paper grain). `styles/_mixins.scss` outputs no CSS and is the only partial a module may `@use`.
   - **The app root:** pinned to `data-theme="light"` until DES-16, so a dark iPad doesn't get half-dark screens while areas move.
-  - **The unused sunset/day/cosmic setting goes** (its type, default and the `theme-*` classes), keeping today's default look.
+  - **The unused sunset/day/cosmic setting goes** (its type, its default, and the `data-theme="sunset|day|cosmic"` rules in `App.module.scss`, which were `theme-*` classes until DES-18b), keeping today's default look.
   - The legacy `_variables.scss` and `_world.scss` stay until their areas move (DES-24 deletes them).
 - **Complete when:**
   - removing one role's dark value fails `npm run build`;
@@ -101,7 +90,7 @@ Story · P0 · M · needs: —
   - the map's status row for tokens is updated.
 
 ### DES-19 · Design check and contrast check in `npm run lint`, and after every edit
-Task · P0 · M · needs: DES-3, DES-18e
+Task · P0 · M · needs: DES-3
 - **Why:** the rules only hold if a machine checks them, and catching a slip straight after the edit means nothing needs cleaning up later (Alex, 2026-10-10).
 - **How:**
   - **`scripts/design/check.mjs`** (no new dependencies), run by `npm run lint` after eslint. Over `src/**/*.{scss,ts,tsx}` it fails on:

@@ -1,11 +1,13 @@
 import React, { useMemo, useState } from 'react';
-import type { SentenceComprehensionQuestion } from '../../../types/reading';
-import type { GameApi } from '../engine/types';
-import { shuffle } from '../engine/content';
-import { soundManager } from '../../../utils/audio';
-import { pronunciation } from '../../../utils/pronunciation';
-import { PromptChip } from './LessonKit';
-import { useAnswer, usePrompt } from './lessonHooks';
+import type { SentenceComprehensionQuestion } from '@/types/reading';
+import type { GameApi } from '../../engine/types';
+import { shuffle } from '../../engine/content';
+import { soundManager } from '@/utils/audio';
+import { pronunciation } from '@/utils/pronunciation';
+import { PromptChip } from '../shared/LessonKit';
+import { useAnswer, usePrompt } from '../shared/lessonHooks';
+import { dataState } from '@/utils/cx';
+import kit from '../shared/LessonKit.module.scss';
 
 /** Read a sentence, any word of it tappable, and find the picture it describes. */
 export const SentenceReader: React.FC<{ question: SentenceComprehensionQuestion; api: GameApi }> = ({
@@ -23,20 +25,19 @@ export const SentenceReader: React.FC<{ question: SentenceComprehensionQuestion;
   const keys = new Set((question.highlightWords ?? []).map(w => w.toLowerCase()));
 
   return (
-    <div className="lesson">
+    <div className={kit.lesson}>
       <PromptChip text={question.prompt} onClick={sayPrompt} />
 
-      <div className="lesson-card">
-        <div className="lesson-sentence">
+      <div className={kit.lessonCard}>
+        <div className={kit.lessonSentence}>
           {words.map((word, i) => {
             // the reader keeps apostrophes; the inventory renders both spellings
             const clean = word.replace(/[.,/#!$%^&*;:{}=\-_`~()?"']/g, '');
             return (
               <button
                 key={`${word}-${i}`}
-                className={`lesson-word-chip ${keys.has(clean.toLowerCase()) ? 'is-key' : ''} ${
-                  active === i ? 'is-active' : ''
-                }`}
+                className={kit.lessonWordChip}
+                data-state={dataState(keys.has(clean.toLowerCase()) ? 'key' : false, active === i ? 'active' : false)}
                 onClick={() => {
                   soundManager.playPop();
                   setActive(i);
@@ -49,7 +50,7 @@ export const SentenceReader: React.FC<{ question: SentenceComprehensionQuestion;
           })}
         </div>
         <button
-          className="lesson-action"
+          className={kit.lessonAction}
           disabled={!tried}
           onClick={() => {
             soundManager.playPop();
@@ -61,23 +62,22 @@ export const SentenceReader: React.FC<{ question: SentenceComprehensionQuestion;
         </button>
       </div>
 
-      <div className="lesson-choices">
+      <div className={kit.lessonChoices}>
         {options.map(option => (
           <button
             key={option.id}
             data-shot="lesson-choice"
-            className={`lesson-choice ${wrongId === option.id ? 'is-wrong' : ''} ${
-              solved && option.isCorrect ? 'is-right' : ''
-            }`}
+            className={kit.lessonChoice}
+            data-state={dataState(wrongId === option.id ? 'wrong' : false, solved && option.isCorrect ? 'right' : false)}
             disabled={solved}
             onClick={() =>
               choose(option.id, option.isCorrect, onEnd => pronunciation.speakText(option.text, { onEnd }))
             }
             aria-label={option.text}
           >
-            {option.imageEmoji ? <span className="choice-emoji">{option.imageEmoji}</span> : null}
+            {option.imageEmoji ? <span className={kit.choiceEmoji}>{option.imageEmoji}</span> : null}
             {/* a written label repeats the sentence's words, so it waits for the answer */}
-            {(solved || !option.imageEmoji) && <span className="choice-label">{option.text}</span>}
+            {(solved || !option.imageEmoji) && <span className={kit.choiceLabel}>{option.text}</span>}
           </button>
         ))}
       </div>

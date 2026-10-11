@@ -115,6 +115,10 @@ changed screens.
 - The Kit page, light and dark side by side (from DES-20).
 - `npm run ui:shots` at the four iPad sizes, and `--diff` for refactors (from
   DES-18a).
+- `node .claude/skills/know-how/module-refs-check.mjs "$PWD" <folders>`: every
+  `styles.x` points at a real class (a typo is silently `undefined`), and no
+  `className="…"` string is left. For a refactor, the know-how entry "A move to
+  CSS modules" has the rule-by-rule comparison too.
 - Dark mode: force it on the Kit page or in the shots. Until DES-16 the app
   itself stays light.
 

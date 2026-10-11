@@ -1,11 +1,14 @@
 import React, { useMemo, useState } from 'react';
-import type { BlendAndReadQuestion } from '../../../types/reading';
-import type { GameApi } from '../engine/types';
-import { shuffle } from '../engine/content';
-import { soundManager } from '../../../utils/audio';
-import { pronunciation } from '../../../utils/pronunciation';
-import { PromptChip } from './LessonKit';
-import { useAnswer, usePrompt } from './lessonHooks';
+import type { BlendAndReadQuestion } from '@/types/reading';
+import type { GameApi } from '../../engine/types';
+import { shuffle } from '../../engine/content';
+import { soundManager } from '@/utils/audio';
+import { pronunciation } from '@/utils/pronunciation';
+import { PromptChip } from '../shared/LessonKit';
+import { useAnswer, usePrompt } from '../shared/lessonHooks';
+import { dataState } from '@/utils/cx';
+import kit from '../shared/LessonKit.module.scss';
+import styles from './BlendAndRead.module.scss';
 
 /** Sound out the letters, blend them, find the picture. */
 export const BlendAndRead: React.FC<{ question: BlendAndReadQuestion; api: GameApi }> = ({ question, api }) => {
@@ -31,44 +34,44 @@ export const BlendAndRead: React.FC<{ question: BlendAndReadQuestion; api: GameA
   };
 
   return (
-    <div className="lesson">
+    <div className={kit.lesson}>
       <PromptChip text={question.prompt} onClick={sayPrompt} />
 
-      <div className="lesson-blocks">
+      <div className={styles.lessonBlocks}>
         {question.phonemes.map((phoneme, i) => (
           <button
             key={`${phoneme.text}-${i}`}
-            className={`lesson-block ${active === i ? 'is-active' : ''}`}
+            className={styles.lessonBlock}
+            data-state={active === i ? 'active' : undefined}
             onClick={() => playSound(i)}
             title="Hear this sound"
           >
             {/* letters only: a phonetic symbol like /æ/ means nothing to a child; the tile says its sound */}
-            <span className="block-letters">{phoneme.text}</span>
+            <span className={styles.blockLetters}>{phoneme.text}</span>
           </button>
         ))}
       </div>
 
-      <button className="lesson-action" onClick={playAll}>
+      <button className={kit.lessonAction} onClick={playAll}>
         🔊 {solved ? `Blend & read: “${question.word}”` : 'Hear the sounds in a row'}
       </button>
 
-      <div className="lesson-choices">
+      <div className={kit.lessonChoices}>
         {options.map(option => (
           <button
             key={option.id}
             data-shot="lesson-choice"
-            className={`lesson-choice ${wrongId === option.id ? 'is-wrong' : ''} ${
-              solved && option.isCorrect ? 'is-right' : ''
-            }`}
+            className={kit.lessonChoice}
+            data-state={dataState(wrongId === option.id ? 'wrong' : false, solved && option.isCorrect ? 'right' : false)}
             disabled={solved}
             onClick={() =>
               choose(option.id, option.isCorrect, onEnd => pronunciation.speakText(option.text, { onEnd }))
             }
             aria-label={option.text}
           >
-            <span className="choice-emoji">{option.imageEmoji}</span>
+            <span className={kit.choiceEmoji}>{option.imageEmoji}</span>
             {/* named once found: written, it could be matched letter for letter without blending */}
-            {solved && <span className="choice-label">{option.text}</span>}
+            {solved && <span className={kit.choiceLabel}>{option.text}</span>}
           </button>
         ))}
       </div>
