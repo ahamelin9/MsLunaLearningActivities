@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
-    "lint": "eslint .",
+    "lint": "eslint . && node scripts/design/check.mjs && node scripts/design/contrast.mjs",
+    "design:status": "node scripts/design/check.mjs --status",
     "preview": "vite preview",
     "voice:render": "node scripts/voice/render.mjs",
     "voice:audit": "node scripts/voice/audit.mjs",

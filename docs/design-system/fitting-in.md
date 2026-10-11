@@ -77,7 +77,8 @@ In TSX:
   new file has any violation at all.
 - **When a ticket moves an area onto the system:** that area's count drops.
   `node scripts/design/check.mjs --update` writes the new, lower baseline. It
-  refuses to write a higher one.
+  refuses to write a higher one. A file that was only moved or renamed counts
+  as new; `--update` accepts it as long as the total doesn't rise.
 - **To see what's left:** `npm run design:status` shows the count per area.
   The map's status table follows it.
 - **The end:** DES-24 deletes the baseline. From then on the check is strict:
@@ -92,5 +93,5 @@ In TSX:
 | `@keyframes` outside the motion folder | Use a shared animation (`var(--motion-…)`). If none fits, add it to `src/styles/motion/` (Alex OKs a new shared animation) |
 | Primitives used outside the tokens | Use the role built on that primitive |
 | A kit folder with no `.kit.tsx` | Add one that shows every state |
-| Unknown ID in an exception marker | Name a real ticket, or remove the exception |
+| Unknown ID in an exception marker, or no reason | Name a real ticket and say why, or remove the exception |
 | Contrast below 4.5 | Change the role's value (step 3 or 4), never the rule |

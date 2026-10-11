@@ -63,6 +63,8 @@ mentioned and what the prototype follows"). A future proposal is marked
 | 2026-10-11 | Only the teacher's picks get illustration colours: owl 1 and the milestone moon. The other Luna options and the progress seed are left out | Claude, Alex OK | They weren't chosen | DES-3 |
 | 2026-10-11 | The breakpoints start as `narrow` (under 900px wide) and `short` (under 800px tall) | Claude, Alex OK | Where the four target sizes split; DES-10 settles the set | DES-3, DES-10 |
 | 2026-10-11 | Today's Feed Luna cookie colours go in the illustration palette until DES-14 draws new cookies | Claude, Alex OK | No board shows a cookie | DES-3, DES-14 |
+| 2026-10-11 | The design check also counts colour names and `.css` files. Its primitives, kit-page and exception-marker rules always fail instead of joining the baseline | Claude | Colour names are raw colours too (colour.md, rule 1), and the always-fail rules have nothing to grandfather | DES-19 |
+| 2026-10-11 | The after-edit hook compares a file with its committed version, by rule and text, so only values the edit added are reported | Claude | Moving a line or editing an old file shouldn't nag; adding a value should | DES-19 |
 
 ## Standards settled on 2026-10-10 (Alex approved)
 

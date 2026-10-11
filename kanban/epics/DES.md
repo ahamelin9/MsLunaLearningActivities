@@ -47,7 +47,7 @@ them in.
 |---|---|---|---|
 | 1 | Guardrails | DES-25 (done 2026-10-10) | Claude gets the right standards before any UI edit; people get a pre-commit check |
 | 2 | Structure (pure refactors, nothing looks different) | DES-18a–e (done 2026-10-11) | Screenshots you can compare; one folder per page, game and lesson; CSS modules; `games.scss` gone |
-| 3 | Foundations | DES-3 (done 2026-10-11) → DES-19 → DES-20 → DES-4 → DES-5 → DES-6 | Tokens in light and dark; lint enforces the rules after every edit; the Kit page; Andika and Fraunces offline; shared motion; reduced motion |
+| 3 | Foundations | DES-3, DES-19 (done 2026-10-11) → DES-20 → DES-4 → DES-5 → DES-6 | Tokens in light and dark; lint enforces the rules after every edit; the Kit page; Andika and Fraunces offline; shared motion; reduced motion |
 | 4 | The kit | DES-7a → DES-7b, DES-7c → DES-15 | Every kit component on the Kit page in every state, and the new Luna |
 | 5 | Frame and shell | DES-8 → DES-10 → DES-9a → DES-9b → DES-9c → DES-12 | One header, the layout grid, the restyled home, Settings, trophies and Grade Select; one Luna per screen |
 | 6 | The library | DES-21 → **PRG-7 (pulled in)** → DES-13 | The library as on the board: lessons in order, one bar |
@@ -65,36 +65,6 @@ them in.
 - **DES-17's full-shelf milestone moved to PRG-4,** so the moon doesn't wait on squishies (PRG-5, Phase 7).
 - **DES-14** (P2) touches the same folder as DES-22b and can slot in straight after it.
 - **P0 bugs** can still be pulled in between tickets for a break from styling.
-
-### DES-19 · Design check and contrast check in `npm run lint`, and after every edit
-Task · P0 · M · needs: —
-- **Why:** the rules only hold if a machine checks them, and catching a slip straight after the edit means nothing needs cleaning up later (Alex, 2026-10-10).
-- **How:**
-  - **`scripts/design/check.mjs`** (no new dependencies), run by `npm run lint` after eslint. Over `src/**/*.{scss,ts,tsx}` it fails on:
-    - colour literals outside `_primitives.scss` and `_illustration.scss`;
-    - px/rem, duration and easing literals outside the token files;
-    - `@keyframes` outside `src/styles/motion/`;
-    - `@use` of the primitives outside `src/styles/tokens/`;
-    - a kit folder with no `.kit.tsx`;
-    - a `design-exception(ID): why` marker whose ID is neither on the board nor in the changelog.
-  - **What the check skips:**
-    - it strips comments and `url(data:…)` first;
-    - it allows `0`, `%`, `fr`, viewport units, `deg`, `em` and unitless numbers;
-    - in `.ts`/`.tsx` it checks colours only.
-  - **Ratchet:**
-    - `scripts/design/baseline.json` holds today's count per file. Lint fails if a file goes up or a new file has any violations.
-    - `--update` rewrites the baseline but refuses any increase, and accepts a moved file only when the total doesn't rise.
-    - `npm run design:status` prints what's left per area.
-  - **`scripts/design/contrast.mjs`**, also run by lint. It compiles `src/styles/tokens` with sass-embedded (`compileAsync`, absolute `loadPaths`), blends semi-transparent colours over their ground, and checks every listed text pair at 4.5:1 or more in light and dark.
-  - **`.claude/hooks/design-check-file.mjs`** (PostToolUse on Edit, Write and MultiEdit) runs the check on the edited file alone. It reports only violations that are new against the baseline or the file's HEAD version, each with a fix hint ("raw hex: use a role, see colour.md"), fed back so Claude fixes them in the same turn.
-- **Complete when:**
-  - a raw hex added to a kit component fails `npm run lint` and is reported straight after the edit;
-  - editing a legacy file without adding violations reports nothing;
-  - today's tree passes through the baseline, and `--update` refuses a raised count;
-  - a marker naming an unknown ID fails;
-  - the contrast check lists every pair in both modes, and fails when a pair is pushed under 4.5;
-  - `npm run design:status` prints counts per area;
-  - the map and the skill explain how to read a failure.
 
 ### DES-20 · Kit page (dev only) and its screenshots
 Task · P0 · M · needs: —

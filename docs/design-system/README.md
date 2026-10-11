@@ -119,6 +119,7 @@ so changing a `## Rules` section changes what Claude is shown.
 - **See everything:** run `npm run dev` and open `/?kit` (DES-20).
 - **Check your work:** `npm run lint` runs eslint, the design check and the
   contrast check. `npm run design:status` shows what's left per area (DES-19).
+  A failure? See "Reading a design check failure" below.
 - **Turn on the pre-commit check** (people; once per clone): run
   `chmod +x .githooks/pre-commit`, then `git config core.hooksPath .githooks`.
   Every commit then runs `npm run lint` first, and a failure stops the commit.
@@ -130,6 +131,51 @@ so changing a `## Rules` section changes what Claude is shown.
   screens by their `data-shot="…"` attributes, so keep them when moving a screen,
   and give anything new it should click one.
 
+## Reading a design check failure
+
+`npm run lint` runs eslint, then the design check, then the contrast check, and
+stops at the first that fails.
+
+**The design check** (`scripts/design/check.mjs`) counts raw values outside
+their homes:
+
+| Kind | What counts | Its home |
+|---|---|---|
+| colour | a hex, `rgb()`, `hsl()` or colour name (the only check in `.ts`/`.tsx`) | `_primitives.scss`, `_illustration.scss` |
+| size | a `px` or `rem` value, media queries included | `src/styles/tokens/` |
+| motion | a duration (`ms`, `s`) or an easing | `src/styles/tokens/` |
+| keyframes | an `@keyframes` | `src/styles/motion/` |
+
+It skips comments, `url(data:…)`, `0`, `%`, `fr`, viewport units, `deg`, `em`
+and plain numbers. A `design-exception(ID): why` marker covers its own line and
+the next ([fitting-in.md](fitting-in.md)).
+
+What a failure says, and what to do:
+- **`src/x.module.scss: 41 raw value(s), the baseline allows 40 (+1)`**: the
+  file gained one. `node scripts/design/check.mjs src/x.module.scss` lists every
+  raw value with its line and a hint (↳) naming the token to use. Replace the
+  new one. `--update` won't help: it refuses a higher count.
+- **`…, the baseline allows 0`** and a list: a new file has raw values. Move
+  them onto tokens. If it's an old file that was only moved or renamed, run
+  `node scripts/design/check.mjs --update`: it accepts the move when the total
+  doesn't rise.
+- **A line with no count**, which fails whatever the baseline: `@use` of the
+  primitives outside `src/styles/tokens/`, a kit folder with no `.kit.tsx`, or
+  a `design-exception` marker whose ticket ID is on neither the board nor the
+  changelog, or that gives no reason.
+- **On a pass, "N file(s) now below their baseline"**: raw values were moved
+  onto tokens. Run `--update` to lock the lower count in, so it can't creep
+  back.
+
+**The contrast check** (`scripts/design/contrast.mjs`) prints every text pair
+from `_roles.scss` with its ratio in light and dark. A ❌ names the text role,
+the role under it and the mode. Change a role's value (steps 3 and 4 of the
+ladder), never the 4.5:1 minimum.
+
+**Straight after Claude's edits,** the hook `design-check-file.mjs` runs the
+same design check on that one file and lists only what the edit added, with
+the same hints, so it's fixed in the same turn.
+
 ## Status per area
 
 Each ticket updates its row when it closes (Completion criteria B7 in
@@ -138,11 +184,11 @@ Each ticket updates its row when it closes (Completion criteria B7 in
 | Area | Where | Status | Tickets |
 |---|---|---|---|
 | Standards (these docs, the skill) | `docs/design-system/`, `luna-design` | Done (Alex approved, 2026-10-10) | DES-2 |
-| Hooks at the moment of editing | `.claude/hooks/`, `.githooks/` | Before-edit hook and pre-commit check built (DES-25, 2026-10-10); the after-edit check comes with DES-19 | DES-25, DES-19 |
+| Hooks at the moment of editing | `.claude/hooks/`, `.githooks/` | Done: the before-edit hook and pre-commit check (DES-25, 2026-10-10), and the after-edit design check (DES-19, 2026-10-11) | DES-25, DES-19 |
 | Screenshots you can compare | `scripts/ui/shots.mjs` | Done (DES-18a, 2026-10-11): same pixels every run on a page clock, `--diff` with red overlays, found by `data-shot` | DES-18a |
 | Source tree and CSS modules | `src/` | Done (2026-10-11): every page, game and lesson type has its own folder and CSS module, and no global class is left in `src/` (`module-refs-check.mjs`). Only the legacy partials and `index.css` stay global until DES-24 | DES-18b–e |
 | Tokens | `src/styles/tokens/` | Done (DES-3, 2026-10-11): primitives, roles in light and dark (the build fails if one is missing), the illustration palette, `bp()`, `global.scss` and `base/`. Every colour on the round 2 boards has a token (`tokens-check.mjs`). The app is pinned light on `<html>`; nothing reads the tokens yet | DES-3 |
-| Design check and contrast check | `scripts/design/` | Planned | DES-19 |
+| Design check and contrast check | `scripts/design/` | Done (DES-19, 2026-10-11): both run in `npm run lint`. Baseline 2,365 raw values in 50 files, which may only shrink; 22 text pairs pass 4.5:1 in both modes. `npm run design:status` shows what's left | DES-19 |
 | Kit page | `src/dev/KitPage/` | Planned | DES-20 |
 | Type and fonts | tokens, `public/fonts/` | Planned | DES-4 |
 | Motion and reduced motion | `src/styles/motion/` | Planned | DES-5, DES-6 |

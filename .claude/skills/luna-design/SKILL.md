@@ -95,7 +95,8 @@ Follow `screens.md`:
 2. Build from the kit, with roles and the space scale only, in the screen's own
    folder.
 3. `npm run design:status` should show the area at zero, and `npm run lint`
-   should pass.
+   should pass. Then `node scripts/design/check.mjs --update` writes the lower
+   baseline, so the area can't slip back.
 4. `npm run ui:shots -- --label after`. Compare it with the board (style sample,
    page "Round 2 · Teacher's picks") in light and dark.
 5. Get Alex's OK, and update the area's row on the map.
@@ -113,8 +114,10 @@ changed screens.
 
 ### Check your work
 - `npm run lint`: eslint, the design check and the contrast check (from DES-19).
-  The backlog guard runs it before any ticket closes.
-- `npm run design:status`: what's left per area.
+  The backlog guard runs it before any ticket closes. To read a failure, see
+  "Reading a design check failure" in `docs/design-system/README.md`;
+  `node scripts/design/check.mjs <file>` lists one file's raw values with hints.
+- `npm run design:status`: what's left per area and folder.
 - The Kit page, light and dark side by side (from DES-20).
 - `npm run ui:shots` at the four iPad sizes, and `--diff` for refactors (from
   DES-18a).
@@ -138,7 +141,8 @@ changed screens.
   `node .claude/skills/luna-design/guide-check.mjs "$PWD"`.
 - **After an edit** (`design-check-file.mjs`, DES-19): it lists new violations
   with a fix hint. Fix them in the same turn. Don't raise the baseline or add an
-  exception to get past them.
+  exception to get past them. It compares with the file's committed version,
+  so a value only moved within the file doesn't count.
 
 ## Who decides, and where learnings go
 

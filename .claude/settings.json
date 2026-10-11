@@ -44,6 +44,16 @@
             "timeout": 10
           }
         ]
+      },
+      {
+        "matcher": "Edit|MultiEdit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/design-check-file.mjs\" 2>/dev/null || true",
+            "timeout": 15
+          }
+        ]
       }
     ]
   }
