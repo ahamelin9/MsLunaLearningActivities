@@ -1,4 +1,4 @@
-@use './world' as *;
+@use 'apps/reading/engine/world' as *;
 
 .game-shell {
   position: relative;
@@ -14,15 +14,15 @@
   overflow: hidden;
 
   // Each game's stage takes on the material of its own world.
-  &.shape-jar .shell-stage { background: linear-gradient(180deg, #EAF6E6, #CFE9CC); }
-  &.shape-bubbles .shell-stage { background: linear-gradient(180deg, #DFF2FB, #A9DCF2); }
-  &.shape-plate .shell-stage { background: linear-gradient(180deg, #FDEFD6, #F6D9A8); }
-  &.shape-cards .shell-stage { background: linear-gradient(180deg, #F2E7FB, #DCC6F4); }
-  &.shape-book .shell-stage { background: linear-gradient(180deg, #FFFBF0, #F3E4C6); }
-  &.shape-page .shell-stage { background: linear-gradient(180deg, #FFFDF6, #EFE3CA); }
-  &.shape-desk .shell-stage { background: linear-gradient(180deg, #FBEEDD, #E7C99B); }
-  &.shape-map .shell-stage { background: linear-gradient(180deg, #FBEFD2, #EBD3A2); }
-  &.shape-lesson .shell-stage {
+  &[data-shape="jar"] .shell-stage { background: linear-gradient(180deg, #EAF6E6, #CFE9CC); }
+  &[data-shape="bubbles"] .shell-stage { background: linear-gradient(180deg, #DFF2FB, #A9DCF2); }
+  &[data-shape="plate"] .shell-stage { background: linear-gradient(180deg, #FDEFD6, #F6D9A8); }
+  &[data-shape="cards"] .shell-stage { background: linear-gradient(180deg, #F2E7FB, #DCC6F4); }
+  &[data-shape="book"] .shell-stage { background: linear-gradient(180deg, #FFFBF0, #F3E4C6); }
+  &[data-shape="page"] .shell-stage { background: linear-gradient(180deg, #FFFDF6, #EFE3CA); }
+  &[data-shape="desk"] .shell-stage { background: linear-gradient(180deg, #FBEEDD, #E7C99B); }
+  &[data-shape="map"] .shell-stage { background: linear-gradient(180deg, #FBEFD2, #EBD3A2); }
+  &[data-shape="lesson"] .shell-stage {
     background: linear-gradient(180deg, #FFFDF5, #F4E7CD);
     // A story can be taller than the stage, so a lesson scrolls inside it.
     // Auto margins centre the lesson when it fits and start it at the top when
@@ -31,7 +31,7 @@
     align-items: flex-start;
     overflow-y: auto;
 
-    > .lesson { margin: auto; }
+    > * { margin: auto; }
   }
 
   // ---------- top bar ----------
@@ -75,12 +75,12 @@
       border: 2px solid transparent;
       transition: all 0.25s ease;
 
-      &.done {
+      &[data-state~="done"] {
         background: $amber;
         box-shadow: 0 0 0 3px rgba(240, 162, 46, 0.25);
       }
 
-      &.current {
+      &[data-state~="current"] {
         border-color: $ink;
         transform: scale(1.25);
       }
@@ -139,8 +139,8 @@
     transition: transform 0.18s ease;
   }
 
-  &.flash-miss .shell-stage { animation: stageShake 0.42s ease; }
-  &.flash-win .shell-stage { box-shadow: inset 0 0 0 4px rgba(74, 160, 90, 0.55), 0 10px 26px rgba(58, 42, 31, 0.16); }
+  &[data-flash="miss"] .shell-stage { animation: stageShake 0.42s ease; }
+  &[data-flash="win"] .shell-stage { box-shadow: inset 0 0 0 4px rgba(74, 160, 90, 0.55), 0 10px 26px rgba(58, 42, 31, 0.16); }
 
   // ---------- Luna's perch ----------
   .luna-perch {
@@ -231,7 +231,7 @@
   }
 
   // ---------- start screen ----------
-  &.phase-intro {
+  &[data-phase="intro"] {
     align-items: center;
     justify-content: center;
 
@@ -329,7 +329,7 @@
 
       &:hover { transform: translateY(-2px); }
 
-      &.is-active {
+      &[data-state="active"] {
         background: #FFF1D4;
         border-color: $amber-deep;
         box-shadow: 0 4px 0 rgba(201, 123, 18, 0.35);
@@ -355,7 +355,7 @@
   }
 
   // ---------- reward screen ----------
-  &.phase-reward {
+  &[data-phase="reward"] {
     align-items: center;
     justify-content: center;
 
@@ -451,38 +451,6 @@
       &.primary { @include chunky($amber, $amber-deep, #46280A); }
       &.ghost { box-shadow: none; background: transparent; border: 2px solid rgba(58, 42, 31, 0.2); }
     }
-  }
-}
-
-// ---------- shared game furniture, used inside stages ----------
-
-.stage-prompt {
-  font-family: 'Fredoka', sans-serif;
-  font-weight: 600;
-  font-size: 1.2rem;
-  color: $ink;
-  text-align: center;
-}
-
-.speak-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  padding: 0.4rem 0.9rem;
-  border-radius: 999px;
-  background: #FFFFFF;
-  border: 2.5px solid rgba(58, 42, 31, 0.18);
-  font-family: 'Fredoka', sans-serif;
-  font-weight: 600;
-  color: $ink;
-  cursor: pointer;
-
-  &:hover:not(:disabled) { background: #FFF6E6; }
-  &:active:not(:disabled) { transform: scale(0.96); }
-  // locked until the child has tried (the text is theirs to read first)
-  &:disabled {
-    cursor: default;
-    opacity: 0.45;
   }
 }
 

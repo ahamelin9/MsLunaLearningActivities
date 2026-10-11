@@ -150,12 +150,13 @@ Copy `speech-check.cjs` from this folder and edit its scenario. It already:
   argument is the text.
 - times every clip by wrapping `AudioBufferSourceNode.prototype.start/stop`.
 
-Selectors that work: `[data-shot="open-reading"]` for the home icon (its
-class went with DES-18b); `.grade-card-item` (0 K, 1 1st,
-2 2nd); lessons are `.hub-lessons .game-thing` and games are
-`.hub-rug .game-thing:not(.nook)`, both named by `.thing-title`;
-`.play-button`; `.game-shell.phase-play` / `.phase-reward`; and
-`.round-pips[aria-label]`, which changes each round.
+Selectors that work (the shell's and the hub's classes went with DES-18b
+and DES-18c): `[data-shot="open-reading"]` for the home icon;
+`[data-shot="grade-card"]` (0 K, 1 1st, 2 2nd); lessons are
+`[data-shot="lesson-tile"]` and games `[data-shot="game-tile"]`, a game
+named by its `[data-shot="tile-title"]`; `[data-shot="play"]`;
+`[data-shot="shell-play"]` / `[data-shot="shell-reward"]`; and
+`[data-shot="round-pips"][aria-label]`, which changes each round.
 
 Prove the check can fail: switch the fix off for a moment (for example, set
 its constant to something huge), rerun, and watch it go ❌, then put the fix
@@ -234,7 +235,7 @@ Pitfalls that cost time:
 
 ## A move to CSS modules: proving nothing changed, even what no screenshot shows
 
-*2026-10-11 · DES-18b*
+*2026-10-11 · DES-18b, DES-18c*
 
 - **Symptom:** `ui:shots --diff` says 0 changed screens, but the shots never
   reach some states: a loading badge, a "playing" pulse, a Button variant, a
@@ -244,12 +245,23 @@ Pitfalls that cost time:
   in ways a shot may miss: a `styles.x` with a typo is `undefined` (no class,
   no error), and a class or `@keyframes` that another file defined stops
   matching, because each module renames its own.
-- **Fix:** before converting, find what crosses files: a class one file
-  styles and another renders, and keyframes used outside their file
-  (Trophy's backdrop and pop-in lived in `SettingsModal.scss`, the home bubbles
-  in `App.scss`). Move each one to the file that uses it, or copy it with a
-  comment naming the ticket that removes the copy. The changelog's DES-18b
-  entry has the table of what becomes what.
+- **Fix:** before converting, find what crosses files, in both directions:
+  - a class one file styles and another renders, and keyframes used outside
+    their file (Trophy's backdrop and pop-in lived in `SettingsModal.scss`,
+    the home bubbles in `App.scss`; GameShell centred a lesson with
+    `> .lesson`, the lesson's own class);
+  - CSS that now loads at a different time. A rule moved into a component
+    loads when that component is first imported: SpeakChip's CSS now loads
+    before `games.scss`, where the shell's used to load after it. That's
+    only safe if no game rule of equal specificity targets the same element,
+    so check the game rules on it first.
+
+  Move each one to the file that uses it, or copy it with a comment naming
+  the ticket that removes the copy. The changelog's DES-18b and DES-18c
+  entries have the table of what becomes what.
+- **Moving into folders:** `node .claude/skills/know-how/move-into-folders.mjs "$PWD" <moves.json>`
+  moves each `.tsx` and `.module.scss` and repoints every import the move
+  breaks: relative inside an app, `@/…` otherwise, and `@use` from `src/`.
 - **Check:** three things.
   - `ui:shots --diff before after`: 0 changed screens, after the in-place
     conversion and again after the move into folders.
@@ -258,11 +270,14 @@ Pitfalls that cost time:
     folder not converted yet, and on a planted typo.
   - `git archive HEAD src | tar -x -C <scratch>/head`, then
     `node .claude/skills/know-how/css-rules-compare.mjs "$PWD" <scratch>/head <map.json>`:
-    compiles every old `X.scss` and new `X.module.scss`, maps the old state
-    classes to the new selectors, and lists any rule that differs. Rules that
-    only moved between files cancel out. Write the ticket's renames into the
-    map (`[["\\.toggle-on", "[data-state=on]"], …]`). Without the map it
-    fails, which proves it can.
+    compiles every stylesheet then and now and compares all the rules as one
+    whole, so a moved rule or a renamed file cancels out. The map's renames
+    (`[["\\.toggle-on", "[data-state=on]"], …]`) apply only to sheets that
+    became modules or went; a sheet still global is compared as it is, so
+    its own edits show up. Without the map it fails, which proves it can.
+    (Its first version paired files by name and called the renamed
+    `ReadingHub.scss` → `Hub.module.scss` all new; it compares the whole
+    tree since DES-18c.)
 
 ## A hook test says nothing, but the hook is fine
 

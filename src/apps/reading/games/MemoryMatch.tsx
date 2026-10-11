@@ -4,6 +4,7 @@ import { lettersFor, sample, shuffle, tierFor, wordsUpTo } from '../engine/conte
 import { distinctByEmoji } from '../engine/distractors';
 import { soundManager } from '../../../utils/audio';
 import { pronunciation, type SpeechPart } from '../../../utils/pronunciation';
+import { StagePrompt } from './shared/StagePrompt/StagePrompt';
 
 interface Card {
   id: string;
@@ -139,9 +140,9 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
 
   return (
     <div className="game-surface memory">
-      <p className="stage-prompt memory-prompt">
+      <StagePrompt className="memory-prompt">
         {round.kind === 'case' ? 'Big letter + little letter' : 'Picture + word'} — find every pair!
-      </p>
+      </StagePrompt>
 
       <div className={`memory-board cols-${round.pairCount >= 6 ? 4 : round.pairCount === 5 ? 5 : 4}`}>
         {round.cards.map(card => {

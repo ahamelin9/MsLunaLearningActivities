@@ -1,19 +1,20 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import type { GradeLevel } from '../../../types/reading';
-import type { UserProgress } from '../../../types/user';
-import type { AnyGameDef, GameShape } from '../engine/types';
-import { GRADES } from '../../../data/readingCurriculum';
-import { GAMES } from '../games';
-import { LunaOwl } from '../engine/LunaOwl';
-import { greeting, lunaSay, maybeQuirk, type LunaMood } from '../engine/luna';
-import { STICKERS, stickerById } from '../engine/stickers';
-import { pick, tierFor, wordsUpTo } from '../engine/content';
-import { soundManager } from '../../../utils/audio';
-import { pronunciation, type SpeechPart } from '../../../utils/pronunciation';
-import { warmReadingVoice } from '../engine/warmup';
-import './ReadingHub.scss';
+import type { GradeLevel } from '@/types/reading';
+import type { UserProgress } from '@/types/user';
+import type { AnyGameDef, GameShape } from '../../engine/types';
+import { GRADES } from '@/data/readingCurriculum';
+import { GAMES } from '../../games';
+import { LunaOwl } from '../../engine/LunaOwl/LunaOwl';
+import { greeting, lunaSay, maybeQuirk, type LunaMood } from '../../engine/luna';
+import { STICKERS, stickerById } from '../../engine/stickers';
+import { pick, tierFor, wordsUpTo } from '../../engine/content';
+import { soundManager } from '@/utils/audio';
+import { pronunciation, type SpeechPart } from '@/utils/pronunciation';
+import { warmReadingVoice } from '../../engine/warmup';
+import { cx } from '@/utils/cx';
+import styles from './Hub.module.scss';
 
-interface ReadingHubProps {
+interface HubProps {
   grade: GradeLevel;
   progress: UserProgress;
   /** this grade's guided lessons, in teaching order (engine/lessons.ts) */
@@ -31,9 +32,9 @@ const Scenery: React.FC<{ shape: GameShape; emoji: string }> = ({ shape, emoji }
   switch (shape) {
     case 'jar':
       return (
-        <span className="scenery jar-scenery" aria-hidden="true">
-          <span className="jar-lid" />
-          <span className="jar-body">
+        <span className={cx(styles.scenery, styles.jarScenery)} aria-hidden="true">
+          <span className={styles.jarLid} />
+          <span className={styles.jarBody}>
             <i>B</i>
             <i>m</i>
             <i>S</i>
@@ -43,7 +44,7 @@ const Scenery: React.FC<{ shape: GameShape; emoji: string }> = ({ shape, emoji }
       );
     case 'bubbles':
       return (
-        <span className="scenery bubble-scenery" aria-hidden="true">
+        <span className={cx(styles.scenery, styles.bubbleScenery)} aria-hidden="true">
           <i style={{ left: '10%', animationDelay: '0s' }}>a</i>
           <i style={{ left: '42%', animationDelay: '0.6s' }}>s</i>
           <i style={{ left: '70%', animationDelay: '1.2s' }}>m</i>
@@ -51,7 +52,7 @@ const Scenery: React.FC<{ shape: GameShape; emoji: string }> = ({ shape, emoji }
       );
     case 'cards':
       return (
-        <span className="scenery card-scenery" aria-hidden="true">
+        <span className={cx(styles.scenery, styles.cardScenery)} aria-hidden="true">
           <i />
           <i />
           <i />
@@ -59,21 +60,21 @@ const Scenery: React.FC<{ shape: GameShape; emoji: string }> = ({ shape, emoji }
       );
     case 'plate':
       return (
-        <span className="scenery plate-scenery" aria-hidden="true">
+        <span className={cx(styles.scenery, styles.plateScenery)} aria-hidden="true">
           <i>b</i>
           <i>D</i>
         </span>
       );
     case 'map':
       return (
-        <span className="scenery map-scenery" aria-hidden="true">
-          <span className="map-path" />
-          <span className="map-x">✕</span>
+        <span className={cx(styles.scenery, styles.mapScenery)} aria-hidden="true">
+          <span className={styles.mapPath} />
+          <span className={styles.mapX}>✕</span>
         </span>
       );
     case 'desk':
       return (
-        <span className="scenery desk-scenery" aria-hidden="true">
+        <span className={cx(styles.scenery, styles.deskScenery)} aria-hidden="true">
           <i>🧦</i>
           <i>🔑</i>
           <i>🍎</i>
@@ -81,13 +82,13 @@ const Scenery: React.FC<{ shape: GameShape; emoji: string }> = ({ shape, emoji }
       );
     case 'book':
       return (
-        <span className="scenery book-scenery" aria-hidden="true">
-          <span className="book-left">
+        <span className={cx(styles.scenery, styles.bookScenery)} aria-hidden="true">
+          <span className={styles.bookLeft}>
             <i />
             <i />
             <i />
           </span>
-          <span className="book-right">
+          <span className={styles.bookRight}>
             <i />
             <i />
             <i />
@@ -96,7 +97,7 @@ const Scenery: React.FC<{ shape: GameShape; emoji: string }> = ({ shape, emoji }
       );
     case 'page':
       return (
-        <span className="scenery page-scenery" aria-hidden="true">
+        <span className={cx(styles.scenery, styles.pageScenery)} aria-hidden="true">
           <i>The</i>
           <i>cat</i>
           <i>is</i>
@@ -106,16 +107,16 @@ const Scenery: React.FC<{ shape: GameShape; emoji: string }> = ({ shape, emoji }
     case 'lesson':
       // an exercise book: a painted spine and ruled lines, the lesson's picture faint on the page
       return (
-        <span className="scenery lesson-scenery" aria-hidden="true">
-          <span className="lesson-spine" />
-          <span className="lesson-lines" />
-          <span className="lesson-mark">{emoji}</span>
+        <span className={cx(styles.scenery, styles.lessonScenery)} aria-hidden="true">
+          <span className={styles.lessonSpine} />
+          <span className={styles.lessonLines} />
+          <span className={styles.lessonMark}>{emoji}</span>
         </span>
       );
   }
 };
 
-export const ReadingHub: React.FC<ReadingHubProps> = ({
+export const Hub: React.FC<HubProps> = ({
   grade,
   progress,
   lessons,
@@ -159,8 +160,8 @@ export const ReadingHub: React.FC<ReadingHubProps> = ({
   };
 
   return (
-    <div className="reading-hub" data-shot="hub">
-      <div className="hub-lanterns" aria-hidden="true">
+    <div className={styles.readingHub} data-shot="hub">
+      <div className={styles.hubLanterns} aria-hidden="true">
         <span>🏮</span>
         <span>✨</span>
         <span>🏮</span>
@@ -169,31 +170,31 @@ export const ReadingHub: React.FC<ReadingHubProps> = ({
       </div>
 
       {/* ---- Luna's desk ---- */}
-      <header className="hub-desk">
-        <div className="desk-luna">
+      <header className={styles.hubDesk}>
+        <div className={styles.deskLuna}>
           <LunaOwl mood={mood} size={128} talking={talking} onClick={nudgeLuna} />
-          <div className="desk-books" aria-hidden="true">
+          <div className={styles.deskBooks} aria-hidden="true">
             <span />
             <span />
             <span />
           </div>
         </div>
 
-        <div className="desk-speech" onClick={nudgeLuna} role="button" tabIndex={0}>
+        <div className={styles.deskSpeech} onClick={nudgeLuna} role="button" tabIndex={0}>
           <p>{line.text}</p>
-          <span className="speech-tap">tap me</span>
+          <span className={styles.speechTap}>tap me</span>
         </div>
 
-        <div className="desk-controls">
-          <button className="grade-sign" onClick={onChangeGrade} title="Change grade">
-            <span className="sign-rope" aria-hidden="true" />
-            <span className="sign-emoji">{gradeInfo.badgeEmoji}</span>
-            <span className="sign-text">{gradeInfo.title}</span>
-            <span className="sign-swap">swap</span>
+        <div className={styles.deskControls}>
+          <button className={styles.gradeSign} onClick={onChangeGrade} title="Change grade">
+            <span className={styles.signRope} aria-hidden="true" />
+            <span className={styles.signEmoji}>{gradeInfo.badgeEmoji}</span>
+            <span className={styles.signText}>{gradeInfo.title}</span>
+            <span className={styles.signSwap}>swap</span>
           </button>
 
           <button
-            className="lunas-pick"
+            className={styles.lunasPick}
             onClick={() => {
               soundManager.playStarChime();
               const pickLine = lunaSay('surprisePick');
@@ -201,46 +202,48 @@ export const ReadingHub: React.FC<ReadingHubProps> = ({
               window.setTimeout(onSurprise, 500);
             }}
           >
-            <span className="pick-glow" aria-hidden="true" />
-            <span className="pick-emoji">🎲</span>
-            <span className="pick-text">Luna’s Pick!</span>
-            <span className="pick-sub">she chooses, you play</span>
+            <span className={styles.pickGlow} aria-hidden="true" />
+            <span className={styles.pickEmoji}>🎲</span>
+            <span className={styles.pickText}>Luna’s Pick!</span>
+            <span className={styles.pickSub}>she chooses, you play</span>
           </button>
         </div>
       </header>
 
       {/* ---- the lessons come first: the structured teaching, in order ---- */}
       {lessons.length > 0 && (
-        <section className="hub-lessons">
-          <h2 className="rug-heading">
+        <section className={styles.hubLessons}>
+          <h2 className={styles.rugHeading}>
             <span>Luna’s Lessons</span>
             <small>
               {lessons.length} lessons for {gradeInfo.title} — start with the first
             </small>
           </h2>
 
-          <div className="lesson-yard">
+          <div className={styles.lessonYard}>
             {lessons.map((lesson, i) => {
               const done = lesson.lesson ? progress.completedLessons.includes(lesson.lesson.id) : false;
               return (
                 <button
                   key={lesson.id}
-                  className={`game-thing shape-lesson skill-${lesson.skill} ${done ? 'is-done' : ''}`}
+                  className={styles.gameThing}
+                  data-shape="lesson"
+                  data-state={done ? 'done' : undefined}
                   data-shot="lesson-tile"
                   style={{ '--spine': SPINE_COLORS[i % SPINE_COLORS.length] } as React.CSSProperties}
                   onClick={() => startGame(lesson)}
                 >
                   <Scenery shape={lesson.shape} emoji={lesson.emoji} />
 
-                  <span className="thing-body">
-                    <span className="thing-kicker">Lesson {i + 1}</span>
-                    <span className="thing-emoji">{lesson.emoji}</span>
-                    <span className="thing-title">{lesson.title}</span>
-                    <span className="thing-tagline">{lesson.tagline}</span>
+                  <span className={styles.thingBody}>
+                    <span className={styles.thingKicker}>Lesson {i + 1}</span>
+                    <span className={styles.thingEmoji}>{lesson.emoji}</span>
+                    <span className={styles.thingTitle}>{lesson.title}</span>
+                    <span className={styles.thingTagline}>{lesson.tagline}</span>
                   </span>
 
                   {done && (
-                    <span className="lesson-done" title="Finished">
+                    <span className={styles.lessonDone} title="Finished">
                       ✓ done
                     </span>
                   )}
@@ -252,33 +255,34 @@ export const ReadingHub: React.FC<ReadingHubProps> = ({
       )}
 
       {/* ---- the play rug: every game is an object, not a card ---- */}
-      <section className="hub-rug" data-shot="hub-rug">
-        <h2 className="rug-heading">
+      <section className={styles.hubRug} data-shot="hub-rug">
+        <h2 className={styles.rugHeading}>
           <span>The Play Rug</span>
           <small>{GAMES.length} games — pick one</small>
         </h2>
 
-        <div className="game-yard">
+        <div className={styles.gameYard}>
           {GAMES.map((game, i) => {
             const plays = progress.gamePlays?.[game.id] ?? 0;
             return (
               <button
                 key={game.id}
-                className={`game-thing shape-${game.shape} skill-${game.skill}`}
+                className={styles.gameThing}
+                data-shape={game.shape}
                 data-shot="game-tile"
                 style={{ '--tilt': `${((i % 3) - 1) * 0.7}deg` } as React.CSSProperties}
                 onClick={() => startGame(game)}
               >
                 <Scenery shape={game.shape} emoji={game.emoji} />
 
-                <span className="thing-body">
-                  <span className="thing-emoji">{game.emoji}</span>
-                  <span className="thing-title" data-shot="tile-title">{game.title}</span>
-                  <span className="thing-tagline">{game.tagline}</span>
+                <span className={styles.thingBody}>
+                  <span className={styles.thingEmoji}>{game.emoji}</span>
+                  <span className={styles.thingTitle} data-shot="tile-title">{game.title}</span>
+                  <span className={styles.thingTagline}>{game.tagline}</span>
                 </span>
 
                 {plays > 0 && (
-                  <span className="thing-played" title={`played ${plays} times`}>
+                  <span className={styles.thingPlayed} title={`played ${plays} times`}>
                     {plays > 3 ? '⭐⭐⭐' : '⭐'.repeat(plays)}
                   </span>
                 )}
@@ -288,7 +292,7 @@ export const ReadingHub: React.FC<ReadingHubProps> = ({
 
           {/* a small nook that fills the rug and still teaches a word */}
           <button
-            className="game-thing nook"
+            className={cx(styles.gameThing, styles.nook)}
             onClick={() => {
               soundManager.playLetterTap();
               const word = wordOfTheDay.word;
@@ -296,30 +300,31 @@ export const ReadingHub: React.FC<ReadingHubProps> = ({
               say(shown, 'happy', [{ text: 'Today’s word is' }, { word }]);
             }}
           >
-            <span className="nook-kicker">Word of the day</span>
-            <span className="nook-emoji">{wordOfTheDay.emoji}</span>
-            <span className="nook-word">{wordOfTheDay.word}</span>
-            <span className="nook-tap">tap to hear it</span>
+            <span className={styles.nookKicker}>Word of the day</span>
+            <span className={styles.nookEmoji}>{wordOfTheDay.emoji}</span>
+            <span className={styles.nookWord}>{wordOfTheDay.word}</span>
+            <span className={styles.nookTap}>tap to hear it</span>
           </button>
         </div>
       </section>
 
       {/* ---- sticker tin ---- */}
-      <section className="hub-tin" data-shot="hub-tin">
-        <div className="tin-head">
+      <section className={styles.hubTin} data-shot="hub-tin">
+        <div className={styles.tinHead}>
           <h2>Luna’s Sticker Tin</h2>
-          <span className="tin-count">
+          <span className={styles.tinCount}>
             {progress.stickers.length} of {STICKERS.length}
           </span>
         </div>
 
-        <div className="tin-slots">
+        <div className={styles.tinSlots}>
           {STICKERS.map(sticker => {
             const owned = progress.stickers.includes(sticker.id);
             return (
               <span
                 key={sticker.id}
-                className={`tin-slot ${owned ? 'is-owned' : ''}`}
+                className={styles.tinSlot}
+                data-state={owned ? 'owned' : undefined}
                 title={owned ? sticker.name : 'Still to find'}
                 onClick={() => {
                   if (!owned) return;
@@ -335,7 +340,7 @@ export const ReadingHub: React.FC<ReadingHubProps> = ({
         </div>
 
         {progress.stickers.length === 0 && (
-          <p className="tin-note">Finish any lesson or game to peel your first sticker.</p>
+          <p className={styles.tinNote}>Finish any lesson or game to peel your first sticker.</p>
         )}
       </section>
 

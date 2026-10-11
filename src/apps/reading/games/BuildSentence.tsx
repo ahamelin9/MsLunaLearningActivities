@@ -4,6 +4,7 @@ import { pick, sentencesFor, shuffle, tierFor, type SentenceItem } from '../engi
 import { pickWrong, textChoice } from '../engine/distractors';
 import { soundManager } from '../../../utils/audio';
 import { pronunciation } from '../../../utils/pronunciation';
+import { SpeakChip } from './shared/SpeakChip/SpeakChip';
 
 interface Tile {
   id: string;
@@ -128,14 +129,13 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
     <div className="game-surface sentence">
       <div className="sentence-scene">
         <span className="scene-emoji">{round.sentence.emoji}</span>
-        <button
-          className="speak-chip"
+        <SpeakChip
           onClick={() => pronunciation.speakSentence(round.sentence.text)}
           disabled={!solved && api.hintLevel < 1}
           title={api.hintLevel < 1 ? 'Try it first!' : 'Hear the sentence'}
         >
           🔊 Hear the whole sentence
-        </button>
+        </SpeakChip>
       </div>
 
       <div className={`sentence-track ${shakeSlot ? 'is-shaking' : ''} ${solved ? 'is-solved' : ''}`}>

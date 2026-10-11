@@ -10,7 +10,7 @@
   flex: 0 0 auto;
   line-height: 0;
 
-  &.is-tappable {
+  &.tappable {
     cursor: pointer;
     &:active .luna-body-group { transform: scale(0.94); }
   }
@@ -88,12 +88,12 @@
 
   // ---------- moods ----------
 
-  &.mood-happy {
+  &[data-mood="happy"] {
     .beak { transform: scaleY(1.1); }
     .blush { opacity: 0.6; }
   }
 
-  &.mood-cheer {
+  &[data-mood="cheer"] {
     .luna-body-group { animation: lunaCheer 0.6s ease-in-out 2; }
     .wing-left { transform: rotate(-34deg) translateY(-6px); }
     .wing-right { transform: rotate(34deg) translateY(-6px); }
@@ -104,7 +104,7 @@
     .mood-sparks { opacity: 1; animation: sparkPop 0.7s ease-out 2; }
   }
 
-  &.mood-think {
+  &[data-mood="think"] {
     .brow-left { transform: translateY(-5px) rotate(-14deg); }
     .brow-right { transform: translateY(2px) rotate(6deg); }
     .eye-left .pupil { transform: translate(4px, -3px); }
@@ -114,7 +114,7 @@
     .mood-think text { opacity: 1; animation: thinkFloat 2s ease-in-out infinite; }
   }
 
-  &.mood-oops {
+  &[data-mood="oops"] {
     .luna-body-group { animation: lunaWobble 0.5s ease-in-out 1; }
     .brow-left { transform: translateY(3px) rotate(16deg); }
     .brow-right { transform: translateY(3px) rotate(-16deg); }
@@ -124,7 +124,7 @@
     .wing-right { transform: rotate(-12deg); }
   }
 
-  &.mood-surprise {
+  &[data-mood="surprise"] {
     .luna-body-group { animation: lunaJump 0.45s ease-out 1; }
     .eye-white { r: 14; }
     .pupil { transform: scale(1.25); transform-origin: center; }
@@ -134,7 +134,7 @@
     .tuft { animation: tuftShake 0.4s ease-in-out 2; }
   }
 
-  &.mood-listen {
+  &[data-mood="listen"] {
     .wing-right { transform: rotate(-46deg) translate(-6px, -14px); }
     .brow-left { transform: translateY(-4px) rotate(-8deg); }
     .eye-left .pupil { transform: translate(-3px, 0); }
@@ -142,14 +142,14 @@
     .tuft { animation: tuftShake 1.6s ease-in-out infinite; }
   }
 
-  &.mood-sleepy {
+  &[data-mood="sleepy"] {
     .luna-body-group { animation: lunaBob 5s ease-in-out infinite; }
     .lid { transform: translateY(-3px); }
     .mood-zzz text { opacity: 1; animation: zzzFloat 2.4s ease-in-out infinite; }
   }
 
   // beak flaps while she is speaking
-  &.is-talking .beak {
+  &[data-state="talking"] .beak {
     animation: beakTalk 0.32s ease-in-out infinite;
   }
 }
@@ -205,9 +205,9 @@
 }
 
 // Blink only in the resting moods, so expression poses are never overridden.
-.luna-owl.mood-idle,
-.luna-owl.mood-happy,
-.luna-owl.mood-listen {
+.luna-owl[data-mood="idle"],
+.luna-owl[data-mood="happy"],
+.luna-owl[data-mood="listen"] {
   .eye .lid { animation: lidBlink 5.4s infinite; }
   .eye-right .lid { animation-delay: 0.08s; }
 }

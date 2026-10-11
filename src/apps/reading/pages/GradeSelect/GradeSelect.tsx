@@ -1,11 +1,11 @@
 import React from 'react';
-import type { GradeLevel } from '../../../types/reading';
-import { GRADES } from '../../../data/readingCurriculum';
-import { soundManager } from '../../../utils/audio';
-import { pronunciation, type SpeechPart } from '../../../utils/pronunciation';
-import { Mascot } from '../../../components/ui/Mascot/Mascot';
-import { SparklesIcon, ArrowRightIcon } from '../../../components/ui/Icons/Icons';
-import './GradeSelect.scss';
+import type { GradeLevel } from '@/types/reading';
+import { GRADES } from '@/data/readingCurriculum';
+import { soundManager } from '@/utils/audio';
+import { pronunciation, type SpeechPart } from '@/utils/pronunciation';
+import { Mascot } from '@/components/ui/Mascot/Mascot';
+import { SparklesIcon, ArrowRightIcon } from '@/components/ui/Icons/Icons';
+import styles from './GradeSelect.module.scss';
 
 /** Written out whole so each is a rendered clip. */
 const GRADE_LINES: Record<GradeLevel, SpeechPart> = {
@@ -30,9 +30,9 @@ export const GradeSelect: React.FC<GradeSelectProps> = ({
   };
 
   return (
-    <div className="grade-select-page" data-shot="grade-select">
+    <div className={styles.gradeSelectPage} data-shot="grade-select">
       {/* Header & Mascot */}
-      <div className="grade-select-header">
+      <div className={styles.gradeSelectHeader}>
         <Mascot
           speechText="Welcome! Pick your grade level to start learning with Ms. Luna!"
           expression="happy"
@@ -40,69 +40,70 @@ export const GradeSelect: React.FC<GradeSelectProps> = ({
         />
 
         <div>
-          <div className="header-badge">
+          <div className={styles.headerBadge}>
             <SparklesIcon size={14} color="#7E22CE" /> Choose Your Adventure
           </div>
-          <h2 className="header-title">
+          <h2 className={styles.headerTitle}>
             What Grade Are You Learning In?
           </h2>
-          <p className="header-desc">
+          <p className={styles.headerDesc}>
             You can change this anytime in your settings or dashboard!
           </p>
         </div>
       </div>
 
       {/* Grade Cards Grid */}
-      <div className="grade-cards-grid">
+      <div className={styles.gradeCardsGrid}>
         {GRADES.map(grade => {
           const isCurrent = currentGrade === grade.id;
           return (
             <div
               key={grade.id}
               onClick={() => handleGradeClick(grade.id)}
-              className={`grade-card-item ${isCurrent ? 'active' : ''}`}
+              className={styles.gradeCardItem}
+              data-state={isCurrent ? 'active' : undefined}
               data-shot="grade-card"
               role="button"
               tabIndex={0}
               aria-label={`Select ${grade.title}`}
             >
-              <div className="card-top">
+              <div className={styles.cardTop}>
                 <div
-                  className="grade-badge-circle"
+                  className={styles.gradeBadgeCircle}
                   style={{ background: grade.gradient }}
                 >
                   <span>{grade.badgeEmoji}</span>
                 </div>
 
-                <div className="grade-meta-row">
-                  <span className="age-pill">
+                <div className={styles.gradeMetaRow}>
+                  <span className={styles.agePill}>
                     {grade.ageRange}
                   </span>
                   {isCurrent && (
-                    <span className="active-pill">
+                    <span className={styles.activePill}>
                       Active
                     </span>
                   )}
                 </div>
 
-                <h3 className="grade-title">
+                <h3 className={styles.gradeTitle}>
                   {grade.title}
                 </h3>
 
-                <h4 className="grade-subtitle">
+                <h4 className={styles.gradeSubtitle}>
                   {grade.subtitle}
                 </h4>
 
-                <p className="grade-desc">
+                <p className={styles.gradeDesc}>
                   {grade.description}
                 </p>
               </div>
 
-              <div className="card-action-footer">
-                <span className="select-label">
+              <div className={styles.cardActionFooter}>
+                <span className={styles.selectLabel}>
                   Select Grade
                 </span>
-                <div className="arrow-circle">
+                <div className={styles.arrowCircle}>
                   <ArrowRightIcon size={18} />
                 </div>
               </div>

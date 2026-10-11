@@ -1,18 +1,19 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import type { GradeLevel } from '../../../types/reading';
-import type { UserProgress } from '../../../types/user';
-import type { AnyGameDef, GameApi, GameContext } from './types';
-import type { Difficulty } from './content';
-import { lunaSay, type LunaMood } from './luna';
-import { LunaOwl } from './LunaOwl';
-import { nextSticker, type Sticker } from './stickers';
-import { soundManager } from '../../../utils/audio';
-import { pronunciation, type SpeechPart } from '../../../utils/pronunciation';
-import { warmGameIntro } from './warmup';
-import { storageService } from '../../../utils/storage';
-import { launchConfetti } from '../../../utils/confetti';
-import { ArrowLeftIcon, StarIcon } from '../../../components/ui/Icons/Icons';
-import './GameShell.scss';
+import type { GradeLevel } from '@/types/reading';
+import type { UserProgress } from '@/types/user';
+import type { AnyGameDef, GameApi, GameContext } from '../types';
+import type { Difficulty } from '../content';
+import { lunaSay, type LunaMood } from '../luna';
+import { LunaOwl } from '../LunaOwl/LunaOwl';
+import { nextSticker, type Sticker } from '../stickers';
+import { soundManager } from '@/utils/audio';
+import { pronunciation, type SpeechPart } from '@/utils/pronunciation';
+import { warmGameIntro } from '../warmup';
+import { storageService } from '@/utils/storage';
+import { launchConfetti } from '@/utils/confetti';
+import { ArrowLeftIcon, StarIcon } from '@/components/ui/Icons/Icons';
+import { cx } from '@/utils/cx';
+import styles from './GameShell.module.scss';
 
 type Phase = 'intro' | 'play' | 'reward';
 
@@ -274,55 +275,56 @@ export const GameShell: React.FC<GameShellProps> = ({
   // ---------- START ----------
   if (phase === 'intro') {
     return (
-      <div className={`game-shell phase-intro shape-${game.shape}`} data-shot="shell-intro">
-        <button className="shell-back" data-shot="shell-back" onClick={onExit}>
+      <div className={styles.gameShell} data-phase="intro" data-shape={game.shape} data-shot="shell-intro">
+        <button className={styles.shellBack} data-shot="shell-back" onClick={onExit}>
           <ArrowLeftIcon size={14} />
           <span>Library</span>
         </button>
 
-        <div className="intro-panel">
-          <div className="intro-scene" aria-hidden="true">
-            <span className="intro-emoji">{game.emoji}</span>
+        <div className={styles.introPanel}>
+          <div className={styles.introScene} aria-hidden="true">
+            <span className={styles.introEmoji}>{game.emoji}</span>
           </div>
 
-          {surpriseBanner && <div className="surprise-banner">{surpriseBanner}</div>}
+          {surpriseBanner && <div className={styles.surpriseBanner}>{surpriseBanner}</div>}
 
-          <h2 className="intro-title">{game.title}</h2>
-          <p className="intro-tagline">{game.tagline}</p>
+          <h2 className={styles.introTitle}>{game.title}</h2>
+          <p className={styles.introTagline}>{game.tagline}</p>
 
-          <div className="intro-luna">
+          <div className={styles.introLuna}>
             <LunaOwl mood="happy" size={78} onClick={() => speak(game.mission, 'happy')} />
-            <p className="intro-mission">“{game.mission}”</p>
+            <p className={styles.introMission}>“{game.mission}”</p>
           </div>
 
           {/* a lesson's questions are fixed, so there is nothing to choose */}
           {!game.lesson && (
-            <div className="difficulty-row" role="group" aria-label="Choose how tricky">
+            <div className={styles.difficultyRow} role="group" aria-label="Choose how tricky">
               {DIFFICULTY_LABELS.map(level => (
                 <button
                   key={level.value}
-                  className={`difficulty-chip ${difficulty === level.value ? 'is-active' : ''}`}
+                  className={styles.difficultyChip}
+                  data-state={difficulty === level.value ? 'active' : undefined}
                   onClick={() => {
                     soundManager.playLetterTap();
                     setDifficulty(level.value);
                   }}
                 >
-                  <span className="chip-dots" aria-hidden="true">
+                  <span className={styles.chipDots} aria-hidden="true">
                     {'●'.repeat(level.value)}
-                    <span className="dim">{'●'.repeat(3 - level.value)}</span>
+                    <span className={styles.dim}>{'●'.repeat(3 - level.value)}</span>
                   </span>
-                  <span className="chip-label">{level.label}</span>
-                  <span className="chip-note">{level.note}</span>
+                  <span className={styles.chipLabel}>{level.label}</span>
+                  <span className={styles.chipNote}>{level.note}</span>
                 </button>
               ))}
             </div>
           )}
 
-          <button className="play-button" data-shot="play" onClick={() => startPlay(difficulty)}>
+          <button className={styles.playButton} data-shot="play" onClick={() => startPlay(difficulty)}>
             {game.lesson ? 'Let’s learn!' : 'Let’s play!'}
           </button>
 
-          <p className="objective-line">
+          <p className={styles.objectiveLine}>
             <strong>Learning:</strong> {game.objective}
           </p>
         </div>
@@ -333,49 +335,49 @@ export const GameShell: React.FC<GameShellProps> = ({
   // ---------- REWARD ----------
   if (phase === 'reward') {
     return (
-      <div className={`game-shell phase-reward shape-${game.shape}`} data-shot="shell-reward">
-        <canvas ref={canvasRef} className="reward-confetti" />
+      <div className={styles.gameShell} data-phase="reward" data-shape={game.shape} data-shot="shell-reward">
+        <canvas ref={canvasRef} className={styles.rewardConfetti} />
 
-        <div className="reward-panel">
-          <div className="reward-luna">
+        <div className={styles.rewardPanel}>
+          <div className={styles.rewardLuna}>
             <LunaOwl mood="cheer" size={110} talking={talking} />
           </div>
 
-          <h2 className="reward-title">{game.title} — done!</h2>
+          <h2 className={styles.rewardTitle}>{game.title} — done!</h2>
 
-          <div className="reward-stars">
+          <div className={styles.rewardStars}>
             {Array.from({ length: award?.stars ?? 1 }).map((_, i) => (
-              <span key={i} className="reward-star" style={{ animationDelay: `${i * 140}ms` }}>
+              <span key={i} className={styles.rewardStar} style={{ animationDelay: `${i * 140}ms` }}>
                 <StarIcon size={40} color="#FFD166" filled />
               </span>
             ))}
           </div>
 
-          <p className="reward-score">
+          <p className={styles.rewardScore}>
             {roundsWon} of {game.roundsPerPlay} solved
             {cleanRounds === game.roundsPerPlay ? ' — no wobbles at all!' : ''}
           </p>
 
           {award?.sticker && (
-            <div className="sticker-award">
-              <span className="sticker-peel">{award.sticker.emoji}</span>
-              <div className="sticker-copy">
-                <span className="sticker-kicker">New sticker for your tin</span>
-                <strong className="sticker-name">{award.sticker.name}</strong>
+            <div className={styles.stickerAward}>
+              <span className={styles.stickerPeel}>{award.sticker.emoji}</span>
+              <div>
+                <span className={styles.stickerKicker}>New sticker for your tin</span>
+                <strong className={styles.stickerName}>{award.sticker.name}</strong>
               </div>
             </div>
           )}
 
-          <div className="reward-actions">
-            <button className="reward-btn primary" onClick={() => startPlay(difficulty)}>
+          <div className={styles.rewardActions}>
+            <button className={cx(styles.rewardBtn, styles.primary)} onClick={() => startPlay(difficulty)}>
               Play again
             </button>
             {onPlayAnother && (
-              <button className="reward-btn" onClick={onPlayAnother}>
+              <button className={styles.rewardBtn} onClick={onPlayAnother}>
                 {playAnotherLabel}
               </button>
             )}
-            <button className="reward-btn ghost" onClick={onExit}>
+            <button className={cx(styles.rewardBtn, styles.ghost)} onClick={onExit}>
               Back to the library
             </button>
           </div>
@@ -390,27 +392,32 @@ export const GameShell: React.FC<GameShellProps> = ({
 
   return (
     <div
-      className={`game-shell phase-play shape-${game.shape} ${flash ? `flash-${flash}` : ''}`}
+      className={styles.gameShell}
+      data-phase="play"
+      data-shape={game.shape}
+      data-flash={flash ?? undefined}
       data-shot="shell-play"
     >
-      <header className="shell-bar">
-        <button className="shell-back" data-shot="shell-back" onClick={onExit}>
+      <header className={styles.shellBar}>
+        <button className={styles.shellBack} data-shot="shell-back" onClick={onExit}>
           <ArrowLeftIcon size={14} />
           <span>Library</span>
         </button>
 
-        <div className="round-pips" data-shot="round-pips" aria-label={`Round ${roundIndex + 1} of ${game.roundsPerPlay}`}>
+        <div className={styles.roundPips} data-shot="round-pips" aria-label={`Round ${roundIndex + 1} of ${game.roundsPerPlay}`}>
           {Array.from({ length: game.roundsPerPlay }).map((_, i) => (
             <span
               key={i}
-              className={`pip ${i < roundsWon ? 'done' : ''} ${i === roundIndex ? 'current' : ''}`}
+              className={styles.pip}
+              // a pip can be both: the round just won, before the next one starts
+              data-state={[i < roundsWon && 'done', i === roundIndex && 'current'].filter(Boolean).join(' ') || undefined}
             />
           ))}
         </div>
 
-        <div className="shell-right">
+        <div className={styles.shellRight}>
           <button
-            className="replay-btn"
+            className={styles.replayBtn}
             onClick={() => {
               soundManager.playLetterTap();
               pronunciation.replayLast();
@@ -418,39 +425,39 @@ export const GameShell: React.FC<GameShellProps> = ({
             title="Hear that again"
           >
             <span aria-hidden="true">🔁</span>
-            <span className="replay-label">Again</span>
+            <span>Again</span>
           </button>
 
-          <div className="shell-title">
-            <span className="shell-emoji">{game.emoji}</span>
+          <div className={styles.shellTitle}>
+            <span className={styles.shellEmoji}>{game.emoji}</span>
             <span>{game.title}</span>
           </div>
         </div>
       </header>
 
-      <div className="shell-stage">
+      <div className={styles.shellStage}>
         {round !== undefined && <PlayComponent key={roundIndex} round={round} api={api} />}
       </div>
 
-      <div className="luna-perch">
+      <div className={styles.lunaPerch}>
         <LunaOwl
           mood={mood}
           size={82}
           talking={talking}
           onClick={() => speak(bubble, mood)}
         />
-        <div className="perch-bubble">
+        <div className={styles.perchBubble}>
           <p>
             {bubble}
             {preparing && (
-              <span className="thinking-dots" aria-label="Ms. Luna is getting ready to speak">
+              <span className={styles.thinkingDots} aria-label="Ms. Luna is getting ready to speak">
                 <i /><i /><i />
               </span>
             )}
           </p>
           {hint && (
             <button
-              className="perch-hint"
+              className={styles.perchHint}
               onClick={() => {
                 soundManager.playLetterTap();
                 pronunciation.speakSequence(hint);
@@ -463,8 +470,8 @@ export const GameShell: React.FC<GameShellProps> = ({
       </div>
 
       {flash === 'win' && (
-        <div className="win-veil" data-shot="win-veil" aria-hidden="true">
-          <span className="win-burst">✦</span>
+        <div className={styles.winVeil} data-shot="win-veil" aria-hidden="true">
+          <span className={styles.winBurst}>✦</span>
         </div>
       )}
     </div>

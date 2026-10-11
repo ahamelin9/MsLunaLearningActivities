@@ -4,6 +4,7 @@ import { lettersFor, pick, shuffle, tierFor } from '../engine/content';
 import { pickWrong, textChoice } from '../engine/distractors';
 import { soundManager } from '../../../utils/audio';
 import { pronunciation } from '../../../utils/pronunciation';
+import { SpeakChip } from './shared/SpeakChip/SpeakChip';
 
 interface Bug {
   id: string;
@@ -149,9 +150,9 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
           <span className="hunt-label">Catch every letter I say</span>
           <span className="hunt-char" aria-hidden="true">?</span>
         </div>
-        <button className="speak-chip" onClick={announce}>
+        <SpeakChip onClick={announce}>
           🔊 Say it again
-        </button>
+        </SpeakChip>
       </div>
 
       <div className="hunt-field">

@@ -4,6 +4,7 @@ import { shuffle, tierFor, wordsUpTo, type WordItem } from '../engine/content';
 import { distinctByEmoji, pickWrong, wordChoice } from '../engine/distractors';
 import { soundManager } from '../../../utils/audio';
 import { pronunciation } from '../../../utils/pronunciation';
+import { StagePrompt } from './shared/StagePrompt/StagePrompt';
 
 interface Round {
   items: WordItem[];
@@ -106,11 +107,11 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
         </div>
       )}
 
-      {phase === 'curtain' && <p className="stage-prompt">Luna is taking something…</p>}
+      {phase === 'curtain' && <StagePrompt>Luna is taking something…</StagePrompt>}
 
       {phase === 'guess' && (
         <div className="missing-choices">
-          <p className="stage-prompt">What disappeared?</p>
+          <StagePrompt>What disappeared?</StagePrompt>
           <div className="choice-row">
             {round.options.map(opt => (
               <button

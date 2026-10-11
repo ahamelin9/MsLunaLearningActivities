@@ -1,0 +1,9 @@
+@use 'apps/reading/engine/world' as *;
+
+.stage-prompt {
+  font-family: 'Fredoka', sans-serif;
+  font-weight: 600;
+  font-size: 1.2rem;
+  color: $ink;
+  text-align: center;
+}

@@ -69,7 +69,7 @@ P2 · S
 
 ### BUG-14 · "Word of the day" changes on every visit
 P2 · S
-- **Cause:** `pages/ReadingHub.tsx` picks a random word each time the hub mounts.
+- **Cause:** `pages/Hub/Hub.tsx` picks a random word each time the hub mounts.
 - **Fix:** seed the pick from the date.
 
 - **Complete when:** the word stays the same on every visit within a local day and changes the next day.

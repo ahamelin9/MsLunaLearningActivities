@@ -4,9 +4,9 @@ import type { UserProgress } from '../../types/user';
 import type { AnyGameDef } from './engine/types';
 import type { Difficulty } from './engine/content';
 import { storageService } from '../../utils/storage';
-import { GradeSelect } from './pages/GradeSelect';
-import { ReadingHub } from './pages/ReadingHub';
-import { GameShell } from './engine/GameShell';
+import { GradeSelect } from './pages/GradeSelect/GradeSelect';
+import { Hub } from './pages/Hub/Hub';
+import { GameShell } from './engine/GameShell/GameShell';
 import { lessonsFor } from './engine/lessons';
 import { surprisePick } from './games';
 
@@ -81,7 +81,7 @@ export const ReadingApp: React.FC<ReadingAppProps> = ({ progress, onGradeChange 
 
   // View 3: Luna's library
   return (
-    <ReadingHub
+    <Hub
       grade={currentGrade}
       progress={progress}
       lessons={lessons}

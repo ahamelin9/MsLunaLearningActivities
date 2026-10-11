@@ -1,4 +1,4 @@
-@use '../engine/world' as *;
+@use 'apps/reading/engine/world' as *;
 
 .reading-hub {
   position: relative;
@@ -236,7 +236,7 @@
   }
 
   // An exercise book rather than a toy: upright, a painted spine, ruled lines.
-  .game-thing.shape-lesson {
+  .game-thing[data-shape="lesson"] {
     padding-left: 1.4rem;
     border-radius: 8px 18px 18px 8px;
     background: #FFFEF8;
@@ -267,7 +267,7 @@
       font-weight: 800;
     }
 
-    &.is-done { background: #F6FBF3; }
+    &[data-state="done"] { background: #F6FBF3; }
   }
 
   .lesson-scenery {
@@ -386,37 +386,37 @@
     }
 
     // --- per-shape treatments: size, colour and built-in scenery ---
-    &.shape-jar {
+    &[data-shape="jar"] {
       grid-row: span 2;
       background: linear-gradient(180deg, #EFF8EA, #D5EBCE);
     }
 
-    &.shape-bubbles {
+    &[data-shape="bubbles"] {
       border-radius: 50% 50% 24px 24px;
       background: linear-gradient(180deg, #DDF1FB, #A9DCF2);
     }
 
-    &.shape-plate {
+    &[data-shape="plate"] {
       border-radius: 28px;
       background: linear-gradient(180deg, #FDF0DA, #F4D8A6);
     }
 
-    &.shape-cards { background: linear-gradient(180deg, #F3E9FC, #DCC8F5); }
+    &[data-shape="cards"] { background: linear-gradient(180deg, #F3E9FC, #DCC8F5); }
 
-    &.shape-book {
+    &[data-shape="book"] {
       grid-column: span 2;
       background: linear-gradient(180deg, #FFFCF0, #F0E0BE);
     }
 
-    &.shape-desk { background: linear-gradient(180deg, #FCEFDD, #E9CEA0); }
+    &[data-shape="desk"] { background: linear-gradient(180deg, #FCEFDD, #E9CEA0); }
 
-    &.shape-map {
+    &[data-shape="map"] {
       grid-row: span 2;
       background: linear-gradient(180deg, #FBF0D6, #E9D2A2);
       border-radius: 8px 8px 22px 22px;
     }
 
-    &.shape-page {
+    &[data-shape="page"] {
       grid-column: span 2;
       background: linear-gradient(180deg, #FFFEF8, #F2E7CE);
     }
@@ -688,7 +688,7 @@
       background: rgba(58, 42, 31, 0.05);
       border: 2.5px dashed rgba(58, 42, 31, 0.2);
 
-      &.is-owned {
+      &[data-state="owned"] {
         cursor: pointer;
         // the faint colour above is for the empty slot's dot; browsers apply
         // a colour's transparency to emoji too, so an earned sticker drawn
@@ -750,7 +750,7 @@
       grid-auto-rows: 120px;
     }
 
-    .game-thing.shape-book { grid-column: span 2; }
+    .game-thing[data-shape="book"] { grid-column: span 2; }
 
     .hub-desk { padding: 0.5rem 0.6rem 0.9rem; }
   }

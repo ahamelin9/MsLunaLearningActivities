@@ -112,3 +112,12 @@ only record of them. One line each: date, ID, title, and `Done` or
   | a fixed modifier (`bubble-1`, `card-stars`, `clickable`) | a module class, joined with `cx()` |
   | a class or keyframe another file defines | moved to the one file that uses it, or copied with a comment naming the ticket that removes the copy |
   | a class no rule styles (`animate-bounce-short`, `mascot-emoji`, `voice-info`) | dropped |
+- **2026-10-11** — DES-18c Reading pages, GameShell and LunaOwl as modules in folders — Done. Grade Select, the library (now `pages/Hub/`, its component `Hub`), GameShell and LunaOwl are each `<Name>/<Name>.tsx` + `<Name>.module.scss`. The shell's global `.speak-chip` and `.stage-prompt` are now the `SpeakChip` and `StagePrompt` components in `games/shared/`, which 6 games use, with Story Corner's right-page chip as `className="page-chip"`. Proven like DES-18b: 0 changed screens at all 4 sizes after the in-place conversion and after the move, and all 932 rules in the tree compile the same apart from that one agreed selector. Found in the code, with Alex's OK: the shell centred a lesson with `> .lesson` (now `> *`), and the hub tiles' `skill-…` classes were styled nowhere (gone). New for DES-18d–e: `move-into-folders.mjs` in the know-how skill moves files and repoints every import, and `css-rules-compare.mjs` now compares the whole tree, so a renamed file can't look new. Added to the rule:
+
+  | Was | Now |
+  |---|---|
+  | a class built from a string for a game's shape, a screen's phase, a flash or a mood (`shape-jar`, `phase-intro`, `flash-win`, `mood-cheer`) | `data-shape`, `data-phase`, `data-flash`, `data-mood` |
+  | two states on one element at once (a round pip both `done` and `current`) | one `data-state="done current"`, matched with `[data-state~="done"]` |
+  | a flag set by props, not by play (`is-tappable`: Luna has an `onClick`) | a module class (`.tappable`), like `clickable` |
+  | a global class many games share (`.speak-chip`, `.stage-prompt`) | a component in `games/shared/` that takes a `className` |
+  | a rule naming another component's class (`> .lesson`) | a selector that doesn't need its name (`> *`) |

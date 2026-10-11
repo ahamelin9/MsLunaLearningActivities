@@ -7,9 +7,11 @@
 //   git archive HEAD src | tar -x -C <scratch>/head
 //   node .claude/skills/know-how/css-rules-compare.mjs "$PWD" <scratch>/head [extra-map.json]
 //
-// Each `X.module.scss` in today's src is paired with the old `X.scss` of the
-// same name. Rules that only moved between files cancel out in the total, so
-// the total lists only real additions and losses. Exits 1 if anything differs.
+// Every stylesheet in src/ is compiled, then and now, and the two sets of
+// rules are compared as one whole: a rule that moved to another file, or a
+// file that was renamed, cancels out, so the total lists only real additions
+// and losses. The per-file lines pair files by name (`X.scss` with
+// `X.module.scss`) as a guide. Exits 1 if anything differs.
 //
 // The built-in map covers `is-x`/`state-x` -> data-state and `size-x` ->
 // data-size. Anything else (a `toggle-on` that became data-state="on", a
@@ -55,28 +57,36 @@ function rules(css) {
   return out.map(r => r.replace(/="([\w-]+)"\]/g, '=$1]'));
 }
 
-const oldByName = new Map(
-  walk(join(old, 'src'))
-    .filter(f => f.endsWith('.scss') && !basename(f).startsWith('_'))
-    .map(f => [basename(f).replace(/\.module\.scss$|\.scss$/, ''), f])
-);
-const modules = walk(join(repo, 'src')).filter(f => f.endsWith('.module.scss'));
+// every stylesheet that outputs CSS (partials don't), compared as one whole,
+// so a rule may move or a file be renamed without showing as a change
+const sheets = root => walk(join(root, 'src')).filter(f => /\.s?css$/.test(f) && !basename(f).startsWith('_'));
+const nameOf = f => basename(f).replace(/\.module\.scss$|\.scss$|\.css$/, '');
+const oldSheets = sheets(old);
+const newSheets = sheets(repo);
+const oldByName = new Map(oldSheets.map(f => [nameOf(f), f]));
+const newNames = new Set(newSheets.map(nameOf));
+// the renames apply to a sheet that became a module or went; one still global
+// in the same place is compared as it is, so its own edits show as changes
+const stillGlobal = new Set(newSheets.filter(f => !f.endsWith('.module.scss')).map(f => relative(repo, f)));
+const mapped = (rs, was) =>
+  stillGlobal.has(relative(old, was)) ? rs : rs.map(r => MAP.reduce((s, [re, to]) => s.replace(re, to), r));
 
 const allOld = [];
 const allNew = [];
-for (const now of modules) {
-  const name = basename(now, '.module.scss');
-  const was = oldByName.get(name);
+for (const now of newSheets) {
+  const was = oldByName.get(nameOf(now));
   const b = rules(await compile(repo, now));
-  const a = was && existsSync(was)
-    ? rules(await compile(old, was)).map(r => MAP.reduce((s, [re, to]) => s.replace(re, to), r))
-    : [];
+  const a = was && existsSync(was) ? mapped(rules(await compile(old, was)), was) : [];
   allOld.push(...a);
   allNew.push(...b);
   const lost = a.filter(r => !b.includes(r)).length;
   const added = b.filter(r => !a.includes(r)).length;
   const note = !was ? 'new file' : lost + added ? `${lost} only before, ${added} only now` : 'same rules';
   console.log(`${relative(repo, now)}: ${note}`);
+}
+for (const was of oldSheets.filter(f => !newNames.has(nameOf(f)))) {
+  allOld.push(...mapped(rules(await compile(old, was)), was));
+  console.log(`${relative(old, was)}: gone (its rules count in the total)`);
 }
 
 // a multiset difference, so a rule moved to another file cancels out

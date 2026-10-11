@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import type { GameApi, GameDef } from '../engine/types';
 import { lettersFor, pick, shuffle, tierFor, wordsUpTo, type LetterItem, type WordItem } from '../engine/content';
 import { pickWrong, textChoice } from '../engine/distractors';
-import { LunaOwl } from '../engine/LunaOwl';
+import { LunaOwl } from '../engine/LunaOwl/LunaOwl';
 import { soundManager } from '../../../utils/audio';
 import { pronunciation, type SpeechPart } from '../../../utils/pronunciation';
 

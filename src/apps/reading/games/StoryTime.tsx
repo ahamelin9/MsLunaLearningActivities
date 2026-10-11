@@ -3,6 +3,8 @@ import type { GameApi, GameDef } from '../engine/types';
 import { MINI_STORIES, pick, shuffle, tierFor, type MiniStory } from '../engine/content';
 import { soundManager } from '../../../utils/audio';
 import { pronunciation } from '../../../utils/pronunciation';
+import { SpeakChip } from './shared/SpeakChip/SpeakChip';
+import { StagePrompt } from './shared/StagePrompt/StagePrompt';
 
 interface Round {
   story: MiniStory;
@@ -132,15 +134,14 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
               ) : (
                 <>
                   Find the word I say{' '}
-                  <button
-                    className="speak-chip"
+                  <SpeakChip
                     onClick={() => {
                       soundManager.playLetterTap();
                       sayHunt();
                     }}
                   >
                     🔊 Hear it
-                  </button>
+                  </SpeakChip>
                 </>
               )}
             </p>
@@ -180,8 +181,8 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
           ))}
 
           {phase === 'question' && (
-            <button
-              className="speak-chip"
+            <SpeakChip
+              className="page-chip"
               disabled={!canHearLines}
               title={canHearLines ? 'Hear the story' : 'Try it first!'}
               onClick={() => {
@@ -191,7 +192,7 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
               }}
             >
               🔊 Read me the story
-            </button>
+            </SpeakChip>
           )}
 
           {phase === 'read' && (
@@ -204,7 +205,7 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
 
       {phase === 'question' && (
         <div className="story-question">
-          <p className="stage-prompt">{story.question}</p>
+          <StagePrompt>{story.question}</StagePrompt>
           <div className="story-answers">
             {answers.map(a => (
               <button

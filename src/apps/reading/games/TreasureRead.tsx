@@ -12,6 +12,7 @@ import {
 } from '../engine/content';
 import { pickWrong, textChoice } from '../engine/distractors';
 import { pronunciation, type SpeechPart } from '../../../utils/pronunciation';
+import { SpeakChip } from './shared/SpeakChip/SpeakChip';
 
 interface Round {
   kind: 'cloze' | 'truefalse';
@@ -156,14 +157,13 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
           </p>
         )}
 
-        <button
-          className="speak-chip"
+        <SpeakChip
           onClick={readToMe}
           disabled={!readAlong && !tried}
           title={readAlong || tried ? 'Hear the story' : 'Try it first!'}
         >
           🔊 Read it to me
-        </button>
+        </SpeakChip>
       </div>
 
       <div className={`treasure-options ${round.kind === 'truefalse' ? 'is-binary' : ''}`}>
