@@ -90,6 +90,12 @@ build, or a tool that misbehaved. Skip routine fixes.
   - A longer pause: say the line as parts with `{ pause: ms }` between them
     (`SpeechPart`, played by `speakSequence`). Treasure Path's gap is the
     example: `readWithGap` in `engine/content.ts`.
+- **A letter's name sounds wrong** (*2026-10-10, BUG-23*): name clips are
+  rendered from `letterNameSpeech` in `src/utils/phonics.ts` exactly as
+  written, with no lexicon step. "ay" came out "eye" and "eff" was spelled
+  "ee-eff-eff"; now "eigh" and "ef". After changing any of them, run them all
+  through the phonemizer: bundle `phonics.ts` with esbuild and phonemize each
+  `letterNameSpeech`. Every one should be its letter's name alone.
 - **Past-tense "read" says "reed"** (*2026-10-10, GAME-1a*): espeak can't
   tell the tense, so "Luna read until…" comes out `ɹˈiːd`. Reword the line
   ("Luna kept reading…", "Luna learned about…"). The old story line "so she

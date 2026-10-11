@@ -49,7 +49,8 @@ export const LETTER_PHONICS: Record<string, PhonicsEntry> = {
   A: {
     letter: 'A',
     letterName: 'ay',
-    letterNameSpeech: 'ay',
+    // "ay" is read as "eye"; "eigh" is /eɪ/, as in scripts/voice/lexicon.mjs
+    letterNameSpeech: 'eigh',
     phoneme: '/a/',
     ipa: 'æ',
     carrier: 'ah',
@@ -102,7 +103,8 @@ export const LETTER_PHONICS: Record<string, PhonicsEntry> = {
   F: {
     letter: 'F',
     letterName: 'eff',
-    letterNameSpeech: 'eff',
+    // "eff" is spelled out as "ee-eff-eff"; "ef" is /ɛf/
+    letterNameSpeech: 'ef',
     phoneme: '/f/',
     ipa: 'f',
     carrier: 'ffff',
