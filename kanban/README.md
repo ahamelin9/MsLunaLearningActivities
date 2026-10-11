@@ -71,8 +71,8 @@ be pulled into Phase 1 for a break from styling.
 
 ### Now / Next
 
-- **Now:** DES-2: the style sample until the teacher gives her final approval (Alex, 2026-10-09: the prototype comes first, since everything else builds on it)
-- **Next:** the teacher's feedback on the new designs (Alex is showing her, 2026-10-10), then the rest of DES-2 once she approves. GAME-1c, Treasure Path's screen, waits on FB-1, which waits on the DES-8/DES-10 layout. Then GAME-4
+- **Now:** DES-2: the teacher has answered everything (2026-10-10) and the style sample shows her picks; what's left is writing them into `docs/design-standards.md` and copying the decisions into DES-3 to DES-7
+- **Next:** DES-3, DES-4, DES-5 and DES-15, which only need DES-2. PRG-7 (lessons open in order) needs no design and can be pulled in any time. GAME-1c, Treasure Path's screen, waits on FB-1, which waits on the DES-8/DES-10 layout. Then GAME-4
 
 ## Epics
 
@@ -96,7 +96,7 @@ In board order. A new epic gets its file in `epics/` first, then a link here
 | ID | Title | Type | P | Size | Status |
 |---|---|---|---|---|---|
 | **DES** | **Design system & layout** | Epic | **P0** | | |
-| DES-2 | Write the design standards | Story | P0 | M | Blocked |
+| DES-2 | Write the design standards | Story | P0 | M | In progress |
 | DES-3 | One set of design tokens | Story | P0 | M | Todo |
 | DES-4 | Typography and local fonts | Story | P0 | S | Todo |
 | DES-5 | Motion system | Story | P0 | M | Todo |
@@ -108,8 +108,9 @@ In board order. A new epic gets its file in `epics/` first, then a link here
 | DES-15 | Draw the chosen Ms. Luna | Story | P0 | M | Todo |
 | DES-11 | One right/wrong/reveal visual language | Story | P1 | S | Todo |
 | DES-12 | Luna on screen: one Luna, clear moods | Story | P1 | S | Todo |
-| DES-13 | Lesson path on the hub: seeds to flowers | Story | P1 | S | Todo |
+| DES-13 | Lesson path on the hub: in order, one bar | Story | P1 | S | Todo |
 | DES-16 | Light and dark mode | Story | P1 | M | Todo |
+| DES-17 | The moon visits for big milestones | Story | P1 | M | Todo |
 | DES-14 | Feed Luna's cookies look like real, different cookies | Story | P2 | S | Todo |
 | **FB** | **Shell feedback & hints** | Epic | **P0** | | |
 | FB-1 | One answer-feedback path in GameShell | Story | P0 | M | Todo |
@@ -157,6 +158,7 @@ In board order. A new epic gets its file in `epics/` first, then a link here
 | PRG-1 | Stars reflect performance | Story | P1 | M | Todo |
 | PRG-5 | Squishies instead of the sticker tin | Story | P1 | M | Todo |
 | PRG-6 | Time per lesson: know it before, see it after | Story | P1 | M | Todo |
+| PRG-7 | Lessons open in order | Story | P1 | M | Todo |
 | PRG-2 | Points: remove or give them a meaning | Story | P2 | S | Todo |
 | PRG-3 | Achievements worked out in one place | Task | P2 | S | Todo |
 | PRG-4 | Secret platinum trophy for a full squishy shelf | Story | P2 | S | Todo |

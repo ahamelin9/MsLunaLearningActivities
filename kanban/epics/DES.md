@@ -62,7 +62,21 @@ Story · P0 · M · needs: —
     - **Home, a little more:** tapping the bunny squishes her, and a "My shelf" button pops up (PRG-5).
   - **Prototype source and the design skill:** `.claude/skills/luna-design/`. `SKILL.md` holds the direction, the decisions so far, the open questions (// TODO) and how to change the prototype. `prototype/` holds the generator that builds the round 2 boards.
   - **Now (Alex, 2026-10-09):** the prototype is the main focus until the teacher gives her final approval, because everything else builds on it. The teacher sees round 2 on 2026-10-10.
-  - **Waiting on, from the teacher:** her pick of character, home screen and flower, and the cookie game's name.
+  - **Teacher's round 2 feedback (2026-10-10):** everything else is good to build from, except:
+    - **Home screen:** the original, with just the one Reading app icon (DES-9).
+    - **Luna:** keep the owl that's there now (the prototype's stand-in: round frames, black glasses; to confirm with Alex). The second moon (a face with black glasses) comes in now and then to say "good job" for big milestones.
+    - **No flowers:** seeds to flowers is too confusing. Something simpler instead: a progress bar, dots or similar (DES-13).
+    - **Lessons go in order:** a lesson opens only once the one before it is done.
+  - **Progress board published (2026-10-10):** "Lesson progress · four simpler options" replaces the Flowers board, and the link now opens on it. The same six lessons, now in order (done, next, locked), four ways: 1 Dots, 2 One bar, 3 Stepping stones (Luna hops to the next stone), 4 Stars. Each also shows its round marks inside a lesson. "Play a round" moves all four; tapping a locked lesson wobbles it and Luna says "Let's finish Lesson 4 first!". Only lessons lock; the games stay open (to confirm).
+  - **The last answers (Alex, 2026-10-10, later):**
+    - **Luna:** the prototype's owl (round black frames, caramel feathers). The teacher loved it (DES-15).
+    - **Progress:** option 2, One bar (DES-13).
+    - **Lessons lock in order; the games stay open** to go in and out of (PRG-7).
+    - **The moon's milestones:** left to us. Proposal on DES-17.
+    - **A win still grows flowers and drops petals,** for now (DES-11).
+    - **The cookie game is "Letter Cookies"** (GAME-6).
+  - **Prototype updated (2026-10-10):** the Library, Round, Done and Look boards use One bar, with lessons in order (done, up next, locked; a locked tap wobbles and Luna talks). The Done screen shows a "Lesson done!" mark and the bar moving to 2 of 6 instead of a flower. The "a little more" home board is gone. The Ms. Luna board marks her owl and the milestone moon. The Progress board stays as the record of the four options, with One bar marked. The link opens on the Look board again.
+  - **Waiting on, from the teacher:** nothing. What's left is the doc (below).
   - **Then:**
     - Fold the choice into sections 3–9 of the doc.
     - Settle the theme setting (proposal: drop it).
@@ -145,7 +159,7 @@ Story · P0 · L · needs: DES-7, DES-8, DES-15 · split before starting
   - Settings
   - Trophy room
   - Grade Select
-- **How:** the home screen keeps its iPad feel (Alex, 2026-10-08) but drops the purple gradients for the DES-2 palette. It stays simple like today, with the one Reading app in the middle (teacher, 2026-10-09), plus the small extras on the round 2 home board in the style sample. No school-subject apps (OPS-3), with room for future ESL companion apps. Use kit components and tokens throughout. Replace the emoji owl `components/ui/Mascot` with the chosen Luna (DES-15). Grade Select talks to the child, not to grown-ups: no "digraphs" and no "dashboard".
+- **How:** the home screen keeps its iPad feel (Alex, 2026-10-08) but drops the purple gradients for the DES-2 palette. It stays like today: just the one Reading app icon (teacher, 2026-10-10, who chose the original over the "a little more" board). No school-subject apps (OPS-3), with room for future ESL companion apps. Use kit components and tokens throughout. Replace the emoji owl `components/ui/Mascot` with the chosen Luna (DES-15). Grade Select talks to the child, not to grown-ups: no "digraphs" and no "dashboard".
 - **Complete when:** the `ui:shots` screenshots show no slate or purple-gradient screens, and `Mascot` is deleted.
 
 ### DES-10 · Layout grid and breakpoints
@@ -160,7 +174,7 @@ Story · P0 · M · needs: DES-7
 ### DES-11 · One right/wrong/reveal visual language
 Story · P1 · S · needs: DES-5, DES-7
 - **How:** use the same right glow, wrong wobble, win veil and "revealed" style (for FB-2) in every game and lesson, through `Choice` and the shell's flash.
-  - **A win grows flowers (Alex, 2026-10-09):** a solved round grows a few flowers up the sides of the stage, and petals fall instead of confetti, as on the round 2 Round board. The lesson-done screen uses the same petals. Flowers and petals never cover the answer choices or block the next tap.
+  - **A win grows flowers (Alex, 2026-10-09):** a solved round grows a few flowers up the sides of the stage, and petals fall instead of confetti, as on the round 2 Round board. The lesson-done screen uses the same petals. Flowers and petals never cover the answer choices or block the next tap. **Kept for now (Alex, 2026-10-10):** the teacher dropped flowers for progress (DES-13), not for wins; change this only if she asks.
 - **Complete when:** a right answer and a wrong answer look the same in all 8 games and 8 lesson types, and every solved round grows flowers and drops petals, with no confetti left anywhere.
 
 ### DES-12 · Luna on screen: one Luna, clear moods
@@ -168,18 +182,21 @@ Story · P1 · S · needs: DES-9, DES-15
 - **Why:** Feed Luna shows two owls at once (the one on the stage and the one on the perch).
 - **How:** at most one Luna per screen; the perch Luna hides when the game's stage has its own. Document what each mood is for. Make sure the talking animation always follows the audio.
   - **Spoken, not shown (Alex, 2026-10-09):** where space is tight, as on the library, Luna's greeting is spoken with no always-on speech bubble. A small speaker mark shows she talks, and tapping her says it again.
-- **Complete when:** no screen shows two Lunas.
+  - **The milestone moon is a visitor (DES-17):** while she visits, the owl stays and watches, and only the moon talks. One talker at a time.
+- **Complete when:** no screen shows two owls, and the moon appears only during a milestone visit.
 
-### DES-13 · Lesson path on the hub: seeds to flowers
-Story · P1 · S · needs: DES-10
-- **Why:** the teacher liked option C's garden (2026-10-09): seeing a lesson bloom is how a child knows they learned it.
-- **How:** show the lessons as a garden path. Each lesson is a plant:
-  - **Not started:** a seed in the soil, open but quieter.
-  - **Up next:** a sprout that glows, with an "Up next" label.
-  - **Started, not finished:** a bud.
-  - **Done:** a flower in bloom. Which flower is the teacher's pick from the round 2 Flowers board: the rose is her favourite (red, or another colour), or a mixed garden with a different flower per lesson.
-  - Finishing a lesson plays a short bloom (DES-5; a plain swap with reduced motion), and the glow moves to the next seed.
-- **Complete when:** a new child sees Lesson 1 as a glowing sprout marked "Up next" and the rest as seeds; finishing it shows it in bloom and moves "Up next" to Lesson 2; a lesson left part-way shows a bud.
+### DES-13 · Lesson path on the hub: in order, one bar
+Story · P1 · S · needs: DES-10, PRG-7
+- **Why:** the teacher found seeds to flowers too confusing and picked "One bar" from the round 2 Progress board (2026-10-10). Lessons now go in order (PRG-7), so each one only needs to say done, up next or locked.
+- **How:** as on the round 2 Library, Round and Done boards:
+  - **The bar:** one bar above the lessons, one segment per lesson, with "N of 6 lessons done". It fills as each lesson is done.
+  - **Done:** a green check badge and "took N min" (PRG-6). It can be played again.
+  - **Up next:** a glowing border, an "Up next" tag and "about N min". Once started, a thin bar shows how many of its rounds are done.
+  - **Locked:** dashed and quieter, with a lock badge and "about N min". Tapping it wobbles it, and Luna says to finish the open lesson first (PRG-7).
+  - **Inside a lesson:** the top bar shows the rounds as a bar, not seeds.
+  - **Finishing a lesson:** the done screen shows a "Lesson done!" mark, the bar moving on, and "Lesson N is open now". Back on the hub, the next card unlocks with a short pop (DES-5; a plain swap with reduced motion).
+  - No seeds, sprouts or flowers anywhere in progress. Wins keep theirs (DES-11).
+- **Complete when:** a new child sees an empty bar, Lesson 1 up next and the rest locked; finishing Lesson 1 fills one segment, shows it done with its time, and opens Lesson 2; a lesson left part-way shows its rounds bar; the hub, the round's top bar and the done screen show no seeds or flowers.
 
 ### DES-14 · Feed Luna's cookies look like real, different cookies
 Story · P2 · S · needs: DES-7
@@ -203,10 +220,25 @@ Story · P1 · M · needs: DES-3, SET-1
 
 ### DES-15 · Draw the chosen Ms. Luna
 Story · P0 · M · needs: DES-2
-- **Why:** the teacher is choosing a new look for Luna (round 2, 2026-10-09): the rounder owl in black glasses, or a crescent moon with or without a face. Today's `LunaOwl` drawing and the emoji `components/ui/Mascot` both retire.
+- **Why:** the teacher picked the round 2 prototype's owl (2026-10-10, "she loved it"): the rounder owl in round black frames, caramel feathers. Today's `LunaOwl` drawing and the emoji `components/ui/Mascot` both retire. The moon is her own ticket (DES-17).
 - **How:**
-  - Redraw `engine/LunaOwl.tsx` as the chosen character, in the DES-2 palette. If she's no longer an owl, rename it to `Luna`.
+  - Redraw `engine/LunaOwl.tsx` as that owl. The reference is `owl()` in `.claude/skills/luna-design/prototype/gen.py` and owl 1 on the round 2 Ms. Luna board (marked "Her pick").
   - Keep all 8 moods (idle, happy, cheer, think, oops, surprise, listen, sleepy), the blink, and the talking animation, which follows the audio.
-  - A moon without a face shows mood through motion and glow instead (a tilt, a bounce, a brighter glow when she cheers).
-  - A moon is moon gold (#F2CF63), the one colour outside the palette, so she reads as a moon in light and dark (Alex, 2026-10-09).
-- **Complete when:** the character the teacher picked appears on every screen that shows Luna, each of the 8 moods looks different, and she only moves her mouth (or glows, for a faceless moon) while a clip is playing.
+- **Complete when:** the round 2 owl appears on every screen that shows Luna, each of the 8 moods looks different, and her beak only moves while a clip is playing.
+
+### DES-17 · The moon visits for big milestones
+Story · P1 · M · needs: DES-15, DES-5
+- **Why:** the teacher (2026-10-10): the second moon on the round 2 Ms. Luna board, a crescent with a face and black glasses, comes in every once in a while to say "good job" for big milestones. The owl stays Luna.
+- **How:**
+  - Draw that moon (round 2 Ms. Luna board, moon 6, marked "Milestone moon") as its own component, in moon gold (#F2CF63), the one colour outside the palette. She needs a happy and a cheer look. Her mouth moves only while her clip plays.
+  - **Milestones (proposal; Alex left the choice to Claude, 2026-10-10):**
+    - the first lesson a child ever finishes;
+    - half of a grade's lessons done;
+    - all of a grade's lessons done;
+    - a full squishy shelf (with PRG-4's Pearl Moon).
+
+    Not after an ordinary lesson, so a visit stays special ("every once in a while"). At most one visit per done screen.
+  - **The visit:** on the done screen she glides in from a top corner, says her line (pre-rendered, a few variants per milestone), and glides out. About 3 seconds, and it never blocks the next tap. With reduced motion she fades in and out.
+  - The owl stays and watches while she talks (DES-12).
+  - Milestones are checked with the achievements in `utils/storage.ts`, so each one fires once per child.
+- **Complete when:** each milestone above brings the moon exactly once, with her line playing; an ordinary lesson never does; with reduced motion she appears without gliding; her clips are rendered and `voice:audit` passes.

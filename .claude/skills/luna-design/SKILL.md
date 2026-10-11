@@ -5,8 +5,9 @@ description: Ms. Luna's design direction and how we build and change the style s
 
 # Ms. Luna design
 
-> **Status: skeleton, 2026-10-09.** The direction is chosen and round 2 of the
-> style sample is with the teacher. Anything marked `// TODO` waits for her
+> **Status: skeleton, 2026-10-10.** The teacher has answered everything in
+> round 2, and the style sample shows her picks. What's left of DES-2 is
+> writing them into `docs/design-standards.md`. Anything marked `// TODO` waits for her
 > final approval (DES-2). When she approves, fill those in here **and** in
 > `docs/design-standards.md`, then copy the decisions into DES-3 to DES-7.
 
@@ -16,7 +17,7 @@ description: Ms. Luna's design direction and how we build and change the style s
 |---|---|
 | Tickets and decisions | `kanban/epics/DES.md` (and PRG-4/5/6 in `PRG.md`, GAME-6 in `GAME.md`); status on the board in `kanban/README.md` |
 | The full written standards | `docs/design-standards.md`. // TODO: still holds round 1 option A (the terracotta palette); update after approval |
-| The style sample (prototype canvas) | <https://claude.ai/artifact/Gr1ngbrVdGS6xE4pALyWsm>, page "Round 2 · Teacher's picks" (the link opens on it). Round 1 (options A–D, 8 Lunas) stays on its own pages |
+| The style sample (prototype canvas) | <https://claude.ai/artifact/Gr1ngbrVdGS6xE4pALyWsm>, page "Round 2 · Teacher's picks" (the link opens on the Look board). Round 1 (options A–D, 8 Lunas) stays on its own pages |
 | Prototype source | `prototype/` next to this file. See "Changing the prototype" |
 
 **Who decides:** the teacher picks the look, Alex passes her feedback on, and
@@ -37,7 +38,7 @@ preferences go in memory. The `wrap-up` skill has the full table.
 4. **Heard, never shown.** Targets and answers are spoken, never written before the round is solved. Hints are spoken. Kids can't read the chatter anyway, so where space is tight Luna *says* it instead of showing a bubble (tap her to hear it again).
 5. **Simple for a five-year-old.** One app on the home screen, big targets, one clear way in to everything. Grown-up things (settings, times in detail) sit behind the gate.
 6. **Calm until it matters.** Motion is for feedback, wins and drawing the eye. Words a child is reading never move. Ambient loops are slow.
-7. **Progress you can see.** Lessons grow from seeds to flowers. Time is visible: about how long before, how long it took after.
+7. **Progress you can see, simply.** Lessons go in order, and each one is plainly done, next or locked. No growth stages to decode (the teacher found seeds to flowers confusing, 2026-10-10). Time is visible: about how long before, how long it took after.
 8. **Collecting is joyful.** Squishies with rare colours, a shelf with things still to find, and a secret last one.
 9. **Light and dark from day one.** Components only use role tokens (card, ink, action…), never raw colours, so every screen works in both.
 10. **The moon is the one colour that breaks the palette.** Moon gold, so a moon reads as a moon. Nothing else gets to.
@@ -50,22 +51,33 @@ preferences go in memory. The `wrap-up` skill has the full table.
 |---|---|---|
 | 2026-10-08 | Full redesign. Home keeps its iPad feel; the reading app goes boho and modern | Alex |
 | 2026-10-09 | Option A Boho, recoloured light tans and browns, no rainbow | Teacher |
-| 2026-10-09 | Home screen stays simple: the one Reading app, maybe a little more | Teacher |
-| 2026-10-09 | Lessons grow seed → sprout → bud → flower | Teacher |
+| 2026-10-09 | Home screen stays simple: the one Reading app, maybe a little more (settled 2026-10-10: just the app) | Teacher |
+| 2026-10-09 | Lessons grow seed → sprout → bud → flower (dropped 2026-10-10) | Teacher |
 | 2026-10-09 | Squishies replace emoji stickers, with rare colours | Teacher |
 | 2026-10-09 | Time per lesson shown before and after | Teacher |
 | 2026-10-09 | Luna: round 2 is the rounder owl in black glasses, or a crescent moon (with or without a face) | Teacher |
 | 2026-10-09 | A real light/dark pair; the unused sunset/day/cosmic setting goes | Alex |
 | 2026-10-09 | A win grows flowers and drops petals; no confetti | Alex |
 | 2026-10-09 | No "Luna is ready" indicator (the problem it flagged is fixed) | Alex |
-| 2026-10-09 | The squishy shelf has a card on the library; the home bunny leads to it | Alex |
+| 2026-10-09 | The squishy shelf has a card on the library; the home bunny leads to it (the bunny went with the "a little more" home, 2026-10-10) | Alex |
+| 2026-10-10 | Home screen: the original, just the one Reading app icon | Teacher |
+| 2026-10-10 | Luna is the prototype's owl (round black frames, caramel feathers); "she loved it". The second moon (a face with black glasses) visits now and then to say "good job" for big milestones | Teacher |
+| 2026-10-10 | No flowers for progress: too confusing. Of four simpler options she picked **One bar** | Teacher |
+| 2026-10-10 | Lessons go in order: the next one opens when the one before is done. Games stay open | Teacher, Alex |
+| 2026-10-10 | A win still grows flowers and drops petals, for now | Alex |
+| 2026-10-10 | The cookie game is "Letter Cookies" | Alex |
+| 2026-10-10 | The moon's milestones (proposal): first lesson ever, half a grade, a whole grade, a full shelf; never an ordinary lesson (DES-17) | Claude, for Alex |
 
 ## Open questions // TODO
 
-- [ ] Luna's character: which owl, or which moon? (round 2, Ms. Luna board) → DES-15
-- [ ] Home screen: "just the app" or "a little more"? → DES-9
-- [ ] Lesson flower: which rose colour, another flower, or a mixed garden? → DES-13
-- [ ] The cookie game's new name ("Letter Cookies" is a placeholder) → GAME-6
+- [x] Luna's character → the prototype's owl, plus the glasses moon for milestones (2026-10-10) → DES-15, DES-17
+- [x] Home screen → just the app (2026-10-10) → DES-9
+- [x] Progress → One bar (2026-10-10) → DES-13
+- [x] Lessons lock in order; games stay open (2026-10-10) → PRG-7
+- [x] A win's flowers and petals → keep for now (2026-10-10) → DES-11
+- [x] The cookie game's name → "Letter Cookies" (2026-10-10) → GAME-6
+- [ ] The moon's milestones: does the proposal on DES-17 suit the teacher?
+- [ ] Can a grown-up unlock lessons ahead (behind the gate)? Not asked for yet → PRG-7
 - [ ] Pearl Moon: tease it with a "?" on the shelf, or keep it a total secret? → PRG-4
 - [ ] Squishy odds (proposal: rare 1 in 8, super rare 1 in 40) → PRG-5
 - [ ] Is the soft green for "right" and soft pink for "try again" OK inside a tan palette?
@@ -122,35 +134,34 @@ Illustrations (Luna, squishies, flowers) keep their own colours in both modes.
 - **Reduced motion:** every loop stops, petals and sparkles hide; Bubble Sounds slows instead of stopping (DES-6).
 - // TODO: petals run about 2s against the proposed 1.5s celebration rule. Decide which wins.
 
-## Luna // TODO pick
+## Luna
 
-- **Round 2 choices:** four rounder owls in black glasses (round frames, cat-eye, bold frames with a scarf, reading glasses) and four crescent moons (a face; a face with glasses; no face with hanging stars; no face cradling a star).
-- **The prototype uses** the round-framed caramel owl as a stand-in everywhere.
+- **The pick (teacher, 2026-10-10):** Luna is the prototype's round-framed caramel owl in black glasses ("she loved it"); `owl()` in `prototype/gen.py` draws her (DES-15). The second moon, a crescent with a face and black glasses, comes in now and then to say "good job" for big milestones (DES-17). The Ms. Luna board marks both.
+- **Round 2 choices were:** four rounder owls in black glasses (round frames, cat-eye, bold frames with a scarf, reading glasses) and four crescent moons (a face; a face with glasses; no face with hanging stars; no face cradling a star).
 - **Rules either way:** one Luna per screen (DES-12), eight moods, her mouth (or a faceless moon's glow) moves only while a clip plays, and the moon is moon gold.
 
 ## Progress and rewards
 
-- **Lesson garden (DES-13):** not yet = seed, up next = glowing sprout, started = bud, learned = flower. Each card shows "about N min"; a learned one shows "took N min" (PRG-6). // TODO: the flower.
-- **Today:** minutes read and lessons in bloom, on the library and the "a little more" home screen.
+- **Lessons in order, one bar (DES-13, PRG-7):** one bar above the lessons fills a segment per lesson done ("N of 6 lessons done"). Each card is done (green check badge, "took N min"), up next (glowing border, "Up next" tag, "about N min", a thin rounds bar once started) or locked (dashed, lock badge, "about N min"; a tap wobbles it and Luna says to finish the open one). Inside a lesson the rounds are a bar too. The done screen shows a "Lesson done!" mark, the bar moving on and "Lesson N is open now". No seeds or flowers in progress (2026-10-10); wins keep their flowers and petals for now.
+- **Today:** minutes read and lessons done, on the library.
 - **Squishies (PRG-5):**
   - Kinds: squish ball, mochi cat, bunny, bear, butter block, peach, cloud, little moon, and more. Generic shapes, no brand names.
   - Colours: usual, rare (soft tints), super rare (swirl, shimmer, glow).
   - **The shelf:** found squishies with colour dots; a usual colour still to find is a grey dot; a rare one is a "?" dot. Easier squishies not found yet are greyed shapes, harder ones are "?" slots. **Pearl Moon**, the last one, sits at the top of the arch (PRG-4).
-  - **Ways in:** the Squishy Shelf card on the library; the bunny on the "a little more" home screen ("My shelf"); "See my shelf" on the lesson-done screen.
+  - **Ways in:** the Squishy Shelf card on the library and "See my shelf" on the lesson-done screen. (The home bunny went with the "a little more" home screen.)
 
 ## Screens in round 2 (the prototype)
 
 | Board | What it shows |
 |---|---|
-| Look | Palette with light/dark values and contrast, type, the garden stages, squishy rarity, time chips |
+| Look | Palette with light/dark values and contrast, type, lessons in order (the bar; done, up next, locked), squishy rarity, time chips |
 | Home · just the app | Like today: one Reading app. Day: sun and dunes. Night: crescent moon and stars |
-| Home · a little more | Plus Luna's greeting, today's mini garden and time, the newest squishy |
-| Library | Luna (spoken greeting), Squishy Shelf card, Today, Luna's Pick, the lesson garden, the Play Shelf |
-| A round | The "?" listen cue, four choices, seeds for the rounds; a win grows flowers and drops petals |
-| Lesson done | The flower blooms, time vs estimate, the garden, a new squishy with a shimmering rare tag |
+| Library | Luna (spoken greeting), Squishy Shelf card, Today, Luna's Pick, Luna's Lessons (one bar; 1 done, 2 up next, 3–6 locked: tap one to see it wobble and Luna talk), the Play Shelf |
+| Progress (wide) | The record of the four options she chose from (dots, one bar, stepping stones with Luna, stars), One bar marked. "Play a round" moves all four |
+| A round | The "?" listen cue, four choices, a bar for the rounds; a win grows flowers and drops petals |
+| Lesson done | A "Lesson done!" mark, time vs estimate, the lessons bar moving to 2 of 6 and the next lesson opening, a new squishy with a shimmering rare tag |
 | Squishy shelf | The arched shelf: found, greyed, "?", colour dots, Pearl Moon |
-| Flowers | Six roses, a rose through the stages, a mixed garden, six other flowers. Tap to bloom and mark a pick |
-| Ms. Luna | Eight characters: four owls, four moons. Tap to say hi |
+| Ms. Luna | Eight characters: four owls, four moons, with her picks marked (the owl; the milestone moon says "Good job!"). Tap to say hi |
 
 ---
 
@@ -183,3 +194,9 @@ The round 2 boards are built from pieces in `prototype/`, so the shared parts
 - **Moons:** a pale moon on tan disappears. Moon gold on a dark sky reads instantly. A glow drawn as a full circle behind a crescent makes it look like a full moon: glow the crescent itself.
 - **Small squishies:** at under 64px the moon shape turns into a squiggle. Use round, simple kinds (bear, cat, peach).
 - **`rose` must not match `rosebud`:** in `gen.py`'s `head()`, the rose check excludes `rosebud`, or buds draw as full roses.
+
+**What we learned (2026-10-10):**
+- **Publishing:** the first publish in a conversation is refused until the artifact itself has been read (`read` with just the `url`), even if its files were read by `path`. The call needs `file_path` as an absolute path to one built board, with the rest in `files` and `root` absolute too.
+- **Changing the nav** (`SCREENS`/`JUMP` in `gen.py`) bakes into every board, so rebuild and republish all the round 2 boards, not just the new one.
+- **Wide boards in the built-in browser:** screenshots are clipped to the pane's size, so at a 1440×1000 viewport a 2440-wide board looks cut off. Reset the viewport (preset "desktop") and the canvas fits the whole board in the pane.
+- **Repeats:** `<sc-for list="{{ lessons }}" as="l">` with per-item handlers (`l.tap`) and state classes (`l.cls`) keeps a 24-card board short; CSS shows the right icon per state.

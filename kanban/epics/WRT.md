@@ -12,6 +12,7 @@ Story · P1 · M · needs: DES-9
   - Register a Writing app in `apps/registry.ts`, built from the DES kit and tokens.
   - It uses the child's grade and `GameShell` the same way Reading does.
   - Its only game for now is WRT-2.
+  - **Check first:** the teacher chose a home screen with just the one Reading icon (2026-10-10). Ask her before a second icon goes on it.
 - **Complete when:** the home screen shows Reading and Writing, Writing opens to a hub listing the punctuation game, and build and lint pass.
 
 ### WRT-2 · Punctuation game: where does the mark go?

@@ -12,6 +12,8 @@
 .fit { height: 26px; padding: 0 10px; border-radius: 8px; background: var(--well); border: 2px solid var(--edge); font-size: 13px; font-weight: 700; display: flex; align-items: center; }
 .hi { position: absolute; top: 18px; right: 18px; padding: 10px 16px; border-radius: 18px 18px 18px 4px; background: var(--card); border: 2px solid var(--edge); font-size: 18px; font-weight: 700; color: var(--ink); box-shadow: 0 3px 0 var(--edge); animation: hiPop 500ms cubic-bezier(0.34, 1.56, 0.64, 1) both; }
 .row-h { display: flex; align-items: baseline; gap: 14px; }
+.card.is-pick { border: 3px solid var(--action); box-shadow: 0 3px 0 var(--action-edge), 0 0 0 6px var(--right-glow), 0 8px 18px var(--shadow); }
+.pick { position: absolute; top: 18px; left: 18px; z-index: 1; height: 34px; padding: 0 14px 0 10px; border-radius: 999px; background: var(--action); color: var(--action-ink); display: flex; align-items: center; gap: 6px; font-size: 16px; font-weight: 700; }
 
 .ch { display: block; animation: float 4.5s ease-in-out infinite; transform-origin: 50% 100%; }
 .eyes { transform-box: fill-box; transform-origin: center; animation: blink 5.2s ease-in-out infinite; }
@@ -50,7 +52,7 @@
 <div style="position: absolute; inset: 0; box-sizing: border-box; padding: 36px 48px; display: flex; flex-direction: column; gap: 14px;">
   <div style="display: flex; align-items: baseline; gap: 18px;">
     <h1 class="display" style="margin: 0; font-size: 44px; font-weight: 650;">Who is Ms. Luna? Round 2</h1>
-    <span class="soft" style="font-size: 19px;">The teacher’s picks: the rounder owl in black glasses, or a crescent moon. The moons wear moon gold, the one colour outside the palette, so they read as moons. Each one blinks or glows, and talks when she speaks. Tap one to say hi.</span>
+    <span class="soft" style="font-size: 19px;">She picked the round-framed owl: that’s Ms. Luna. The crescent in glasses visits now and then to say “good job” for big milestones. Moons wear moon gold, the one colour outside the palette. Tap one to say hi.</span>
   </div>
 
   <div class="row-h" style="margin-top: 6px;">
@@ -59,8 +61,9 @@
   <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 32px;">
 
     <!-- 1 · classic round frames -->
-    <button class="card" onClick="{{ p1 }}" style="animation-delay: 0ms;">
+    <button class="card is-pick" onClick="{{ p1 }}" style="animation-delay: 0ms;">
       <span class="stage" style="background: var(--accent-soft);">
+        <span class="pick"><svg width="16" height="16" viewBox="0 0 24 24"><path class="ic" style="stroke-width: 3.4;" d="M5 12.5l4.5 4.5L19 7.5"></path></svg>Her pick: Ms. Luna</span>
         <span class="arch" style="background: var(--soil);"></span>
         <span class="{{ c1 }}" style="position: relative; width: 200px; height: 200px;">
           <svg width="200" height="200" viewBox="0 0 200 200">
@@ -272,8 +275,9 @@
     </button>
 
     <!-- 6 · crescent with a face and black glasses -->
-    <button class="card" onClick="{{ p6 }}" style="animation-delay: 400ms;">
+    <button class="card is-pick" onClick="{{ p6 }}" style="animation-delay: 400ms;">
       <span class="stage" style="background: #2E221B;">
+        <span class="pick"><svg width="16" height="16" viewBox="0 0 24 24"><path class="ic" style="stroke-width: 3.4;" d="M5 12.5l4.5 4.5L19 7.5"></path></svg>Milestone moon</span>
         <span class="arch" style="background: #3A2B22;"></span>
         <span style="position: absolute; left: 60px; top: 50px; width: 4px; height: 4px; border-radius: 999px; background: #FBEFD9;"></span>
         <span style="position: absolute; right: 56px; top: 210px; width: 3px; height: 3px; border-radius: 999px; background: #FBEFD9;"></span>
@@ -300,7 +304,7 @@
             </g>
           </svg>
         </span>
-        <sc-if value="{{ s6 }}" hint-placeholder-val="{{ false }}"><span class="hi">Hi! I’m Ms. Luna!</span></sc-if>
+        <sc-if value="{{ s6 }}" hint-placeholder-val="{{ false }}"><span class="hi">Good job!</span></sc-if>
       </span>
       <span class="about">
         <span class="display name">Crescent in glasses</span>

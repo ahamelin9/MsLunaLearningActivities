@@ -37,7 +37,7 @@ Story · P1 · M · needs: DES-2
   - The shelf shows each squishy once, with its rarest colour. Under it, a row of colour dots: a found colour is filled in, a usual colour still to find is grey, and a rare one still to find is a "?" (Alex, 2026-10-09).
   - Squishies not found yet: easier ones show as a greyed shape, harder ones as a "?" slot. Tapping either has Luna say a hint, never the answer to a round.
   - A new rare or super-rare squishy on the reward screen gets a shimmering, sparkling tag.
-  - **Ways in to the shelf (Alex, 2026-10-09):** a Squishy Shelf card on the library (the last three found, on a little plank, with the count); "See my shelf" on the lesson-done screen; and, if the teacher picks the "a little more" home screen, tapping the squishy there squishes it and pops up a "My shelf" button. The small header pill goes.
+  - **Ways in to the shelf (Alex, 2026-10-09):** a Squishy Shelf card on the library (the last three found, on a little plank, with the count) and "See my shelf" on the lesson-done screen. The small header pill goes. (The home-screen bunny went with the "a little more" home screen, which the teacher passed on, 2026-10-10.)
   - Tapping a squishy on the shelf squishes it and Luna says its line (pre-rendered). With reduced motion it gives a small press instead.
   - Old saves keep their count: each sticker id maps to a squishy, so no child loses anything. The saved field can stay `stickers`.
   - Lessons and games keep their signature reward (`SIGNATURE_STICKER` in `engine/lessons.ts`, `nextSticker` in `engine/stickers.ts`).
@@ -54,11 +54,23 @@ Story · P1 · M · needs: DES-13
 - **How:**
   - **Before:** each lesson card on the hub shows an estimate, e.g. "about 5 min", with a small clock. It starts as rounds × a typical round time, then uses the real average once a few plays are saved.
   - **During:** time only counts while the app is open and on screen (paused when the tab is hidden or the iPad sleeps).
-  - **After:** the lesson-done screen shows the time taken next to the estimate, and the lesson's flower blooming (DES-13).
-  - **On the hub:** a "Today" line: minutes read today and lessons in bloom (e.g. "12 min today · 3 of 6 in bloom").
+  - **After:** the lesson-done screen shows the time taken next to the estimate, and the lessons bar moving on (DES-13).
+  - **On the hub:** a "Today" line: minutes read today and lessons done (e.g. "12 min today · 3 of 6 done").
   - Saved per lesson: last time, best time and number of plays, in `utils/storage.ts`.
 - **Complete when:**
   - every lesson card shows an estimate in minutes;
   - after a lesson, the done screen shows the minutes it took, and the hub's "Today" total goes up by the same amount;
   - hiding the tab for a minute mid-lesson doesn't add that minute;
   - the times survive a reload, and older saves load without errors.
+
+### PRG-7 · Lessons open in order
+Story · P1 · M
+- **Why:** the teacher (2026-10-10): the lessons are linear, so a lesson opens only once the one before it is done. Games stay open to go in and out of as needed (Alex, 2026-10-10). Today every lesson is open; `completedLessons` is saved but nothing reads it to lock anything.
+- **How:**
+  - In each grade, Lesson 1 is open. Each next lesson opens when the one before is in `completedLessons` (`utils/storage.ts`). Done lessons stay open to play again.
+  - Games on the Play Shelf are never locked.
+  - Tapping a locked lesson never opens it. It gives a small wobble, and Luna says (pre-rendered) "Let's finish Lesson N first!", where N is the open one.
+  - **Old saves:** lessons already done stay done and open, and the open one is the first lesson not done yet, so nobody loses anything.
+  - If Luna's Pick can choose a lesson, it only picks an open one.
+  - The look comes with DES-13. Until then, keep any screen change minimal, in today's style, and isolated so the restyle can replace it.
+- **Complete when:** a fresh save has only Lesson 1 open in each grade; finishing it opens Lesson 2; tapping a locked lesson doesn't open it and plays Luna's line; every game opens at any time; a save with lessons done out of order loads with those still done and the first not-done lesson open; `voice:audit` passes.

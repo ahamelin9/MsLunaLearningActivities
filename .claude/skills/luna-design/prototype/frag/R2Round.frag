@@ -32,7 +32,10 @@
 .petal-b { animation: petalB 2200ms cubic-bezier(0.35, 0.1, 0.6, 1) forwards; }
 .grow-in { transform-origin: 50% 100%; animation: growIn 700ms cubic-bezier(0.34, 1.56, 0.64, 1) both; }
 .sway { transform-box: fill-box; transform-origin: 50% 100%; animation: sway 5s ease-in-out 1.2s infinite; }
-.sprouted { transform-box: fill-box; transform-origin: 50% 100%; animation: sproutUp 600ms cubic-bezier(0.34, 1.56, 0.64, 1); }
+.rbar { position: relative; width: 220px; height: 22px; box-sizing: border-box; border-radius: 999px; background: var(--well); border: 2px solid var(--edge); overflow: hidden; }
+.rfill { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 999px; background: var(--right); transition: width 600ms cubic-bezier(0.34, 1.3, 0.64, 1); }
+.q0 { width: 0; } .q1 { width: 25%; }
+.rtick { position: absolute; top: 0; bottom: 0; width: 3px; margin-left: -1px; background: var(--card); opacity: 0.85; }
 .bubble-in { animation: rise 500ms cubic-bezier(0.34, 1.56, 0.64, 1) 400ms both; }
 @keyframes talkA { 0%, 100% { transform: scaleY(1); } 50% { transform: scaleY(1.5); } }
 @keyframes talkB { 0%, 100% { transform: scaleY(1); } 50% { transform: scaleY(1.5); } }
@@ -56,26 +59,18 @@
 @keyframes petalB { 0% { transform: translate(0, -40px) rotate(0deg); opacity: 0; } 8% { opacity: 1; } 30% { transform: translate(-24px, 220px) rotate(-80deg); } 55% { transform: translate(18px, 450px) rotate(-170deg); } 80% { transform: translate(-20px, 680px) rotate(-260deg); opacity: 1; } 100% { transform: translate(-4px, 880px) rotate(-330deg); opacity: 0.6; } }
 @keyframes growIn { 0% { transform: scale(0.3, 0); opacity: 0; } 60% { transform: scale(1.06, 1.12); opacity: 1; } 100% { transform: scale(1, 1); opacity: 1; } }
 @keyframes sway { 0%, 100% { transform: rotate(-4deg); } 50% { transform: rotate(4deg); } }
-@keyframes sproutUp { 0% { transform: scale(0.2, 0); } 60% { transform: scale(1.1, 1.2); } 100% { transform: scale(1, 1); } }
-@media (prefers-reduced-motion: reduce) { .choice, .cue, .cue-wrap, .slot, .spark, .petal, .ring, .hop-a, .hop-b, .tilt-a, .tilt-b, .grow-in, .sway, .sprouted, .bubble-in, .talk-a .ow-beak, .talk-b .ow-beak { animation: none !important; } .spark, .petal, .ring { display: none; } .grow-in { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .choice, .cue, .cue-wrap, .slot, .spark, .petal, .ring, .hop-a, .hop-b, .tilt-a, .tilt-b, .grow-in, .sway, .rfill, .bubble-in, .talk-a .ow-beak, .talk-b .ow-beak { animation: none !important; } .spark, .petal, .ring { display: none; } .grow-in { opacity: 1; } }
 <!--BODY-->
-  <!-- one bar: back to the library, where you are, seeds for the rounds, hear it again -->
+  <!-- one bar: back to the library, where you are, a bar for the rounds, hear it again -->
   <header class="bar" style="gap: 18px;">
     <a href="R2Library.dc.html" class="press btn">
       <svg width="22" height="22" viewBox="0 0 24 24"><path class="ic" d="M19 12H5"></path><path class="ic" d="M11 6l-6 6 6 6"></path></svg>
       Library
     </a>
     <span class="display" style="font-size: 22px; font-weight: 600;">Find A, M, S &amp; B</span>
-    <span style="margin-left: auto; display: flex; gap: 4px; align-items: flex-end;" aria-label="Round 1 of 4">
-      <sc-if value="{{ solved }}" hint-placeholder-val="{{ false }}">
-        <svg width="30" height="34" viewBox="0 0 60 70"><path d="M6 66 Q30 50 54 66 Z" style="fill: var(--soil);"></path><g class="sprouted"><path d="M30 60 V40" style="fill: none; stroke: var(--stem); stroke-width: 4; stroke-linecap: round;"></path><path d="M30 47 C22 47 18 41 18 37 C26 37 30 41 30 47 Z" style="fill: var(--leaf);"></path><path d="M30 43 C38 43 42 37 42 33 C34 33 30 37 30 43 Z" style="fill: var(--leaf);"></path></g></svg>
-      </sc-if>
-      <sc-if value="{{ hidden }}" hint-placeholder-val="{{ true }}">
-        <svg width="30" height="34" viewBox="0 0 60 70"><path d="M6 66 Q30 50 54 66 Z" style="fill: var(--accent);"></path><ellipse cx="30" cy="56" rx="7" ry="5" transform="rotate(-20 30 56)" style="fill: var(--action-edge);"></ellipse></svg>
-      </sc-if>
-      <svg width="30" height="34" viewBox="0 0 60 70"><path d="M6 66 Q30 50 54 66 Z" style="fill: var(--edge);"></path><ellipse cx="30" cy="58" rx="6" ry="4" transform="rotate(-20 30 58)" style="fill: var(--soil-dk);"></ellipse></svg>
-      <svg width="30" height="34" viewBox="0 0 60 70"><path d="M6 66 Q30 50 54 66 Z" style="fill: var(--edge);"></path><ellipse cx="30" cy="58" rx="6" ry="4" transform="rotate(-20 30 58)" style="fill: var(--soil-dk);"></ellipse></svg>
-      <svg width="30" height="34" viewBox="0 0 60 70"><path d="M6 66 Q30 50 54 66 Z" style="fill: var(--edge);"></path><ellipse cx="30" cy="58" rx="6" ry="4" transform="rotate(-20 30 58)" style="fill: var(--soil-dk);"></ellipse></svg>
+    <span style="margin-left: auto; display: flex; align-items: center; gap: 12px;" aria-label="{{ roundText }}">
+      <span class="rbar"><span class="{{ roundFill }}"></span><span class="rtick" style="left: 25%;"></span><span class="rtick" style="left: 50%;"></span><span class="rtick" style="left: 75%;"></span></span>
+      <span class="soft" style="font-size: 15px; font-weight: 700; white-space: nowrap;">{{ roundText }}</span>
     </span>
     <button class="press btn" onClick="{{ hear }}" style="padding: 0 16px 0 12px;">
       <svg width="22" height="22" viewBox="0 0 24 24"><path class="ic" d="M3 12a9 9 0 1 0 3-6.7"></path><path class="ic" d="M3 4v5h5"></path></svg>
@@ -231,6 +226,8 @@
     if (beat > 0) owlClass = (solved ? 'hop-' : (wrong || misses > 0 ? 'tilt-' : 'hop-')) + flip + ' talk-' + flip;
     var ringFlip = heard % 2 === 0 ? 'a' : 'b';
     vals.solved = solved;
+    vals.roundFill = solved ? 'rfill q1' : 'rfill q0';
+    vals.roundText = solved ? '1 of 4 done' : 'round 1 of 4';
     vals.hidden = !solved;
     vals.cueClass = solved ? 'cue is-found' : 'cue is-hidden';
     vals.ringClass = heard > 0 && !solved ? 'ring ring-' + ringFlip : 'ring';

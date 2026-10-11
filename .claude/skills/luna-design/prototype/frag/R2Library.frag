@@ -19,8 +19,7 @@
 .in { animation: enter 600ms cubic-bezier(0.34, 1.56, 0.64, 1) both; }
 .bubble-in { animation: bubbleIn 500ms cubic-bezier(0.34, 1.56, 0.64, 1) 300ms both; transform-origin: 0 50%; }
 .tag { animation: tagBounce 4s ease-in-out infinite; }
-.bloom { transform-box: fill-box; transform-origin: 50% 100%; animation: sway 6s ease-in-out infinite; }
-.sprouting { transform-box: fill-box; transform-origin: 50% 100%; animation: sprout 2.4s ease-in-out infinite; }
+.sway { transform-box: fill-box; transform-origin: 50% 100%; animation: sway 6s ease-in-out infinite; }
 .rise { animation: floatUp 4s ease-in-out infinite; }
 .jiggle { transform-box: fill-box; transform-origin: center; animation: jiggle 4s ease-in-out infinite; }
 .sh1 { transform-box: fill-box; transform-origin: center; animation: shuffle 4.5s ease-in-out infinite; }
@@ -28,7 +27,21 @@
 .dashes { stroke-dasharray: 2 10; animation: dash 1.4s linear infinite; }
 .page-flap { transform-box: fill-box; transform-origin: 0 50%; animation: flutter 4s ease-in-out infinite; }
 .word { display: inline-block; animation: drift 4s ease-in-out infinite; }
-.lesson { position: relative; height: 184px; border-radius: 999px 999px 20px 20px; border: 2px solid var(--edge); background: var(--card); box-shadow: 0 3px 0 var(--edge); display: flex; flex-direction: column; align-items: center; padding: 14px 8px 10px; gap: 3px; box-sizing: border-box; }
+.lc { position: relative; height: 150px; box-sizing: border-box; border-radius: 20px; border: 2px solid var(--edge); background: var(--card); box-shadow: 0 3px 0 var(--edge); display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 16px 8px 10px; text-align: center; }
+.lnum { font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--soft); }
+.lc .ttl { min-height: 37px; display: flex; align-items: center; justify-content: center; }
+.st-done .lnum { color: var(--right-text); }
+.st-now { border: 3px solid var(--action); box-shadow: none; }
+.st-now .lnum { color: var(--accent-text); }
+.st-lock { background: var(--well); border-style: dashed; box-shadow: none; cursor: default; }
+.st-lock:active { transform: none; }
+.st-lock .ttl { color: var(--soft); }
+.cbadge { position: absolute; top: -10px; right: 10px; width: 30px; height: 30px; box-sizing: border-box; border-radius: 999px; display: flex; align-items: center; justify-content: center; }
+.cb-done { background: var(--right); color: var(--right-ink); }
+.cb-lock { background: var(--card); border: 2px solid var(--edge); color: var(--soft); }
+.lbar { flex: 1; position: relative; height: 24px; box-sizing: border-box; border-radius: 999px; background: var(--well); border: 2px solid var(--edge); overflow: hidden; }
+.lfill { position: absolute; left: 0; top: 0; bottom: 0; width: 16.667%; border-radius: 999px; background: var(--right); }
+.ltick { position: absolute; top: 0; bottom: 0; width: 3px; margin-left: -1px; background: var(--card); opacity: 0.85; }
 .ttl { font-size: 15px; font-weight: 700; line-height: 1.2; text-align: center; }
 .time { margin-top: auto; height: 28px; padding: 0 10px 0 6px; border-radius: 999px; display: inline-flex; align-items: center; gap: 4px; font-size: 13px; font-weight: 700; white-space: nowrap; }
 .game { height: 124px; padding: 0; border-radius: 22px; border: 2px solid var(--edge); background: var(--card); box-shadow: 0 3px 0 var(--edge); overflow: hidden; display: flex; flex-direction: column; text-align: left; }
@@ -42,7 +55,6 @@
 @keyframes bubbleIn { 0% { transform: scale(0.6); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
 @keyframes tagBounce { 0%, 86%, 100% { transform: translateX(-50%) rotate(-3deg) translateY(0); } 90% { transform: translateX(-50%) rotate(-3deg) translateY(-6px); } 95% { transform: translateX(-50%) rotate(-3deg) translateY(0); } }
 @keyframes sway { 0%, 100% { transform: rotate(-5deg); } 50% { transform: rotate(5deg); } }
-@keyframes sprout { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.08, 1.12); } }
 @keyframes floatUp { 0% { transform: translateY(14px); opacity: 0; } 20% { opacity: 1; } 80% { opacity: 1; } 100% { transform: translateY(-30px); opacity: 0; } }
 @keyframes jiggle { 0%, 100% { transform: rotate(0deg); } 25% { transform: rotate(-8deg); } 75% { transform: rotate(8deg); } }
 @keyframes shuffle { 0%, 100% { transform: translateX(0) rotate(-10deg); } 50% { transform: translateX(10px) rotate(-4deg); } }
@@ -50,11 +62,15 @@
 @keyframes dash { 0% { stroke-dashoffset: 0; } 100% { stroke-dashoffset: -24; } }
 @keyframes flutter { 0%, 100% { transform: scaleX(1); } 50% { transform: scaleX(0.82); } }
 @keyframes drift { 0%, 100% { transform: translateY(0) rotate(var(--r, 0deg)); } 50% { transform: translateY(-5px) rotate(var(--r, 0deg)); } }
-@media (prefers-reduced-motion: reduce) { .talk-intro .ow-beak, .talk-a .ow-beak, .talk-b .ow-beak, .wv, .sq-idle, .owl-bob, .up-next, .in, .bubble-in, .tag, .bloom, .sprouting, .rise, .jiggle, .sh1, .sh2, .dashes, .page-flap, .word { animation: none !important; } }
+.wob-a { animation: wobA 450ms ease-in-out; }
+.wob-b { animation: wobB 450ms ease-in-out; }
+@keyframes wobA { 0%, 100% { transform: translateX(0) rotate(0deg); } 20% { transform: translateX(-7px) rotate(-2deg); } 40% { transform: translateX(7px) rotate(2deg); } 60% { transform: translateX(-4px) rotate(-1deg); } 80% { transform: translateX(3px) rotate(1deg); } }
+@keyframes wobB { 0%, 100% { transform: translateX(0) rotate(0deg); } 20% { transform: translateX(-7px) rotate(-2deg); } 40% { transform: translateX(7px) rotate(2deg); } 60% { transform: translateX(-4px) rotate(-1deg); } 80% { transform: translateX(3px) rotate(1deg); } }
+@media (prefers-reduced-motion: reduce) { .talk-intro .ow-beak, .talk-a .ow-beak, .talk-b .ow-beak, .wv, .sq-idle, .owl-bob, .up-next, .in, .bubble-in, .tag, .sway, .wob-a, .wob-b, .rise, .jiggle, .sh1, .sh2, .dashes, .page-flap, .word { animation: none !important; } }
 <!--BODY-->
   <!-- one header: home, where you are, stars, grown-ups -->
   <header class="bar" style="gap: 14px;">
-    <a href="R2HomeMore.dc.html" class="press btn">
+    <a href="R2Home.dc.html" class="press btn">
       <svg width="22" height="22" viewBox="0 0 24 24"><path class="ic" d="M3.5 11L12 4l8.5 7"></path><path class="ic" d="M6 9.5V20h12V9.5"></path></svg>
       Home
     </a>
@@ -73,7 +89,7 @@
 
     <!-- welcome: Luna greets you out loud (tap her to hear it again), the squishy shelf, today so far, and her pick -->
     <div style="height: 116px; display: flex; align-items: center; gap: 16px;">
-      <button class="tap in owl-bob" onClick="{{ hi }}" aria-label="Hear Ms. Luna: Welcome back! Lesson 2 is ready to grow." style="position: relative; width: 108px; height: 108px; flex: none;">
+      <button class="tap in owl-bob" onClick="{{ hi }}" aria-label="Hear Ms. Luna: Welcome back! Lesson 2 is ready." style="position: relative; width: 108px; height: 108px; flex: none;">
         <span class="{{ owlClass }}" style="position: relative; display: block; width: 108px; height: 108px;">
           %%OWL 108%%
           <span class="speak"><svg width="20" height="20" viewBox="0 0 24 24"><path class="ic" d="M4 9v6h4l5 4V5L8 9z"></path><path class="ic wv" d="M16 9a4 4 0 0 1 0 6"></path><path class="ic wv" d="M18.5 6.5a8 8 0 0 1 0 11"></path></svg></span>
@@ -103,11 +119,11 @@
           <span class="display" style="font-size: 34px; font-weight: 700; line-height: 1;">8</span>
           <span class="soft" style="font-size: 16px; font-weight: 700;">min reading</span>
         </span>
-        <span class="soft" style="font-size: 14px;"><strong style="color: var(--ink);">1 of 6</strong> lessons in bloom</span>
+        <span class="soft" style="font-size: 14px;"><strong style="color: var(--ink);">1 of 6</strong> lessons done</span>
       </div>
 
       <button class="press in" style="width: 222px; height: 108px; flex: none; border: none; border-radius: 22px; background: var(--accent); color: var(--accent-ink); box-shadow: 0 5px 0 var(--accent-edge); display: flex; align-items: center; gap: 10px; padding: 0 14px; text-align: left; animation-delay: 250ms;">
-        <span class="bloom" style="width: 46px; height: 46px; border-radius: 14px; background: #FFFBF5; color: #3B2A20; display: flex; align-items: center; justify-content: center; flex: none;">
+        <span class="sway" style="width: 46px; height: 46px; border-radius: 14px; background: #FFFBF5; color: #3B2A20; display: flex; align-items: center; justify-content: center; flex: none;">
           <svg width="30" height="30" viewBox="0 0 24 24"><rect class="ic" x="4" y="4" width="16" height="16" rx="4"></rect><circle cx="9" cy="9" r="1.4" fill="#3B2A20"></circle><circle cx="15" cy="9" r="1.4" fill="#3B2A20"></circle><circle cx="12" cy="12" r="1.4" fill="#3B2A20"></circle><circle cx="9" cy="15" r="1.4" fill="#3B2A20"></circle><circle cx="15" cy="15" r="1.4" fill="#3B2A20"></circle></svg>
         </span>
         <span style="display: flex; flex-direction: column;">
@@ -117,56 +133,48 @@
       </button>
     </div>
 
-    <!-- the lessons, as a garden: seed, sprout, bud, bloom, and their times -->
-    <div style="margin-top: 14px; display: flex; align-items: baseline; gap: 12px;">
-      <h2 class="display" style="margin: 0; font-size: 24px; font-weight: 600;">Luna’s Lesson Garden</h2>
-      <span class="soft" style="font-size: 15px;">a flower means you learned it</span>
+    <!-- the lessons, in order: one bar fills as each is done, and the next opens when the one before is done -->
+    <div style="margin-top: 16px; display: flex; align-items: center; gap: 18px;">
+      <h2 class="display" style="margin: 0; font-size: 24px; font-weight: 600; white-space: nowrap;">Luna’s Lessons</h2>
+      <span class="lbar" aria-hidden="true"><span class="lfill"></span><span class="ltick" style="left: 16.667%;"></span><span class="ltick" style="left: 33.333%;"></span><span class="ltick" style="left: 50%;"></span><span class="ltick" style="left: 66.667%;"></span><span class="ltick" style="left: 83.333%;"></span></span>
+      <span class="soft" style="font-size: 16px; white-space: nowrap;"><strong style="color: var(--ink); font-size: 20px;">1 of 6</strong> lessons done</span>
     </div>
-    <div style="position: relative; margin-top: 12px; display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 16px;">
-      <svg style="position: absolute; left: 40px; right: 40px; bottom: -10px;" width="1044" height="20" viewBox="0 0 1044 20" preserveAspectRatio="none"><path d="M0 10 Q 130 0 260 10 T 520 10 T 780 10 T 1044 10" stroke-dasharray="2 12" style="fill: none; stroke: var(--soil); stroke-width: 5; stroke-linecap: round;"></path></svg>
-
-      <a href="R2Done.dc.html" class="press lesson in" style="animation-delay: 300ms;">
-        <span style="position: absolute; top: -6px; right: 12px; width: 28px; height: 28px; border-radius: 999px; background: var(--right); color: var(--right-ink); display: flex; align-items: center; justify-content: center;"><svg width="16" height="16" viewBox="0 0 24 24"><path class="ic" style="stroke-width: 3.4;" d="M5 12.5l4.5 4.5L19 7.5"></path></svg></span>
-        %%PLANT daisy 54 63 bloom%%
-        <span class="lbl" style="color: var(--right-text);">Lesson 1</span>
+    <div style="margin-top: 18px; display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 16px;">
+      <a href="R2Done.dc.html" class="press lc st-done in" aria-label="Lesson 1, Sounds for M, S, B and T, done, took 4 minutes" style="animation-delay: 300ms;">
+        <span class="cbadge cb-done"><svg width="16" height="16" viewBox="0 0 24 24"><path class="ic" style="stroke-width: 3.4;" d="M5 12.5l4.5 4.5L19 7.5"></path></svg></span>
+        <span class="lnum">Lesson 1</span>
         <span class="ttl">Sounds for M, S, B &amp; T</span>
         <span class="time chip-took"><svg width="16" height="16" viewBox="0 0 24 24"><path class="ic" style="stroke-width: 3;" d="M5 12.5l4.5 4.5L19 7.5"></path></svg>took 4 min</span>
       </a>
-
-      <a href="R2Round.dc.html" class="press lesson up-next" style="border: 3px solid var(--action); box-shadow: none; animation-delay: 0s, 360ms;">
+      <a href="R2Round.dc.html" class="press lc st-now up-next" aria-label="Lesson 2, Find A, M, S and B, up next, about 5 minutes" style="animation-delay: 0s, 360ms;">
         <span class="tag" style="position: absolute; top: -15px; left: 50%; padding: 3px 12px; border-radius: 8px; background: var(--accent); color: var(--accent-ink); font-size: 13px; font-weight: 700; white-space: nowrap;">Up next</span>
-        %%PLANT sprout 54 63 - sprouting%%
-        <span class="lbl" style="color: var(--accent-text);">Lesson 2</span>
+        <span class="lnum">Lesson 2</span>
         <span class="ttl">Find A, M, S &amp; B</span>
         <span class="time chip-accent"><svg width="16" height="16" viewBox="0 0 24 24"><circle class="ic" cx="12" cy="13" r="8"></circle><path class="ic" d="M12 9v4l2.5 2"></path></svg>about 5 min</span>
       </a>
-
-      <button class="press lesson in" style="animation-delay: 420ms;">
-        %%PLANT seed 54 63%%
-        <span class="lbl">Lesson 3</span>
+      <button class="press lc st-lock in {{ w3 }}" onClick="{{ lock3 }}" aria-label="Lesson 3, Pet and Animal Words, locked" style="animation-delay: 420ms;">
+        <span class="cbadge cb-lock"><svg width="15" height="15" viewBox="0 0 24 24"><rect class="ic" x="5" y="10.5" width="14" height="10" rx="2.5"></rect><path class="ic" d="M8 10.5V8a4 4 0 0 1 8 0v2.5"></path></svg></span>
+        <span class="lnum">Lesson 3</span>
         <span class="ttl">Pet &amp; Animal Words</span>
-        <span class="time chip-time"><svg width="16" height="16" viewBox="0 0 24 24"><circle class="ic" cx="12" cy="13" r="8"></circle><path class="ic" d="M12 9v4l2.5 2"></path></svg>about 4 min</span>
+        <span class="time chip-time" style="background: var(--card);"><svg width="16" height="16" viewBox="0 0 24 24"><circle class="ic" cx="12" cy="13" r="8"></circle><path class="ic" d="M12 9v4l2.5 2"></path></svg>about 4 min</span>
       </button>
-
-      <button class="press lesson in" style="animation-delay: 480ms;">
-        %%PLANT bud 54 63%%
-        <span class="lbl">Lesson 4 · started</span>
+      <button class="press lc st-lock in {{ w4 }}" onClick="{{ lock4 }}" aria-label="Lesson 4, Everyday Words, locked" style="animation-delay: 480ms;">
+        <span class="cbadge cb-lock"><svg width="15" height="15" viewBox="0 0 24 24"><rect class="ic" x="5" y="10.5" width="14" height="10" rx="2.5"></rect><path class="ic" d="M8 10.5V8a4 4 0 0 1 8 0v2.5"></path></svg></span>
+        <span class="lnum">Lesson 4</span>
         <span class="ttl">Everyday Words</span>
-        <span class="time chip-time"><svg width="16" height="16" viewBox="0 0 24 24"><circle class="ic" cx="12" cy="13" r="8"></circle><path class="ic" d="M12 9v4l2.5 2"></path></svg>about 4 min</span>
+        <span class="time chip-time" style="background: var(--card);"><svg width="16" height="16" viewBox="0 0 24 24"><circle class="ic" cx="12" cy="13" r="8"></circle><path class="ic" d="M12 9v4l2.5 2"></path></svg>about 4 min</span>
       </button>
-
-      <button class="press lesson in" style="animation-delay: 540ms;">
-        %%PLANT seed 54 63%%
-        <span class="lbl">Lesson 5</span>
+      <button class="press lc st-lock in {{ w5 }}" onClick="{{ lock5 }}" aria-label="Lesson 5, Starter Sight Words, locked" style="animation-delay: 540ms;">
+        <span class="cbadge cb-lock"><svg width="15" height="15" viewBox="0 0 24 24"><rect class="ic" x="5" y="10.5" width="14" height="10" rx="2.5"></rect><path class="ic" d="M8 10.5V8a4 4 0 0 1 8 0v2.5"></path></svg></span>
+        <span class="lnum">Lesson 5</span>
         <span class="ttl">Starter Sight Words</span>
-        <span class="time chip-time"><svg width="16" height="16" viewBox="0 0 24 24"><circle class="ic" cx="12" cy="13" r="8"></circle><path class="ic" d="M12 9v4l2.5 2"></path></svg>about 4 min</span>
+        <span class="time chip-time" style="background: var(--card);"><svg width="16" height="16" viewBox="0 0 24 24"><circle class="ic" cx="12" cy="13" r="8"></circle><path class="ic" d="M12 9v4l2.5 2"></path></svg>about 4 min</span>
       </button>
-
-      <button class="press lesson in" style="animation-delay: 600ms;">
-        %%PLANT seed 54 63%%
-        <span class="lbl">Lesson 6</span>
+      <button class="press lc st-lock in {{ w6 }}" onClick="{{ lock6 }}" aria-label="Lesson 6, Rhyme Matcher, locked" style="animation-delay: 600ms;">
+        <span class="cbadge cb-lock"><svg width="15" height="15" viewBox="0 0 24 24"><rect class="ic" x="5" y="10.5" width="14" height="10" rx="2.5"></rect><path class="ic" d="M8 10.5V8a4 4 0 0 1 8 0v2.5"></path></svg></span>
+        <span class="lnum">Lesson 6</span>
         <span class="ttl">Rhyme Matcher</span>
-        <span class="time chip-time"><svg width="16" height="16" viewBox="0 0 24 24"><circle class="ic" cx="12" cy="13" r="8"></circle><path class="ic" d="M12 9v4l2.5 2"></path></svg>about 6 min</span>
+        <span class="time chip-time" style="background: var(--card);"><svg width="16" height="16" viewBox="0 0 24 24"><circle class="ic" cx="12" cy="13" r="8"></circle><path class="ic" d="M12 9v4l2.5 2"></path></svg>about 6 min</span>
       </button>
     </div>
 
@@ -227,4 +235,12 @@
       var cur = self.state || {};
       self.setState({ hiBeat: (cur.hiBeat || 0) + 1 });
     };
+    // a locked lesson wobbles and Luna says (out loud) to finish Lesson 2 first
+    [3, 4, 5, 6].forEach(function (n) {
+      vals['w' + n] = s.lockN === n ? ((s.lockBeat || 0) % 2 ? 'wob-a' : 'wob-b') : '';
+      vals['lock' + n] = function () {
+        var cur = self.state || {};
+        self.setState({ lockN: n, lockBeat: (cur.lockBeat || 0) + 1, hiBeat: (cur.hiBeat || 0) + 1 });
+      };
+    });
   }

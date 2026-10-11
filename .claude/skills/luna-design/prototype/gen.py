@@ -18,17 +18,16 @@ OUT = ROOT / 'project'
 SCREENS = [
     ('R2Look', 'Round 2 · The look'),
     ('R2Home', 'Home · just the app, like today'),
-    ('R2HomeMore', 'Home · a little more'),
-    ('R2Library', 'Library · lessons grow from seeds'),
+    ('R2Library', 'Library · lessons in order, one bar'),
+    ('R2Progress', 'Lesson progress · she picked One bar'),
     ('R2Round', 'A round · tap the letters and the ?'),
     ('R2Done', 'Lesson done · time and a new squishy'),
     ('R2Squishies', 'The squishy shelf · tap one'),
-    ('R2Flowers', 'Flowers · pick the garden’s flower'),
-    ('R2Luna', 'Ms. Luna · owl or moon (tap one)'),
+    ('R2Luna', 'Ms. Luna · the owl, and the milestone moon'),
 ]
-JUMP = [('Look', 'R2Look'), ('Home', 'R2Home'), ('Library', 'R2Library'), ('Round', 'R2Round'),
-        ('Done', 'R2Done'), ('Squishies', 'R2Squishies'), ('Flowers', 'R2Flowers'), ('Ms. Luna', 'R2Luna')]
-WIDE = {'R2Luna'}
+JUMP = [('Look', 'R2Look'), ('Home', 'R2Home'), ('Library', 'R2Library'), ('Progress', 'R2Progress'),
+        ('Round', 'R2Round'), ('Done', 'R2Done'), ('Squishies', 'R2Squishies'), ('Ms. Luna', 'R2Luna')]
+WIDE = {'R2Luna', 'R2Progress'}
 
 FONTS = '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&amp;family=Fraunces:opsz,wght,SOFT,WONK@9..144,300..900,0..100,0..1&amp;display=swap">'
 
@@ -287,7 +286,7 @@ def nav(cur, s):
     idx = [n for n, _ in SCREENS].index(cur)
     prev_f = SCREENS[idx - 1][0]
     next_f = SCREENS[(idx + 1) % len(SCREENS)][0]
-    cur_jump = 'R2Home' if cur == 'R2HomeMore' else cur
+    cur_jump = cur
     item = (f'flex: 1 1 0; display: flex; align-items: center; justify-content: center; border-radius: {px(14)}; '
             f'text-decoration: none; font-family: system-ui, -apple-system, sans-serif; font-size: {px(18)}; font-weight: 700; white-space: nowrap; overflow: hidden;')
     links = []

@@ -1,19 +1,12 @@
 <!--CSS-->
 .ow-beak { animation: talk 240ms ease-in-out 1.6s 8; }
 .owl-hop { animation: hop 800ms cubic-bezier(0.34, 1.56, 0.64, 1) 1.4s both; }
-.head { transform-box: view-box; transform-origin: 100px 210px; animation: sway 6s ease-in-out 2.2s infinite; }
-.stem { transform-box: fill-box; transform-origin: 50% 100%; }
-.leaf-l { transform-box: fill-box; transform-origin: 100% 100%; }
-.leaf-r { transform-box: fill-box; transform-origin: 0% 100%; }
-.fpetal, .bud-center { transform-box: view-box; transform-origin: 100px 80px; }
-.grow-a .stem { animation: stemA 600ms cubic-bezier(0.2, 0, 0, 1) both; }
-.grow-b .stem { animation: stemB 600ms cubic-bezier(0.2, 0, 0, 1) both; }
-.grow-a .leaf-l, .grow-a .leaf-r { animation: popA 500ms cubic-bezier(0.34, 1.56, 0.64, 1) 450ms both; }
-.grow-b .leaf-l, .grow-b .leaf-r { animation: popB 500ms cubic-bezier(0.34, 1.56, 0.64, 1) 450ms both; }
-.grow-a .fpetal { animation: popA 520ms cubic-bezier(0.34, 1.56, 0.64, 1) both; }
-.grow-b .fpetal { animation: popB 520ms cubic-bezier(0.34, 1.56, 0.64, 1) both; }
-.grow-a .bud-center { animation: popA 520ms cubic-bezier(0.34, 1.56, 0.64, 1) 1300ms both; }
-.grow-b .bud-center { animation: popB 520ms cubic-bezier(0.34, 1.56, 0.64, 1) 1300ms both; }
+.medal { width: 168px; height: 168px; border-radius: 999px; background: var(--right); color: var(--right-ink); box-shadow: 0 6px 0 var(--right-edge), 0 0 0 14px var(--right-glow); display: flex; align-items: center; justify-content: center; }
+.grow-a .medal { animation: popA 700ms cubic-bezier(0.34, 1.56, 0.64, 1) 300ms both; }
+.grow-b .medal { animation: popB 700ms cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+.lbar { flex: 1; position: relative; height: 26px; box-sizing: border-box; border-radius: 999px; background: var(--well); border: 2px solid var(--edge); overflow: hidden; }
+.lfill { position: absolute; left: 0; top: 0; bottom: 0; width: 33.333%; border-radius: 999px; background: var(--right); animation: fillUp 900ms cubic-bezier(0.34, 1.3, 0.64, 1) 1.2s both; }
+.ltick { position: absolute; top: 0; bottom: 0; width: 3px; margin-left: -1px; background: var(--card); opacity: 0.85; }
 .in { animation: enter 600ms cubic-bezier(0.34, 1.56, 0.64, 1) both; }
 .star { transform-box: fill-box; transform-origin: center; animation: starIn 600ms cubic-bezier(0.34, 1.56, 0.64, 1) both; }
 .sq { transform-origin: 50% 100%; }
@@ -29,11 +22,9 @@
 .tag-spark { position: absolute; transform-box: fill-box; transform-origin: center; animation: twinkle 1.8s ease-in-out infinite; }
 @keyframes talk { 0%, 100% { transform: scaleY(1); } 50% { transform: scaleY(1.5); } }
 @keyframes hop { 0%, 100% { transform: translateY(0); } 40% { transform: translateY(-14px) rotate(-4deg); } 70% { transform: translateY(0) rotate(2deg); } }
-@keyframes stemA { 0% { transform: scaleY(0); } 100% { transform: scaleY(1); } }
-@keyframes stemB { 0% { transform: scaleY(0); } 100% { transform: scaleY(1); } }
+@keyframes fillUp { 0% { width: 16.667%; } 100% { width: 33.333%; } }
 @keyframes popA { 0% { transform: scale(0); } 70% { transform: scale(1.15); } 100% { transform: scale(1); } }
 @keyframes popB { 0% { transform: scale(0); } 70% { transform: scale(1.15); } 100% { transform: scale(1); } }
-@keyframes sway { 0%, 100% { transform: rotate(-3deg); } 50% { transform: rotate(3deg); } }
 @keyframes enter { 0% { transform: translateY(24px) scale(0.96); opacity: 0; } 100% { transform: translateY(0) scale(1); opacity: 1; } }
 @keyframes starIn { 0% { transform: scale(0) rotate(-40deg); } 70% { transform: scale(1.2) rotate(8deg); } 100% { transform: scale(1) rotate(0deg); } }
 @keyframes squishA { 0%, 100% { transform: scale(1, 1); } 25% { transform: scale(1.3, 0.66); } 50% { transform: scale(0.9, 1.12); } 75% { transform: scale(1.05, 0.96); } }
@@ -43,7 +34,7 @@
 @keyframes rareGlow { 0%, 100% { box-shadow: 0 0 0 2px var(--rare-edge), 0 0 0 0 rgba(201, 142, 123, 0); } 50% { box-shadow: 0 0 0 2px var(--rare-edge), 0 0 12px 3px rgba(201, 142, 123, 0.45); } }
 @keyframes petalA { 0% { transform: translate(0, -40px) rotate(0deg); opacity: 0; } 8% { opacity: 1; } 30% { transform: translate(26px, 220px) rotate(90deg); } 55% { transform: translate(-16px, 450px) rotate(180deg); } 80% { transform: translate(20px, 680px) rotate(270deg); opacity: 1; } 100% { transform: translate(4px, 880px) rotate(340deg); opacity: 0.6; } }
 @keyframes petalB { 0% { transform: translate(0, -40px) rotate(0deg); opacity: 0; } 8% { opacity: 1; } 30% { transform: translate(-24px, 220px) rotate(-80deg); } 55% { transform: translate(18px, 450px) rotate(-170deg); } 80% { transform: translate(-20px, 680px) rotate(-260deg); opacity: 1; } 100% { transform: translate(-4px, 880px) rotate(-330deg); opacity: 0.6; } }
-@media (prefers-reduced-motion: reduce) { .owl-hop, .head, .stem, .leaf-l, .leaf-r, .fpetal, .bud-center, .in, .star, .sq-a, .sq-b, .spark, .shimmer, .shimmer::after, .tag-spark { animation: none !important; } .petal, .shimmer::after { display: none; } }
+@media (prefers-reduced-motion: reduce) { .owl-hop, .medal, .lfill, .in, .star, .sq-a, .sq-b, .spark, .shimmer, .shimmer::after, .tag-spark { animation: none !important; } .petal, .shimmer::after { display: none; } }
 <!--BODY-->
   <header class="bar" style="gap: 18px;">
     <a href="R2Library.dc.html" class="press btn">
@@ -55,36 +46,15 @@
 
   <div class="in panel" style="position: absolute; left: 60px; right: 60px; top: 92px; height: 690px; box-sizing: border-box; border-radius: 32px; box-shadow: 0 5px 0 var(--edge), 0 18px 36px var(--shadow-lg); display: grid; grid-template-columns: 420px minmax(0, 1fr); overflow: hidden;">
 
-    <!-- left: the lesson blooms -->
+    <!-- left: the lesson is done -->
     <div style="position: relative; background: var(--accent-soft); display: flex; flex-direction: column; align-items: center; padding: 26px 24px 0; gap: 6px; overflow: hidden;">
       <div style="position: absolute; left: 50%; top: 40px; width: 300px; height: 300px; margin-left: -150px; border-radius: 999px 999px 0 0; background: var(--edge);"></div>
-      <button class="tap" onClick="{{ regrow }}" aria-label="Watch it bloom again" style="position: relative;">
-        <svg width="220" height="264" viewBox="0 0 200 240">
-          <g class="{{ growClass }}">
-            <path d="M24 236 Q100 186 176 236 Z" style="fill: var(--soil-dk);"></path>
-            <g class="head">
-              <path class="stem" d="M100 222 V96" style="fill: none; stroke: var(--stem); stroke-width: 6; stroke-linecap: round;"></path>
-              <path class="leaf-l" d="M100 184 C80 184 64 170 62 156 C82 156 98 166 100 184 Z" style="fill: var(--leaf); stroke: var(--stem); stroke-width: 2;"></path>
-              <path class="leaf-r" d="M100 158 C120 158 136 144 138 130 C118 130 102 140 100 158 Z" style="fill: var(--leaf); stroke: var(--stem); stroke-width: 2;"></path>
-              <g class="fpetal" style="animation-delay: 800ms;"><ellipse cx="100" cy="46" rx="12" ry="26" style="fill: var(--petal); stroke: var(--petal-edge); stroke-width: 2.5;"></ellipse></g>
-              <g class="fpetal" style="animation-delay: 850ms;"><ellipse cx="100" cy="46" rx="12" ry="26" transform="rotate(36 100 80)" style="fill: var(--petal); stroke: var(--petal-edge); stroke-width: 2.5;"></ellipse></g>
-              <g class="fpetal" style="animation-delay: 900ms;"><ellipse cx="100" cy="46" rx="12" ry="26" transform="rotate(72 100 80)" style="fill: var(--petal); stroke: var(--petal-edge); stroke-width: 2.5;"></ellipse></g>
-              <g class="fpetal" style="animation-delay: 950ms;"><ellipse cx="100" cy="46" rx="12" ry="26" transform="rotate(108 100 80)" style="fill: var(--petal); stroke: var(--petal-edge); stroke-width: 2.5;"></ellipse></g>
-              <g class="fpetal" style="animation-delay: 1000ms;"><ellipse cx="100" cy="46" rx="12" ry="26" transform="rotate(144 100 80)" style="fill: var(--petal); stroke: var(--petal-edge); stroke-width: 2.5;"></ellipse></g>
-              <g class="fpetal" style="animation-delay: 1050ms;"><ellipse cx="100" cy="46" rx="12" ry="26" transform="rotate(180 100 80)" style="fill: var(--petal); stroke: var(--petal-edge); stroke-width: 2.5;"></ellipse></g>
-              <g class="fpetal" style="animation-delay: 1100ms;"><ellipse cx="100" cy="46" rx="12" ry="26" transform="rotate(216 100 80)" style="fill: var(--petal); stroke: var(--petal-edge); stroke-width: 2.5;"></ellipse></g>
-              <g class="fpetal" style="animation-delay: 1150ms;"><ellipse cx="100" cy="46" rx="12" ry="26" transform="rotate(252 100 80)" style="fill: var(--petal); stroke: var(--petal-edge); stroke-width: 2.5;"></ellipse></g>
-              <g class="fpetal" style="animation-delay: 1200ms;"><ellipse cx="100" cy="46" rx="12" ry="26" transform="rotate(288 100 80)" style="fill: var(--petal); stroke: var(--petal-edge); stroke-width: 2.5;"></ellipse></g>
-              <g class="fpetal" style="animation-delay: 1250ms;"><ellipse cx="100" cy="46" rx="12" ry="26" transform="rotate(324 100 80)" style="fill: var(--petal); stroke: var(--petal-edge); stroke-width: 2.5;"></ellipse></g>
-              <g class="bud-center">
-                <circle cx="100" cy="80" r="20" fill="#C4996A" stroke="#7A5236" style="stroke-width: 2.5;"></circle>
-                <circle cx="94" cy="74" r="2.4" fill="#7A5236"></circle><circle cx="104" cy="72" r="2.4" fill="#7A5236"></circle><circle cx="108" cy="82" r="2.4" fill="#7A5236"></circle><circle cx="98" cy="86" r="2.4" fill="#7A5236"></circle><circle cx="90" cy="82" r="2" fill="#7A5236"></circle>
-              </g>
-            </g>
-          </g>
-        </svg>
+      <button class="tap" onClick="{{ regrow }}" aria-label="See it again" style="position: relative; margin-top: 70px;">
+        <span class="{{ growClass }}" style="display: block;">
+          <span class="medal"><svg width="92" height="92" viewBox="0 0 24 24"><path class="ic" style="stroke-width: 3;" d="M5 12.5l4.5 4.5L19 7.5"></path></svg></span>
+        </span>
       </button>
-      <h1 class="display" style="position: relative; margin: 2px 0 0; font-size: 40px; font-weight: 650; text-align: center; line-height: 1.05;">In bloom!</h1>
+      <h1 class="display" style="position: relative; margin: 26px 0 0; font-size: 40px; font-weight: 650; text-align: center; line-height: 1.05;">Lesson done!</h1>
       <p class="soft" style="position: relative; margin: 0; font-size: 18px; text-align: center;">You learned A, M, S and B.</p>
       <div style="position: relative; display: flex; gap: 10px; margin-top: 8px;" aria-label="3 stars">
         <svg class="star" style="animation-delay: 1.6s;" width="46" height="46" viewBox="0 0 24 24"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z" fill="#C4996A" stroke="#7A5236" stroke-linejoin="round" style="stroke-width: 1.2;"></path></svg>
@@ -118,7 +88,7 @@
       </div>
     </div>
 
-    <!-- right: time, the garden, the new squishy, what next -->
+    <!-- right: time, the lessons bar, the new squishy, what next -->
     <div style="padding: 30px 34px; display: flex; flex-direction: column; gap: 20px;">
       <div style="display: flex; flex-direction: column; gap: 8px;">
         <span class="lbl">Time</span>
@@ -126,25 +96,18 @@
           <span class="chip chip-took" style="height: 44px; font-size: 19px;"><svg width="24" height="24" viewBox="0 0 24 24"><circle class="ic" cx="12" cy="13" r="8"></circle><path class="ic" d="M12 9v4l2.5 2"></path></svg>You took 4 minutes</span>
           <span class="chip chip-time">this lesson is about 5 min</span>
         </div>
-        <div style="height: 12px; border-radius: 999px; background: var(--well); position: relative; overflow: hidden;" aria-hidden="true">
-          <span style="position: absolute; left: 0; top: 0; bottom: 0; width: 80%; border-radius: 999px; background: var(--leaf);"></span>
-        </div>
       </div>
 
-      <div style="display: flex; flex-direction: column; gap: 8px;">
-        <span class="lbl">Your garden</span>
-        <div style="display: flex; align-items: flex-end; gap: 10px;">
-          %%PLANT daisy 42 49%%
-          %%PLANT daisy 42 49%%
-          %%PLANT sprout 42 49%%
-          %%PLANT bud 42 49%%
-          %%PLANT seed 42 49%%
-          %%PLANT seed 42 49%%
-          <span style="margin-left: 8px; display: flex; flex-direction: column;">
+      <div style="display: flex; flex-direction: column; gap: 10px;">
+        <span class="lbl">Your lessons</span>
+        <div style="display: flex; align-items: center; gap: 16px;">
+          <span class="lbar" aria-hidden="true"><span class="lfill"></span><span class="ltick" style="left: 16.667%;"></span><span class="ltick" style="left: 33.333%;"></span><span class="ltick" style="left: 50%;"></span><span class="ltick" style="left: 66.667%;"></span><span class="ltick" style="left: 83.333%;"></span></span>
+          <span style="display: flex; flex-direction: column; flex: none;">
             <strong style="font-size: 22px;">2 of 6</strong>
-            <span class="soft" style="font-size: 15px;">lessons in bloom · 12 min today</span>
+            <span class="soft" style="font-size: 15px;">lessons done · 12 min today</span>
           </span>
         </div>
+        <span class="chip chip-accent" style="align-self: flex-start; height: 38px; font-size: 17px;"><svg width="20" height="20" viewBox="0 0 24 24"><rect class="ic" x="5" y="10.5" width="14" height="10" rx="2.5"></rect><path class="ic" d="M8 10.5V8a4 4 0 0 1 7.6-1.8"></path></svg>Lesson 3 is open now</span>
       </div>
 
       <div style="display: flex; align-items: center; gap: 18px; padding: 14px 18px; border-radius: 22px; border: 3px dashed var(--accent); background: var(--card);">

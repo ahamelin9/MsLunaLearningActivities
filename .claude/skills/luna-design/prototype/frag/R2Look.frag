@@ -4,14 +4,21 @@
 .sw strong { font-size: 14px; }
 .sw .note { font-size: 12px; color: var(--soft); line-height: 1.3; }
 .grow { transform-box: fill-box; transform-origin: 50% 100%; animation: grow 2.4s cubic-bezier(0.34, 1.56, 0.64, 1) infinite; }
-.petals { transform-box: fill-box; transform-origin: 50% 100%; animation: open 3.2s cubic-bezier(0.34, 1.56, 0.64, 1) infinite; }
+.pbar { flex: 1; position: relative; height: 22px; box-sizing: border-box; border-radius: 999px; background: var(--well); border: 2px solid var(--edge); overflow: hidden; }
+.pfill { position: absolute; left: 0; top: 0; bottom: 0; width: 33.333%; border-radius: 999px; background: var(--right); animation: fill 4s cubic-bezier(0.34, 1.3, 0.64, 1) infinite; }
+.ptick { position: absolute; top: 0; bottom: 0; width: 3px; margin-left: -1px; background: var(--card); opacity: 0.85; }
+.pmark { width: 42px; height: 42px; box-sizing: border-box; border-radius: 999px; display: flex; align-items: center; justify-content: center; }
+.pm-done { background: var(--right); color: var(--right-ink); }
+.pm-now { background: var(--action); color: var(--action-ink); animation: glow 4s ease-in-out infinite; }
+.pm-lock { background: var(--well); border: 2px dashed var(--soil-dk); color: var(--soft); }
 .sq { transform-box: fill-box; transform-origin: 50% 100%; animation: squish 3.6s ease-in-out infinite; }
 .spark { transform-box: fill-box; transform-origin: center; animation: twinkle 2.2s ease-in-out infinite; }
 @keyframes grow { 0% { transform: scaleY(0.2); opacity: 0; } 30%, 100% { transform: scaleY(1); opacity: 1; } }
-@keyframes open { 0%, 20% { transform: scale(0.2); opacity: 0; } 50%, 100% { transform: scale(1); opacity: 1; } }
+@keyframes fill { 0%, 15% { width: 16.667%; } 45%, 100% { width: 33.333%; } }
+@keyframes glow { 0%, 100% { box-shadow: 0 0 0 0 rgba(154, 107, 69, 0.45); } 50% { box-shadow: 0 0 0 10px rgba(154, 107, 69, 0); } }
 @keyframes squish { 0%, 60%, 100% { transform: scale(1, 1); } 68% { transform: scale(1.22, 0.74); } 78% { transform: scale(0.92, 1.1); } 88% { transform: scale(1.04, 0.97); } }
 @keyframes twinkle { 0%, 100% { opacity: 0.2; transform: scale(0.6); } 50% { opacity: 1; transform: scale(1.1); } }
-@media (prefers-reduced-motion: reduce) { .grow, .petals, .sq, .spark { animation: none !important; } }
+@media (prefers-reduced-motion: reduce) { .grow, .pfill, .pm-now, .sq, .spark { animation: none !important; } }
 <!--BODY-->
 <div style="position: absolute; inset: 0; box-sizing: border-box; padding: 40px 52px; display: grid; grid-template-columns: 440px minmax(0, 1fr); column-gap: 48px;">
 
@@ -28,11 +35,11 @@
     <div style="display: flex; flex-direction: column; gap: 10px;">
       <div style="display: flex; gap: 14px; align-items: flex-start;">
         <span style="flex: none; width: 38px; height: 38px; border-radius: 12px; background: var(--action); color: var(--action-ink); display: flex; align-items: center; justify-content: center;"><svg width="22" height="22" viewBox="0 0 24 24"><rect class="ic" x="6" y="3" width="12" height="18" rx="3"></rect><path class="ic" d="M10.5 18h3"></path></svg></span>
-        <span style="font-size: 16px; line-height: 1.4;"><strong>A simple home screen.</strong> Just her Reading app, like today, with a little more around it.</span>
+        <span style="font-size: 16px; line-height: 1.4;"><strong>A simple home screen.</strong> Just her Reading app, like today.</span>
       </div>
       <div style="display: flex; gap: 14px; align-items: flex-start;">
-        <span style="flex: none; width: 38px; height: 38px; border-radius: 12px; background: #A9B391; color: #3B2A20; display: flex; align-items: center; justify-content: center;"><svg width="22" height="22" viewBox="0 0 24 24"><path class="ic" d="M12 21v-9"></path><path class="ic" d="M12 14c-4 0-6-3-6-6 4 0 6 3 6 6z"></path><path class="ic" d="M12 12c0-3 2-6 6-6 0 3-2 6-6 6z"></path></svg></span>
-        <span style="font-size: 16px; line-height: 1.4;"><strong>Lessons grow from seeds.</strong> A flower in bloom means you learned it.</span>
+        <span style="flex: none; width: 38px; height: 38px; border-radius: 12px; background: #A9B391; color: #3B2A20; display: flex; align-items: center; justify-content: center;"><svg width="22" height="22" viewBox="0 0 24 24"><rect class="ic" x="2.5" y="8.5" width="19" height="7" rx="3.5"></rect><path class="ic" d="M6 12h6.5"></path></svg></span>
+        <span style="font-size: 16px; line-height: 1.4;"><strong>Lessons in order, one bar.</strong> The next lesson opens when the one before is done, and one bar fills up.</span>
       </div>
       <div style="display: flex; gap: 14px; align-items: flex-start;">
         <span style="flex: none; width: 38px; height: 38px; border-radius: 12px; background: #C4996A; color: #3B2A20; display: flex; align-items: center; justify-content: center;"><svg width="22" height="22" viewBox="0 0 24 24"><circle class="ic" cx="12" cy="13" r="8"></circle><path class="ic" d="M12 9v4l2.5 2M9 2.5h6"></path></svg></span>
@@ -85,12 +92,15 @@
 
     <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px;">
       <div class="panel" style="border-radius: 22px; padding: 14px 18px;">
-        <h2 class="display" style="margin: 0 0 6px; font-size: 21px; font-weight: 600;">Seeds to flowers</h2>
-        <div style="display: flex; justify-content: space-between; align-items: flex-end;">
-          <span style="display: flex; flex-direction: column; align-items: center; gap: 2px;">%%PLANT seed 56 65%%<span class="soft" style="font-size: 13px;">not yet</span></span>
-          <span style="display: flex; flex-direction: column; align-items: center; gap: 2px;">%%PLANT sprout 56 65 - grow%%<span class="soft" style="font-size: 13px;">up next</span></span>
-          <span style="display: flex; flex-direction: column; align-items: center; gap: 2px;">%%PLANT bud 56 65%%<span class="soft" style="font-size: 13px;">started</span></span>
-          <span style="display: flex; flex-direction: column; align-items: center; gap: 2px;">%%PLANT daisy 56 65 - petals%%<span style="font-size: 13px; font-weight: 700; color: var(--right-text);">learned!</span></span>
+        <h2 class="display" style="margin: 0 0 8px; font-size: 21px; font-weight: 600;">Lessons, in order</h2>
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span class="pbar" aria-hidden="true"><span class="pfill"></span><span class="ptick" style="left: 16.667%;"></span><span class="ptick" style="left: 33.333%;"></span><span class="ptick" style="left: 50%;"></span><span class="ptick" style="left: 66.667%;"></span><span class="ptick" style="left: 83.333%;"></span></span>
+          <span style="font-size: 14px; white-space: nowrap;"><strong>2 of 6</strong> done</span>
+        </div>
+        <div style="display: flex; justify-content: space-around; margin-top: 12px;">
+          <span style="display: flex; flex-direction: column; align-items: center; gap: 4px;"><span class="pmark pm-done"><svg width="22" height="22" viewBox="0 0 24 24"><path class="ic" style="stroke-width: 3.4;" d="M5 12.5l4.5 4.5L19 7.5"></path></svg></span><span style="font-size: 13px; font-weight: 700; color: var(--right-text);">done</span></span>
+          <span style="display: flex; flex-direction: column; align-items: center; gap: 4px;"><span class="pmark pm-now"><svg width="20" height="20" viewBox="0 0 24 24"><path d="M8 5.5v13l10.5-6.5z" stroke-linejoin="round" style="fill: currentColor; stroke: currentColor; stroke-width: 2;"></path></svg></span><span style="font-size: 13px; font-weight: 700; color: var(--accent-text);">up next</span></span>
+          <span style="display: flex; flex-direction: column; align-items: center; gap: 4px;"><span class="pmark pm-lock"><svg width="18" height="18" viewBox="0 0 24 24"><rect class="ic" x="5" y="10.5" width="14" height="10" rx="2.5"></rect><path class="ic" d="M8 10.5V8a4 4 0 0 1 8 0v2.5"></path></svg></span><span class="soft" style="font-size: 13px;">locked</span></span>
         </div>
       </div>
 
