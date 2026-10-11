@@ -1,0 +1,8 @@
+#!/bin/sh
+# Runs `npm run lint` before each commit (DES-25): eslint now, and the design
+# and contrast checks once DES-19 adds them, so a slip is caught before it
+# lands. Turn it on once per clone:
+#   chmod +x .githooks/pre-commit
+#   git config core.hooksPath .githooks
+# Skip it for a single commit with `git commit --no-verify`.
+npm run lint

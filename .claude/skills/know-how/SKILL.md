@@ -319,6 +319,22 @@ the old version either proves nothing.
   "already used in the Changelog". Order: new sections, the changelog line,
   the board rows, then delete the old section.
 
+## Auto mode refuses to write a git hook file
+
+*2026-10-10 · DES-25*
+
+- **Symptom:** a shell command that creates `.githooks/pre-commit` (a heredoc
+  plus `chmod +x`) is refused by Claude Code's auto-mode classifier as
+  "Unauthorized Persistence".
+- **Cause:** writing an executable into a hooks folder looks like setting up
+  something that runs on its own later, whatever the ticket says.
+- **Fix:** create the file with the Write tool, like any other repo file, and
+  leave `chmod +x` and `git config core.hooksPath .githooks` to Alex as his
+  one-time turn-on steps (the map's "How to…" lists both). Don't retry the
+  shell version or look for another way to set the bit.
+- **Check:** `sh .githooks/pre-commit` runs `npm run lint` and exits with its
+  status, without needing the executable bit.
+
 ## Lint suddenly fails with dozens of errors in `.d.ts` files nobody wrote
 
 *2026-10-10 · OPS-5*

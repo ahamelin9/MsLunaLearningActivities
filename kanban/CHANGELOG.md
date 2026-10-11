@@ -93,3 +93,12 @@ only record of them. One line each: date, ID, title, and `Done` or
   - **Standards that turn the prototype into enforceable scales,** approved by Alex and recorded in `decisions.md`: a 4px space scale, six radii, three elevations with ledges, an 11-role type scale, motion durations taken from the prototype, a "revealed" answer state, and game pieces sharing Choice's states.
   - **The `luna-design` skill** is now the rules and recipes Claude follows before any UI work, pointing into the docs. The round 2 prototype is frozen as the approved reference, with its how-to archived in `prototype/README.md`.
   - **The epic** now opens with the order to finish it. PRG-7 and SET-1 are pulled in because DES-13 and DES-16 need them, and DES-17's full-shelf milestone moved to PRG-4.
+- **2026-10-10** — DES-25 Standards brought in at the moment of editing — Done. `.claude/hooks/design-guide.mjs` (PreToolUse on Edit, Write and MultiEdit) works out a UI file's area from its path and reads that area's standards live from `docs/design-system/`. The first edit in an area each session is refused once with them as the reason, because PreToolUse context only reaches Claude after the edit has landed (Alex's call). The retry goes through, and later edits get one reminder line. What a session has seen is tracked per section, so a section two areas share shows once. `node .claude/skills/luna-design/guide-check.mjs "$PWD"` checks 39 cases (every area, once-then-reminder, live doc text) and fails on planted bugs. For people, `.githooks/pre-commit` runs `npm run lint`; the map says how to turn it on. Added OPS-8 for two stale cases in the backlog guard check.
+
+  | Path | Area | What the hook shows |
+  |---|---|---|
+  | `src/styles/` (except `motion/`) | tokens | colour.md `## Rules` + fitting-in.md `## The ladder` |
+  | `src/styles/motion/` | motion | the **Motion** block of foundations.md `## Rules` |
+  | `src/components/kit/`, legacy `components/ui/` | kit | components.md `## Rules` |
+  | any other `.scss`/`.tsx` in `src` | screens | screens.md `## Rules` |
+  | `_illustration.scss`, `LunaOwl`, kit `Luna`, `MilestoneMoon`, `Squishy` | + illustrations | colour.md `## Rules` + `## Illustrations` |

@@ -79,7 +79,7 @@ Raw colours may appear in two files only: `_primitives.scss` and
 | Design check | `scripts/design/check.mjs`, run by `npm run lint` and `npm run design:status` | DES-19 |
 | Contrast check | `scripts/design/contrast.mjs`, run by `npm run lint` | DES-19 |
 | Hooks for Claude's edits | `.claude/hooks/design-guide.mjs` (before), `design-check-file.mjs` (after) | DES-25, DES-19 |
-| Pre-commit check for people | `.githooks/pre-commit`; turn it on once with `git config core.hooksPath .githooks` | DES-25 |
+| Pre-commit check for people | `.githooks/pre-commit`; turn it on once per clone (see "How to…") | DES-25 |
 | Screenshots and the pixel diff | `scripts/ui/shots.mjs`, run by `npm run ui:shots` | DES-1, DES-18a |
 | The approved design (frozen) | the [style sample](https://claude.ai/artifact/Gr1ngbrVdGS6xE4pALyWsm), page "Round 2 · Teacher's picks"; source in `.claude/skills/luna-design/prototype/` | frozen 2026-10-10 |
 | Legacy styles (going away) | `src/styles/_variables.scss`, `src/apps/reading/engine/_world.scss`, `src/index.css` | DES-24 deletes them |
@@ -98,7 +98,11 @@ Raw colours may appear in two files only: `_primitives.scss` and
 | [audit-2026-10-08.md](audit-2026-10-08.md) | curious about the styles before the redesign |
 
 Each topic doc opens with `## Rules`: the short version, which is also what
-the hook shows Claude before an edit.
+the hook shows Claude before an edit. The first time Claude edits a UI file in
+an area in a session, the hook refuses that edit once, with the area's rules
+as the reason, and Claude makes it again following them. Later edits in the
+area get a one-line reminder. The hook reads the rules from these docs live,
+so changing a `## Rules` section changes what Claude is shown.
 
 ## How to…
 
@@ -114,6 +118,10 @@ the hook shows Claude before an edit.
 - **See everything:** run `npm run dev` and open `/?kit` (DES-20).
 - **Check your work:** `npm run lint` runs eslint, the design check and the
   contrast check. `npm run design:status` shows what's left per area (DES-19).
+- **Turn on the pre-commit check** (people; once per clone): run
+  `chmod +x .githooks/pre-commit`, then `git config core.hooksPath .githooks`.
+  Every commit then runs `npm run lint` first, and a failure stops the commit.
+  Claude never runs `git config`.
 - **Prove a refactor looks the same:** run `npm run ui:shots -- --label before`,
   change the code, run `--label after`, then `npm run ui:shots -- --diff before after`
   (DES-18a).
@@ -126,7 +134,7 @@ Each ticket updates its row when it closes (Completion criteria B7 in
 | Area | Where | Status | Tickets |
 |---|---|---|---|
 | Standards (these docs, the skill) | `docs/design-system/`, `luna-design` | Done (Alex approved, 2026-10-10) | DES-2 |
-| Hooks at the moment of editing | `.claude/hooks/`, `.githooks/` | Planned | DES-25 |
+| Hooks at the moment of editing | `.claude/hooks/`, `.githooks/` | Before-edit hook and pre-commit check built (DES-25, 2026-10-10); the after-edit check comes with DES-19 | DES-25, DES-19 |
 | Screenshots you can compare | `scripts/ui/shots.mjs` | Planned | DES-18a |
 | Source tree and CSS modules | `src/` | Planned | DES-18b–e |
 | Tokens | `src/styles/tokens/` | Planned | DES-3 |

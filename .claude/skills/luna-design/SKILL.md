@@ -33,9 +33,9 @@ here; link to them.
 
 3. The ticket's Why / How / Complete when (`kanban/epics/DES.md`).
 
-Once DES-25 is built, a hook shows the right `## Rules` the first time a UI file
-is edited in a session. Read the doc anyway when the job is bigger than one
-edit.
+A hook (DES-25) shows the right `## Rules` the first time a UI file in an area
+is edited in a session (see "When a hook speaks"). Read the doc anyway when the
+job is bigger than one edit.
 
 ## The hard rules
 
@@ -119,8 +119,16 @@ changed screens.
   itself stays light.
 
 ### When a hook speaks
-- **Before an edit** (`design-guide.mjs`, DES-25): it shows the area's
-  `## Rules`. Follow them in the edit you're about to make.
+- **Before an edit** (`design-guide.mjs`, DES-25): the first edit in an area
+  each session is refused once, with the area's `## Rules` as the reason (plus
+  the ladder for tokens, the Illustrations section for drawn things). Read
+  them, then make the edit again, following them; it goes through. Later edits
+  in the area get one reminder line. Areas: tokens (all of `src/styles/`
+  except motion), motion, kit (and the legacy `components/ui/`), screens
+  (everything else in `src`), and illustrations on top (`_illustration.scss`,
+  `LunaOwl`, kit `Luna`, `MilestoneMoon`, `Squishy`). After changing the hook,
+  a doc's headings or the folders, run
+  `node .claude/skills/luna-design/guide-check.mjs "$PWD"`.
 - **After an edit** (`design-check-file.mjs`, DES-19): it lists new violations
   with a fix hint. Fix them in the same turn. Don't raise the baseline or add an
   exception to get past them.

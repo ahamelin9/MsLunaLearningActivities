@@ -50,6 +50,7 @@ mentioned and what the prototype follows"). A future proposal is marked
 | 2026-10-10 | The written standards live in `docs/design-system/`, which replaces `docs/design-standards.md`; the `luna-design` skill links into it | Alex | One explanation for people and Claude, never written twice | DES-2 |
 | 2026-10-10 | The round 2 prototype is frozen as the approved reference; the token files are the source from DES-3 on | Alex | The canvas is finished; keeping it in sync would mean renaming its variables on 8 boards | DES-2 |
 | 2026-10-10 | Hooks bring the standards in whenever a UI file is created or edited, and check the file after the edit | Alex | So nothing needs cleaning up afterwards | DES-25, DES-19 |
+| 2026-10-10 | The before-edit hook refuses the first edit in an area once per session, with the rules as the reason, instead of adding them as context | Alex | PreToolUse context reaches Claude only with the tool result, after the edit has landed | DES-25 |
 | 2026-10-10 | A design check and a contrast check run in `npm run lint`, with a baseline that may only shrink | Alex (plan) | Rules only hold if a machine checks them | DES-19 |
 | 2026-10-10 | Screens read roles and the space scale only; component tokens belong to kit components | Alex (plan) | Space has no meaning beyond its size, so it needs no role | DES-3 |
 | 2026-10-10 | The app stays pinned to light until DES-16 | Alex (plan) | Following the iPad mid-migration would show half-dark screens | DES-3, DES-16 |

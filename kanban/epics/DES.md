@@ -45,7 +45,7 @@ them in.
 
 | # | Stage | Tickets | What you have at the end |
 |---|---|---|---|
-| 1 | Guardrails | DES-25 | Claude gets the right standards before any UI edit; people get a pre-commit check |
+| 1 | Guardrails | DES-25 (done 2026-10-10) | Claude gets the right standards before any UI edit; people get a pre-commit check |
 | 2 | Structure (pure refactors, nothing looks different) | DES-18a → DES-18b → DES-18c → DES-18d, DES-18e | Screenshots you can compare; one folder per page, game and lesson; CSS modules; `games.scss` gone |
 | 3 | Foundations | DES-3 → DES-19 → DES-20 → DES-4 → DES-5 → DES-6 | Tokens in light and dark; lint enforces the rules after every edit; the Kit page; Andika and Fraunces offline; shared motion; reduced motion |
 | 4 | The kit | DES-7a → DES-7b, DES-7c → DES-15 | Every kit component on the Kit page in every state, and the new Luna |
@@ -66,33 +66,8 @@ them in.
 - **DES-14** (P2) touches the same folder as DES-22b and can slot in straight after it.
 - **P0 bugs** can still be pulled in between tickets for a break from styling.
 
-### DES-25 · Standards brought in at the moment of editing
-Task · P0 · S · needs: —
-- **Why:** Alex (2026-10-10): whoever creates or edits a UI file, Claude or a person, should get the right standards right then, so nothing needs cleaning up afterwards.
-- **How:**
-  - **`.claude/hooks/design-guide.mjs`** (PreToolUse on Edit, Write and MultiEdit), registered in `.claude/settings.json` beside the backlog hooks. It runs for `src/**/*.{scss,tsx}`, `src/styles/**` and `src/components/kit/**`, and works out the area from the path:
-
-    | Area | Standards it brings in |
-    |---|---|
-    | tokens | `colour.md` plus the ladder in `fitting-in.md` |
-    | motion | the motion part of `foundations.md` |
-    | kit | `components.md` |
-    | games, lessons, pages, os | `screens.md` |
-    | illustrations | the illustration part of `colour.md` |
-  - It reads that doc's `## Rules` section live, so nothing is copied. The full rules come the first time an area is touched in a session, then one reminder line; a small state file per session in the temp folder tracks this.
-  - **How the text reaches Claude:** check in the Claude Code docs whether PreToolUse supports `additionalContext`. If it does, use it. If not, refuse the first edit once with the rules as the reason, and let the retry through.
-  - **A check script** in the style of `.claude/skills/backlog/guard-check.mjs`: it feeds the hook pretend edits (nothing is written) and checks each path gets the right area.
-  - **For people:** a `.githooks/pre-commit` that runs `npm run lint`. Alex turns it on once with `git config core.hooksPath .githooks`; Claude never runs git config. It's documented on the map.
-  - The after-edit file check comes with DES-19.
-- **Complete when:**
-  - in a fresh session, editing a game's `.scss` brings in `screens.md`'s rules once, and the next edit gets only the reminder line;
-  - editing a token file brings in the colour rules and the ladder;
-  - changing a doc's `## Rules` section changes what the hook shows;
-  - the check script passes for every area;
-  - the pre-commit hook exists and the map explains how to turn it on.
-
 ### DES-18a · Screenshots you can compare: same every run, with a pixel diff
-Task · P0 · M · needs: DES-25
+Task · P0 · M · needs: —
 - **Why:** pure refactors must look identical, and today that can't be proven:
   - `Math.random` (in 11 files), the clock and endless animations make every run differ;
   - `ui:shots` clicks through by class names, which CSS modules will change (DES-18b on).
@@ -186,7 +161,7 @@ Story · P0 · M · needs: —
   - the map's status row for tokens is updated.
 
 ### DES-19 · Design check and contrast check in `npm run lint`, and after every edit
-Task · P0 · M · needs: DES-3, DES-18e, DES-25
+Task · P0 · M · needs: DES-3, DES-18e
 - **Why:** the rules only hold if a machine checks them, and catching a slip straight after the edit means nothing needs cleaning up later (Alex, 2026-10-10).
 - **How:**
   - **`scripts/design/check.mjs`** (no new dependencies), run by `npm run lint` after eslint. Over `src/**/*.{scss,ts,tsx}` it fails on:
