@@ -52,6 +52,8 @@ execFileSync(
     '--bundle',
     '--platform=node',
     '--format=esm',
+    // the same `@/` as vite.config.ts (BUG-24)
+    `--alias:@=${join(root, 'src')}`,
     // the games are imported for their missions, which brings their
     // components and stylesheets along; neither is ever run here
     '--jsx=automatic',

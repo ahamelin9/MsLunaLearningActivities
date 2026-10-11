@@ -24,6 +24,8 @@ const bundle = (entry, out) =>
     entry, '--bundle', '--platform=neutral', '--format=esm',
     `--outfile=${join(tmp, out)}`,
     `--define:import.meta.env={"BASE_URL":"/","DEV":false}`,
+    // the same `@/` as vite.config.ts (BUG-24)
+    `--alias:@=${join(root, 'src')}`,
     // the games come in for their rounds and missions, with their components
     // and stylesheets attached; none of that is ever rendered here
     '--jsx=automatic', '--loader:.scss=empty', '--loader:.css=empty',

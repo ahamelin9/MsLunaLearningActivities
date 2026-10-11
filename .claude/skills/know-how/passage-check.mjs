@@ -46,6 +46,8 @@ await build({
   platform: 'node',
   outfile: join(out, 'bundle.mjs'),
   loader: { '.scss': 'empty', '.css': 'empty' },
+  // the same `@/` as vite.config.ts, into the src/ being checked (BUG-24)
+  alias: { '@': join(root, 'src') },
   nodePaths: [join(repo, 'node_modules')],
   jsx: 'automatic',
   logLevel: 'error'

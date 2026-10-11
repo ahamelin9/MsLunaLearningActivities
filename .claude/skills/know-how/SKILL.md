@@ -262,6 +262,13 @@ Pitfalls that cost time:
 - **Moving into folders:** `node .claude/skills/know-how/move-into-folders.mjs "$PWD" <moves.json>`
   moves each `.tsx` and `.module.scss` and repoints every import the move
   breaks: relative inside an app, `@/…` otherwise, and `@use` from `src/`.
+- **Pitfall: the tools outside Vite** (*BUG-24*). `npm run voice:audit`,
+  `voice:render` and the know-how `distractor-check.mjs` and
+  `passage-check.mjs` bundle `src/` with esbuild, not Vite. DES-18c's first
+  `@/` import in a game broke all four ("Could not resolve "@/utils/cx""),
+  and nobody noticed because no speech had changed. They now carry the same
+  alias as `vite.config.ts`. After any move or new import style, run
+  `npm run voice:audit` and the two checks too, not only build and lint.
 - **Check:** three things.
   - `ui:shots --diff before after`: 0 changed screens, after the in-place
     conversion and again after the move into folders.
