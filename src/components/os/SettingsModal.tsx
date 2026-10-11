@@ -49,6 +49,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
         onClick={e => e.stopPropagation()}
         role="dialog"
         aria-label="Settings and Preferences"
+        data-shot="settings"
       >
         {/* Modal Header */}
         <div className="modal-header">
@@ -69,6 +70,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               onClose();
             }}
             className="modal-close-btn"
+            data-shot="modal-close"
             aria-label="Close Settings"
           >
             <XIcon size={20} />

@@ -167,12 +167,20 @@ and serve your own response. `stale-index-check.cjs` is the example.
 Pitfalls that cost time:
 
 - **A puppeteer run prints its result but never exits** (*2026-10-10,
-  GAME-1b*): copies of `speech-check.cjs`, and `npm run ui:shots` itself,
-  sometimes keep running after "Done" or the ✅ line. Their output is complete
-  by then. Stop just that process by its script path
-  (`pkill -f "scratchpad/<name>.cjs"`, or its pid for `shots.mjs`), and never
-  with a bare `pkill -f vite`: that would also stop Alex's server on 5173.
-  Cause not tracked down yet.
+  GAME-1b*): copies of `speech-check.cjs` sometimes keep running after the ✅
+  line. Their output is complete by then. Stop just that process by its script
+  path (`pkill -f "scratchpad/<name>.cjs"`), and never with a bare
+  `pkill -f vite`: that would also stop Alex's server on 5173. Cause not
+  tracked down yet; `ui:shots` now ends with `process.exit` (DES-18a), and a
+  copied check can do the same.
+- **Class names stop working from DES-18b:** CSS modules rename them, so the
+  selectors above break as each area moves. The stable hooks are `data-shot`
+  names (DES-18a): `home`, `open-reading`, `grade-select`, `grade-card`, `hub`,
+  `hub-rug`, `hub-tin`, `lesson-tile`, `game-tile`, `tile-title`,
+  `shell-intro`, `shell-play`, `shell-reward`, `play`, `shell-back`,
+  `round-pips`, `win-veil`, `lesson-choice`, `open-settings`, `settings`,
+  `open-trophies`, `trophies`, `modal-close`. OPS-9 moves the checks in this
+  folder onto them.
 - **"Does it still fit?"** for a screen whose content grows by grade (Treasure
   Path's 2nd-grade passages): `ui:shots` only plays Kindergarten. Play the game
   at 2nd grade at 1024×768 (the smallest landscape iPad) and compare the
@@ -190,6 +198,38 @@ Pitfalls that cost time:
 - Word chips have no spaces between them in `textContent`. Join their texts
   with `' '`.
 - Scan what a child can see with `document.querySelector('.game-shell').innerText`.
+
+## Two screenshot runs of the same code don't match
+
+*2026-10-11 · DES-18a*
+
+- **Symptom:** `npm run ui:shots -- --diff a b` lists screens that differ
+  although nothing changed: a whole screen (Grade Select caught with the app
+  window half zoomed in), or 1–4 pixels at an edge (Luna's beak on the
+  reward screen, a letter in Letter Jar), usually only at one size.
+- **Cause:** anything that runs on the browser's real clock. Seeding
+  `Math.random` and fixing `Date.now` aren't enough:
+  - timers and Luna's real audio move the app on (Bubble Sounds' bubbles,
+    What's Missing's countdown, Luna's talking pose);
+  - CSS animations run on the compositor in real time. One finished from
+    script is only on screen after the next paint, and a layer caught
+    mid-animation can be rasterised at a slightly different scale, which
+    shows up as a few changed edge pixels.
+- **Fix:** all in `scripts/ui/shots.mjs`:
+  - `installPageClock` puts the page on a clock the script moves (timers,
+    `Date`, `performance.now`, `requestAnimationFrame`, silent clips that
+    "end" after their length), and waits for fetches and decodes before each
+    step;
+  - `Animation.setPlaybackRate` 0 (DevTools protocol) keeps CSS animations
+    standing still, so `holdAnimations` is the only thing that moves them;
+  - `painted()` waits two real frames before the screenshot.
+  - Not the fix: `--disable-gpu`. Software drawing made it worse (more
+    edge pixels, and the zoom still caught).
+- **Check:** three runs in a row, then `--diff` each pair: 0 changed screens
+  at all 4 sizes. To prove the diff can fail, change a 1 px border's colour
+  (the status bar's bottom line shows on 24 of 26 screens at y 47), or one
+  pixel of a copied run with `pixel-poke.cjs` in this folder: 9 per channel
+  shows up as 1 pixel, 8 doesn't.
 
 ## A hook test says nothing, but the hook is fine
 

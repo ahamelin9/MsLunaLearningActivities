@@ -1,18 +1,32 @@
 #!/usr/bin/env node
 // Screenshots every screen of the Learning Pad at the four iPad sizes, so a
-// design change can be judged before and after.
+// design change can be judged before and after, and compares two sets.
 //
-//   npm run ui:shots                      -> screenshots/latest/
-//   npm run ui:shots -- --label before    -> screenshots/before/
-//   npm run ui:shots -- --label after     -> screenshots/after/
+//   npm run ui:shots                          -> screenshots/latest/
+//   npm run ui:shots -- --label before        -> screenshots/before/
+//   npm run ui:shots -- --label after         -> screenshots/after/
+//   npm run ui:shots -- --diff before after   -> screenshots/diff-before-after/
 //
 // It starts its own Vite dev server and drives the Chrome already installed
 // on this machine (puppeteer-core downloads no browser of its own). Set
 // CHROME_PATH to use a different one. Each size runs from a fresh start:
 // its own browser profile with localStorage cleared, the way a new child
 // first meets the app.
+//
+// The same tree gives the same pixels on every run, so a pure refactor can be
+// proven with --diff (0 changed screens):
+//  - the page runs on its own clock (installPageClock). Time moves only when
+//    the script moves it, timers fire in a fixed order, Math.random is seeded,
+//    and Luna's clips "play" for their own length on that clock without a
+//    sound. Network speed and machine load can't change a frame.
+//  - CSS animations stand still on the browser's clock. Before each shot,
+//    endless ones are held at their start and the rest are finished, then two
+//    real frames are painted. The confetti canvas never draws.
+//  - --diff exits 1 when any screen differs, so it can gate a refactor.
+//  - everything is found by `data-shot="…"` attributes, never by a class
+//    name, so moving styles into CSS modules can't break the run.
 
-import { existsSync, mkdirSync, rmSync } from 'node:fs';
+import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import puppeteer from 'puppeteer-core';
@@ -31,26 +45,397 @@ const VIEWPORTS = [
 const CHROME_PATH =
   process.env.CHROME_PATH ?? '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
 
-/** Long enough for a screen's entrance animation to finish. */
+/** App time a screen gets before its shot: its entrance and its first line. */
 const SETTLE_MS = 900;
+/** How far the page clock moves between looks while waiting for something. */
+const STEP_MS = 50;
+/** A right answer's explanation can run up to 7 s before it settles (useAnswer). */
+const ANSWER_MS = 8000;
+/** Every run starts at the same moment: 9:41 AM on a Monday, in UTC. */
+const CLOCK_START = Date.UTC(2026, 9, 12, 9, 41);
+const RANDOM_SEED = 20261012;
+/** A pixel differs when any channel moves by more than this (0–255). */
+const DIFF_THRESHOLD = 8;
 
-function parseLabel(argv) {
+function parseArgs(argv) {
+  const name = /^[\w.-]+$/;
+  const usage = () => {
+    console.error(
+      'Usage: npm run ui:shots -- [--label <name>]\n' +
+        '       npm run ui:shots -- --diff <label-a> <label-b>\n' +
+        'Labels use letters, digits, . _ - only.'
+    );
+    process.exit(1);
+  };
+  const d = argv.indexOf('--diff');
+  if (d !== -1) {
+    const [a, b] = argv.slice(d + 1, d + 3);
+    if (!name.test(a ?? '') || !name.test(b ?? '')) usage();
+    return { mode: 'diff', a, b };
+  }
   const i = argv.indexOf('--label');
   const label = i === -1 ? 'latest' : argv[i + 1];
-  if (!label || !/^[\w.-]+$/.test(label)) {
-    console.error('Usage: npm run ui:shots -- [--label <name>]   (letters, digits, . _ - only)');
-    process.exit(1);
-  }
-  return label;
+  if (!label || !name.test(label)) usage();
+  return { mode: 'shoot', label };
 }
 
-const sleep = ms => new Promise(r => setTimeout(r, ms));
 const slug = text =>
   text
     .toLowerCase()
     .replace(/[’']/g, '')
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-|-$/g, '');
+
+const at = name => `[data-shot="${name}"]`;
+
+const launchChrome = () =>
+  puppeteer.launch({
+    executablePath: CHROME_PATH,
+    headless: true,
+    args: [
+      // Luna's sound effects still run, but nothing comes out of the speakers
+      '--autoplay-policy=no-user-gesture-required',
+      '--mute-audio',
+      // four pages run side by side; none of them may be slowed as a background tab
+      '--disable-background-timer-throttling',
+      '--disable-renderer-backgrounding',
+      '--disable-backgrounding-occluded-windows'
+    ]
+  });
+
+// ---------------------------------------------------------------------------
+// In the page. These run in the browser, so they must not use anything from
+// this file's scope: puppeteer sends them over as source text.
+// ---------------------------------------------------------------------------
+
+/**
+ * Puts the page on a clock the script moves (`window.__pageClock.advance`),
+ * installed before any of the app's code runs. Date, performance.now,
+ * setTimeout, setInterval and requestAnimationFrame all read it. Before every
+ * step it waits for fetches, clip decodes, fonts and images in flight, so how
+ * fast they arrive can't change what happens next.
+ */
+function installPageClock({ start, seed }) {
+  const realSetTimeout = window.setTimeout.bind(window);
+  const realFrame = window.requestAnimationFrame.bind(window);
+  const RealDate = Date;
+
+  // a seeded Math.random (mulberry32), so every run deals the same rounds
+  let state = seed >>> 0;
+  Math.random = () => {
+    state = (state + 0x6d2b79f5) >>> 0;
+    let t = state;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+
+  // ---- the clock ----
+  let now = 0;
+  function PageDate(...args) {
+    if (!new.target) return new RealDate(start + now).toString();
+    return args.length ? new RealDate(...args) : new RealDate(start + now);
+  }
+  PageDate.prototype = RealDate.prototype;
+  PageDate.now = () => start + now;
+  PageDate.parse = RealDate.parse;
+  PageDate.UTC = RealDate.UTC;
+  window.Date = PageDate;
+  performance.now = () => now;
+
+  const timers = new Map();
+  let nextId = 1;
+  let order = 0;
+  const schedule = (fn, ms, args, repeat) => {
+    const id = nextId++;
+    if (typeof fn !== 'function') return id;
+    const delay = Math.max(0, Number(ms) || 0);
+    timers.set(id, { at: now + (repeat ? Math.max(1, delay) : delay), order: order++, fn, args, every: repeat ? Math.max(1, delay) : 0 });
+    return id;
+  };
+  const cancel = id => void timers.delete(id);
+  window.setTimeout = (fn, ms, ...args) => schedule(fn, ms, args, false);
+  window.setInterval = (fn, ms, ...args) => schedule(fn, ms, args, true);
+  window.clearTimeout = cancel;
+  window.clearInterval = cancel;
+  window.requestAnimationFrame = fn => {
+    const frame = (Math.floor(now / 16) + 1) * 16;
+    return schedule(() => fn(frame), frame - now, [], false);
+  };
+  window.cancelAnimationFrame = cancel;
+
+  // ---- what the clock waits for ----
+  let inFlight = 0;
+  const track = promise => {
+    inFlight += 1;
+    const done = () => (inFlight -= 1);
+    promise.then(done, done);
+    return promise;
+  };
+  const realFetch = window.fetch;
+  window.fetch = function (...args) {
+    return track(realFetch.apply(this, args));
+  };
+  for (const method of ['arrayBuffer', 'blob', 'json', 'text']) {
+    const real = Response.prototype[method];
+    Response.prototype[method] = function () {
+      return track(real.call(this));
+    };
+  }
+  const realDecode = BaseAudioContext.prototype.decodeAudioData;
+  BaseAudioContext.prototype.decodeAudioData = function (...args) {
+    return track(realDecode.apply(this, args));
+  };
+  const realResume = AudioContext.prototype.resume;
+  AudioContext.prototype.resume = function () {
+    return track(realResume.call(this));
+  };
+
+  // ---- Luna's voice, on the clock ----
+  // A clip ends after its own length, and stopping it ends it at once, as in
+  // a browser. Nothing reaches the speakers.
+  const playing = new WeakMap();
+  AudioBufferSourceNode.prototype.start = function () {
+    const ms = (this.buffer ? this.buffer.duration : 0) * 1000;
+    playing.set(this, schedule(() => this.dispatchEvent(new Event('ended')), ms, [], false));
+  };
+  AudioBufferSourceNode.prototype.stop = function () {
+    if (!playing.has(this)) throw new DOMException('stop() before start()', 'InvalidStateError');
+    cancel(playing.get(this));
+    schedule(() => this.dispatchEvent(new Event('ended')), 0, [], false);
+  };
+  // The browser voice is Luna's fallback for a line with no clip. It "speaks"
+  // on the clock too.
+  let utterance = null;
+  Object.defineProperty(window, 'speechSynthesis', {
+    configurable: true,
+    value: {
+      speaking: false,
+      pending: false,
+      paused: false,
+      onvoiceschanged: null,
+      getVoices: () => [],
+      addEventListener() {},
+      removeEventListener() {},
+      pause() {},
+      resume() {},
+      speak(next) {
+        utterance = next;
+        next.dispatchEvent(new Event('start'));
+        schedule(() => utterance === next && next.dispatchEvent(new Event('end')), 400 + 60 * next.text.length, [], false);
+      },
+      cancel() {
+        utterance = null;
+      }
+    }
+  });
+
+  // ---- moving the clock ----
+  const turn = () => new Promise(r => realSetTimeout(r, 0));
+  const settled = () =>
+    inFlight === 0 && document.fonts.status === 'loaded' && [...document.images].every(img => img.complete);
+
+  /** Lets everything in flight land, and React finish what it started. */
+  async function quiet() {
+    const giveUp = RealDate.now() + 30_000;
+    for (let calm = 0; calm < 3; ) {
+      await turn();
+      calm = settled() ? calm + 1 : 0;
+      if (RealDate.now() > giveUp) throw new Error(`the page never went quiet (${inFlight} requests in flight)`);
+    }
+  }
+
+  /** Moves the clock on by `ms`, firing every timer due on the way, in order. */
+  async function advance(ms) {
+    const until = now + ms;
+    await quiet();
+    for (let fired = 0; ; fired++) {
+      if (fired > 50_000) throw new Error('a timer loop never let the page clock move on');
+      let dueId = null;
+      let due = null;
+      for (const [id, timer] of timers) {
+        if (timer.at > until) continue;
+        if (!due || timer.at < due.at || (timer.at === due.at && timer.order < due.order)) {
+          due = timer;
+          dueId = id;
+        }
+      }
+      if (!due) break;
+      now = Math.max(now, due.at);
+      if (due.every) {
+        due.at = now + due.every;
+        due.order = order++;
+      } else {
+        timers.delete(dueId);
+      }
+      try {
+        due.fn(...due.args);
+      } catch (err) {
+        realSetTimeout(() => {
+          throw err;
+        });
+      }
+      await quiet();
+    }
+    now = until;
+    await quiet();
+  }
+
+  /**
+   * Waits for two real frames. CSS animations run on the browser's own clock,
+   * and an animation finished from script is only on screen once the next
+   * frame is painted; a shot taken sooner can catch the app window mid-zoom.
+   */
+  const painted = () =>
+    new Promise(done => {
+      realSetTimeout(done, 1000); // in case a frame never comes
+      realFrame(() => realFrame(done));
+    });
+
+  // the confetti canvas never draws: its 120 pieces would differ frame to frame
+  HTMLCanvasElement.prototype.getContext = () => null;
+
+  window.__pageClock = { advance, quiet, painted };
+}
+
+/** True when the element is on the page and takes up space. */
+function shown(selector) {
+  const el = document.querySelector(selector);
+  if (!el) return false;
+  const box = el.getBoundingClientRect();
+  return box.width > 0 && box.height > 0;
+}
+
+/** Holds endless animations at their start and finishes the rest. */
+function holdAnimations() {
+  for (const animation of document.getAnimations()) {
+    try {
+      if (animation.effect?.getComputedTiming().endTime === Infinity) {
+        animation.pause();
+        animation.currentTime = 0;
+      } else {
+        animation.finish();
+      }
+    } catch {
+      // an animation that can't be finished is left as it is
+    }
+  }
+}
+
+/** The round's label ("Round 2 of 5"), or null once the round pips are gone. */
+function roundLabel() {
+  return document.querySelector('[data-shot="round-pips"]')?.getAttribute('aria-label') ?? null;
+}
+
+/** True once the round has moved on from `round`: the next round, or the reward. */
+function roundMoved(round) {
+  const label = document.querySelector('[data-shot="round-pips"]')?.getAttribute('aria-label') ?? null;
+  return Boolean(document.querySelector('[data-shot="shell-reward"]')) || label !== round;
+}
+
+/** True once a choice was right: the win veil, the next round, or the reward. */
+function answerWon(round) {
+  const label = document.querySelector('[data-shot="round-pips"]')?.getAttribute('aria-label') ?? null;
+  return Boolean(document.querySelector('[data-shot="win-veil"], [data-shot="shell-reward"]')) || label !== round;
+}
+
+/**
+ * Compares two PNGs pixel by pixel. Returns how many differ and, if any do,
+ * an overlay: the second screen faded, every differing pixel red, and a red
+ * box around them all so a single pixel can still be found.
+ */
+async function comparePngs(aBase64, bBase64, threshold) {
+  const pixels = async base64 => {
+    const blob = await (await fetch(`data:image/png;base64,${base64}`)).blob();
+    const bitmap = await createImageBitmap(blob, { colorSpaceConversion: 'none', premultiplyAlpha: 'none' });
+    const ctx = new OffscreenCanvas(bitmap.width, bitmap.height).getContext('2d');
+    ctx.drawImage(bitmap, 0, 0);
+    return ctx.getImageData(0, 0, bitmap.width, bitmap.height);
+  };
+  const [a, b] = await Promise.all([pixels(aBase64), pixels(bBase64)]);
+  if (a.width !== b.width || a.height !== b.height) {
+    return { differing: b.width * b.height, note: `size changed from ${a.width}×${a.height} to ${b.width}×${b.height}`, overlay: null };
+  }
+
+  const out = new ImageData(b.width, b.height);
+  let differing = 0;
+  let [left, top, right, bottom] = [b.width, b.height, -1, -1];
+  for (let i = 0; i < b.data.length; i += 4) {
+    const changed =
+      Math.abs(a.data[i] - b.data[i]) > threshold ||
+      Math.abs(a.data[i + 1] - b.data[i + 1]) > threshold ||
+      Math.abs(a.data[i + 2] - b.data[i + 2]) > threshold ||
+      Math.abs(a.data[i + 3] - b.data[i + 3]) > threshold;
+    if (changed) {
+      differing += 1;
+      const x = (i / 4) % b.width;
+      const y = Math.floor(i / 4 / b.width);
+      [left, top, right, bottom] = [Math.min(left, x), Math.min(top, y), Math.max(right, x), Math.max(bottom, y)];
+      out.data.set([255, 0, 0, 255], i);
+    } else {
+      const grey = b.data[i] * 0.3 + b.data[i + 1] * 0.59 + b.data[i + 2] * 0.11;
+      const faded = 255 - (255 - grey) * 0.3;
+      out.data.set([faded, faded, faded, 255], i);
+    }
+  }
+  if (differing === 0) return { differing, note: '', overlay: null };
+
+  const canvas = new OffscreenCanvas(b.width, b.height);
+  const ctx = canvas.getContext('2d');
+  ctx.putImageData(out, 0, 0);
+  ctx.strokeStyle = 'rgb(255, 0, 0)';
+  ctx.lineWidth = 2;
+  ctx.strokeRect(left - 6, top - 6, right - left + 13, bottom - top + 13);
+  const png = await canvas.convertToBlob({ type: 'image/png' });
+  const overlay = await new Promise(done => {
+    const reader = new FileReader();
+    reader.onload = () => done(String(reader.result).split(',')[1]);
+    reader.readAsDataURL(png);
+  });
+  const share = ((differing / (b.width * b.height)) * 100).toFixed(differing < 100 ? 4 : 2);
+  return {
+    differing,
+    note: `${differing.toLocaleString('en-US')} pixel${differing === 1 ? '' : 's'} (${share}%) between x ${left}–${right}, y ${top}–${bottom}`,
+    overlay
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Driving the app
+// ---------------------------------------------------------------------------
+
+/** The moves every run makes, all on the page clock. */
+function driver(page) {
+  const advance = ms => page.evaluate(ms => window.__pageClock.advance(ms), ms);
+  const quiet = () => page.evaluate(() => window.__pageClock.quiet());
+
+  /** Moves the clock on until `test(arg)` holds in the page; false if it never does within `withinMs`. */
+  const waitFor = async (test, arg, withinMs) => {
+    await quiet();
+    for (let waited = 0; ; waited += STEP_MS) {
+      if (await page.evaluate(test, arg)) return true;
+      if (waited >= withinMs) return false;
+      await advance(STEP_MS);
+    }
+  };
+  const until = async (name, withinMs = 15_000) => {
+    if (!(await waitFor(shown, at(name), withinMs))) throw new Error(`${at(name)} never appeared`);
+  };
+  const gone = async (name, withinMs = 15_000) => {
+    const hidden = await waitFor(selector => !document.querySelector(selector), at(name), withinMs);
+    if (!hidden) throw new Error(`${at(name)} never went away`);
+  };
+  const click = async (name, nth = 0) => {
+    await until(name);
+    const targets = await page.$$(at(name));
+    if (!targets[nth]) throw new Error(`there is no ${at(name)} number ${nth + 1}`);
+    await targets[nth].click();
+  };
+  const scrollTo = name =>
+    page.$eval(at(name), el => el.scrollIntoView({ block: 'start', behavior: 'instant' }));
+
+  return { advance, quiet, waitFor, until, gone, click, scrollTo };
+}
 
 /** One run through the app at one size. */
 async function shootViewport(browser, url, viewport, outDir) {
@@ -61,89 +446,94 @@ async function shootViewport(browser, url, viewport, outDir) {
   const context = await browser.createBrowserContext();
   const page = await context.newPage();
   await page.setViewport({ ...viewport, deviceScaleFactor: 1, hasTouch: true });
+  await page.emulateTimezone('UTC');
+  await page.evaluateOnNewDocument(installPageClock, { start: CLOCK_START, seed: RANDOM_SEED });
+  // CSS animations would otherwise run on the browser's real clock; standing
+  // still, each one is only ever where holdAnimations puts it
+  const devtools = await page.createCDPSession();
+  await devtools.send('Animation.enable');
+  await devtools.send('Animation.setPlaybackRate', { playbackRate: 0 });
+  const drive = driver(page);
+  const { advance, quiet, until, gone, click, scrollTo } = drive;
 
   let n = 0;
   let step = 'start';
   const shot = async name => {
     step = name;
-    await page.evaluate(() => document.fonts.ready);
-    await sleep(SETTLE_MS);
     // the pointer rests off to the side, so nothing is caught mid-hover
     await page.mouse.move(viewport.width - 1, viewport.height - 1);
+    await advance(SETTLE_MS);
+    await page.evaluate(holdAnimations);
+    await quiet();
+    await page.evaluate(() => window.__pageClock.painted());
     const file = `${String(++n).padStart(2, '0')}-${name}.png`;
     await page.screenshot({ path: join(dir, file) });
     console.log(`  ${size}  ${file}`);
   };
-  const click = async selector => {
-    await page.waitForSelector(selector, { visible: true });
-    await page.click(selector);
-  };
-  const scrollTo = selector =>
-    page.$eval(selector, el => el.scrollIntoView({ block: 'start', behavior: 'instant' }));
 
   try {
     // ---- a fresh start ----
     await page.goto(url, { waitUntil: 'networkidle0' });
     await page.evaluate(() => localStorage.clear());
     await page.reload({ waitUntil: 'networkidle0' });
-    await page.waitForSelector('.home-screen-container');
+    await until('home');
     await shot('home');
 
     // ---- into the Reading app, which asks for a grade first ----
-    await click('.ipad-reading-app-card');
-    await page.waitForSelector('.grade-select-page');
+    await click('open-reading');
+    await until('grade-select');
     await shot('grade-select');
 
-    await click('.grade-card-item'); // Kindergarten
-    await page.waitForSelector('.reading-hub');
+    await click('grade-card'); // the first card: Kindergarten
+    await until('hub');
     await shot('hub-top');
-    await scrollTo('.hub-rug');
+    await scrollTo('hub-rug');
     await shot('hub-rug');
-    await scrollTo('.hub-tin');
+    await scrollTo('hub-tin');
     await shot('hub-tin');
-    await scrollTo('.reading-hub');
+    await scrollTo('hub');
 
     // ---- the grown-up screens ----
-    await click('[aria-label="Settings"]');
-    await page.waitForSelector('[aria-label="Settings and Preferences"]');
+    await click('open-settings');
+    await until('settings');
     await shot('settings');
-    await click('.modal-close-btn');
-    await page.waitForSelector('[aria-label="Settings and Preferences"]', { hidden: true });
+    await click('modal-close');
+    await gone('settings');
 
-    await click('[aria-label="Trophy Room"]');
-    await page.waitForSelector('.trophy-modal-card');
+    await click('open-trophies');
+    await until('trophies');
     await shot('trophies');
-    await click('.modal-close-btn');
-    await page.waitForSelector('.trophy-modal-card', { hidden: true });
+    await click('modal-close');
+    await gone('trophies');
 
     // ---- every game: its start screen and its first round ----
-    const titles = await page.$$eval('.hub-rug .game-thing:not(.nook) .thing-title', els =>
+    const titles = await page.$$eval(`${at('game-tile')} ${at('tile-title')}`, els =>
       els.map(el => el.textContent.trim())
     );
     for (const [i, title] of titles.entries()) {
       const name = `game-${slug(title)}`;
       step = name;
-      const tiles = await page.$$('.hub-rug .game-thing:not(.nook)');
-      await tiles[i].click();
-      await page.waitForSelector('.game-shell.phase-intro');
+      await click('game-tile', i);
+      await until('shell-intro');
       await shot(`${name}-intro`);
-      await click('.play-button');
-      await page.waitForSelector('.game-shell.phase-play');
+      await click('play');
+      await until('shell-play');
       await shot(`${name}-play`);
-      await click('.shell-back');
-      await page.waitForSelector('.reading-hub');
+      await click('shell-back');
+      await until('hub');
     }
 
     // ---- the first lesson, played through to its reward ----
     step = 'lesson';
-    await click('.hub-lessons .game-thing');
-    await page.waitForSelector('.game-shell.phase-intro');
+    await click('lesson-tile');
+    await until('shell-intro');
     await shot('lesson-intro');
-    await click('.play-button');
-    await page.waitForSelector('.game-shell.phase-play');
+    await click('play');
+    await until('shell-play');
     await shot('lesson-play');
     step = 'lesson-solve';
-    await solveLesson(page);
+    await solveLesson(page, drive);
+    await until('shell-reward');
     await shot('reward');
   } catch (err) {
     await page.screenshot({ path: join(dir, `FAILED-${step}.png`) }).catch(() => {});
@@ -154,73 +544,36 @@ async function shootViewport(browser, url, viewport, outDir) {
 }
 
 /**
- * Answers every question of a lesson by trying its choices in turn: a wrong
- * one makes the shell flash a miss, the right one a win, and the round then
- * moves on by itself.
+ * Answers every question of a lesson by trying its choices in turn. A choice
+ * is said aloud first; a right one then brings the win veil and the next
+ * round, and a wrong one only Luna's comfort, so the next choice is tried.
  */
-async function solveLesson(page) {
-  const roundIndex = () =>
-    page.evaluate(() =>
-      [...document.querySelectorAll('.round-pips .pip')].findIndex(p => p.classList.contains('current'))
-    );
-
+async function solveLesson(page, { click, waitFor }) {
   for (let guard = 0; guard < 30; guard++) {
-    if (await page.$('.game-shell.phase-reward')) return;
-    const round = await roundIndex();
-    const count = (await page.$$('.lesson-choice')).length;
-    if (count === 0) throw new Error('this lesson question has no .lesson-choice buttons to try');
+    if (await page.evaluate(shown, at('shell-reward'))) return;
+    const round = await page.evaluate(roundLabel);
+    const count = (await page.$$(at('lesson-choice'))).length;
+    if (count === 0) throw new Error(`this lesson question has no ${at('lesson-choice')} buttons to try`);
 
-    for (let i = 0; i < count; i++) {
-      const choices = await page.$$('.lesson-choice');
-      await choices[i].click();
-      // the shell flashes once the child's choice has been said aloud
-      const outcome = await page
-        .waitForFunction(
-          () => {
-            const shell = document.querySelector('.game-shell');
-            if (shell?.classList.contains('flash-win')) return 'win';
-            if (shell?.classList.contains('flash-miss')) return 'miss';
-            return false;
-          },
-          { timeout: 10_000 }
-        )
-        .then(h => h.jsonValue());
-      if (outcome === 'win') break;
-      await page.waitForFunction(() => !document.querySelector('.game-shell.flash-miss'));
+    let won = false;
+    for (let i = 0; i < count && !won; i++) {
+      await click('lesson-choice', i);
+      won = await waitFor(answerWon, round, ANSWER_MS);
     }
-
-    await page.waitForFunction(
-      r =>
-        document.querySelector('.game-shell.phase-reward') ||
-        [...document.querySelectorAll('.round-pips .pip')].findIndex(p => p.classList.contains('current')) !== r,
-      { timeout: 10_000 },
-      round
-    );
+    if (!won) throw new Error(`no choice was right in "${round}"`);
+    if (!(await waitFor(roundMoved, round, 10_000))) throw new Error(`"${round}" never moved on`);
   }
   throw new Error('the lesson never reached its reward screen');
 }
 
-async function main() {
-  const label = parseLabel(process.argv.slice(2));
-  if (!existsSync(CHROME_PATH)) {
-    console.error(`Chrome not found at ${CHROME_PATH}. Set CHROME_PATH to a Chrome or Chromium binary.`);
-    process.exit(1);
-  }
-
+async function shoot(label) {
   const outDir = join(ROOT, 'screenshots', label);
   rmSync(outDir, { recursive: true, force: true });
 
   const server = await createServer({ root: ROOT, logLevel: 'error', server: { open: false } });
   await server.listen();
   const url = server.resolvedUrls.local[0];
-
-  const browser = await puppeteer.launch({
-    executablePath: CHROME_PATH,
-    headless: true,
-    // Luna's voice plays, so speech ends and the app moves on as it would,
-    // but nothing comes out of the speakers.
-    args: ['--autoplay-policy=no-user-gesture-required', '--mute-audio']
-  });
+  const browser = await launchChrome();
 
   // the four sizes run side by side, each in its own fresh profile
   const started = Date.now();
@@ -237,4 +590,82 @@ async function main() {
   console.log(`\nDone in ${secs}s: screenshots/${label}/`);
 }
 
-main();
+// ---------------------------------------------------------------------------
+// Comparing two runs
+// ---------------------------------------------------------------------------
+
+const folders = dir =>
+  readdirSync(dir, { withFileTypes: true })
+    .filter(e => e.isDirectory())
+    .map(e => e.name);
+const pngs = dir => (existsSync(dir) ? readdirSync(dir).filter(f => f.endsWith('.png')) : []);
+
+async function diff(a, b) {
+  const [dirA, dirB] = [a, b].map(label => join(ROOT, 'screenshots', label));
+  for (const [label, dir] of [[a, dirA], [b, dirB]]) {
+    if (!existsSync(dir)) {
+      console.error(`No screenshots/${label}/ yet. Make it with: npm run ui:shots -- --label ${label}`);
+      process.exit(1);
+    }
+  }
+  const outName = `diff-${a}-${b}`;
+  const outDir = join(ROOT, 'screenshots', outName);
+  rmSync(outDir, { recursive: true, force: true });
+
+  const sizes = [...new Set([...folders(dirA), ...folders(dirB)])].sort();
+  console.log(`Comparing screenshots/${a}/ with screenshots/${b}/ (a pixel differs past ${DIFF_THRESHOLD} per channel)\n`);
+
+  const browser = await launchChrome();
+  const page = await browser.newPage();
+  let changed = 0;
+  for (const size of sizes) {
+    const files = [...new Set([...pngs(join(dirA, size)), ...pngs(join(dirB, size))])].sort();
+    const lines = [];
+    for (const file of files) {
+      const [fileA, fileB] = [join(dirA, size, file), join(dirB, size, file)];
+      if (!existsSync(fileA) || !existsSync(fileB)) {
+        lines.push(`    ${file}  only in ${existsSync(fileA) ? a : b}`);
+        continue;
+      }
+      const result = await page.evaluate(
+        comparePngs,
+        readFileSync(fileA).toString('base64'),
+        readFileSync(fileB).toString('base64'),
+        DIFF_THRESHOLD
+      );
+      if (result.differing === 0) continue;
+      lines.push(`    ${file}  ${result.note}`);
+      if (result.overlay) {
+        mkdirSync(join(outDir, size), { recursive: true });
+        writeFileSync(join(outDir, size, file), Buffer.from(result.overlay, 'base64'));
+      }
+    }
+    console.log(`  ${size}  ${lines.length} of ${files.length} screens differ`);
+    for (const line of lines) console.log(line);
+    changed += lines.length;
+  }
+  await browser.close();
+
+  if (changed) {
+    console.log(`\n${changed} changed screen${changed === 1 ? '' : 's'} at ${sizes.length} sizes. Red overlays: screenshots/${outName}/`);
+    process.exit(1);
+  }
+  console.log(`\n0 changed screens at ${sizes.length} sizes.`);
+}
+
+async function main() {
+  const args = parseArgs(process.argv.slice(2));
+  if (!existsSync(CHROME_PATH)) {
+    console.error(`Chrome not found at ${CHROME_PATH}. Set CHROME_PATH to a Chrome or Chromium binary.`);
+    process.exit(1);
+  }
+  if (args.mode === 'diff') await diff(args.a, args.b);
+  else await shoot(args.label);
+  // a puppeteer run can keep the process alive after it's done
+  process.exit(0);
+}
+
+main().catch(err => {
+  console.error(err);
+  process.exit(1);
+});

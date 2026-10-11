@@ -25,6 +25,7 @@ export const TrophyModal: React.FC<TrophyModalProps> = ({
         onClick={e => e.stopPropagation()}
         role="dialog"
         aria-label="Trophy Room"
+        data-shot="trophies"
       >
         {/* Header */}
         <div className="trophy-header">
@@ -47,6 +48,7 @@ export const TrophyModal: React.FC<TrophyModalProps> = ({
               onClose();
             }}
             className="modal-close-btn"
+            data-shot="modal-close"
             style={{
               width: '36px',
               height: '36px',

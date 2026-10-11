@@ -38,6 +38,7 @@ export const RhymeMatch: React.FC<{ question: RhymeMatchQuestion; api: GameApi }
         {options.map(option => (
           <button
             key={option.word}
+            data-shot="lesson-choice"
             className={`lesson-choice ${wrongId === option.word ? 'is-wrong' : ''} ${
               solved && option.isRhyme ? 'is-right' : ''
             }`}

@@ -274,8 +274,8 @@ export const GameShell: React.FC<GameShellProps> = ({
   // ---------- START ----------
   if (phase === 'intro') {
     return (
-      <div className={`game-shell phase-intro shape-${game.shape}`}>
-        <button className="shell-back" onClick={onExit}>
+      <div className={`game-shell phase-intro shape-${game.shape}`} data-shot="shell-intro">
+        <button className="shell-back" data-shot="shell-back" onClick={onExit}>
           <ArrowLeftIcon size={14} />
           <span>Library</span>
         </button>
@@ -318,7 +318,7 @@ export const GameShell: React.FC<GameShellProps> = ({
             </div>
           )}
 
-          <button className="play-button" onClick={() => startPlay(difficulty)}>
+          <button className="play-button" data-shot="play" onClick={() => startPlay(difficulty)}>
             {game.lesson ? 'Let’s learn!' : 'Let’s play!'}
           </button>
 
@@ -333,7 +333,7 @@ export const GameShell: React.FC<GameShellProps> = ({
   // ---------- REWARD ----------
   if (phase === 'reward') {
     return (
-      <div className={`game-shell phase-reward shape-${game.shape}`}>
+      <div className={`game-shell phase-reward shape-${game.shape}`} data-shot="shell-reward">
         <canvas ref={canvasRef} className="reward-confetti" />
 
         <div className="reward-panel">
@@ -389,14 +389,17 @@ export const GameShell: React.FC<GameShellProps> = ({
   const round = rounds[roundIndex];
 
   return (
-    <div className={`game-shell phase-play shape-${game.shape} ${flash ? `flash-${flash}` : ''}`}>
+    <div
+      className={`game-shell phase-play shape-${game.shape} ${flash ? `flash-${flash}` : ''}`}
+      data-shot="shell-play"
+    >
       <header className="shell-bar">
-        <button className="shell-back" onClick={onExit}>
+        <button className="shell-back" data-shot="shell-back" onClick={onExit}>
           <ArrowLeftIcon size={14} />
           <span>Library</span>
         </button>
 
-        <div className="round-pips" aria-label={`Round ${roundIndex + 1} of ${game.roundsPerPlay}`}>
+        <div className="round-pips" data-shot="round-pips" aria-label={`Round ${roundIndex + 1} of ${game.roundsPerPlay}`}>
           {Array.from({ length: game.roundsPerPlay }).map((_, i) => (
             <span
               key={i}
@@ -460,7 +463,7 @@ export const GameShell: React.FC<GameShellProps> = ({
       </div>
 
       {flash === 'win' && (
-        <div className="win-veil" aria-hidden="true">
+        <div className="win-veil" data-shot="win-veil" aria-hidden="true">
           <span className="win-burst">✦</span>
         </div>
       )}

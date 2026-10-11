@@ -159,7 +159,7 @@ export const ReadingHub: React.FC<ReadingHubProps> = ({
   };
 
   return (
-    <div className="reading-hub">
+    <div className="reading-hub" data-shot="hub">
       <div className="hub-lanterns" aria-hidden="true">
         <span>🏮</span>
         <span>✨</span>
@@ -226,6 +226,7 @@ export const ReadingHub: React.FC<ReadingHubProps> = ({
                 <button
                   key={lesson.id}
                   className={`game-thing shape-lesson skill-${lesson.skill} ${done ? 'is-done' : ''}`}
+                  data-shot="lesson-tile"
                   style={{ '--spine': SPINE_COLORS[i % SPINE_COLORS.length] } as React.CSSProperties}
                   onClick={() => startGame(lesson)}
                 >
@@ -251,7 +252,7 @@ export const ReadingHub: React.FC<ReadingHubProps> = ({
       )}
 
       {/* ---- the play rug: every game is an object, not a card ---- */}
-      <section className="hub-rug">
+      <section className="hub-rug" data-shot="hub-rug">
         <h2 className="rug-heading">
           <span>The Play Rug</span>
           <small>{GAMES.length} games — pick one</small>
@@ -264,6 +265,7 @@ export const ReadingHub: React.FC<ReadingHubProps> = ({
               <button
                 key={game.id}
                 className={`game-thing shape-${game.shape} skill-${game.skill}`}
+                data-shot="game-tile"
                 style={{ '--tilt': `${((i % 3) - 1) * 0.7}deg` } as React.CSSProperties}
                 onClick={() => startGame(game)}
               >
@@ -271,7 +273,7 @@ export const ReadingHub: React.FC<ReadingHubProps> = ({
 
                 <span className="thing-body">
                   <span className="thing-emoji">{game.emoji}</span>
-                  <span className="thing-title">{game.title}</span>
+                  <span className="thing-title" data-shot="tile-title">{game.title}</span>
                   <span className="thing-tagline">{game.tagline}</span>
                 </span>
 
@@ -303,7 +305,7 @@ export const ReadingHub: React.FC<ReadingHubProps> = ({
       </section>
 
       {/* ---- sticker tin ---- */}
-      <section className="hub-tin">
+      <section className="hub-tin" data-shot="hub-tin">
         <div className="tin-head">
           <h2>Luna’s Sticker Tin</h2>
           <span className="tin-count">

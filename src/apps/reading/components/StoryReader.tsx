@@ -96,6 +96,7 @@ export const StoryReader: React.FC<{ question: StoryReadQuestion; api: GameApi }
         {answers.map(answer => (
           <button
             key={answer.id}
+            data-shot="lesson-choice"
             className={`lesson-answer ${wrongId === answer.id ? 'is-wrong' : ''} ${
               solved && answer.isCorrect ? 'is-right' : ''
             }`}

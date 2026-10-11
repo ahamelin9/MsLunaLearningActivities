@@ -56,6 +56,7 @@ export const BlendAndRead: React.FC<{ question: BlendAndReadQuestion; api: GameA
         {options.map(option => (
           <button
             key={option.id}
+            data-shot="lesson-choice"
             className={`lesson-choice ${wrongId === option.id ? 'is-wrong' : ''} ${
               solved && option.isCorrect ? 'is-right' : ''
             }`}

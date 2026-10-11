@@ -47,6 +47,7 @@ export const SightWordReader: React.FC<{ question: SightWordReaderQuestion; api:
         {options.map(option => (
           <button
             key={option.id}
+            data-shot="lesson-choice"
             className={`lesson-choice ${wrongId === option.id ? 'is-wrong' : ''} ${
               solved && option.isCorrect ? 'is-right' : ''
             }`}

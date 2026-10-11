@@ -10,7 +10,7 @@ tickets.
 - **`epics/<EPIC>.md`**: one file per epic, with its goal and every ticket's full section (Why / How / Complete when). A ticket never moves files when its status changes.
 - **`CHANGELOG.md`**: finished and dropped tickets. Once a ticket is deleted, its changelog line is its only record.
 
-**Last updated:** 2026-10-10
+**Last updated:** 2026-10-11
 
 ## How to read this
 
@@ -72,8 +72,8 @@ be pulled into Phase 1 for a break from styling.
 
 ### Now / Next
 
-- **Now:** DES-18a: screenshots you can compare, same every run, with a pixel diff (the editing hooks are done, DES-25)
-- **Next:** follow "Order to finish the epic" at the top of `epics/DES.md`: DES-18b–e (structure first, pure refactors proven by a pixel diff), then DES-3, DES-19 and DES-20. PRG-7 and SET-1 are pulled in where DES-13 and DES-16 need them. GAME-1c, Treasure Path's screen, waits on FB-1, which waits on the DES-8/DES-10 layout
+- **Now:** DES-18b: module setup, then the shell and UI as modules in folders (screenshots you can compare are done, DES-18a)
+- **Next:** follow "Order to finish the epic" at the top of `epics/DES.md`: DES-18c–e (pure refactors, each proven by `ui:shots --diff`), then DES-3, DES-19 and DES-20. OPS-9 (know-how checks onto `data-shot`) fits straight after DES-18d. PRG-7 and SET-1 are pulled in where DES-13 and DES-16 need them. GAME-1c, Treasure Path's screen, waits on FB-1, which waits on the DES-8/DES-10 layout
 
 ## Epics
 
@@ -97,7 +97,6 @@ In board order. A new epic gets its file in `epics/` first, then a link here
 | ID | Title | Type | P | Size | Status |
 |---|---|---|---|---|---|
 | **DES** | **Design system & layout** | Epic | **P0** | | |
-| DES-18a | Screenshots you can compare: same every run, with a pixel diff | Task | P0 | M | Todo |
 | DES-18b | Module setup, then the shell and UI as modules in folders | Task | P0 | M | Todo |
 | DES-18c | Reading pages, GameShell and LunaOwl as modules in folders | Task | P0 | M | Todo |
 | DES-18d | One folder per game; `games.scss` gone | Task | P0 | M | Todo |
@@ -183,6 +182,7 @@ In board order. A new epic gets its file in `epics/` first, then a link here
 | WRT-1 | Writing app on the home screen | Story | P1 | M | Todo |
 | WRT-2 | Punctuation game: where does the mark go? | Story | P1 | L | Todo |
 | **OPS** | **Housekeeping** | Epic | **P2** | | |
+| OPS-9 | Know-how browser checks find things by `data-shot` | Task | P1 | S | Todo |
 | OPS-1 | Delete dead code | Task | P2 | S | Todo |
 | OPS-2 | README and stale copy | Task | P2 | S | Todo |
 | OPS-3 | Decide the "Coming Soon" apps | Task | P2 | S | Todo |

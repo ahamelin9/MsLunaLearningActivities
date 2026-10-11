@@ -124,7 +124,10 @@ so changing a `## Rules` section changes what Claude is shown.
   Claude never runs `git config`.
 - **Prove a refactor looks the same:** run `npm run ui:shots -- --label before`,
   change the code, run `--label after`, then `npm run ui:shots -- --diff before after`
-  (DES-18a).
+  (DES-18a). It should say "0 changed screens"; anything else lists the screens
+  and saves red overlays in `screenshots/diff-before-after/`. The run finds
+  screens by their `data-shot="…"` attributes, so keep them when moving a screen,
+  and give anything new it should click one.
 
 ## Status per area
 
@@ -135,7 +138,7 @@ Each ticket updates its row when it closes (Completion criteria B7 in
 |---|---|---|---|
 | Standards (these docs, the skill) | `docs/design-system/`, `luna-design` | Done (Alex approved, 2026-10-10) | DES-2 |
 | Hooks at the moment of editing | `.claude/hooks/`, `.githooks/` | Before-edit hook and pre-commit check built (DES-25, 2026-10-10); the after-edit check comes with DES-19 | DES-25, DES-19 |
-| Screenshots you can compare | `scripts/ui/shots.mjs` | Planned | DES-18a |
+| Screenshots you can compare | `scripts/ui/shots.mjs` | Done (DES-18a, 2026-10-11): same pixels every run on a page clock, `--diff` with red overlays, found by `data-shot` | DES-18a |
 | Source tree and CSS modules | `src/` | Planned | DES-18b–e |
 | Tokens | `src/styles/tokens/` | Planned | DES-3 |
 | Design check and contrast check | `scripts/design/` | Planned | DES-19 |

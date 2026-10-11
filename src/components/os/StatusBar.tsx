@@ -85,6 +85,7 @@ export const StatusBar: React.FC<StatusBarProps> = ({
           className="status-bar-btn"
           title="Trophy Room & Badges"
           aria-label="Trophy Room"
+          data-shot="open-trophies"
         >
           <TrophyIcon size={18} color="#FFD166" />
           {progress.unlockedAchievements.length > 0 && (
@@ -110,6 +111,7 @@ export const StatusBar: React.FC<StatusBarProps> = ({
           className="status-bar-btn"
           title="Settings & Preferences"
           aria-label="Settings"
+          data-shot="open-settings"
         >
           <SettingsIcon size={18} />
         </button>

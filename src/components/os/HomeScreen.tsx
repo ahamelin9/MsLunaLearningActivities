@@ -21,7 +21,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
   };
 
   return (
-    <div className="home-screen-container">
+    <div className="home-screen-container" data-shot="home">
       {/* Decorative ambient background glows */}
       <div className="home-bg-bubble bubble-1" />
       <div className="home-bg-bubble bubble-2" />
@@ -32,6 +32,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
         <button
           onClick={handleLaunch}
           className="ipad-reading-app-card"
+          data-shot="open-reading"
           title="Open Reading App"
           aria-label="Launch Reading App"
         >

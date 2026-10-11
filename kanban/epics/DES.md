@@ -46,7 +46,7 @@ them in.
 | # | Stage | Tickets | What you have at the end |
 |---|---|---|---|
 | 1 | Guardrails | DES-25 (done 2026-10-10) | Claude gets the right standards before any UI edit; people get a pre-commit check |
-| 2 | Structure (pure refactors, nothing looks different) | DES-18a → DES-18b → DES-18c → DES-18d, DES-18e | Screenshots you can compare; one folder per page, game and lesson; CSS modules; `games.scss` gone |
+| 2 | Structure (pure refactors, nothing looks different) | DES-18a (done 2026-10-11) → DES-18b → DES-18c → DES-18d, DES-18e | Screenshots you can compare; one folder per page, game and lesson; CSS modules; `games.scss` gone |
 | 3 | Foundations | DES-3 → DES-19 → DES-20 → DES-4 → DES-5 → DES-6 | Tokens in light and dark; lint enforces the rules after every edit; the Kit page; Andika and Fraunces offline; shared motion; reduced motion |
 | 4 | The kit | DES-7a → DES-7b, DES-7c → DES-15 | Every kit component on the Kit page in every state, and the new Luna |
 | 5 | Frame and shell | DES-8 → DES-10 → DES-9a → DES-9b → DES-9c → DES-12 | One header, the layout grid, the restyled home, Settings, trophies and Grade Select; one Luna per screen |
@@ -66,26 +66,8 @@ them in.
 - **DES-14** (P2) touches the same folder as DES-22b and can slot in straight after it.
 - **P0 bugs** can still be pulled in between tickets for a break from styling.
 
-### DES-18a · Screenshots you can compare: same every run, with a pixel diff
-Task · P0 · M · needs: —
-- **Why:** pure refactors must look identical, and today that can't be proven:
-  - `Math.random` (in 11 files), the clock and endless animations make every run differ;
-  - `ui:shots` clicks through by class names, which CSS modules will change (DES-18b on).
-- **How:** in `scripts/ui/shots.mjs` only, with no app change:
-  - seed `Math.random` and fix `Date.now` in `evaluateOnNewDocument`;
-  - before each shot, pause infinite animations at 0 and finish the rest (`document.getAnimations()`);
-  - stub the confetti canvas;
-  - click by `data-shot="…"` attributes, added to the elements the script uses today (`.home-screen-container`, `.grade-card-item`, `.game-thing`, `.lesson-choice` and the rest);
-  - add `--diff <a> <b>`: it compares the PNGs inside the headless page (a pixel counts as different past about 8 per channel), lists the screens that differ, and saves a red overlay for each.
-  - Also delete `src/App.css` (never imported; taken from OPS-1).
-- **Complete when:**
-  - two runs of an unchanged tree diff to 0 differing screens at all 4 sizes;
-  - a deliberate one-pixel colour change shows up in `--diff` with an overlay;
-  - the script uses no class selectors;
-  - `App.css` is gone, and build and lint pass.
-
 ### DES-18b · Module setup, then the shell and UI as modules in folders
-Task · P0 · M · needs: DES-18a
+Task · P0 · M · needs: —
 - **Why:** global SCSS lets moved files collide. CSS modules make collisions impossible (Alex's call, 2026-10-10).
 - **How:**
   - **Setup:**

@@ -30,7 +30,7 @@ export const GradeSelect: React.FC<GradeSelectProps> = ({
   };
 
   return (
-    <div className="grade-select-page">
+    <div className="grade-select-page" data-shot="grade-select">
       {/* Header & Mascot */}
       <div className="grade-select-header">
         <Mascot
@@ -61,6 +61,7 @@ export const GradeSelect: React.FC<GradeSelectProps> = ({
               key={grade.id}
               onClick={() => handleGradeClick(grade.id)}
               className={`grade-card-item ${isCurrent ? 'active' : ''}`}
+              data-shot="grade-card"
               role="button"
               tabIndex={0}
               aria-label={`Select ${grade.title}`}
