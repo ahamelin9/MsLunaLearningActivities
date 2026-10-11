@@ -69,3 +69,27 @@ only record of them. One line each: date, ID, title, and `Done` or
   |---|---|---|
   | Kindergarten | True/false: the passage, "Is this true?" and the claim. Fill-in-the-blank: the instruction only. | Any time: the passage, then the claim, or the statement with "what?" in the gap |
   | 1st and 2nd | The instruction only ("Read the story…") | Greyed out until the first answer; after a miss, the same as Kindergarten |
+- **2026-10-10** — Design-system plan approved by Alex, for finishing DES-2 and building the system after it.
+  - **Alex's calls:**
+    - the source tree keeps `src/apps/<app>/` as the app boundary, with one folder per page, game and lesson;
+    - the standards go in a new `docs/design-system/`, replacing `docs/design-standards.md`, and the skill links into it;
+    - styles are scoped with CSS modules;
+    - the round 2 prototype is frozen as the approved reference;
+    - hooks bring the standards in whenever a UI file is created or edited.
+  - **What the system is:**
+    - three token layers (SCSS primitives; colour roles with light and dark; component tokens), plus one illustration palette;
+    - a kit of components with a dev-only Kit page;
+    - a design check and contrast check in `npm run lint`, with a baseline that may only shrink.
+  - **Ticket changes:** DES-3 to DES-17 rewritten to match. New: DES-25 (the editing hooks), DES-18a–e (structure first, as pure refactors proven by a pixel diff), DES-19 (the checks), DES-20 (the Kit page), DES-21 (the library), DES-22a–c (GameShell and the games), DES-23 (lessons) and DES-24 (retire the legacy styles, the finish line). OPS-1 loses `App.css` and `AppDock` to DES-18a/b.
+- **2026-10-10** — DES-7 Shared component kit — Won't do: split in three before starting, DES-7a basics (Icon, ChunkyButton, PaperCard, Chip, Tile, Modal), DES-7b play (Choice, ListenCue, SpeechBubble, StarRow) and DES-7c progress and rewards (ProgressBar, LessonCard, Squishy). Its old finish line (every answer is a Choice, `components/ui/Button` gone) moved to DES-22b/c, DES-23 and DES-9b.
+- **2026-10-10** — DES-9 Restyle the tablet shell: iPad feel, boho finish — Won't do: split in three before starting, DES-9a home screen and status bar, DES-9b Settings and the Trophy room, DES-9c Grade Select.
+- **2026-10-10** — DES-2 Write the design standards — Done.
+  - **The teacher's round 2 picks** are written into `docs/design-system/`, which replaces `docs/design-standards.md`:
+    - the map (`README.md`);
+    - six topic docs, each opening with `## Rules`: principles, colour, foundations, components, screens, fitting-in;
+    - the decision log;
+    - the old audit, as a dated appendix.
+  - **No hex values in the docs.** Values will live only in `src/styles/tokens/` (DES-3).
+  - **Standards that turn the prototype into enforceable scales,** approved by Alex and recorded in `decisions.md`: a 4px space scale, six radii, three elevations with ledges, an 11-role type scale, motion durations taken from the prototype, a "revealed" answer state, and game pieces sharing Choice's states.
+  - **The `luna-design` skill** is now the rules and recipes Claude follows before any UI work, pointing into the docs. The round 2 prototype is frozen as the approved reference, with its how-to archived in `prototype/README.md`.
+  - **The epic** now opens with the order to finish it. PRG-7 and SET-1 are pulled in because DES-13 and DES-16 need them, and DES-17's full-shelf milestone moved to PRG-4.

@@ -1,7 +1,7 @@
 # SET — Settings & grown-up area (Phase 3)
 
 ### SET-1 · Grown-up gate for settings
-Story · P0 · M · needs: DES-9
+Story · P0 · M · needs: DES-9b
 - **Why:** a child can open Settings, change the grade, turn off narration, or reset all progress.
 - **How:** add a press-and-hold gate (about 2s) or a simple grown-up question before Settings opens. Grade, narration, speed, reduced motion and reset all go behind it.
 - **Complete when:** a child tapping around can't change any setting.

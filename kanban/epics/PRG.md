@@ -19,17 +19,18 @@ Task · P2 · S
 - **Complete when:** achievements are checked only in `utils/storage.ts`, `TrophyModal` only reads them, and BUG-13 is closed.
 
 ### PRG-4 · Secret platinum trophy for a full squishy shelf
-Story · P2 · S · needs: PRG-3, PRG-5
+Story · P2 · S · needs: PRG-3, PRG-5, DES-17
 - **Why:** collecting every squishy should feel like a big moment (Alex, 2026-10-09).
 - **How:**
   - A hidden achievement, checked with the others in `utils/storage.ts` (PRG-3), unlocks when every squishy (PRG-5) is on the shelf in at least one colour. It counts the whole set, so adding a squishy later raises the bar. Rare colours aren't needed (proposal, to confirm with Alex).
   - **The last squishy (Alex, 2026-10-09):** unlocking it also brings home one extra, one-of-a-kind squishy, "Pearl Moon", which sits at the top of the shelf's arch.
   - Until then the trophy appears nowhere. The round 2 shelf shows the top spot as a shimmering "?". To confirm with Alex: keep that tease, or leave the spot empty so it stays a complete secret like the trophy.
   - When it unlocks, Luna celebrates with a pre-rendered line, and the trophy shows in the Trophy room from then on.
-- **Complete when:** with one squishy missing, no screen hints at the trophy; collecting the last one unlocks it, Luna says her line, and it stays in the Trophy room after a reload.
+  - **The milestone moon visits** (DES-17's last milestone, moved here 2026-10-10): the full shelf brings her once, through DES-17's visit, with her own pre-rendered line.
+- **Complete when:** with one squishy missing, no screen hints at the trophy; collecting the last one unlocks it, Luna says her line, the milestone moon visits once, and it stays in the Trophy room after a reload.
 
 ### PRG-5 · Squishies instead of the sticker tin
-Story · P1 · M · needs: DES-2
+Story · P1 · M · needs: DES-7c
 - **Why:** the teacher wants the collectible to be squishies rather than emoji stickers (2026-10-09): squish balls, mochi animals, butter blocks and the like, with rare colours too. Today's tin is 18 emoji (`engine/stickers.ts`).
 - **How:**
   - Replace the emoji with drawn squishies in the DES-2 style, generic shapes with no brand names or logos (round squish ball, mochi cat, bunny and bear, butter block, dumpling, peach, cloud, a little moon, and so on).

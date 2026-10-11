@@ -2,8 +2,7 @@
 
 ### OPS-1 · Delete dead code
 Task · P2 · S
-- `src/App.css` (534 lines, never imported)
-- `components/os/AppDock.tsx`
+- (`src/App.css` and `components/os/AppDock` go with DES-18a and DES-18b, 2026-10-10.)
 - `useUserProgress`
 - `getAppById`
 - `AppDefinition.component`

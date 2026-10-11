@@ -18,7 +18,8 @@ for an existing entry and update it instead.
 | A link to something outside the repo | **Memory**, type `reference`, plus the skill that uses it | The style sample canvas URL |
 | Progress, a decision or a new idea for a ticket | **`kanban/`** through the `backlog` skill: the ticket's section in `kanban/epics/<EPIC>.md`, status and Now/Next in `kanban/README.md` | "Teacher (2026-10-09): no rainbow" on DES-2 |
 | A problem that took troubleshooting: symptom, cause, fix, check | **`know-how` skill** | Luna sounds like the browser voice |
-| Design direction, design decisions, how to change the prototype | **`luna-design` skill**; `docs/design-standards.md` once final | Moon gold is the only off-palette colour |
+| A design decision, rule or standard | **`docs/design-system/`**: the decision in `decisions.md`, the rule in its topic doc (never a value; values live in `src/styles/tokens/`) | Moon gold is the only off-palette colour |
+| How Claude does design work (a recipe, a step) | **`luna-design` skill** | How to add a kit component |
 | A process we will repeat | **A skill**: a section in the closest one, or a new skill if none fits | This wrap-up |
 | A reusable script | **Next to the skill that uses it**, never the scratchpad (it's deleted after the session) | `luna-design/prototype/gen.py` |
 | What changed today, for the teacher | **`app-updates` skill** (`/app-updates`) | The end-of-day note for Apple Notes |

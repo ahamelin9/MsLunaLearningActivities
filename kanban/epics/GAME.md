@@ -43,7 +43,7 @@ Story · P2 · S
 - **Complete when:** at tier 2+, flipping a word card makes no speech until its pair is matched.
 
 ### GAME-6 · Rename "Feed Luna the Letter"
-Story · P2 · S · needs: DES-2
+Story · P2 · S · needs: —
 - **Why:** the teacher would like the cookie game called something else (2026-10-09). The cookies stay. **Decided (Alex, 2026-10-10):** "Letter Cookies", the round 2 prototype's name.
 - **How:** change `title` in `games/FeedLuna.tsx` to "Letter Cookies", and reword any spoken line that says "Feed Luna" or "feed me" if she wants (the `mission` line). Keep the id `feed-luna` so saved progress carries over. Re-render the changed lines with `npm run voice:render`.
 - **Complete when:** the Play Shelf and the game's start screen show the new name, no screen or spoken line says "Feed Luna", saved progress for the game still shows, and `voice:audit` passes.

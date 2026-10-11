@@ -1,5 +1,10 @@
 """Assembles the round 2 artboards from fragments in frag/.
 
+FROZEN 2026-10-10: the teacher approved these boards; they are the reference,
+not the source. The app's values live in src/styles/tokens/ (DES-3), snapped to
+the scales in docs/design-system/decisions.md. Don't change TOKENS here to
+change the app. See README.md next to this file.
+
 Each fragment has three parts, split by marker lines:
     <!--CSS-->    board-only styles
     <!--BODY-->   the screen's markup (inside the themed screen div)

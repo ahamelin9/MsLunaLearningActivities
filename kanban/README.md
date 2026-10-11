@@ -38,6 +38,7 @@ screenshots. Nothing is assumed.
 4. Targets stay heard, never shown, and hints stay spoken.
 5. No on-device speech or extra runtime audio work (voice stays pre-rendered).
 6. Nothing was built beyond the ticket; extra ideas became new tickets.
+7. UI work: the design check passes (part of `npm run lint` from DES-19), and the status row in `docs/design-system/README.md` is updated.
 
 **C. Alex signs off where it matters.** Any point that needs judgement
 (a design approval, anything marked "reviewed by Alex", how something looks
@@ -71,8 +72,8 @@ be pulled into Phase 1 for a break from styling.
 
 ### Now / Next
 
-- **Now:** DES-2: the teacher has answered everything (2026-10-10) and the style sample shows her picks; what's left is writing them into `docs/design-standards.md` and copying the decisions into DES-3 to DES-7
-- **Next:** DES-3, DES-4, DES-5 and DES-15, which only need DES-2. PRG-7 (lessons open in order) needs no design and can be pulled in any time. GAME-1c, Treasure Path's screen, waits on FB-1, which waits on the DES-8/DES-10 layout. Then GAME-4
+- **Now:** DES-25: hooks that bring the standards in at every UI edit, so nothing needs cleaning up afterwards (the standards are done, DES-2)
+- **Next:** follow "Order to finish the epic" at the top of `epics/DES.md`: DES-18a–e (structure first, pure refactors proven by a pixel diff), then DES-3, DES-19 and DES-20. PRG-7 and SET-1 are pulled in where DES-13 and DES-16 need them. GAME-1c, Treasure Path's screen, waits on FB-1, which waits on the DES-8/DES-10 layout
 
 ## Epics
 
@@ -96,19 +97,36 @@ In board order. A new epic gets its file in `epics/` first, then a link here
 | ID | Title | Type | P | Size | Status |
 |---|---|---|---|---|---|
 | **DES** | **Design system & layout** | Epic | **P0** | | |
-| DES-2 | Write the design standards | Story | P0 | M | In progress |
+| DES-25 | Standards brought in at the moment of editing | Task | P0 | S | Todo |
+| DES-18a | Screenshots you can compare: same every run, with a pixel diff | Task | P0 | M | Todo |
+| DES-18b | Module setup, then the shell and UI as modules in folders | Task | P0 | M | Todo |
+| DES-18c | Reading pages, GameShell and LunaOwl as modules in folders | Task | P0 | M | Todo |
+| DES-18d | One folder per game; `games.scss` gone | Task | P0 | M | Todo |
+| DES-18e | One folder per lesson type | Task | P0 | S | Todo |
 | DES-3 | One set of design tokens | Story | P0 | M | Todo |
+| DES-19 | Design check and contrast check in `npm run lint`, and after every edit | Task | P0 | M | Todo |
+| DES-20 | Kit page (dev only) and its screenshots | Task | P0 | M | Todo |
 | DES-4 | Typography and local fonts | Story | P0 | S | Todo |
 | DES-5 | Motion system | Story | P0 | M | Todo |
 | DES-6 | Reduced motion, wired end to end | Story | P0 | S | Todo |
-| DES-7 | Shared component kit | Story | P0 | M | Todo |
-| DES-8 | One set of chrome | Story | P0 | M | Todo |
-| DES-9 | Restyle the tablet shell: iPad feel, boho finish | Story | P0 | L | Todo |
-| DES-10 | Layout grid and breakpoints | Story | P0 | M | Todo |
+| DES-7a | Kit, part 1: the basics | Story | P0 | M | Todo |
+| DES-7b | Kit, part 2: play | Story | P0 | M | Todo |
+| DES-7c | Kit, part 3: progress and rewards | Story | P0 | M | Todo |
 | DES-15 | Draw the chosen Ms. Luna | Story | P0 | M | Todo |
-| DES-11 | One right/wrong/reveal visual language | Story | P1 | S | Todo |
+| DES-8 | One set of chrome | Story | P0 | M | Todo |
+| DES-10 | Layout grid and breakpoints | Story | P0 | M | Todo |
+| DES-9a | Shell restyle, part 1: home screen and status bar | Story | P0 | M | Todo |
+| DES-9b | Shell restyle, part 2: Settings and the Trophy room | Story | P0 | M | Todo |
+| DES-9c | Shell restyle, part 3: Grade Select | Story | P0 | S | Todo |
 | DES-12 | Luna on screen: one Luna, clear moods | Story | P1 | S | Todo |
+| DES-21 | Library on the kit: header, welcome row, Luna's Pick, Play Shelf | Story | P1 | M | Todo |
 | DES-13 | Lesson path on the hub: in order, one bar | Story | P1 | S | Todo |
+| DES-22a | GameShell on the kit: start, stage, perch, reward | Story | P1 | M | Todo |
+| DES-11 | One right/wrong/reveal visual language | Story | P1 | S | Todo |
+| DES-22b | Games on the kit, part 1: Letter Jar, Bubble Sounds, Letter Cookies, Muddled Cards | Story | P1 | M | Todo |
+| DES-22c | Games on the kit, part 2: Words Off the Page, What's Missing?, Treasure Path, Story Corner | Story | P1 | M | Todo |
+| DES-23 | Lessons on the kit | Story | P1 | M | Todo |
+| DES-24 | Retire the legacy styles | Task | P1 | S | Todo |
 | DES-16 | Light and dark mode | Story | P1 | M | Todo |
 | DES-17 | The moon visits for big milestones | Story | P1 | M | Todo |
 | DES-14 | Feed Luna's cookies look like real, different cookies | Story | P2 | S | Todo |

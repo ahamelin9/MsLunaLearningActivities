@@ -6,7 +6,7 @@ separate app, not a Reading game, because placing marks is a writing skill.
 The alternative is a punctuation game inside Reading, taught as fluency.
 
 ### WRT-1 · Writing app on the home screen
-Story · P1 · M · needs: DES-9
+Story · P1 · M · needs: DES-9a
 - **Why:** a home for the punctuation game and later writing and grammar games.
 - **How:**
   - Register a Writing app in `apps/registry.ts`, built from the DES kit and tokens.

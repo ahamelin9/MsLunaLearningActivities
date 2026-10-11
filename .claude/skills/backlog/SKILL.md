@@ -43,6 +43,15 @@ files when its status changes; the status changes in the board row only. The
 2. Set the ticket to `In progress` on the board.
 3. Before starting, split anything sized **L** into smaller tickets
    (e.g. `DES-9a`, `DES-9b`). Each piece gets its own **Complete when**.
+   **Order of edits when splitting** (DES-7 and DES-9, 2026-10-10):
+   1. add the new sections;
+   2. add their board rows;
+   3. write the old ticket's `Won't do: split…` changelog line;
+   4. remove the old row, then the old section;
+   5. repoint any `needs:` on the old ID.
+
+   A changelog line that names a new ID before its row exists makes the guard
+   refuse that ID as "already used".
 4. Build it.
 5. **Completion check:** go through the **Completion criteria** in the README.
    - **A:** check every point of the ticket's **Complete when**.
