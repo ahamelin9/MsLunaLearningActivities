@@ -1,9 +1,10 @@
 import React from 'react';
-import type { UserProgress } from '../../types/user';
-import { ACHIEVEMENTS } from '../../data/achievements';
-import { soundManager } from '../../utils/audio';
-import { XIcon, StarIcon, TrophyIcon, CheckIcon } from '../ui/Icons';
-import './TrophyModal.scss';
+import type { UserProgress } from '@/types/user';
+import { ACHIEVEMENTS } from '@/data/achievements';
+import { soundManager } from '@/utils/audio';
+import { XIcon, StarIcon, TrophyIcon, CheckIcon } from '@/components/ui/Icons/Icons';
+import { cx } from '@/utils/cx';
+import styles from './TrophyModal.module.scss';
 
 interface TrophyModalProps {
   isOpen: boolean;
@@ -19,25 +20,25 @@ export const TrophyModal: React.FC<TrophyModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="modal-backdrop-blur" onClick={onClose}>
+    <div className={styles.modalBackdropBlur} onClick={onClose}>
       <div
-        className="trophy-modal-card"
+        className={styles.trophyModalCard}
         onClick={e => e.stopPropagation()}
         role="dialog"
         aria-label="Trophy Room"
         data-shot="trophies"
       >
         {/* Header */}
-        <div className="trophy-header">
-          <div className="trophy-title-group">
-            <div className="trophy-badge-icon">
+        <div className={styles.trophyHeader}>
+          <div className={styles.trophyTitleGroup}>
+            <div className={styles.trophyBadgeIcon}>
               <TrophyIcon size={26} />
             </div>
             <div>
-              <h3 className="modal-title">
+              <h3 className={styles.modalTitle}>
                 Trophy & Badge Room
               </h3>
-              <p className="modal-subtitle">
+              <p className={styles.modalSubtitle}>
                 Celebrate your reading accomplishments!
               </p>
             </div>
@@ -47,7 +48,6 @@ export const TrophyModal: React.FC<TrophyModalProps> = ({
               soundManager.playPop();
               onClose();
             }}
-            className="modal-close-btn"
             data-shot="modal-close"
             style={{
               width: '36px',
@@ -66,47 +66,48 @@ export const TrophyModal: React.FC<TrophyModalProps> = ({
         </div>
 
         {/* Stats Highlight Banner */}
-        <div className="trophy-stats-grid">
-          <div className="trophy-stat-card card-stars">
+        <div className={styles.trophyStatsGrid}>
+          <div className={cx(styles.trophyStatCard, styles.cardStars)}>
             <StarIcon size={22} color="#D97706" filled />
-            <span className="stat-number">
+            <span className={styles.statNumber}>
               {progress.totalStars}
             </span>
-            <span className="stat-desc">Stars Earned</span>
+            <span className={styles.statDesc}>Stars Earned</span>
           </div>
 
-          <div className="trophy-stat-card card-streak">
+          <div className={cx(styles.trophyStatCard, styles.cardStreak)}>
             <span style={{ fontSize: '1.4rem' }}>🔥</span>
-            <span className="stat-number">
+            <span className={styles.statNumber}>
               {progress.streakDays}
             </span>
-            <span className="stat-desc">Day Streak</span>
+            <span className={styles.statDesc}>Day Streak</span>
           </div>
 
-          <div className="trophy-stat-card card-lessons">
+          <div className={cx(styles.trophyStatCard, styles.cardLessons)}>
             <span style={{ fontSize: '1.4rem' }}>📖</span>
-            <span className="stat-number">
+            <span className={styles.statNumber}>
               {progress.completedLessons.length}
             </span>
-            <span className="stat-desc">Lessons Won</span>
+            <span className={styles.statDesc}>Lessons Won</span>
           </div>
         </div>
 
         {/* Badges Grid */}
-        <div className="badges-list-section">
-          <span className="badges-section-title">
+        <div className={styles.badgesListSection}>
+          <span className={styles.badgesSectionTitle}>
             Achievements & Badges
           </span>
-          <div className="badges-grid">
+          <div className={styles.badgesGrid}>
             {ACHIEVEMENTS.map(badge => {
               const isUnlocked = progress.unlockedAchievements.includes(badge.id) || badge.requirement(progress);
               return (
                 <div
                   key={badge.id}
-                  className={`badge-item-card ${isUnlocked ? 'unlocked' : 'locked'}`}
+                  className={styles.badgeItemCard}
+                  data-state={isUnlocked ? 'unlocked' : 'locked'}
                 >
                   <div
-                    className="badge-icon-box"
+                    className={styles.badgeIconBox}
                     style={{
                       background: isUnlocked ? badge.badgeColor : '#E2E8F0',
                       color: isUnlocked ? '#FFF' : '#94A3B8'
@@ -114,8 +115,8 @@ export const TrophyModal: React.FC<TrophyModalProps> = ({
                   >
                     {isUnlocked ? badge.iconEmoji : '🔒'}
                   </div>
-                  <div className="badge-details">
-                    <div className="badge-title">
+                  <div className={styles.badgeDetails}>
+                    <div className={styles.badgeTitle}>
                       <span>{badge.title}</span>
                       {isUnlocked && (
                         <span style={{ color: '#10B981', display: 'flex' }}>
@@ -123,7 +124,7 @@ export const TrophyModal: React.FC<TrophyModalProps> = ({
                         </span>
                       )}
                     </div>
-                    <span className="badge-desc">
+                    <span className={styles.badgeDesc}>
                       {badge.description}
                     </span>
                   </div>

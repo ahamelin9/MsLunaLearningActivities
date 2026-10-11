@@ -11,7 +11,7 @@ Task · P1 · S · needs: DES-18d
 
 ### OPS-1 · Delete dead code
 Task · P2 · S
-- (`src/App.css` went with DES-18a, 2026-10-11; `components/os/AppDock` goes with DES-18b.)
+- (`src/App.css` went with DES-18a and `components/os/AppDock` with DES-18b, both 2026-10-11.)
 - `useUserProgress`
 - `getAppById`
 - `AppDefinition.component`

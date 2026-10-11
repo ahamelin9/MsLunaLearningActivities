@@ -1,6 +1,7 @@
 import React, { type ButtonHTMLAttributes } from 'react';
-import { soundManager } from '../../utils/audio';
-import './Button.scss';
+import { soundManager } from '@/utils/audio';
+import { cx } from '@/utils/cx';
+import styles from './Button.module.scss';
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary' | 'success' | 'warning' | 'purple' | 'ghost' | 'icon';
@@ -29,19 +30,11 @@ export const Button: React.FC<ButtonProps> = ({
     onClick?.(e);
   };
 
-  const variantClass = {
-    primary: 'btn-blue',
-    secondary: 'btn-white',
-    success: 'btn-green',
-    warning: 'btn-yellow',
-    purple: 'btn-purple',
-    ghost: 'btn-ghost',
-    icon: 'btn-white'
-  }[variant];
-
   return (
     <button
-      className={`btn-fun size-${size} ${variantClass} ${className}`}
+      className={cx(styles.btnFun, className)}
+      data-size={size}
+      data-variant={variant}
       onClick={handleClick}
       disabled={disabled}
       {...props}

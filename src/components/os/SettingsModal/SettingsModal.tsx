@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import type { UserProgress, UserSettings } from '../../types/user';
-import type { GradeLevel } from '../../types/reading';
-import { storageService } from '../../utils/storage';
-import { soundManager } from '../../utils/audio';
-import { XIcon, RefreshIcon, CheckIcon } from '../ui/Icons';
-import { VoicePicker } from './VoicePicker';
-import { Button } from '../ui/Button';
-import './SettingsModal.scss';
+import type { UserProgress, UserSettings } from '@/types/user';
+import type { GradeLevel } from '@/types/reading';
+import { storageService } from '@/utils/storage';
+import { soundManager } from '@/utils/audio';
+import { XIcon, RefreshIcon, CheckIcon } from '@/components/ui/Icons/Icons';
+import { VoicePicker } from '../VoicePicker/VoicePicker';
+import { Button } from '@/components/ui/Button/Button';
+import styles from './SettingsModal.module.scss';
 
 interface SettingsModalProps {
   isOpen: boolean;
@@ -43,23 +43,23 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   };
 
   return (
-    <div className="modal-backdrop-blur" onClick={onClose}>
+    <div className={styles.modalBackdropBlur} onClick={onClose}>
       <div
-        className="modal-card"
+        className={styles.modalCard}
         onClick={e => e.stopPropagation()}
         role="dialog"
         aria-label="Settings and Preferences"
         data-shot="settings"
       >
         {/* Modal Header */}
-        <div className="modal-header">
-          <div className="header-title-group">
-            <span className="settings-avatar">⚙️</span>
+        <div className={styles.modalHeader}>
+          <div className={styles.headerTitleGroup}>
+            <span className={styles.settingsAvatar}>⚙️</span>
             <div>
-              <h3 className="modal-title">
+              <h3 className={styles.modalTitle}>
                 LunaPad Settings
               </h3>
-              <p className="modal-subtitle">
+              <p className={styles.modalSubtitle}>
                 Audio, speed, and learning controls
               </p>
             </div>
@@ -69,7 +69,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               soundManager.playPop();
               onClose();
             }}
-            className="modal-close-btn"
+            className={styles.modalCloseBtn}
             data-shot="modal-close"
             aria-label="Close Settings"
           >
@@ -78,55 +78,57 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
         </div>
 
         {/* Audio & Voice Settings */}
-        <div className="settings-group">
-          <span className="group-label">
+        <div className={styles.settingsGroup}>
+          <span className={styles.groupLabel}>
             Audio & Speech
           </span>
 
           {/* Sound Effects */}
-          <div className="setting-item-row">
-            <div className="item-left">
-              <span className="item-emoji">🔔</span>
-              <div className="item-text">
-                <span className="item-title">Sound Effects</span>
-                <span className="item-desc">Chimes, pops, and cheer fanfares</span>
+          <div className={styles.settingItemRow}>
+            <div className={styles.itemLeft}>
+              <span className={styles.itemEmoji}>🔔</span>
+              <div className={styles.itemText}>
+                <span className={styles.itemTitle}>Sound Effects</span>
+                <span className={styles.itemDesc}>Chimes, pops, and cheer fanfares</span>
               </div>
             </div>
             <button
               onClick={() => handleUpdateSetting({ soundEnabled: !progress.settings.soundEnabled })}
-              className={`toggle-switch-btn ${progress.settings.soundEnabled ? 'toggle-on' : ''}`}
+              className={styles.toggleSwitchBtn}
+              data-state={progress.settings.soundEnabled ? 'on' : 'off'}
             >
-              <div className="toggle-switch-handle" />
+              <div className={styles.toggleSwitchHandle} />
             </button>
           </div>
 
           {/* Voice Narration */}
-          <div className="setting-item-row">
-            <div className="item-left">
-              <span className="item-emoji">🗣️</span>
-              <div className="item-text">
-                <span className="item-title">Ms. Luna Voice Narration</span>
-                <span className="item-desc">Read words, phonemes, and hints aloud</span>
+          <div className={styles.settingItemRow}>
+            <div className={styles.itemLeft}>
+              <span className={styles.itemEmoji}>🗣️</span>
+              <div className={styles.itemText}>
+                <span className={styles.itemTitle}>Ms. Luna Voice Narration</span>
+                <span className={styles.itemDesc}>Read words, phonemes, and hints aloud</span>
               </div>
             </div>
             <button
               onClick={() => handleUpdateSetting({ speechEnabled: !progress.settings.speechEnabled })}
-              className={`toggle-switch-btn ${progress.settings.speechEnabled ? 'toggle-on' : ''}`}
+              className={styles.toggleSwitchBtn}
+              data-state={progress.settings.speechEnabled ? 'on' : 'off'}
             >
-              <div className="toggle-switch-handle" />
+              <div className={styles.toggleSwitchHandle} />
             </button>
           </div>
 
           {/* Voice Speed */}
-          <div className="setting-item-row">
-            <div className="item-left">
-              <span className="item-emoji">🐢</span>
-              <div className="item-text">
-                <span className="item-title">Voice Speed</span>
-                <span className="item-desc">Beginners often need the slower setting</span>
+          <div className={styles.settingItemRow}>
+            <div className={styles.itemLeft}>
+              <span className={styles.itemEmoji}>🐢</span>
+              <div className={styles.itemText}>
+                <span className={styles.itemTitle}>Voice Speed</span>
+                <span className={styles.itemDesc}>Beginners often need the slower setting</span>
               </div>
             </div>
-            <div className="speed-control" role="group" aria-label="Voice speed">
+            <div className={styles.speedControl} role="group" aria-label="Voice speed">
               {[
                 { label: 'Beginner', value: 0.75 },
                 { label: 'Normal', value: 0.95 },
@@ -138,7 +140,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 return (
                   <button
                     key={option.label}
-                    className={`speed-btn ${isActive ? 'is-active' : ''}`}
+                    className={styles.speedBtn}
+                    data-state={isActive ? 'active' : undefined}
                     onClick={() => handleUpdateSetting({ speechRate: option.value })}
                   >
                     {option.label}
@@ -150,8 +153,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
         </div>
 
         {/* Ms. Luna's Voice */}
-        <div className="settings-group">
-          <span className="group-label">Ms. Luna’s Voice</span>
+        <div className={styles.settingsGroup}>
+          <span className={styles.groupLabel}>Ms. Luna’s Voice</span>
 
           <VoicePicker
             settings={progress.settings}
@@ -161,11 +164,11 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
         </div>
 
         {/* Grade Level Selector */}
-        <div className="settings-group">
-          <span className="group-label">
+        <div className={styles.settingsGroup}>
+          <span className={styles.groupLabel}>
             Current Grade Level
           </span>
-          <div className="grade-selector-grid">
+          <div className={styles.gradeSelectorGrid}>
             {[
               { id: 'kindergarten', label: 'Kindergarten', emoji: '🔤' },
               { id: 'grade1', label: '1st Grade', emoji: '🚀' },
@@ -177,40 +180,41 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   soundManager.playPop();
                   onGradeChange(g.id as GradeLevel);
                 }}
-                className={`grade-select-btn ${progress.selectedGrade === g.id ? 'active' : ''}`}
+                className={styles.gradeSelectBtn}
+                data-state={progress.selectedGrade === g.id ? 'active' : undefined}
               >
-                <span className="grade-btn-emoji">{g.emoji}</span>
-                <span className="grade-btn-label">{g.label}</span>
+                <span className={styles.gradeBtnEmoji}>{g.emoji}</span>
+                <span className={styles.gradeBtnLabel}>{g.label}</span>
               </button>
             ))}
           </div>
         </div>
 
         {/* Reset Progress Area */}
-        <div className="reset-area">
+        <div className={styles.resetArea}>
           {!showResetConfirm ? (
             <button
               onClick={() => {
                 soundManager.playPop();
                 setShowResetConfirm(true);
               }}
-              className="reset-trigger-btn"
+              className={styles.resetTriggerBtn}
             >
               <RefreshIcon size={16} />
               <span>Reset All Learning Progress</span>
             </button>
           ) : (
-            <div className="reset-confirm-box">
-              <div className="confirm-warning">
+            <div className={styles.resetConfirmBox}>
+              <div className={styles.confirmWarning}>
                 <span>⚠️</span>
                 <span>Are you sure? This resets all stars, points, and lessons!</span>
               </div>
               {resetSuccess ? (
-                <div className="reset-success-alert">
+                <div className={styles.resetSuccessAlert}>
                   <CheckIcon size={18} /> Progress Reset Successfully!
                 </div>
               ) : (
-                <div className="confirm-actions">
+                <div className={styles.confirmActions}>
                   <Button
                     variant="warning"
                     size="sm"

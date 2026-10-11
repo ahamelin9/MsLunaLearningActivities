@@ -1,12 +1,12 @@
 import React, { type ReactNode } from 'react';
-import type { AppDefinition } from '../../types/app';
-import type { UserProgress } from '../../types/user';
-import { HomeIcon, BookIcon, MathIcon, ScienceIcon, ArtIcon, Volume2Icon, VolumeXIcon } from '../ui/Icons';
-import { StarBadge } from '../ui/StarBadge';
-import { soundManager } from '../../utils/audio';
-import { storageService } from '../../utils/storage';
-import { VoiceIndicator } from './VoiceIndicator';
-import './AppWindow.scss';
+import type { AppDefinition } from '@/types/app';
+import type { UserProgress } from '@/types/user';
+import { HomeIcon, BookIcon, MathIcon, ScienceIcon, ArtIcon, Volume2Icon, VolumeXIcon } from '@/components/ui/Icons/Icons';
+import { StarBadge } from '@/components/ui/StarBadge/StarBadge';
+import { soundManager } from '@/utils/audio';
+import { storageService } from '@/utils/storage';
+import { VoiceIndicator } from '../VoiceIndicator/VoiceIndicator';
+import styles from './AppWindow.module.scss';
 
 interface AppWindowProps {
   app: AppDefinition;
@@ -51,13 +51,13 @@ export const AppWindow: React.FC<AppWindowProps> = ({
   };
 
   return (
-    <div className="app-window-overlay">
+    <div className={styles.appWindowOverlay}>
       {/* OS App Window Header Bar */}
-      <header className="app-window-header">
-        <div className="header-left">
+      <header className={styles.appWindowHeader}>
+        <div className={styles.headerLeft}>
           <button
             onClick={handleReturnHome}
-            className="home-nav-btn"
+            className={styles.homeNavBtn}
             title="Return to Tablet Home"
             aria-label="Return to Home"
           >
@@ -65,23 +65,23 @@ export const AppWindow: React.FC<AppWindowProps> = ({
             <span>Home</span>
           </button>
 
-          <div className="app-title-group">
+          <div className={styles.appTitleGroup}>
             <div
-              className="app-header-icon"
+              className={styles.appHeaderIcon}
               style={{
                 background: `linear-gradient(135deg, ${app.color} 0%, ${app.accentColor} 100%)`
               }}
             >
               {getIcon(app.iconName, 18)}
             </div>
-            <span className="app-header-title">
+            <span className={styles.appHeaderTitle}>
               {app.name}
             </span>
           </div>
         </div>
 
         {/* Right Header Controls: Voice status, Stars and Audio */}
-        <div className="header-right">
+        <div className={styles.headerRight}>
           <VoiceIndicator />
 
           <StarBadge
@@ -92,7 +92,7 @@ export const AppWindow: React.FC<AppWindowProps> = ({
 
           <button
             onClick={handleToggleSound}
-            className="audio-toggle-btn"
+            className={styles.audioToggleBtn}
             title={isAudioActive ? 'Mute All Audio' : 'Unmute All Audio'}
             aria-label="Toggle Sound"
           >
@@ -106,15 +106,15 @@ export const AppWindow: React.FC<AppWindowProps> = ({
       </header>
 
       {/* App Body Content */}
-      <main className="app-window-content">
+      <main className={styles.appWindowContent}>
         {children}
       </main>
 
       {/* Tablet Bottom Home Indicator Bar */}
-      <footer className="tablet-home-indicator-bar">
+      <footer className={styles.tabletHomeIndicatorBar}>
         <button
           onClick={handleReturnHome}
-          className="tablet-home-pill"
+          className={styles.tabletHomePill}
           title="Tap to return to Home"
           aria-label="Home Indicator Bar"
         />

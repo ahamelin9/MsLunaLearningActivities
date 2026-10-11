@@ -11,7 +11,7 @@ import { pronunciation, type SpeechPart } from '../../../utils/pronunciation';
 import { warmGameIntro } from './warmup';
 import { storageService } from '../../../utils/storage';
 import { launchConfetti } from '../../../utils/confetti';
-import { ArrowLeftIcon, StarIcon } from '../../../components/ui/Icons';
+import { ArrowLeftIcon, StarIcon } from '../../../components/ui/Icons/Icons';
 import './GameShell.scss';
 
 type Phase = 'intro' | 'play' | 'reward';

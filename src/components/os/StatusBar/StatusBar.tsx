@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { SettingsIcon, TrophyIcon, Volume2Icon, VolumeXIcon } from '../ui/Icons';
-import { StarBadge } from '../ui/StarBadge';
-import { storageService } from '../../utils/storage';
-import { soundManager } from '../../utils/audio';
-import type { UserProgress } from '../../types/user';
-import './StatusBar.scss';
-import { VoiceIndicator } from './VoiceIndicator';
+import { SettingsIcon, TrophyIcon, Volume2Icon, VolumeXIcon } from '@/components/ui/Icons/Icons';
+import { StarBadge } from '@/components/ui/StarBadge/StarBadge';
+import { storageService } from '@/utils/storage';
+import { soundManager } from '@/utils/audio';
+import type { UserProgress } from '@/types/user';
+import styles from './StatusBar.module.scss';
+import { VoiceIndicator } from '../VoiceIndicator/VoiceIndicator';
 
 interface StatusBarProps {
   progress: UserProgress;
@@ -48,20 +48,20 @@ export const StatusBar: React.FC<StatusBarProps> = ({
   };
 
   return (
-    <header className="status-bar-container" aria-label="Tablet Status Bar">
+    <header className={styles.statusBarContainer} aria-label="Tablet Status Bar">
       {/* Left side: Clock */}
-      <div className="status-bar-left">
-        <span className="status-bar-time">
+      <div className={styles.statusBarLeft}>
+        <span className={styles.statusBarTime}>
           {currentTime || '9:41 AM'}
         </span>
       </div>
 
       {/* Center: Active App Title (when inside an app) */}
-      <div className="status-bar-center">
+      <div className={styles.statusBarCenter}>
         {appName ? (
           <button
             onClick={onHomeClick}
-            className="app-title-pill"
+            className={styles.appTitlePill}
             title="Return to Home Screen"
           >
             <span>{appName}</span>
@@ -70,7 +70,7 @@ export const StatusBar: React.FC<StatusBarProps> = ({
       </div>
 
       {/* Right side: Star Points, Trophy Room, Audio Mute, Settings */}
-      <div className="status-bar-right">
+      <div className={styles.statusBarRight}>
         <VoiceIndicator />
 
         <StarBadge
@@ -82,20 +82,20 @@ export const StatusBar: React.FC<StatusBarProps> = ({
 
         <button
           onClick={onOpenTrophies}
-          className="status-bar-btn"
+          className={styles.statusBarBtn}
           title="Trophy Room & Badges"
           aria-label="Trophy Room"
           data-shot="open-trophies"
         >
           <TrophyIcon size={18} color="#FFD166" />
           {progress.unlockedAchievements.length > 0 && (
-            <span className="badge-notification-dot" />
+            <span className={styles.badgeNotificationDot} />
           )}
         </button>
 
         <button
           onClick={handleToggleSound}
-          className="status-bar-btn"
+          className={styles.statusBarBtn}
           title={isAudioActive ? 'Mute All Audio' : 'Unmute All Audio'}
           aria-label="Toggle Sound"
         >
@@ -108,7 +108,7 @@ export const StatusBar: React.FC<StatusBarProps> = ({
 
         <button
           onClick={onOpenSettings}
-          className="status-bar-btn"
+          className={styles.statusBarBtn}
           title="Settings & Preferences"
           aria-label="Settings"
           data-shot="open-settings"

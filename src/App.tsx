@@ -6,14 +6,14 @@ import { APP_REGISTRY } from './apps/registry';
 import { storageService } from './utils/storage';
 import { soundManager } from './utils/audio';
 import { pronunciation } from './utils/pronunciation';
-import { StatusBar } from './components/os/StatusBar';
-import { HomeScreen } from './components/os/HomeScreen';
-import { AppWindow } from './components/os/AppWindow';
-import { SettingsModal } from './components/os/SettingsModal';
-import { TrophyModal } from './components/os/TrophyModal';
+import { StatusBar } from './components/os/StatusBar/StatusBar';
+import { HomeScreen } from './components/os/HomeScreen/HomeScreen';
+import { AppWindow } from './components/os/AppWindow/AppWindow';
+import { SettingsModal } from './components/os/SettingsModal/SettingsModal';
+import { TrophyModal } from './components/os/TrophyModal/TrophyModal';
 import { ReadingApp } from './apps/reading/ReadingApp';
-import { ComingSoonApp } from './apps/preview/ComingSoonApp';
-import './App.scss';
+import { ComingSoonApp } from './apps/preview/ComingSoonApp/ComingSoonApp';
+import styles from './App.module.scss';
 
 export function App() {
   const [progress, setProgress] = useState<UserProgress>(storageService.getProgress());
@@ -54,7 +54,7 @@ export function App() {
   };
 
   return (
-    <div className={`tablet-os-root theme-${progress.settings.theme || 'sunset'}`}>
+    <div className={styles.tabletOsRoot} data-theme={progress.settings.theme || 'sunset'}>
       {/* Tablet Top Status Bar */}
       <StatusBar
         progress={progress}
@@ -71,7 +71,7 @@ export function App() {
       />
 
       {/* Main OS View: Either Home Screen or Active App Window */}
-      <div className="os-viewport">
+      <div className={styles.osViewport}>
         {!activeApp ? (
           <HomeScreen
             apps={APP_REGISTRY}

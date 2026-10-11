@@ -1,7 +1,7 @@
 import React from 'react';
-import { Volume2Icon } from './Icons';
-import { soundManager } from '../../utils/audio';
-import './Mascot.scss';
+import { Volume2Icon } from '../Icons/Icons';
+import { soundManager } from '@/utils/audio';
+import styles from './Mascot.module.scss';
 
 interface MascotProps {
   speechText?: string;
@@ -25,17 +25,18 @@ export const Mascot: React.FC<MascotProps> = ({
   };
 
   return (
-    <div className="mascot-container">
+    <div className={styles.mascotContainer}>
       <button
         onClick={handleMascotClick}
-        className={`mascot-avatar size-${size}`}
+        className={styles.mascotAvatar}
+        data-size={size}
         title="Tap Ms. Luna to listen!"
         aria-label="Tap Ms. Luna to listen"
       >
-        <span className="mascot-emoji">
+        <span>
           {expression === 'celebrate' ? '🎉' : expression === 'thinking' ? '🦉' : expression === 'encouraging' ? '✨' : '🦉'}
         </span>
-        <div className="mascot-sound-indicator">
+        <div className={styles.mascotSoundIndicator}>
           <Volume2Icon size={14} />
         </div>
       </button>
@@ -43,13 +44,13 @@ export const Mascot: React.FC<MascotProps> = ({
       {speechText && (
         <div
           onClick={handleMascotClick}
-          className="mascot-speech-bubble"
+          className={styles.mascotSpeechBubble}
         >
-          <div className="speech-arrow" />
-          <p className="mascot-speech-text">
+          <div className={styles.speechArrow} />
+          <p className={styles.mascotSpeechText}>
             {speechText}
           </p>
-          <span className="mascot-tap-prompt">
+          <span className={styles.mascotTapPrompt}>
             <Volume2Icon size={12} /> Tap to hear again
           </span>
         </div>

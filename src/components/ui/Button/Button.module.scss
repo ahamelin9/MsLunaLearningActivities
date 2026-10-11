@@ -1,5 +1,5 @@
-@use '../../styles/variables' as *;
-@use '../../styles/mixins' as *;
+@use 'styles/variables' as *;
+@use 'styles/mixins' as *;
 
 .btn-fun {
   display: inline-flex;
@@ -33,64 +33,65 @@
     pointer-events: none;
   }
 
-  &.size-sm {
+  &[data-size="sm"] {
     padding: 0.45rem 0.9rem;
     font-size: 0.875rem;
     gap: 0.35rem;
   }
 
-  &.size-md {
+  &[data-size="md"] {
     padding: 0.75rem 1.4rem;
     font-size: 1.05rem;
     gap: 0.5rem;
   }
 
-  &.size-lg {
+  &[data-size="lg"] {
     padding: 0.9rem 1.8rem;
     font-size: 1.2rem;
     gap: 0.65rem;
     border-radius: 1.5rem;
   }
 
-  &.size-xl {
+  &[data-size="xl"] {
     padding: 1.1rem 2.2rem;
     font-size: 1.35rem;
     gap: 0.75rem;
     border-radius: 1.75rem;
   }
 
-  &.btn-blue {
+  &[data-variant="primary"] {
     background: $color-blue;
     color: #FFFFFF;
     border-bottom-color: $color-blue-dark;
   }
 
-  &.btn-green {
+  &[data-variant="success"] {
     background: $color-green;
     color: #FFFFFF;
     border-bottom-color: $color-green-dark;
   }
 
-  &.btn-purple {
+  &[data-variant="purple"] {
     background: $color-primary;
     color: #FFFFFF;
     border-bottom-color: $color-primary-dark;
   }
 
-  &.btn-yellow {
+  &[data-variant="warning"] {
     background: $color-orange;
     color: #FFFFFF;
     border-bottom-color: $color-orange-dark;
   }
 
-  &.btn-white {
+  &[data-variant="secondary"],
+  &[data-variant="icon"] {
     background: #FFFFFF;
     color: $color-text-dark;
     border: 2px solid #E2E8F0;
     border-bottom: 4px solid #CBD5E1;
   }
 
-  &.btn-ghost {
+  &[data-variant="ghost"] {
     background: rgba(255, 255, 255, 0.2);
     color: #FFFFFF;
     border: 1px solid rgba(255, 255, 255, 0.35);

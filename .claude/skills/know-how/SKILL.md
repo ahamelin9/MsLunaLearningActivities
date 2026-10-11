@@ -150,7 +150,8 @@ Copy `speech-check.cjs` from this folder and edit its scenario. It already:
   argument is the text.
 - times every clip by wrapping `AudioBufferSourceNode.prototype.start/stop`.
 
-Selectors that work: `.ipad-reading-app-card`; `.grade-card-item` (0 K, 1 1st,
+Selectors that work: `[data-shot="open-reading"]` for the home icon (its
+class went with DES-18b); `.grade-card-item` (0 K, 1 1st,
 2 2nd); lessons are `.hub-lessons .game-thing` and games are
 `.hub-rug .game-thing:not(.nook)`, both named by `.thing-title`;
 `.play-button`; `.game-shell.phase-play` / `.phase-reward`; and
@@ -230,6 +231,38 @@ Pitfalls that cost time:
   (the status bar's bottom line shows on 24 of 26 screens at y 47), or one
   pixel of a copied run with `pixel-poke.cjs` in this folder: 9 per channel
   shows up as 1 pixel, 8 doesn't.
+
+## A move to CSS modules: proving nothing changed, even what no screenshot shows
+
+*2026-10-11 · DES-18b*
+
+- **Symptom:** `ui:shots --diff` says 0 changed screens, but the shots never
+  reach some states: a loading badge, a "playing" pulse, a Button variant, a
+  screen no shot visits (ComingSoonApp). A wrong `data-state` selector there
+  would pass unseen.
+- **Cause:** the diff only proves what the 26 screens show. Modules also break
+  in ways a shot may miss: a `styles.x` with a typo is `undefined` (no class,
+  no error), and a class or `@keyframes` that another file defined stops
+  matching, because each module renames its own.
+- **Fix:** before converting, find what crosses files: a class one file
+  styles and another renders, and keyframes used outside their file
+  (Trophy's backdrop and pop-in lived in `SettingsModal.scss`, the home bubbles
+  in `App.scss`). Move each one to the file that uses it, or copy it with a
+  comment naming the ticket that removes the copy. The changelog's DES-18b
+  entry has the table of what becomes what.
+- **Check:** three things.
+  - `ui:shots --diff before after`: 0 changed screens, after the in-place
+    conversion and again after the move into folders.
+  - `node .claude/skills/know-how/module-refs-check.mjs "$PWD" <folders>`:
+    every `styles.x` resolves and no `className="…"` is left. It fails on a
+    folder not converted yet, and on a planted typo.
+  - `git archive HEAD src | tar -x -C <scratch>/head`, then
+    `node .claude/skills/know-how/css-rules-compare.mjs "$PWD" <scratch>/head <map.json>`:
+    compiles every old `X.scss` and new `X.module.scss`, maps the old state
+    classes to the new selectors, and lists any rule that differs. Rules that
+    only moved between files cancel out. Write the ticket's renames into the
+    map (`[["\\.toggle-on", "[data-state=on]"], …]`). Without the map it
+    fails, which proves it can.
 
 ## A hook test says nothing, but the hook is fine
 

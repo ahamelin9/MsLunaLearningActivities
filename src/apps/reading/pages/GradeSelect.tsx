@@ -3,8 +3,8 @@ import type { GradeLevel } from '../../../types/reading';
 import { GRADES } from '../../../data/readingCurriculum';
 import { soundManager } from '../../../utils/audio';
 import { pronunciation, type SpeechPart } from '../../../utils/pronunciation';
-import { Mascot } from '../../../components/ui/Mascot';
-import { SparklesIcon, ArrowRightIcon } from '../../../components/ui/Icons';
+import { Mascot } from '../../../components/ui/Mascot/Mascot';
+import { SparklesIcon, ArrowRightIcon } from '../../../components/ui/Icons/Icons';
 import './GradeSelect.scss';
 
 /** Written out whole so each is a rendered clip. */

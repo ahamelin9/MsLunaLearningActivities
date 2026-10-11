@@ -1,9 +1,9 @@
 import React from 'react';
-import type { AppDefinition } from '../../types/app';
-import { soundManager } from '../../utils/audio';
-import { SparklesIcon, HomeIcon } from '../../components/ui/Icons';
-import { Button } from '../../components/ui/Button';
-import './ComingSoonApp.scss';
+import type { AppDefinition } from '@/types/app';
+import { soundManager } from '@/utils/audio';
+import { SparklesIcon, HomeIcon } from '@/components/ui/Icons/Icons';
+import { Button } from '@/components/ui/Button/Button';
+import styles from './ComingSoonApp.module.scss';
 
 interface ComingSoonAppProps {
   app: AppDefinition;
@@ -15,9 +15,9 @@ export const ComingSoonApp: React.FC<ComingSoonAppProps> = ({
   onReturnHome
 }) => {
   return (
-    <div className="coming-soon-container">
+    <div className={styles.comingSoonContainer}>
       <div
-        className="coming-soon-icon"
+        className={styles.comingSoonIcon}
         style={{
           background: `linear-gradient(135deg, ${app.color} 0%, ${app.accentColor} 100%)`
         }}
@@ -25,20 +25,20 @@ export const ComingSoonApp: React.FC<ComingSoonAppProps> = ({
         <span>{app.iconName === 'math' ? '🔢' : app.iconName === 'science' ? '🧪' : '🎨'}</span>
       </div>
 
-      <div className="in-lab-pill">
+      <div className={styles.inLabPill}>
         <SparklesIcon size={14} color="#7E22CE" /> In Ms. Luna's Workshop
       </div>
 
-      <h2 className="coming-soon-title">
+      <h2 className={styles.comingSoonTitle}>
         {app.name} is Coming Soon!
       </h2>
 
-      <p className="coming-soon-desc">
+      <p className={styles.comingSoonDesc}>
         Ms. Luna is busy drawing pictures and building fun learning games for {app.name}.
         Check back soon for new adventures!
       </p>
 
-      <div className="coming-soon-actions">
+      <div className={styles.comingSoonActions}>
         <Button
           variant="primary"
           size="lg"

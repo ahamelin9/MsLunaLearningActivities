@@ -1,0 +1,34 @@
+@use './styles/variables' as *;
+@use './styles/mixins' as *;
+
+.tablet-os-root {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+  color: $color-text-dark;
+  font-family: $font-main;
+  transition: background 0.5s ease;
+
+  &[data-theme="sunset"] {
+    background: linear-gradient(145deg, #1e0938 0%, #3b1366 30%, #6d28d9 65%, #db2777 100%);
+  }
+
+  &[data-theme="day"] {
+    background: linear-gradient(145deg, #1E3A8A 0%, #3B82F6 40%, #60A5FA 70%, #93C5FD 100%);
+  }
+
+  &[data-theme="cosmic"] {
+    background: linear-gradient(145deg, #0F172A 0%, #1E1B4B 45%, #312E81 75%, #4C1D95 100%);
+  }
+}
+
+.os-viewport {
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+

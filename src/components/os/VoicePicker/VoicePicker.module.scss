@@ -1,4 +1,4 @@
-@use '../../styles/variables' as *;
+@use 'styles/variables' as *;
 
 .voice-picker {
   display: flex;
@@ -26,9 +26,9 @@
       flex: 0 0 auto;
     }
 
-    &.state-ready .status-dot { background: $color-green; box-shadow: 0 0 0 3px rgba(6, 214, 160, 0.22); }
-    &.state-loading .status-dot { background: $color-amber; animation: voicePulse 1s ease-in-out infinite; }
-    &.state-unavailable .status-dot { background: $color-orange; }
+    &[data-state="ready"] .status-dot { background: $color-green; box-shadow: 0 0 0 3px rgba(6, 214, 160, 0.22); }
+    &[data-state="loading"] .status-dot { background: $color-amber; animation: voicePulse 1s ease-in-out infinite; }
+    &[data-state="unavailable"] .status-dot { background: $color-orange; }
 
     .status-text { flex: 1; min-width: 140px; }
 
@@ -77,7 +77,7 @@
       color: #475569;
       cursor: pointer;
 
-      &.is-active {
+      &[data-state="active"] {
         border-color: $color-primary;
         background: $color-primary-light;
         color: $color-primary-dark;
@@ -134,12 +134,12 @@
       background: $color-primary-light;
       color: $color-primary;
 
-      &.is-playing { animation: voicePulse 0.8s ease-in-out infinite; }
+      &[data-state="playing"] { animation: voicePulse 0.8s ease-in-out infinite; }
     }
 
     &:hover { border-color: #C084FC; transform: translateY(-1px); }
 
-    &.is-active {
+    &[data-state="active"] {
       border-color: $color-primary;
       background: $color-primary-light;
     }

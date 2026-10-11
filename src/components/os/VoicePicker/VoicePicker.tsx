@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import type { UserSettings } from '../../types/user';
-import { DEFAULT_VOICE_ID, LUNA_VOICES, pronunciation, type VoiceStatus } from '../../utils/pronunciation';
-import { soundManager } from '../../utils/audio';
-import { SpeakerIcon, CheckIcon } from '../ui/Icons';
-import './VoicePicker.scss';
+import type { UserSettings } from '@/types/user';
+import { DEFAULT_VOICE_ID, LUNA_VOICES, pronunciation, type VoiceStatus } from '@/utils/pronunciation';
+import { soundManager } from '@/utils/audio';
+import { SpeakerIcon, CheckIcon } from '@/components/ui/Icons/Icons';
+import styles from './VoicePicker.module.scss';
 
 interface VoicePickerProps {
   settings: UserSettings;
@@ -83,20 +83,20 @@ export const VoicePicker: React.FC<VoicePickerProps> = ({ settings, onChange }) 
   })();
 
   return (
-    <div className="voice-picker">
-      <div className={`voice-status state-${status.state}`}>
-        <span className="status-dot" aria-hidden="true" />
-        <span className="status-text">{statusLine}</span>
+    <div className={styles.voicePicker}>
+      <div className={styles.voiceStatus} data-state={status.state}>
+        <span className={styles.statusDot} aria-hidden="true" />
+        <span className={styles.statusText}>{statusLine}</span>
 
         {status.state === 'loading' && (
-          <span className="status-bar" aria-hidden="true">
-            <span className="status-fill" style={{ width: `${status.progress}%` }} />
+          <span className={styles.statusBar} aria-hidden="true">
+            <span className={styles.statusFill} style={{ width: `${status.progress}%` }} />
           </span>
         )}
 
         {(status.state === 'idle' || status.state === 'unavailable') && (
           <button
-            className="status-action"
+            className={styles.statusAction}
             onClick={() => {
               soundManager.playPop();
               void pronunciation.init().then(ok => {
@@ -109,13 +109,14 @@ export const VoicePicker: React.FC<VoicePickerProps> = ({ settings, onChange }) 
         )}
       </div>
 
-      <div className="language-row" role="group" aria-label="Accent">
+      <div className={styles.languageRow} role="group" aria-label="Accent">
         {(['en-US', 'en-GB'] as const)
           .filter(code => available.some(v => v.language === code))
           .map(code => (
           <button
             key={code}
-            className={`language-chip ${language === code ? 'is-active' : ''}`}
+            className={styles.languageChip}
+            data-state={language === code ? 'active' : undefined}
             onClick={() => {
               soundManager.playPop();
               const first = available.find(v => v.language === code);
@@ -128,23 +129,27 @@ export const VoicePicker: React.FC<VoicePickerProps> = ({ settings, onChange }) 
         ))}
       </div>
 
-      <div className="voice-list">
+      <div className={styles.voiceList}>
         {voices.map(voice => {
           const isActive = voiceId === voice.id;
           return (
             <button
               key={voice.id}
-              className={`voice-option ${isActive ? 'is-active' : ''}`}
+              className={styles.voiceOption}
+              data-state={isActive ? 'active' : undefined}
               onClick={() => preview(voice.id)}
             >
-              <span className="voice-info">
-                <span className="voice-name">
+              <span>
+                <span className={styles.voiceName}>
                   {voice.name}
                   {isActive && <CheckIcon size={13} />}
                 </span>
-                <span className="voice-desc">{voice.description}</span>
+                <span className={styles.voiceDesc}>{voice.description}</span>
               </span>
-              <span className={`voice-play ${previewing === voice.id ? 'is-playing' : ''}`}>
+              <span
+                className={styles.voicePlay}
+                data-state={previewing === voice.id ? 'playing' : undefined}
+              >
                 <SpeakerIcon size={15} />
               </span>
             </button>
@@ -152,7 +157,7 @@ export const VoicePicker: React.FC<VoicePickerProps> = ({ settings, onChange }) 
         })}
       </div>
 
-      <p className="voice-note">
+      <p className={styles.voiceNote}>
         Tap a voice to hear it. Ms. Luna speaks from audio built into the app — nothing is
         sent to a server.
       </p>

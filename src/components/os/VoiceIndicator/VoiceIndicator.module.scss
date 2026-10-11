@@ -1,4 +1,4 @@
-@use '../../styles/variables' as *;
+@use 'styles/variables' as *;
 
 .voice-indicator {
   display: inline-flex;
@@ -29,20 +29,20 @@
     }
   }
 
-  &.is-loading {
+  &[data-state="loading"] {
     background: #FEF3C7;
     color: #92400E;
     border: 1.5px solid #FCD34D;
     .vi-owl { animation: viBob 1.1s ease-in-out infinite; }
   }
 
-  &.is-ready {
+  &[data-state="ready"] {
     background: #DCFCE7;
     color: #166534;
     border: 1.5px solid #86EFAC;
   }
 
-  &.is-fallback {
+  &[data-state="fallback"] {
     background: #F1F5F9;
     color: #475569;
     border: 1.5px solid #CBD5E1;

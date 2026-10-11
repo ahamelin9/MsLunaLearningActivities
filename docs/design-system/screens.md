@@ -51,7 +51,10 @@ GAME ticket.
 1. **Start from the board** if one exists (the style sample, page "Round 2 ·
    Teacher's picks"). If none exists, build it from the kit, and Alex OKs the
    screenshots.
-2. **Make its folder** with `<Name>.tsx` and `<Name>.module.scss`.
+2. **Make its folder** with `<Name>.tsx` and `<Name>.module.scss`. Take class
+   names from the module (`styles.card`) and join them with `cx()` from
+   `src/utils/cx.ts`. A stylesheet loads partials from `src/`
+   (`@use 'styles/mixins'`), and TypeScript can import from `@/`.
 3. **Lay it out from kit components.** Write styles only for layout and for
    what's truly this screen's own, using roles, the space scale and the
    breakpoint mixin.

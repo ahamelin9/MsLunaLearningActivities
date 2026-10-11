@@ -46,7 +46,7 @@ them in.
 | # | Stage | Tickets | What you have at the end |
 |---|---|---|---|
 | 1 | Guardrails | DES-25 (done 2026-10-10) | Claude gets the right standards before any UI edit; people get a pre-commit check |
-| 2 | Structure (pure refactors, nothing looks different) | DES-18a (done 2026-10-11) → DES-18b → DES-18c → DES-18d, DES-18e | Screenshots you can compare; one folder per page, game and lesson; CSS modules; `games.scss` gone |
+| 2 | Structure (pure refactors, nothing looks different) | DES-18a, DES-18b (done 2026-10-11) → DES-18c → DES-18d, DES-18e | Screenshots you can compare; one folder per page, game and lesson; CSS modules; `games.scss` gone |
 | 3 | Foundations | DES-3 → DES-19 → DES-20 → DES-4 → DES-5 → DES-6 | Tokens in light and dark; lint enforces the rules after every edit; the Kit page; Andika and Fraunces offline; shared motion; reduced motion |
 | 4 | The kit | DES-7a → DES-7b, DES-7c → DES-15 | Every kit component on the Kit page in every state, and the new Luna |
 | 5 | Frame and shell | DES-8 → DES-10 → DES-9a → DES-9b → DES-9c → DES-12 | One header, the layout grid, the restyled home, Settings, trophies and Grade Select; one Luna per screen |
@@ -66,25 +66,8 @@ them in.
 - **DES-14** (P2) touches the same folder as DES-22b and can slot in straight after it.
 - **P0 bugs** can still be pulled in between tickets for a break from styling.
 
-### DES-18b · Module setup, then the shell and UI as modules in folders
-Task · P0 · M · needs: —
-- **Why:** global SCSS lets moved files collide. CSS modules make collisions impossible (Alex's call, 2026-10-10).
-- **How:**
-  - **Setup:**
-    - `vite.config.ts`: `css.modules.localsConvention: 'camelCaseOnly'`, and `css.preprocessorOptions.scss.loadPaths` set to the absolute `src`;
-    - an `@/` alias in Vite and the tsconfig, for TypeScript only;
-    - a small `cx()` helper in `src/utils/`.
-  - **Convert in place, then move:** each file in `components/os/` and `components/ui/` becomes `Name.module.scss` in its current place, with the same selectors and order. Diff. Then each moves into its own folder (`components/os/HomeScreen/HomeScreen.tsx` + `.module.scss`). Diff again.
-  - State classes become `data-*` attributes (`is-active` becomes `data-state="active"`), which keeps the specificity the same.
-  - The same goes for `App.scss` and `apps/preview/ComingSoonApp`.
-  - Delete `AppDock` (never rendered; taken from OPS-1).
-- **Complete when:**
-  - `--diff before after` shows 0 differing screens at 4 sizes;
-  - no global class is left in `components/os`, `components/ui`, `App` or `apps/preview`;
-  - `AppDock` is gone, and build and lint pass.
-
 ### DES-18c · Reading pages, GameShell and LunaOwl as modules in folders
-Task · P0 · M · needs: DES-18b
+Task · P0 · M · needs: —
 - **How:**
   - `pages/ReadingHub` becomes `pages/Hub/`, plus `pages/GradeSelect/`, `engine/GameShell/` and `engine/LunaOwl/`, each converted in place and then moved, as in DES-18b.
   - The template-built class names (`shape-${…}`, `flash-${…}`, `phase-${…}`, `is-*`) become `data-shape`, `data-flash`, `data-phase` and `data-state`.
@@ -173,7 +156,7 @@ Task · P0 · M · needs: DES-3, DES-18e
   - the map and the skill explain how to read a failure.
 
 ### DES-20 · Kit page (dev only) and its screenshots
-Task · P0 · M · needs: DES-3, DES-18b
+Task · P0 · M · needs: DES-3
 - **Why:** one place to see every token and component, in every state, in light and dark, so a restyle can be judged at a glance.
 - **How:**
   - `src/dev/KitPage/`, opened with `?kit` only when `import.meta.env.DEV`, and lazy-loaded so the production build has none of it.

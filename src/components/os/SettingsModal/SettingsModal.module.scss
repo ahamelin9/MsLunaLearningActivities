@@ -1,5 +1,5 @@
-@use '../../styles/variables' as *;
-@use '../../styles/mixins' as *;
+@use 'styles/variables' as *;
+@use 'styles/mixins' as *;
 
 .modal-backdrop-blur {
   position: fixed;
@@ -135,7 +135,7 @@
       position: relative;
       transition: background 0.2s ease;
 
-      &.toggle-on {
+      &[data-state="on"] {
         background: $color-green;
         .toggle-switch-handle {
           transform: translateX(20px);
@@ -180,7 +180,7 @@
           color: $color-text-dark;
         }
 
-        &.active {
+        &[data-state="active"] {
           border-color: $color-primary;
           background: #FAF5FF;
           box-shadow: 0 4px 12px rgba(126, 34, 206, 0.15);
@@ -190,7 +190,7 @@
           }
         }
 
-        &:hover:not(.active) {
+        &:hover:not([data-state="active"]) {
           background: #F1F5F9;
         }
       }
@@ -299,7 +299,7 @@
 
     &:hover { background: #F1F5F9; }
 
-    &.is-active {
+    &[data-state="active"] {
       background: #7E22CE;
       color: #FFFFFF;
     }
