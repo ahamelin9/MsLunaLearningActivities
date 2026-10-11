@@ -39,7 +39,7 @@ LAYER 1 · PRIMITIVES                          src/styles/tokens/_primitives.scs
 LAYER 2 · ROLES                               src/styles/tokens/_roles.scss
   colour roles, each with a light and a dark value:
     ground, card, edge, well, soil, ink, ink-soft, accent, action,
-    pressed, right, try again, rare, super rare, focus, grain…
+    right, try again, rare, super rare, picture tints, focus, grain…
   plus elevation, radius, type, motion, z-index and target roles
   CSS custom properties, so light/dark and reduced motion can swap them
           │                                   ┌───────────────────────────────────┐
@@ -70,7 +70,8 @@ Raw colours may appear in two files only: `_primitives.scss` and
 | Illustration palette | `src/styles/tokens/_illustration.scss` | DES-3 |
 | Type roles and fonts | the tokens, `src/styles/base/_fonts.scss`, `public/fonts/` | DES-4 |
 | Motion roles and keyframes | `src/styles/motion/` | DES-5 |
-| Mixins (breakpoints, press, focus ring) | `src/styles/_mixins.scss`, the one partial a module may `@use` | DES-3 |
+| Mixins: `bp()` for breakpoints, `focus-ring`, and the press (DES-5) | `src/styles/_mixins.scss`, the one partial a module may `@use`; `bp()` lives in `tokens/_breakpoints.scss` | DES-3, DES-5 |
+| Proof that every colour on the approved boards has a token | `node .claude/skills/luna-design/prototype/tokens-check.mjs "$PWD"` | DES-3 |
 | The one global stylesheet | `src/styles/global.scss`, imported by `main.tsx` | DES-3 |
 | Kit components | `src/components/kit/<Name>/`, listed in `kit/index.ts` | DES-7a–c, DES-15, DES-17 |
 | The tablet shell (home, status bar, Settings, trophies) | `src/components/os/<Name>/` | DES-18b |
@@ -140,7 +141,7 @@ Each ticket updates its row when it closes (Completion criteria B7 in
 | Hooks at the moment of editing | `.claude/hooks/`, `.githooks/` | Before-edit hook and pre-commit check built (DES-25, 2026-10-10); the after-edit check comes with DES-19 | DES-25, DES-19 |
 | Screenshots you can compare | `scripts/ui/shots.mjs` | Done (DES-18a, 2026-10-11): same pixels every run on a page clock, `--diff` with red overlays, found by `data-shot` | DES-18a |
 | Source tree and CSS modules | `src/` | Done (2026-10-11): every page, game and lesson type has its own folder and CSS module, and no global class is left in `src/` (`module-refs-check.mjs`). Only the legacy partials and `index.css` stay global until DES-24 | DES-18b–e |
-| Tokens | `src/styles/tokens/` | Planned | DES-3 |
+| Tokens | `src/styles/tokens/` | Done (DES-3, 2026-10-11): primitives, roles in light and dark (the build fails if one is missing), the illustration palette, `bp()`, `global.scss` and `base/`. Every colour on the round 2 boards has a token (`tokens-check.mjs`). The app is pinned light on `<html>`; nothing reads the tokens yet | DES-3 |
 | Design check and contrast check | `scripts/design/` | Planned | DES-19 |
 | Kit page | `src/dev/KitPage/` | Planned | DES-20 |
 | Type and fonts | tokens, `public/fonts/` | Planned | DES-4 |

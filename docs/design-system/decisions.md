@@ -55,6 +55,14 @@ mentioned and what the prototype follows"). A future proposal is marked
 | 2026-10-10 | Screens read roles and the space scale only; component tokens belong to kit components | Alex (plan) | Space has no meaning beyond its size, so it needs no role | DES-3 |
 | 2026-10-10 | The app stays pinned to light until DES-16 | Alex (plan) | Following the iPad mid-migration would show half-dark screens | DES-3, DES-16 |
 | 2026-10-10 | No `light-dark()`; plain custom properties | Claude | It needs a newer iPadOS than some classroom tablets have | DES-3 |
+| 2026-10-11 | Light is pinned with `data-theme="light"` on `<html>`, the element DES-16 will switch | Claude, Alex OK | One place sets the mode, for the app and the Kit page alike | DES-3, DES-16 |
+| 2026-10-11 | `--action-glow` is the main button's colour at 45% in each mode, and the listening "?" pulses with it too (it was 35%) | Claude, Alex OK | The prototype typed the light colour into its glow in both modes; there's one glow | DES-3, DES-5 |
+| 2026-10-11 | No `--pressed` role: `--action-edge` is the pressed ledge | Claude, Alex OK | The two held the same values | DES-3 |
+| 2026-10-11 | The home pieces tuned to the sky (the "Tap to play" ledge, the glass behind the gear, the home indicator) are scenery colours in the illustration palette, not roles | Claude, Alex OK | They exist only over the home scenery and switch with it | DES-3, DES-9a |
+| 2026-10-11 | Illustration colours are named by thing and part (`--illo-luna-feather`), and values repeat across things on purpose | Claude, Alex OK | A character keeps her look if the interface palette changes | DES-3 |
+| 2026-10-11 | Only the teacher's picks get illustration colours: owl 1 and the milestone moon. The other Luna options and the progress seed are left out | Claude, Alex OK | They weren't chosen | DES-3 |
+| 2026-10-11 | The breakpoints start as `narrow` (under 900px wide) and `short` (under 800px tall) | Claude, Alex OK | Where the four target sizes split; DES-10 settles the set | DES-3, DES-10 |
+| 2026-10-11 | Today's Feed Luna cookie colours go in the illustration palette until DES-14 draws new cookies | Claude, Alex OK | No board shows a cookie | DES-3, DES-14 |
 
 ## Standards settled on 2026-10-10 (Alex approved)
 

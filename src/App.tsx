@@ -54,7 +54,7 @@ export function App() {
   };
 
   return (
-    <div className={styles.tabletOsRoot} data-theme={progress.settings.theme || 'sunset'}>
+    <div className={styles.tabletOsRoot}>
       {/* Tablet Top Status Bar */}
       <StatusBar
         progress={progress}

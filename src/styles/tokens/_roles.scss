@@ -1,0 +1,180 @@
+// Layer 2 · Roles: what screens and kit components read (DES-3).
+//
+// Every role is a CSS custom property named for its job (colour.md has the
+// table). Colour roles are written once below as `role: (light, dark)`, and
+// roles() outputs the whole list twice: under `:root, [data-theme="light"]`
+// and under `[data-theme="dark"]`. Roles built from colours (elevation, the
+// paper grain) are in both blocks too, so they switch with the mode. No
+// `light-dark()`: older classroom iPads don't have it.
+//
+// The app stays light until DES-16 (`data-theme="light"` on <html>).
+// A new role is step 3 of the ladder in fitting-in.md: Alex's OK, both values,
+// its text pairs, and a line in decisions.md.
+
+@use 'sass:list';
+@use 'sass:map';
+@use 'primitives' as p;
+
+// ── Colour roles: (light, dark) ────────────────────────────────────────────
+$colours: (
+  // the page background, under the paper grain
+  ground: (p.$oat, p.$night-cocoa),
+  // the paper texture's two dot layers
+  grain: (p.$grain-day, p.$grain-night),
+  grain-2: (p.$grain-day-2, p.$grain-night-2),
+  // cards, panels, answer choices, speech bubbles
+  card: (p.$cream, p.$espresso),
+  // borders, and the hard ledge under cards
+  edge: (p.$sand, p.$bark),
+  // chips, wells, empty slots, locked lessons
+  well: (p.$oat, p.$cocoa-bean),
+  // planks, shelves and arches
+  soil: (p.$latte, p.$loam),
+  soil-deep: (p.$toast, p.$loam-deep),
+  // all main text
+  ink: (p.$cocoa, p.$milk),
+  // quiet text: captions, "about 5 min"
+  ink-soft: (p.$mocha, p.$oat-milk),
+  // stars, Luna's Pick, highlights; with its text and ledge
+  accent: (p.$caramel, p.$caramel-glow),
+  accent-ink: (p.$cocoa, p.$night-cocoa),
+  accent-edge: (p.$toffee, p.$toffee-night),
+  // soft accent fills and the text on them: "Up next", the prompt pill
+  accent-soft: (p.$linen, p.$mocha-night),
+  accent-text: (p.$walnut, p.$honey-milk),
+  // the main button on a screen; its edge is the pressed ledge, never text
+  action: (p.$toffee, p.$caramel-glow),
+  action-ink: (p.$white, p.$night-cocoa),
+  action-edge: (p.$walnut, p.$toffee-night),
+  // the "up next" glow that pulses round the main thing to do
+  action-glow: (p.$glow-day, p.$glow-night),
+  // a right answer, the "Lesson done!" mark
+  right: (p.$olive, p.$sage-night),
+  right-ink: (p.$white, p.$night-cocoa),
+  right-edge: (p.$olive-deep, p.$moss),
+  right-glow: (p.$right-glow-day, p.$right-glow-night),
+  // soft right fills and their text: "took 4 min", a found ListenCue
+  right-soft: (p.$sage-mist, p.$moss-night),
+  right-text: (p.$olive-dark, p.$sage-pale),
+  // a wrong answer: a soft tint and an edge, never red
+  try-again-soft: (p.$clay-mist, p.$clay-night),
+  try-again-edge: (p.$clay, p.$clay-glow),
+  try-again-text: (p.$clay-deep, p.$clay-pale),
+  // a rare squishy colour's tag, and its shimmer
+  rare-soft: (p.$clay-mist, p.$clay-night),
+  rare-edge: (p.$rose-clay, p.$rose-clay),
+  rare-text: (p.$clay-deep, p.$clay-pale),
+  rare-glow: (p.$rare-glow, p.$rare-glow),
+  // a super-rare squishy colour's tag
+  super-rare-soft: (p.$butter, p.$honey-night),
+  super-rare-edge: (p.$honey, p.$honey-glow),
+  super-rare-text: (p.$walnut, p.$honey-pale),
+  // soft tints behind the pictures on Play Shelf tiles
+  picture-1: (p.$sage-mist, p.$moss-night),
+  picture-2: (p.$oat-deep, p.$cocoa-bean),
+  picture-3: (p.$linen, p.$mocha-night),
+  picture-4: (p.$sand, p.$bark),
+  picture-5: (p.$blush-mist, p.$clay-night),
+  // the keyboard focus ring
+  focus: (p.$cocoa, p.$milk),
+  // the soft colour of shadows, for card and lifted
+  shade: (p.$shade-day, p.$shade-night),
+  shade-deep: (p.$shade-day-deep, p.$shade-night-deep),
+  // highlights on pressable things
+  shine: (p.$shine-day, p.$shine-night),
+);
+
+// ── Text pairs ─────────────────────────────────────────────────────────────
+// Each text role and the roles it sits on. scripts/design/contrast.mjs
+// (DES-19) checks every pair at 4.5:1 or more, in light and in dark.
+$text-pairs: (
+  ink: (ground, card, well, soil, edge, accent-soft, right-soft, try-again-soft),
+  ink-soft: (ground, card, well),
+  accent-ink: (accent),
+  accent-text: (accent-soft, card),
+  action-ink: (action),
+  right-ink: (right),
+  right-text: (right-soft, card),
+  try-again-text: (try-again-soft, card),
+  rare-text: (rare-soft),
+  super-rare-text: (super-rare-soft),
+);
+
+@each $text, $grounds in $text-pairs {
+  @each $role in list.join($text, $grounds) {
+    @if not map.has-key($colours, $role) {
+      @error 'Text pair #{$text}: there is no colour role called #{$role}.';
+    }
+  }
+}
+
+// ── The full list, for one mode ────────────────────────────────────────────
+@mixin roles($mode) {
+  $at: 1;
+  @if $mode == dark {
+    $at: 2;
+  } @else if $mode != light {
+    @error 'roles() takes light or dark, not #{$mode}.';
+  }
+
+  color-scheme: $mode;
+
+  @each $name, $pair in $colours {
+    @if list.length($pair) != 2 {
+      @error 'Colour role --#{$name} needs a light and a dark value, written (light, dark).';
+    }
+    --#{$name}: #{list.nth($pair, $at)};
+  }
+
+  // elevation: flat, card and lifted, the ledges, and the glow ring
+  --elevation-flat: none;
+  --elevation-card: 0 var(--ledge-small) 0 var(--edge), #{p.$shade-near} var(--shade);
+  --elevation-lifted: 0 var(--ledge-medium) 0 var(--edge), #{p.$shade-far} var(--shade-deep);
+  @each $name, $depth in p.$ledge {
+    --ledge-#{$name}: #{$depth};
+  }
+  --press-depth: #{p.$press-depth};
+  --glow-ring: 0 0 0 #{p.$glow-ring} var(--right-glow);
+
+  // the paper grain on the ground (base/_ground.scss)
+  --paper-grain:
+    radial-gradient(var(--grain) #{p.$grain-dot}, transparent #{p.$grain-fade}),
+    radial-gradient(var(--grain-2) #{p.$grain-dot}, transparent #{p.$grain-fade});
+  --paper-grain-size: #{p.$grain-size};
+  --paper-grain-offset: #{p.$grain-offset};
+
+  // borders and the focus ring
+  @each $name, $width in p.$border {
+    --border-#{$name}: #{$width};
+  }
+  --focus-offset: #{p.$focus-offset};
+
+  // corners: chip, tag, tile, card, stage, arch
+  @each $name, $radius in p.$radius {
+    --radius-#{$name}: #{$radius};
+  }
+
+  // the 4px space scale: the one scale screens use directly
+  @each $step, $size in p.$space {
+    --space-#{$step}: #{$size};
+  }
+
+  // stacking
+  @each $name, $z in p.$z {
+    --z-#{$name}: #{$z};
+  }
+
+  // touch targets
+  @each $name, $size in p.$target {
+    --target-#{$name}: #{$size};
+  }
+}
+
+:root,
+[data-theme="light"] {
+  @include roles(light);
+}
+
+[data-theme="dark"] {
+  @include roles(dark);
+}

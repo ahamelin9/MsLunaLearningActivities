@@ -1,9 +1,10 @@
 # Colour
 
 How colour works in Ms. Luna: the palette, the roles screens use, light and
-dark, illustrations and contrast. The values themselves live only in
-`src/styles/tokens/` (from DES-3). Until then, the frozen prototype's
-`gen.py` holds them. The Kit page shows them live (DES-20).
+dark, illustrations and contrast. The values live only in
+`src/styles/tokens/`: the palette in `_primitives.scss`, the roles in
+`_roles.scss` and the drawn colours in `_illustration.scss` (DES-3). The Kit
+page shows them live (DES-20).
 
 ## Rules
 
@@ -56,10 +57,11 @@ use those names; they use roles.
 | `--accent` (with `-ink`, `-edge`) | Stars, Luna's Pick, highlights |
 | `--accent-soft`, `--accent-text` | Soft accent fills and the text on them: "Up next", the prompt pill, the revealed answer |
 | `--action` (with `-ink`, `-edge`) | The main button on a screen. `--action-edge` is its "pressed" ledge, an edge only, never text |
+| `--action-glow` | The glow that pulses round the main thing to do: the "up next" card, the listening "?" |
 | `--right` (with `-ink`, `-edge`, `-glow`) | A right answer, the "Lesson done!" mark |
 | `--right-soft`, `--right-text` | Soft right fills and their text: "took 4 min", a found ListenCue |
 | `--try-again-soft`, `--try-again-edge`, `--try-again-text` | A wrong answer: a soft tint and an edge, never red |
-| `--rare-soft`, `--rare-edge`, `--rare-text` | A rare squishy colour's tag |
+| `--rare-soft`, `--rare-edge`, `--rare-text`, `--rare-glow` | A rare squishy colour's tag, and its shimmer |
 | `--super-rare-soft`, `--super-rare-edge`, `--super-rare-text` | A super-rare squishy colour's tag |
 | `--picture-1` … `--picture-5` | Soft tints behind the pictures on Play Shelf tiles |
 | `--focus` | The keyboard focus ring |
@@ -97,7 +99,16 @@ different jobs.
   black round frames), the milestone moon (moon gold), squishies in their usual,
   rare and super-rare colours, cookies, roses and petals.
 - **Scenery with a day and a night value:** the home sky, the dunes, the
-  pampas, and the plants' leaves and stems.
+  pampas, and the plants' leaves and stems. The home pieces tuned to that sky
+  sit with it and switch with it: the ledge under "Tap to play", the glass
+  behind the gear and the home indicator (`--illo-home-*`).
+
+**How the names go:** by the thing, then its part: `--illo-luna-feather`,
+`--illo-moon-pale`, `--illo-squishy-blush-edge`, `--illo-petal-red`,
+`--illo-sky`. A few are shared by every drawing: `--illo-line` (faces and
+outlines), `--illo-shadow`, `--illo-shine` and `--illo-frames` (the black
+glasses). Each thing owns its colours, so a value can repeat across things on
+purpose: changing the interface's caramel never recolours Luna.
 
 **Why a separate palette:** a character has to look like herself in both modes,
 and a moon has to read as a moon. Roles change with the mode; illustrations

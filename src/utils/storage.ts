@@ -11,7 +11,6 @@ export const DEFAULT_SETTINGS: UserSettings = {
   speechEnabled: true,
   speechRate: 0.95,
   reducedMotion: false,
-  theme: 'sunset',
   voiceId: DEFAULT_VOICE_ID,
   voiceLanguage: 'en-US',
 };

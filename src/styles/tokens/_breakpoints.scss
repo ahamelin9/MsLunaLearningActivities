@@ -1,0 +1,18 @@
+// The breakpoint mixin (DES-3). Media queries can't read custom properties, so
+// the breakpoints stay in _primitives.scss and every media query goes through
+// bp(). Modules reach it through styles/_mixins.scss:
+//
+//   @use 'styles/mixins' as *;
+//   .stage { @include bp(narrow) { … } }
+
+@use 'sass:map';
+@use 'primitives' as p;
+
+@mixin bp($name) {
+  @if not map.has-key(p.$breakpoints, $name) {
+    @error 'No breakpoint called #{$name}. There are: #{map.keys(p.$breakpoints)}.';
+  }
+  @media #{map.get(p.$breakpoints, $name)} {
+    @content;
+  }
+}

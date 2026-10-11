@@ -5,7 +5,6 @@ export interface UserSettings {
   speechEnabled: boolean;
   speechRate: number;
   reducedMotion: boolean;
-  theme: 'day' | 'sunset' | 'cosmic';
   /** which Kokoro voice Ms. Luna speaks with */
   voiceId: string;
   /** accent the voices are drawn from */

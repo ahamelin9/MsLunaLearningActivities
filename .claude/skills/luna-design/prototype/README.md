@@ -21,6 +21,12 @@ design. A new design round starts from the token files instead.
 - `check.py` checks that tags balance, no placeholder is left and the script
   parses. It needs `node`.
 - `project/` holds the built boards (gitignored).
+- `tokens-check.mjs` proves every colour on the boards has a role or an
+  `--illo-*` entry in `src/styles/tokens/`, with the same light and dark
+  values (DES-3). Run it from the repo root after changing a token:
+  `node .claude/skills/luna-design/prototype/tokens-check.mjs "$PWD"`. It
+  rebuilds the boards into a temporary folder, so `project/` is left alone.
+  `--drop <token>` forgets one token, to see it fail.
 
 ## Rebuilding and publishing a board
 

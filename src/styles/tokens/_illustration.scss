@@ -1,0 +1,210 @@
+// The illustration palette: the colours of things that are drawn (DES-3).
+//
+// Drawings read these through classes in their own module, never
+// `fill="#…"` in the markup (colour.md, Illustrations). Each drawn thing owns
+// its colours, so values repeat across things on purpose: changing the
+// interface's caramel never recolours Luna, and the bear can change without
+// touching the stars.
+//
+//  - Fixed: Luna, the moon, squishies, cookies, roses, petals and the other
+//    drawn things look the same in both modes.
+//  - Scenery: the home sky, dunes and pampas, the plants' leaves and stems,
+//    and the home pieces tuned to them have a day and a night value.
+//
+// The values are the approved round 2 boards'. A new drawn colour goes here,
+// and Alex OKs it on the Kit page.
+
+@use 'sass:list';
+
+// ── Fixed in both modes ────────────────────────────────────────────────────
+$fixed: (
+  // shared by every drawing
+  line: #3B2A20,                        // faces, outlines, pips
+  shadow: rgba(59, 42, 32, 0.12),       // the soft shadow under a drawn thing
+  shine: #FFFFFF,                       // eye glints, highlights
+  frames: #1E1916,                      // the round black glasses Luna and the moon wear
+
+  // Ms. Luna, the owl (DES-15)
+  luna-feather: #C4996A,
+  luna-feather-deep: #A0744B,           // ears and wings
+  luna-belly: #F5E6CF,
+  luna-eye: #FFFBF5,
+  luna-pupil: #2A1E17,
+  luna-cheek: #E2B9A6,
+  luna-beak: #7A5236,                   // beak and feet
+
+  // the moon: moon gold is only for the moon (colour.md)
+  moon-gold: #F2CF63,                   // the night sky's moon, the Reading icon's moon
+  moon-crater: #F7DE8E,
+  moon-glow: rgba(242, 207, 99, 0.35),
+  moon-glow-strong: rgba(242, 207, 99, 0.6),
+  moon-pale: #F7E3A1,                   // the milestone moon's face (DES-17)
+  moon-pale-crater: #FBEDC0,
+  moon-edge: #C9A23A,
+  moon-cheek: #E9A898,
+  moon-mouth: #7A5236,
+  moon-sky: #2E221B,                    // the dusk behind the milestone moon on her board
+  moon-sky-arch: #3A2B22,
+
+  // the home sky's lights
+  sun: #FFF8EC,
+  sun-halo: rgba(255, 251, 245, 0.35),
+  sun-halo-far: rgba(255, 251, 245, 0.16),
+  sun-halo-peak: rgba(255, 251, 245, 0.42),
+  sun-halo-far-peak: rgba(255, 251, 245, 0.2),
+  night-star: #FBEFD9,                  // stars in the night sky and round the moon
+  fluff: #FFFBF5,                       // pampas fluff drifting by
+
+  // flowers that grow after a win (DES-11)
+  daisy-heart: #C4996A,
+  daisy-heart-edge: #7A5236,
+  rose-red: #C8323C,
+  rose-red-deep: #8E1F2A,
+  rose-red-front: #A82732,
+  rose-blush: #EBA9AC,
+  rose-blush-deep: #B5636A,
+  rose-blush-front: #D88C91,
+
+  // petals that fall after a win and on the done screen
+  petal-cream: #FFFBF5,
+  petal-blush: #F1C9BC,
+  petal-red: #C8323C,
+  petal-latte: #D9C4A6,
+  petal-ivory: #FBF1E2,
+  petal-pink: #EBA9AC,
+  petal-caramel: #C4996A,
+  petal-edge: #C9AE8B,                  // the thin edge on the cream and ivory petals
+
+  // squishies (DES-7c, PRG-5): each colour and its outline
+  squishy-oat: #EFE3D1,
+  squishy-oat-edge: #C9AE8B,
+  squishy-caramel: #D2A878,
+  squishy-caramel-edge: #9A6B45,
+  squishy-toffee: #B07D52,
+  squishy-toffee-edge: #7A5236,
+  squishy-cream: #FFF6E8,
+  squishy-cream-edge: #CDB592,
+  squishy-blush: #F1C9BC,               // rare
+  squishy-blush-edge: #C98E7B,
+  squishy-butter: #F5E2A0,              // rare
+  squishy-butter-top: #FFF4CC,
+  squishy-butter-edge: #C9A94F,
+  squishy-honey: #E6C47A,               // super rare
+  squishy-honey-edge: #A9832F,
+  // Pearl Moon, the secret last one (PRG-4)
+  squishy-pearl: #F7F3F8,
+  squishy-pearl-edge: #BDB3C9,
+  squishy-pearl-lilac: #E3DAF0,
+  squishy-pearl-mist: #D6E8EE,
+  squishy-pearl-sheen: #FBEFD9,
+  squishy-pearl-cheek: #E9B8C8,
+  squishy-pearl-mark: #8E819E,          // the "?" in her empty niche
+  squishy-pearl-tag: #EEE8F2,
+  squishy-pearl-tag-text: #5B4A6E,
+  squishy-pearl-glow: rgba(189, 179, 201, 0.6),
+  // colours still to find, as dots on the shelf
+  squishy-cocoa: #8A6446,
+  squishy-sage: #CFD8BE,
+  squishy-sky: #CADBE4,
+  squishy-lilac: #DCCFE6,
+  // their faces and extras
+  squishy-muzzle: #E9D3AE,
+  squishy-cheek: #E59C8A,
+  squishy-ear: #FFFBF5,
+  squishy-leaf: #A9B391,
+  squishy-leaf-edge: #5C6849,
+  squishy-dot-edge: rgba(59, 42, 32, 0.25),
+
+  // sparkles: on rarity tags, and round a win
+  spark-rare: #E2B9A6,
+  spark-rare-light: #F1C9BC,
+  spark-rare-edge: #9A5A44,
+  spark-rare-deep: #7F4433,
+  spark-super: #E6C47A,
+  spark-super-edge: #7A5236,
+  spark-pearl: #EEE8F2,
+  spark-pearl-edge: #8E819E,
+  spark-plain: #FFFBF5,
+  spark-plain-edge: #A9832F,
+  spark-win-1: #C4996A,
+  spark-win-2: #9A6B45,
+  spark-win-3: #A9B391,
+  spark-win-4: #E2B9A6,
+
+  // the stars a child earns
+  star: #C4996A,
+  star-edge: #7A5236,
+
+  // pictures on Play Shelf tiles and the Luna's Pick die (DES-21)
+  tile-cream: #FFFBF5,
+  tile-caramel: #D2A878,
+  tile-toffee: #9A6B45,
+  tile-walnut: #6B4C35,
+  tile-brown: #7A5236,
+  tile-almond: #E9D3AE,
+  tile-olive: #5C6849,
+  tile-sage: #A9B391,
+  tile-clay: #E2B9A6,
+
+  // the Reading app's icon on the home screen (DES-9a)
+  app-reading: #9A6B45,
+  app-reading-ledge: #6B4C35,
+  app-reading-page: #FFFBF5,
+  app-reading-page-2: #F2E6D3,
+  app-reading-lines: #C4996A,
+
+  // Feed Luna's cookie as it is today; DES-14 draws real, different cookies
+  cookie-dough: #E8B978,
+  cookie-dough-deep: #C98A45,
+  cookie-edge: #A9713F,
+  cookie-ledge: #8A5A2E,
+  cookie-chip: rgba(74, 46, 16, 0.55),
+  cookie-chip-soft: rgba(74, 46, 16, 0.45),
+  cookie-letter: #4A2E10,
+);
+
+// ── Scenery: (day, night) ──────────────────────────────────────────────────
+$scenery: (
+  // the home screen's sky and dunes (DES-9a; the night scene is DES-16)
+  sky: (#EBDFCC, #261E1B),
+  dune-1: (#E0CFB6, #33281F),
+  dune-2: (#D9C4A6, #2C221B),
+  dune-3: (#CDB592, #201914),
+  pampas: (#F4EAD9, #8C7A64),
+  pampas-2: (#E8D7BC, #7A6A56),
+  pampas-line: (#D9C4A6, #6B5A48),
+  reed: (#A88B66, #5A4636),
+  // home pieces tuned to show up on that sky
+  home-pill-edge: (#D9C4A6, #433629),   // the ledge under "Tap to play"
+  home-glass: (rgba(255, 251, 245, 0.7), rgba(42, 33, 27, 0.85)), // behind the gear
+  home-indicator: (rgba(59, 42, 32, 0.45), rgba(244, 234, 220, 0.5)),
+  // plants
+  leaf: (#A9B391, #8E9A74),
+  stem: (#5C6849, #A9B88C),
+  daisy-petal: (#FFFBF5, #FBF3E6),
+  daisy-petal-edge: (#9A6B45, #C08A5A),
+);
+
+@mixin scenery($at) {
+  @each $name, $pair in $scenery {
+    @if list.length($pair) != 2 {
+      @error 'Scenery colour --illo-#{$name} needs a day and a night value, written (day, night).';
+    }
+    --illo-#{$name}: #{list.nth($pair, $at)};
+  }
+}
+
+:root {
+  @each $name, $colour in $fixed {
+    --illo-#{$name}: #{$colour};
+  }
+}
+
+:root,
+[data-theme="light"] {
+  @include scenery(1);
+}
+
+[data-theme="dark"] {
+  @include scenery(2);
+}

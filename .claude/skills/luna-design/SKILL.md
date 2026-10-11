@@ -74,7 +74,10 @@ build only what the ticket asks.
    primitive that changes the look, Alex asks the teacher.
 3. A role goes in `_roles.scss` with a light **and** a dark value, a comment
    saying its job, and its text pairs if it carries text.
-4. `npm run lint` checks the build and contrast in both modes.
+4. `npm run lint` checks the build and contrast in both modes. After changing
+   a value the round 2 boards use, run
+   `node .claude/skills/luna-design/prototype/tokens-check.mjs "$PWD"` too: a
+   gap means the token no longer matches what the teacher approved.
 5. Add a line to `docs/design-system/decisions.md`, and the role to the table in
    `colour.md`.
 

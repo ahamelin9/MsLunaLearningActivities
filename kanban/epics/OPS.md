@@ -33,7 +33,7 @@ Task · P2 · S
 
 ### OPS-8 · Retarget the backlog guard check's two stale cases
 Task · P2 · S
-- **Why:** found while closing DES-25 (2026-10-10): `node .claude/skills/backlog/guard-check.mjs "$PWD"` shows 2 cases wrong. "A second In progress" edits a DES-3 row followed by DES-4, but the board now runs DES-3, DES-19; "a ticket losing its Complete when" looks for DES-4's old one-line Complete when, which is now a list. Their edits miss, so the guard never sees them and they show as allowed. The guard itself is fine.
+- **Why:** found while closing DES-25 (2026-10-10): `node .claude/skills/backlog/guard-check.mjs "$PWD"` shows 2 cases wrong. "A second In progress" edits a DES-3 row followed by DES-4, but the board now runs DES-3, DES-19; "a ticket losing its Complete when" looks for DES-4's old one-line Complete when, which is now a list. Their edits miss, so the guard never sees them and they show as allowed. The guard itself is fine. (DES-3 closed on 2026-10-11, so its row is gone too; still the same 2 cases.)
 - **How:** point both cases at text that's on the board and in `epics/DES.md` today (two rows next to each other; a one-line `- **Complete when:**`), ideally rows less likely to move, and keep the script's note on what to do when a target goes.
 - **Complete when:** the guard check shows all 14 cases as expected.
 

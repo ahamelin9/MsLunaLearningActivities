@@ -93,6 +93,8 @@ Everything except colour ([colour.md](colour.md)). The values live in
 | `stage` | The game stage and big panels |
 | `arch` | The ListenCue, arched panels, Luna's window: round top, gentle bottom corners |
 
+In code: `var(--radius-card)` and so on; the arch is `var(--radius-arch)`.
+
 The arch is the motif: lesson cards, the "?" cue, the squishy shelf, Luna's
 stages. The hand-cut uneven corners of the old reading app retire. The boho
 feel comes from the arches, the colour and the paper.
@@ -113,12 +115,22 @@ the thing sinks until its ledge is a hairline.
 **The glow ring** is a soft halo, used for the "up next" card, a right answer
 and the picked thing.
 
+In code: `--elevation-flat`, `--elevation-card` and `--elevation-lifted` (each a
+whole `box-shadow`), the ledge depths `--ledge-small`, `--ledge-medium` and
+`--ledge-large`, `--press-depth`, and `--glow-ring`. The "up next" pulse uses
+`--action-glow`. Border widths are `--border-hair`, `--border-regular` and
+`--border-thick`.
+
 ## Touch
 
 The minimums in the Rules come from five-year-old fingers. In practice, letter
 choices are much bigger than 64px. The header's buttons are 48px, and nothing
 sits in the 16px band around the screen's edge, where an iPad's case and swipes
 get in the way.
+
+In code: `--target-answer`, `--target-chrome`, `--target-gap` and
+`--target-edge`. Anything you can tab to shows the `focus-ring` mixin from
+`styles/mixins`.
 
 ## Motion
 
@@ -157,7 +169,12 @@ What the moments look like:
   the older iPad (1024×768) and the iPad mini (744×1133). `npm run ui:shots`
   captures all four.
 - **Breakpoints:** as few as those four sizes need, decided in DES-10. They're
-  written once in the tokens and used only through the breakpoint mixin.
+  written once in the tokens and used only through the breakpoint mixin:
+  `@use 'styles/mixins' as *;` then `@include bp(narrow) { … }`. DES-3 starts
+  with `narrow` (the portrait iPads) and `short` (the 1024×768 iPad).
+- **Stacking:** the z roles, lowest first: `--z-ground`, `--z-raised`,
+  `--z-float`, `--z-header`, `--z-celebrate` (petals and the win veil, which
+  never take taps) and `--z-modal`.
 - **Chrome:** one 64px header inside an app. The status bar shrinks to the
   clock (DES-8).
 - **The library:** the next lesson and Luna's Pick show without scrolling, and

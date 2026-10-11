@@ -1,4 +1,17 @@
+// The one partial a module may @use (DES-3). It outputs no CSS.
+//   @use 'styles/mixins' as *;
+// bp(name): every media query goes through it (tokens/_breakpoints.scss).
+@forward 'tokens/breakpoints' show bp;
 @use './variables' as *;
+
+// The keyboard focus ring, the same on everything a child or grown-up can tab to.
+@mixin focus-ring {
+  outline: var(--border-thick) solid var(--focus);
+  outline-offset: var(--focus-offset);
+}
+
+// The mixins below predate the design system. DES-24 deletes the ones that
+// carry old values (glassmorphism, squircle-icon) with _variables.scss.
 
 @mixin glassmorphism($blur: 20px, $opacity: 0.3) {
   background: rgba(255, 255, 255, $opacity);

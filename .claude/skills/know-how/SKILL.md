@@ -288,6 +288,22 @@ Pitfalls that cost time:
     `ReadingHub.scss` → `Hub.module.scss` all new; it compares the whole
     tree since DES-18c.)
 
+## The build says a breakpoint "isn't a valid CSS value"
+
+*2026-10-11 · DES-3*
+
+- **Symptom:** after adding or changing a breakpoint in `$breakpoints`
+  (`src/styles/tokens/_primitives.scss`), the build fails inside `bp()` with
+  "(max-width: 899px) isn't a valid CSS value".
+- **Cause:** written bare inside a Sass map, `(max-width: 899px)` is read as a
+  nested map (key `max-width`), not as a media feature.
+- **Fix:** write each one as a string: `narrow: '(max-width: 899px)'`. `bp()`
+  interpolates it without the quotes.
+- **Check:** compile a one-line module with sass-embedded
+  (`compileStringAsync("@use 'styles/mixins' as *; .a { @include bp(narrow) { color: red } }", { loadPaths: ['<repo>/src'] })`)
+  and look for `@media (max-width: 899px)` in the output. An unknown name
+  fails with "No breakpoint called …".
+
 ## A hook test says nothing, but the hook is fine
 
 *2026-10-09*

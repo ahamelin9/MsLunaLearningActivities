@@ -1,0 +1,161 @@
+// Layer 1 · Primitives: the raw palette and every scale (DES-3).
+//
+// SCSS only: this file outputs no CSS, and only the other files in
+// src/styles/tokens/ may @use it. Screens never name a primitive; they use the
+// roles in _roles.scss, which pick from here by job (docs/design-system/
+// colour.md, foundations.md). Values are the round 2 prototype's, snapped to
+// the scales in docs/design-system/decisions.md.
+//
+// Changing or adding a value here is step 4 of the ladder in fitting-in.md:
+// Alex's OK, and the teacher's if the look changes.
+
+@use 'sass:color';
+
+// ── Palette, day ───────────────────────────────────────────────────────────
+$oat: #F5EDE1;          // the page, wells
+$cream: #FFFBF5;        // cards
+$sand: #E9DCC9;         // edges and ledges
+$latte: #D9C4A6;        // planks and shelves
+$toast: #C9AE8B;        // deep planks
+$linen: #F2E6D3;        // soft accent fills
+$oat-deep: #EFE3D1;     // a picture tint
+$blush-mist: #F3E3DA;   // a picture tint
+$caramel: #C4996A;      // accents, stars
+$toffee: #9A6B45;       // the main button
+$walnut: #6B4C35;       // its ledge, accent text
+$cocoa: #3B2A20;        // all main text
+$mocha: #6E5747;        // quiet text
+$white: #FFFFFF;
+$olive: #5C6849;        // right
+$olive-deep: #434C33;
+$olive-dark: #4B5639;
+$sage: #A9B391;
+$sage-mist: #E7EADF;
+$clay-mist: #F3E0D6;    // try again, rare
+$clay: #9A5A44;
+$clay-deep: #7F4433;
+$rose-clay: #C98E7B;    // the rare edge, both modes
+$butter: #F3E3BC;       // super rare
+$honey: #A9832F;
+
+// ── Palette, night ─────────────────────────────────────────────────────────
+$night-cocoa: #1E1813;  // the page
+$espresso: #2A211B;     // cards
+$cocoa-bean: #352A21;   // wells
+$bark: #433629;         // edges and ledges
+$loam: #5A4636;         // planks
+$loam-deep: #6B5442;
+$mocha-night: #3F3125;  // soft accent fills
+$caramel-glow: #D9AE7C; // accents and the main button
+$toffee-night: #9C7651; // their ledges
+$honey-milk: #E6C49A;   // accent text
+$milk: #F4EADC;         // all main text
+$oat-milk: #C9B6A1;     // quiet text
+$sage-night: #A9B88C;   // right
+$moss: #6F7A57;
+$moss-night: #2F3527;
+$sage-pale: #C5D0AA;
+$clay-night: #46302A;   // try again, rare
+$clay-glow: #D79C86;
+$clay-pale: #EDBBA8;
+$honey-night: #3F3420;  // super rare
+$honey-glow: #C9A54A;
+$honey-pale: #E8CB8A;
+$grain-milk: #FFF0DC;   // the night paper's dots
+$black: #000000;        // night shadows
+
+// ── See-through colours ────────────────────────────────────────────────────
+$grain-day: color.change($cocoa, $alpha: 0.05);
+$grain-day-2: color.change($cocoa, $alpha: 0.035);
+$grain-night: color.change($grain-milk, $alpha: 0.045);
+$grain-night-2: color.change($grain-milk, $alpha: 0.03);
+$shade-day: color.change($cocoa, $alpha: 0.08);
+$shade-day-deep: color.change($cocoa, $alpha: 0.16);
+$shade-night: color.change($black, $alpha: 0.3);
+$shade-night-deep: color.change($black, $alpha: 0.45);
+$shine-day: color.change($white, $alpha: 0.8);
+$shine-night: color.change($white, $alpha: 0.35);
+$glow-day: color.change($toffee, $alpha: 0.45);
+$glow-night: color.change($caramel-glow, $alpha: 0.45);
+$right-glow-day: color.change($sage, $alpha: 0.45);
+$right-glow-night: color.change($sage-night, $alpha: 0.3);
+$rare-glow: color.change($rose-clay, $alpha: 0.45);
+
+// ── Space: the 4px scale ───────────────────────────────────────────────────
+$space: (
+  1: 4px,
+  2: 8px,
+  3: 12px,
+  4: 16px,
+  5: 20px,
+  6: 24px,
+  8: 32px,
+  10: 40px,
+  12: 48px,
+  16: 64px,
+);
+
+// ── Corners ────────────────────────────────────────────────────────────────
+$radius-round: 999px;
+$radius: (
+  chip: $radius-round,
+  tag: 8px,
+  tile: 16px,
+  card: 22px,
+  stage: 30px,
+  // the arch: a round top on gentle card corners
+  arch: $radius-round $radius-round 22px 22px,
+);
+
+// ── Borders, ledges and the press ──────────────────────────────────────────
+$border: (
+  hair: 1px,
+  regular: 2px,
+  thick: 3px,
+);
+// the hard band under a pressable thing (foundations.md, Elevation)
+$ledge: (
+  small: 3px,
+  medium: 5px,
+  large: 6px,
+);
+$press-depth: 3px;
+$focus-offset: 3px;
+
+// ── Elevation geometry ─────────────────────────────────────────────────────
+$shade-near: 0 8px 18px;   // card
+$shade-far: 0 18px 36px;   // lifted
+$glow-ring: 6px;
+
+// ── Paper grain: two offset layers of dots ─────────────────────────────────
+$grain-dot: 1px;
+$grain-fade: 1.2px;
+$grain-size: 22px 22px, 31px 31px;
+$grain-offset: 0 0, 11px 17px;
+
+// ── Stacking ───────────────────────────────────────────────────────────────
+$z: (
+  ground: 0,
+  raised: 1,     // above its siblings
+  float: 20,     // dragged things, pop-ups inside a screen
+  header: 50,    // the status bar and app headers
+  celebrate: 60, // petals and the win veil, which never take taps
+  modal: 100,
+);
+
+// ── Touch targets (foundations.md, Touch) ──────────────────────────────────
+$target: (
+  answer: 64px, // the smallest answer a child taps
+  chrome: 48px, // header buttons
+  gap: 12px,    // between answers
+  edge: 16px,   // the band round the screen nothing tappable sits in
+);
+
+// ── Breakpoints ────────────────────────────────────────────────────────────
+// Media queries can't read custom properties, so these are used only through
+// the bp() mixin (tokens/_breakpoints.scss, forwarded by styles/_mixins.scss).
+// Chosen from the four ui:shots sizes; DES-10 settles the final set.
+$breakpoints: (
+  narrow: '(max-width: 899px)',  // portrait iPads: 820 and 744 wide
+  short: '(max-height: 799px)',  // the 1024×768 iPad in landscape
+);
