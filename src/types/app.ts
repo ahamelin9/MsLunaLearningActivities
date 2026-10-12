@@ -1,20 +1,15 @@
 import type { ReactNode } from 'react';
 
-export type AppCategory = 'reading' | 'math' | 'science' | 'creativity' | 'tools';
+// Reading now; later ESL companion apps, never school subjects (OPS-3)
+export type AppCategory = 'reading';
 
 export interface AppDefinition {
   id: string;
   name: string;
-  shortName?: string;
   tagline: string;
-  iconName: string;
-  color: string;
-  accentColor: string;
   category: AppCategory;
-  isReady: boolean;
   gradeLevels?: string[];
   component?: () => ReactNode;
 }
 
 export type WindowState = 'closed' | 'opening' | 'open' | 'closing';
-

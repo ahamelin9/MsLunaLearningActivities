@@ -541,18 +541,28 @@ async function shootViewport(browser, url, viewport, outDir, reduced = false, th
     await gone('settings');
 
     // since DES-8 the Trophy room opens from the home screen only, so the run
-    // goes home for it and back into Reading (the shot keeps its number)
-    const trophiesHere = await page.evaluate(shown, at('open-trophies'));
-    if (!trophiesHere) {
+    // goes home for it and back into Reading. Since DES-9a nothing opens it
+    // (the Home board has no trophy button) until DES-9b gives it a way in:
+    // the shot is skipped, but its number and the trip home stay, so every
+    // later screen keeps its file name and its rounds
+    let trophiesHere = await page.evaluate(shown, at('open-trophies'));
+    const wentHome = !trophiesHere;
+    if (wentHome) {
       await click('app-home');
       await until('home');
+      trophiesHere = await page.evaluate(shown, at('open-trophies'));
     }
-    await click('open-trophies');
-    await until('trophies');
-    await shot('trophies');
-    await click('modal-close');
-    await gone('trophies');
-    if (!trophiesHere) {
+    if (trophiesHere) {
+      await click('open-trophies');
+      await until('trophies');
+      await shot('trophies');
+      await click('modal-close');
+      await gone('trophies');
+    } else {
+      n += 1;
+      console.log(`  ${size}  ${String(n).padStart(2, '0')}-trophies.png skipped: nothing opens the Trophy room yet`);
+    }
+    if (wentHome) {
       await click('open-reading');
       await until('hub');
     }

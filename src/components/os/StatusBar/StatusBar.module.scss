@@ -1,80 +1,20 @@
-@use 'styles/variables' as *;
-@use 'styles/mixins' as *;
+// The home screen's status bar (DES-9a), as on the round 2 Home board: the
+// time on the left, the gear on the right, over the home sky. Roles and the
+// space scale only.
 
-.status-bar-container {
-  height: 48px;
-  padding: 0 1.5rem;
-  @include flex-between;
-  background: rgba(0, 0, 0, 0.22);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
-  color: #FFFFFF;
-  z-index: 50;
-  position: relative;
+.root {
+  position: absolute;
+  inset: 0 0 auto;
+  z-index: var(--z-header);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: var(--space-16);
+  padding: 0 var(--space-6);
+  color: var(--ink);
   user-select: none;
-
-  .status-bar-left {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-
-    .status-bar-time {
-      font-family: var(--font-read);
-      font-weight: 700;
-      font-size: 0.95rem;
-      letter-spacing: 0.02em;
-    }
-
-    .device-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.35rem;
-      padding: 0.2rem 0.6rem;
-      border-radius: $radius-pill;
-      background: rgba(255, 255, 255, 0.2);
-      font-size: 0.75rem;
-      font-weight: 700;
-    }
-  }
-
-  .status-bar-right {
-    display: flex;
-    align-items: center;
-    gap: 0.6rem;
-
-    .status-bar-btn {
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      @include flex-center;
-      background: rgba(255, 255, 255, 0.18);
-      color: #FFFFFF;
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      cursor: pointer;
-      position: relative;
-      transition: background 0.15s ease, transform 0.15s ease;
-
-      &:hover {
-        background: rgba(255, 255, 255, 0.35);
-        transform: scale(1.08);
-      }
-
-      &:active {
-        transform: scale(0.92);
-      }
-
-      .badge-notification-dot {
-        position: absolute;
-        top: 2px;
-        right: 2px;
-        width: 8px;
-        height: 8px;
-        border-radius: 50%;
-        background: $color-red;
-        border: 1.5px solid #FFFFFF;
-      }
-    }
-  }
 }
 
+.time {
+  font: var(--text-label);
+}

@@ -161,8 +161,9 @@ In code: `--target-answer`, `--target-chrome`, `--target-gap` and
 - **Easings:** `standard` for most things, `springy` for a pop with a little
   overshoot, `soft-spring` for bars filling, `exit` for things leaving.
 - **The shared animations:** pop, wobble, glow, float, sway, twinkle, squish,
-  shimmer, petal-fall, grow-in, talk and blink (Luna's eyes, DES-15). Each is
-  a `--motion-*` role, used as `animation: var(--motion-pop)`.
+  shimmer, petal-fall, grow-in, talk, blink (Luna's eyes, DES-15) and open (an
+  app window opening from the home screen, DES-9a). Each is a `--motion-*`
+  role, used as `animation: var(--motion-pop)`.
 - **Luna's beak follows the voice:** the voice code reports when one of her
   clips starts and when the last one ends (`pronunciation.onSpeaking`, read
   through `useSpeaking()`), and the kit's Luna moves her beak only then.

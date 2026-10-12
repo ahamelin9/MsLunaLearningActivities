@@ -6,44 +6,6 @@ interface IconProps {
   color?: string;
 }
 
-export const BookIcon: React.FC<IconProps> = ({ size = 24, color = 'currentColor', className }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={className}>
-    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
-    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
-    <path d="M8 7h8" />
-    <path d="M8 11h6" />
-  </svg>
-);
-
-export const MathIcon: React.FC<IconProps> = ({ size = 24, color = 'currentColor', className }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={className}>
-    <rect x="4" y="4" width="16" height="16" rx="4" />
-    <path d="M8 10h3" />
-    <path d="M9.5 8.5v3" />
-    <path d="M14 10h2.5" />
-    <path d="M14 14h2.5" />
-    <path d="M14 16h2.5" />
-  </svg>
-);
-
-export const ScienceIcon: React.FC<IconProps> = ({ size = 24, color = 'currentColor', className }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={className}>
-    <path d="M10 2v7.5L5.2 18.2A2 2 0 0 0 7 21h10a2 2 0 0 0 1.8-2.8L14 9.5V2" />
-    <path d="M8.5 2h7" />
-    <path d="M7 16h10" />
-  </svg>
-);
-
-export const ArtIcon: React.FC<IconProps> = ({ size = 24, color = 'currentColor', className }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={className}>
-    <circle cx="13.5" cy="6.5" r=".5" fill={color} />
-    <circle cx="17.5" cy="10.5" r=".5" fill={color} />
-    <circle cx="8.5" cy="7.5" r=".5" fill={color} />
-    <circle cx="6.5" cy="12.5" r=".5" fill={color} />
-    <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.9 0 1.5-.7 1.5-1.5 0-.4-.2-.8-.4-1.1-.3-.3-.4-.7-.4-1.1 0-.8.7-1.5 1.5-1.5H16c3.3 0 6-2.7 6-6 0-5.5-4.5-9.8-10-8.8z" />
-  </svg>
-);
-
 export const StarIcon: React.FC<IconProps & { filled?: boolean }> = ({ size = 24, color = '#FFD166', filled = true, className }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill={filled ? color : 'none'} stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
     <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />

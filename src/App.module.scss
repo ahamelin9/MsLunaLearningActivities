@@ -1,17 +1,16 @@
-@use './styles/variables' as *;
-@use './styles/mixins' as *;
+// The tablet itself (DES-9a): the home screen or an open app fills it. The
+// home screen paints its own sky; the status bar sits over it.
 
 .tablet-os-root {
-  min-height: 100vh;
-  min-height: 100dvh;
+  position: relative;
   display: flex;
   flex-direction: column;
-  position: relative;
+  min-height: 100vh;
+  min-height: 100dvh;
   overflow: hidden;
-  color: $color-text-dark;
+  background: var(--ground);
+  color: var(--ink);
   font-family: var(--font-read);
-  transition: background 0.5s ease;
-  background: linear-gradient(145deg, #1e0938 0%, #3b1366 30%, #6d28d9 65%, #db2777 100%);
 }
 
 .os-viewport {
@@ -20,4 +19,3 @@
   display: flex;
   flex-direction: column;
 }
-

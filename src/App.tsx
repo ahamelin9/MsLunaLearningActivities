@@ -13,7 +13,6 @@ import { AppWindow } from './components/os/AppWindow/AppWindow';
 import { SettingsModal } from './components/os/SettingsModal/SettingsModal';
 import { TrophyModal } from './components/os/TrophyModal/TrophyModal';
 import { ReadingApp } from './apps/reading/ReadingApp';
-import { ComingSoonApp } from './apps/preview/ComingSoonApp/ComingSoonApp';
 import styles from './App.module.scss';
 
 export function App() {
@@ -65,17 +64,9 @@ export function App() {
 
   return (
     <div className={styles.tabletOsRoot}>
-      {/* the home screen's status bar; inside an app, the app's own header takes its place (DES-8) */}
-      {!activeApp && (
-        <StatusBar
-          progress={progress}
-          onOpenSettings={handleOpenSettings}
-          onOpenTrophies={() => {
-            soundManager.playPop();
-            setIsTrophyOpen(true);
-          }}
-        />
-      )}
+      {/* the home screen's status bar, as on the round 2 Home board: the time and
+          the gear (DES-9a); inside an app, the app's own header takes its place (DES-8) */}
+      {!activeApp && <StatusBar onOpenSettings={handleOpenSettings} />}
 
       {/* Main OS View: Either Home Screen or Active App Window */}
       <div className={styles.osViewport}>
@@ -86,19 +77,12 @@ export function App() {
           />
         ) : (
           <AppWindow>
-            {activeApp.id === 'reading' ? (
-              <ReadingApp
-                progress={progress}
-                onReturnToHome={handleCloseApp}
-                onOpenSettings={handleOpenSettings}
-                onGradeChange={handleGradeChange}
-              />
-            ) : (
-              <ComingSoonApp
-                app={activeApp}
-                onReturnHome={handleCloseApp}
-              />
-            )}
+            <ReadingApp
+              progress={progress}
+              onReturnToHome={handleCloseApp}
+              onOpenSettings={handleOpenSettings}
+              onGradeChange={handleGradeChange}
+            />
           </AppWindow>
         )}
       </div>
@@ -111,7 +95,8 @@ export function App() {
         onGradeChange={handleGradeChange}
       />
 
-      {/* Trophy & Badges Modal */}
+      {/* the Trophy room: nothing opens it since DES-9a followed the Home board;
+          DES-9b gives it its way in (the library's squishy shelf, PRG-5) */}
       <TrophyModal
         isOpen={isTrophyOpen}
         progress={progress}

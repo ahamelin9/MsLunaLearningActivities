@@ -1,5 +1,5 @@
-// The window an app opens in (DES-8): the frame only. Its opening zoom is the
-// last of its own values; DES-9a moves it onto the shared motion.
+// The window an app opens in (DES-8): the frame only. It opens with the
+// shared `open` motion (DES-9a), which reduced motion turns off.
 
 .app-window-overlay {
   position: absolute;
@@ -9,7 +9,7 @@
   z-index: var(--z-raised);
   overflow: hidden;
   background: var(--ground);
-  animation: appZoomLaunch 0.32s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: var(--motion-open);
 }
 
 .app-window-content {
@@ -21,15 +21,4 @@
   overflow-y: auto;
   // a section scrolled into view stops below the sticky AppHeader
   scroll-padding-top: var(--space-16);
-}
-
-@keyframes appZoomLaunch {
-  0% {
-    opacity: 0;
-    transform: scale(0.9) translateY(20px);
-  }
-  100% {
-    opacity: 1;
-    transform: scale(1) translateY(0);
-  }
 }

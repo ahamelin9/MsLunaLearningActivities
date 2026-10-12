@@ -1,103 +1,37 @@
-import React, { useState, useEffect } from 'react';
-import { SettingsIcon, TrophyIcon, Volume2Icon, VolumeXIcon } from '@/components/ui/Icons/Icons';
-import { StarBadge } from '@/components/ui/StarBadge/StarBadge';
-import { storageService } from '@/utils/storage';
-import { soundManager } from '@/utils/audio';
-import type { UserProgress } from '@/types/user';
+import React, { useEffect, useState } from 'react';
+import { ChunkyButton } from '@/components/kit';
 import styles from './StatusBar.module.scss';
 
 interface StatusBarProps {
-  progress: UserProgress;
   onOpenSettings: () => void;
-  onOpenTrophies: () => void;
 }
 
-/** The home screen's status bar. Inside an app there is none: the app's own header takes its place (DES-8). */
+/** "9:41", as an iPad shows it */
+const clock = (now: Date) => `${now.getHours() % 12 || 12}:${String(now.getMinutes()).padStart(2, '0')}`;
 
-export const StatusBar: React.FC<StatusBarProps> = ({
-  progress,
-  onOpenSettings,
-  onOpenTrophies
-}) => {
-  const [currentTime, setCurrentTime] = useState<string>('');
+/**
+ * The home screen's status bar, as on the round 2 Home board: the time, and
+ * the gear for grown-ups (DES-9a; SET-1 gates it). Inside an app there is
+ * none: the app's own header takes its place (DES-8).
+ */
+export const StatusBar: React.FC<StatusBarProps> = ({ onOpenSettings }) => {
+  const [time, setTime] = useState(() => clock(new Date()));
 
   useEffect(() => {
-    const updateTime = () => {
-      const now = new Date();
-      let hours = now.getHours();
-      const minutes = now.getMinutes().toString().padStart(2, '0');
-      const ampm = hours >= 12 ? 'PM' : 'AM';
-      hours = hours % 12 || 12;
-      setCurrentTime(`${hours}:${minutes} ${ampm}`);
-    };
-    updateTime();
-    const timer = setInterval(updateTime, 10000);
+    const timer = setInterval(() => setTime(clock(new Date())), 10000);
     return () => clearInterval(timer);
   }, []);
 
-  const isAudioActive = progress.settings.soundEnabled && progress.settings.speechEnabled;
-
-  const handleToggleSound = () => {
-    const nextState = storageService.toggleMasterSound();
-    if (nextState) {
-      soundManager.playPop();
-    }
-  };
-
   return (
-    <header className={styles.statusBarContainer} aria-label="Tablet Status Bar">
-      {/* Left side: Clock */}
-      <div className={styles.statusBarLeft}>
-        <span className={styles.statusBarTime}>
-          {currentTime || '9:41 AM'}
-        </span>
-      </div>
-
-      {/* Right side: Star Points, Trophy Room, Audio Mute, Settings */}
-      <div className={styles.statusBarRight}>
-        <StarBadge
-          stars={progress.totalStars}
-          points={progress.totalPoints}
-          size="sm"
-          onClick={onOpenTrophies}
-        />
-
-        <button
-          onClick={onOpenTrophies}
-          className={styles.statusBarBtn}
-          title="Trophy Room & Badges"
-          aria-label="Trophy Room"
-          data-shot="open-trophies"
-        >
-          <TrophyIcon size={18} color="#FFD166" />
-          {progress.unlockedAchievements.length > 0 && (
-            <span className={styles.badgeNotificationDot} />
-          )}
-        </button>
-
-        <button
-          onClick={handleToggleSound}
-          className={styles.statusBarBtn}
-          title={isAudioActive ? 'Mute All Audio' : 'Unmute All Audio'}
-          aria-label="Toggle Sound"
-        >
-          {isAudioActive ? (
-            <Volume2Icon size={18} />
-          ) : (
-            <VolumeXIcon size={18} color="#FF5964" />
-          )}
-        </button>
-
-        <button
-          onClick={onOpenSettings}
-          className={styles.statusBarBtn}
-          title="Settings & Preferences"
-          aria-label="Settings"
-          data-shot="open-settings"
-        >
-          <SettingsIcon size={18} />
-        </button>
-      </div>
+    <header className={styles.root} aria-label="Status bar">
+      <span className={styles.time}>{time}</span>
+      <ChunkyButton
+        variant="icon"
+        icon="gear"
+        aria-label="Grown-ups: settings"
+        data-shot="open-settings"
+        onClick={onOpenSettings}
+      />
     </header>
   );
 };

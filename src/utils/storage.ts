@@ -106,16 +106,6 @@ class StorageService {
     this.persist();
   }
 
-  public toggleMasterSound(): boolean {
-    const isCurrentlyOn = this.progress.settings.soundEnabled || this.progress.settings.speechEnabled;
-    const nextState = !isCurrentlyOn;
-    this.updateSettings({
-      soundEnabled: nextState,
-      speechEnabled: nextState
-    });
-    return nextState;
-  }
-
   public updateSettings(partial: Partial<UserSettings>) {
     this.progress = {
       ...this.progress,

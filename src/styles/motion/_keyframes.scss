@@ -84,6 +84,12 @@
   50% { transform: scaleY(1.5); }
 }
 
+// an app opening from the home screen: it fades in and grows a touch (DES-9a)
+@keyframes luna-open {
+  0% { opacity: 0; transform: scale(0.96); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
 // Luna's eyes: a quick blink near the end of each slow loop (DES-15, as on the
 // round 2 Ms. Luna board)
 @keyframes luna-blink {

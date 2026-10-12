@@ -1,172 +1,165 @@
-@use 'styles/variables' as *;
+// The home screen (DES-9a), as on the round 2 Home board. The scenery's
+// colours come from the illustration palette, and its day and night values
+// switch with the mode. It's sized in viewport units, so the same picture
+// fits all four iPads. Everything else uses roles and the space scale.
+
 @use 'styles/mixins' as *;
 
-.home-screen-container {
+.root {
+  position: relative;
   flex: 1;
-  width: 100%;
-  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: var(--illo-sky);
+  user-select: none;
+}
+
+// ── the scenery ────────────────────────────────────────────────────────────
+.scenery {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+// the day's pale sun; at night (DES-16) the moon and stars take its place
+.sun {
+  position: absolute;
+  top: 12vh;
+  right: 18vw;
+  width: 18vmin;
+  height: 18vmin;
+  border-radius: var(--radius-chip);
+  background: var(--illo-sun);
+  box-shadow:
+    0 0 0 2.7vmin var(--illo-sun-halo),
+    0 0 0 6.3vmin var(--illo-sun-halo-far);
+  animation: var(--motion-float);
+}
+
+[data-theme='dark'] .sun {
+  display: none;
+}
+
+.dune {
+  position: absolute;
+  border-radius: 50%;
+}
+
+.dune1 {
+  left: -22vw;
+  bottom: -51vh;
+  width: 93vw;
+  height: 85vh;
+  background: var(--illo-dune-1);
+}
+
+.dune2 {
+  left: 44vw;
+  bottom: -56vh;
+  width: 93vw;
+  height: 85vh;
+  background: var(--illo-dune-2);
+}
+
+.dune3 {
+  left: -10vw;
+  bottom: -68vh;
+  width: 119vw;
+  height: 93vh;
+  background: var(--illo-dune-3);
+}
+
+.pampas {
+  position: absolute;
+  transform-origin: 50% 100%;
+  animation: var(--motion-sway);
+}
+
+.pampasLeft {
+  left: 3vw;
+  bottom: 5vh;
+  height: 40vh;
+}
+
+// half a sway behind the left one, so they don't move as one
+.pampasRight {
+  right: 2.5vw;
+  bottom: 3.7vh;
+  height: 36vh;
+  animation-delay: calc(var(--dur-loop) * -0.75);
+}
+
+.reed { fill: none; stroke: var(--illo-reed); }
+.plume { fill: var(--illo-pampas); }
+.plume2 { fill: var(--illo-pampas-2); }
+.plumeLine { fill: none; stroke: var(--illo-pampas-line); }
+
+// ── the apps: Reading now, room for ESL companions later ───────────────────
+.apps {
+  position: relative;
+  z-index: var(--z-raised);
+  display: flex;
+  gap: var(--space-16);
+}
+
+.app {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  padding: 2rem;
-  position: relative;
-  z-index: 10;
-  user-select: none;
-  box-sizing: border-box;
+  gap: var(--space-3);
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--ink);
+  cursor: pointer;
+  transition: transform var(--dur-tap) var(--ease-standard);
 
-  .home-center-stage {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 1.5rem;
-    margin: auto;
-    z-index: 10;
-    text-align: center;
+  &:active {
+    transform: scale(0.92);
   }
 
-  .ipad-reading-app-card {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 1.1rem;
-    background: none;
-    border: none;
-    outline: none;
-    cursor: pointer;
-    padding: 1.5rem;
-    border-radius: 2.5rem;
-    transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.2s ease;
-    text-decoration: none;
-
-    &:hover {
-      transform: translateY(-8px) scale(1.04);
-
-      .app-squircle-box {
-        box-shadow: 0 20px 45px rgba(255, 89, 100, 0.5), inset 0 2px 3px rgba(255, 255, 255, 0.7);
-        transform: rotate(1deg);
-      }
-
-      .app-tap-prompt {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    &:active {
-      transform: scale(0.95);
-
-      .app-squircle-box {
-        box-shadow: 0 6px 15px rgba(255, 89, 100, 0.3);
-      }
-    }
-
-    .app-squircle-box {
-      width: 128px;
-      height: 128px;
-      border-radius: 28px;
-      background: linear-gradient(145deg, #FF5964 0%, #FF9F1C 50%, #FFD166 100%);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-      box-shadow: 0 14px 32px rgba(255, 89, 100, 0.4), inset 0 1.5px 2px rgba(255, 255, 255, 0.6);
-      border: 3px solid rgba(255, 255, 255, 0.35);
-      transition: all 0.22s ease;
-      overflow: hidden;
-
-      /* iOS glass sheen top overlay */
-      &::after {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 48%;
-        background: linear-gradient(180deg, rgba(255, 255, 255, 0.45) 0%, rgba(255, 255, 255, 0.05) 100%);
-        border-radius: 26px 26px 0 0;
-        pointer-events: none;
-      }
-
-      .reading-icon-svg {
-        filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.25));
-        position: relative;
-        z-index: 2;
-        transform: translateY(-2px);
-      }
-    }
-
-    .app-title-text {
-      font-family: var(--font-display);
-      font-weight: 700;
-      font-size: 1.5rem;
-      color: #FFFFFF;
-      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8), 0 1px 3px rgba(0, 0, 0, 0.6);
-      letter-spacing: 0.02em;
-      line-height: 1.1;
-
-    }
-
-    .app-tap-prompt {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.4rem;
-      padding: 0.35rem 0.9rem;
-      border-radius: $radius-pill;
-      background: rgba(255, 255, 255, 0.25);
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
-      border: 1px solid rgba(255, 255, 255, 0.4);
-      color: #FFFFFF;
-      font-family: var(--font-read);
-      font-weight: 700;
-      font-size: 0.85rem;
-      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-      transition: all 0.2s ease;
-    }
+  &:focus-visible {
+    @include focus-ring;
+    border-radius: var(--radius-stage);
   }
 }
 
-/* Floating ambient background glow bubbles */
-.home-bg-bubble {
+.icon {
+  display: block;
+  width: calc(var(--space-16) * 2);
+  height: calc(var(--space-16) * 2);
+  border-radius: var(--radius-stage);
+  background: var(--illo-app-reading);
+  box-shadow:
+    0 var(--ledge-large) 0 var(--illo-app-reading-ledge),
+    var(--elevation-lifted);
+
+  svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+}
+
+.iconMoon { fill: var(--illo-moon-gold); }
+.iconPage { fill: var(--illo-app-reading-page); }
+.iconPage2 { fill: var(--illo-app-reading-page-2); }
+.iconLines { fill: none; stroke: var(--illo-app-reading-lines); }
+
+.name {
+  font: var(--text-display-l);
+}
+
+// ── the iPad's home indicator ──────────────────────────────────────────────
+.indicator {
   position: absolute;
-  border-radius: 50%;
-  pointer-events: none;
-  filter: blur(70px);
-  z-index: 0;
-  opacity: 0.35;
-
-  &.bubble-1 {
-    width: 420px;
-    height: 420px;
-    background: #F59E0B;
-    top: -100px;
-    left: -100px;
-    animation: floatSlow 14s infinite alternate ease-in-out;
-  }
-
-  &.bubble-2 {
-    width: 480px;
-    height: 480px;
-    background: #EC4899;
-    bottom: 60px;
-    right: -120px;
-    animation: floatSlow 18s infinite alternate-reverse ease-in-out;
-  }
-
-  &.bubble-3 {
-    width: 320px;
-    height: 320px;
-    background: #38BDF8;
-    bottom: -60px;
-    left: 25%;
-    animation: floatSlow 12s infinite alternate ease-in-out;
-  }
-}
-
-@keyframes floatSlow {
-  0% { transform: translateY(0) scale(1); }
-  100% { transform: translateY(30px) scale(1.08); }
+  bottom: var(--space-2);
+  left: 50%;
+  width: calc(var(--space-16) * 2.5);
+  height: var(--space-1);
+  translate: -50% 0;
+  border-radius: var(--radius-chip);
+  background: var(--illo-home-indicator);
 }

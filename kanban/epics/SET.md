@@ -9,6 +9,7 @@ Story · P0 · M · needs: DES-9b
 ### SET-2 · A child can't silence Luna by accident
 Story · P0 · S · needs: SET-1
 - **Why:** targets are only spoken, so with narration off every activity shows "?" and can't be played. Today the status-bar mute turns off narration in one tap.
+  - **Since DES-8 and DES-9a (2026-10-12):** there is no mute button anywhere a child can reach: the app's header and the home status bar follow the boards, which have none. Narration still switches off in Settings, which a child can open until SET-1 gates it, so the gate and the banner remain.
 - **How:**
   - Kid-reachable controls only touch sound effects.
   - Narration lives behind the gate.

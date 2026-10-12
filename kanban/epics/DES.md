@@ -88,7 +88,8 @@ Story · P0 · M · needs: DES-9a
   - No board shows them, so Alex OKs the shots.
   - The achievement badge colours (`data/achievements.ts`) and `TrophyModal`'s inline colours go; badges use roles or `_illustration.scss`.
   - `components/ui/Button` goes with its last users here. It plays a pop on every tap and the kit's ChunkyButton plays nothing, so a button that should keep its sound calls `soundManager` in its `onClick` (found in DES-7a).
-  - **The Trophy room's way in (Alex, 2026-10-11):** inside the app, a child reaches the collection by tapping the library's squishy shelf (the Squishy Shelf card, PRG-5); the app's header has no trophy button. Since DES-8 the Trophy room opens only from the home screen's trophy button, which the Home board doesn't show.
+  - **The Trophy room's way in (Alex, 2026-10-11):** inside the app, a child reaches the collection by tapping the library's squishy shelf (the Squishy Shelf card, PRG-5); the app's header has no trophy button.
+  - **Left by DES-9a (2026-10-12):** the home status bar follows the Home board (time and gear), so nothing opens the Trophy room now. `TrophyModal` is still mounted in `App`, with no opener, and `ui:shots` skips its shot (keeping the number). Give it a way in here, so its restyle can be seen and shot; the squishy shelf itself is PRG-5's. The StarBadge component went with the status bar's stars.
 - **Complete when:**
   - both screens use kit components and roles only, and their folders show zero;
   - `components/ui/Button` is deleted;
@@ -166,6 +167,7 @@ Story · P1 · M · needs: SET-1
 - **How:** the dark roles already exist (DES-3), and the contrast check runs in lint (DES-19). What's left:
   - **Follow the iPad's light/dark setting by default:** a `prefers-color-scheme: dark` block (`:root:not([data-theme="light"])`) outputs the dark roles. An inline script in `index.html` sets `data-theme` on `<html>` before the first paint, so there's no flash.
   - **A grown-up's choice:** Light, Dark or "Match the iPad" in Settings, behind the gate (SET-1). The choice is saved.
+  - **A sun/moon button on the home screen (Alex, 2026-10-12):** beside the gear in the status bar, a kit icon button a child can tap to turn day into night (the moon and stars) and back. It's saved like the Settings choice, which still works; the gear stays Settings. The Home board has no such button, so Alex OKs its shots. It comes only here: before every screen is on the roles, dark would show a dark header over light screens.
   - Every screen uses the roles only. Illustrations (Luna, squishies, flowers) keep their own colours from `_illustration.scss`.
   - At night the home screen shows a crescent moon in moon gold and twinkling stars instead of the sun (round 2 Home board), using the night scenery from `_illustration.scss`.
   - With reduced motion (DES-6) the stars don't twinkle.
@@ -174,6 +176,7 @@ Story · P1 · M · needs: SET-1
   - the contrast check passes in both modes;
   - the home screen shows the moon and stars in dark mode and the sun in light mode;
   - the Settings choice overrides the iPad and survives a reload;
+  - tapping the home screen's sun/moon button turns day into night and back, and the choice survives a reload;
   - every screen is checked in dark on the real iPad (Alex).
 
 ### DES-17 · The moon visits for big milestones
