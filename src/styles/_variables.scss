@@ -1,8 +1,8 @@
 // Global SCSS Variables - Ms. Luna's Learning Pad (LunaPad OS)
 
 // Typography
-$font-main: 'Nunito', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-$font-display: 'Fredoka', 'Nunito', sans-serif;
+$font-main: var(--font-read); // DES-4: Andika, from the tokens
+$font-display: var(--font-display); // DES-4: Fraunces, from the tokens
 
 // Brand & Palette Colors
 $color-primary: #7E22CE;

@@ -144,7 +144,14 @@ function Demo({ name, value, group }: { name: string; value: string; group: stri
         if (name === '--press-depth') return <span className={styles.lift} style={{ transform: `translateY(var(${name}))`, boxShadow: '0 var(--border-hair) 0 var(--action-edge)', background: 'var(--action)' }} />;
         return <span className={styles.lift} style={{ boxShadow: `var(${name})` }} />;
       case 'Borders': return <span className={styles.border} style={name === '--focus-offset' ? { outline: 'var(--border-thick) solid var(--focus)', outlineOffset: `var(${name})` } : { borderTopWidth: `var(${name})` }} />;
-      case 'Type': return <span style={{ font: `var(${name})` }}>Ms. Luna reads</span>;
+      case 'Type':
+        if (name.startsWith('--font-')) return name === '--font-display-axes' ? null : <span style={{ fontFamily: `var(${name})` }}>I l 1 · a g</span>;
+        if (name === '--tracking-tag') return null;
+        return (
+          <span style={{ font: `var(${name})`, ...(name === '--text-tag' && { textTransform: 'uppercase', letterSpacing: 'var(--tracking-tag)' }) }}>
+            I l 1 · a g
+          </span>
+        );
       case 'Motion': return name.startsWith('--motion-') ? <span className={styles.lift} style={{ animation: `var(${name})` }} /> : null;
       case 'Touch targets': return <span className={styles.target} style={{ width: `var(${name})`, height: `var(${name})` }} />;
       default: return null;

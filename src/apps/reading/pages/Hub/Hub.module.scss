@@ -5,14 +5,14 @@
   flex: 1;
   padding: 0.6rem 1.2rem 2rem;
   color: $ink;
-  font-family: 'Nunito', sans-serif;
+  font-family: var(--font-read);
   background:
     radial-gradient(ellipse at 50% 0%, rgba(240, 162, 46, 0.28), transparent 55%),
     linear-gradient(180deg, #FFF4E0 0%, #F7E3C3 55%, #EFD6B0 100%);
   overflow-x: hidden;
 
   h2 {
-    font-family: 'Fredoka', sans-serif;
+    font-family: var(--font-display);
     font-weight: 600;
   }
 
@@ -94,7 +94,7 @@
     min-width: 220px;
 
     p {
-      font-family: 'Fredoka', sans-serif;
+      font-family: var(--font-read);
       font-size: 1.08rem;
       font-weight: 500;
       line-height: 1.35;
@@ -141,7 +141,7 @@
     background: linear-gradient(180deg, #E8C08B, #C99356);
     border: 3px solid $wood-dark;
     box-shadow: 0 4px 0 rgba(90, 53, 23, 0.5);
-    font-family: 'Fredoka', sans-serif;
+    font-family: var(--font-display);
     cursor: pointer;
     transform: rotate(-2deg);
     text-align: center;
@@ -200,7 +200,7 @@
     .pick-text {
       position: relative;
       display: block;
-      font-family: 'Fredoka', sans-serif;
+      font-family: var(--font-read);
       font-size: 1.15rem;
       font-weight: 600;
       color: #4A2E10;
@@ -314,7 +314,7 @@
     margin-bottom: 0.9rem;
     padding-left: 0.3rem;
 
-    small { font-size: 0.8rem; color: $ink-soft; font-family: 'Nunito', sans-serif; font-weight: 700; }
+    small { font-size: 0.8rem; color: $ink-soft; font-family: var(--font-read); font-weight: 700; }
   }
 
   .game-yard {
@@ -361,7 +361,7 @@
 
     .thing-title {
       display: block;
-      font-family: 'Fredoka', sans-serif;
+      font-family: var(--font-read);
       font-size: 1.08rem;
       font-weight: 600;
       line-height: 1.15;
@@ -453,7 +453,7 @@
       }
       .nook-emoji { font-size: 2.4rem; line-height: 1.1; }
       .nook-word {
-        font-family: 'Fredoka', sans-serif;
+        font-family: var(--font-read);
         font-size: 1.3rem;
         font-weight: 600;
       }
@@ -499,7 +499,7 @@
       padding-bottom: 4px;
 
       i {
-        font-family: 'Fredoka', sans-serif;
+        font-family: var(--font-read);
         font-style: normal;
         font-size: 1rem;
         font-weight: 600;
@@ -520,7 +520,7 @@
     border-radius: 50%;
     border: 2px solid rgba(255, 255, 255, 0.8);
     background: rgba(255, 255, 255, 0.35);
-    font-family: 'Fredoka', sans-serif;
+    font-family: var(--font-read);
     font-style: normal;
     font-size: 0.9rem;
     color: #10496B;
@@ -565,7 +565,7 @@
       border-radius: 50%;
       background: #C98A45;
       border: 2px solid #8A5A2E;
-      font-family: 'Fredoka', sans-serif;
+      font-family: var(--font-read);
       font-style: normal;
       font-size: 0.8rem;
       color: #4A2E10;
@@ -637,7 +637,7 @@
   .page-scenery i {
     position: absolute;
     font-style: normal;
-    font-family: 'Fredoka', sans-serif;
+    font-family: var(--font-read);
     font-size: 0.85rem;
     padding: 2px 8px;
     border-radius: 6px;

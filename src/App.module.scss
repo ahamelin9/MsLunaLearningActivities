@@ -9,7 +9,7 @@
   position: relative;
   overflow: hidden;
   color: $color-text-dark;
-  font-family: $font-main;
+  font-family: var(--font-read);
   transition: background 0.5s ease;
   background: linear-gradient(145deg, #1e0938 0%, #3b1366 30%, #6d28d9 65%, #db2777 100%);
 }

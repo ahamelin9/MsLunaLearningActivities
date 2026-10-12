@@ -32,7 +32,7 @@
     border-radius: $radius-pill;
     background: #F3E8FF;
     color: $color-primary;
-    font-family: $font-display;
+    font-family: var(--font-read);
     font-weight: 800;
     font-size: 0.75rem;
     text-transform: uppercase;
@@ -41,7 +41,7 @@
   }
 
   .coming-soon-title {
-    font-family: $font-display;
+    font-family: var(--font-display);
     font-weight: 800;
     font-size: 2.2rem;
     color: $color-text-dark;

@@ -26,7 +26,7 @@
       border-radius: $radius-pill;
       background: #F3E8FF;
       color: $color-primary;
-      font-family: $font-display;
+      font-family: var(--font-read);
       font-weight: 800;
       font-size: 0.75rem;
       text-transform: uppercase;
@@ -34,7 +34,7 @@
     }
 
     .header-title {
-      font-family: $font-display;
+      font-family: var(--font-display);
       font-weight: 800;
       font-size: 2.2rem;
       color: $color-text-dark;
@@ -113,7 +113,7 @@
             border-radius: $radius-pill;
             background: #F1F5F9;
             color: $color-primary;
-            font-family: $font-display;
+            font-family: var(--font-read);
             font-weight: 800;
             font-size: 0.75rem;
           }
@@ -123,14 +123,14 @@
             border-radius: $radius-pill;
             background: #D1FAE5;
             color: #065F46;
-            font-family: $font-display;
+            font-family: var(--font-read);
             font-weight: 800;
             font-size: 0.75rem;
           }
         }
 
         .grade-title {
-          font-family: $font-display;
+          font-family: var(--font-display);
           font-weight: 800;
           font-size: 1.75rem;
           color: $color-text-dark;
@@ -138,7 +138,7 @@
         }
 
         .grade-subtitle {
-          font-family: $font-display;
+          font-family: var(--font-read);
           font-weight: 800;
           font-size: 1.1rem;
           color: $color-primary;
@@ -162,7 +162,7 @@
         border-top: 1.5px solid #F1F5F9;
 
         .select-label {
-          font-family: $font-display;
+          font-family: var(--font-read);
           font-weight: 800;
           font-size: 0.95rem;
           color: $color-primary;

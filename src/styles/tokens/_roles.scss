@@ -159,6 +159,17 @@ $text-pairs: (
     --space-#{$step}: #{$size};
   }
 
+  // type: the two fonts, and the type roles as `font` shorthands
+  //   font: var(--text-read);  — a tag adds text-transform: uppercase and
+  //   letter-spacing: var(--tracking-tag)
+  --font-read: #{p.$font-read};
+  --font-display: #{p.$font-display};
+  --font-display-axes: #{p.$font-display-axes};
+  @each $name, $font in p.$type {
+    --text-#{$name}: #{$font};
+  }
+  --tracking-tag: #{p.$tracking-tag};
+
   // stacking
   @each $name, $z in p.$z {
     --z-#{$name}: #{$z};

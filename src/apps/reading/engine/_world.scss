@@ -38,7 +38,7 @@ $radius-soft: 18px;
   border: none;
   border-radius: 16px;
   box-shadow: 0 5px 0 $edge, 0 8px 14px rgba(58, 42, 31, 0.22);
-  font-family: 'Fredoka', sans-serif;
+  font-family: var(--font-read);
   font-weight: 600;
   cursor: pointer;
   transition: transform 0.12s ease, box-shadow 0.12s ease, filter 0.12s ease;
@@ -80,7 +80,7 @@ $radius-soft: 18px;
 }
 
 @mixin tape-label {
-  font-family: 'Fredoka', sans-serif;
+  font-family: var(--font-read);
   font-weight: 600;
   background: rgba(240, 162, 46, 0.9);
   color: #4A2E10;

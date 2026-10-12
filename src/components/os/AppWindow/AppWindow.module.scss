@@ -35,7 +35,7 @@
         border-radius: $radius-pill;
         background: #F1F5F9;
         color: #334155;
-        font-family: $font-display;
+        font-family: var(--font-read);
         font-weight: 800;
         font-size: 0.85rem;
         border: 1.5px solid #CBD5E1;
@@ -68,7 +68,7 @@
         }
 
         .app-header-title {
-          font-family: $font-display;
+          font-family: var(--font-display);
           font-weight: 800;
           font-size: 1.1rem;
           color: $color-text-dark;

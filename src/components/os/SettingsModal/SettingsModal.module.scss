@@ -42,7 +42,7 @@
         }
 
         .modal-title {
-          font-family: $font-display;
+          font-family: var(--font-display);
           font-weight: 800;
           font-size: 1.35rem;
           color: $color-text-dark;
@@ -79,7 +79,7 @@
       gap: 0.75rem;
 
       .group-label {
-        font-family: $font-display;
+        font-family: var(--font-read);
         font-weight: 800;
         font-size: 0.75rem;
         text-transform: uppercase;
@@ -108,7 +108,7 @@
             flex-direction: column;
 
             .item-title {
-              font-family: $font-display;
+              font-family: var(--font-read);
               font-weight: 800;
               font-size: 0.95rem;
               color: $color-text-dark;
@@ -174,7 +174,7 @@
         }
 
         .grade-btn-label {
-          font-family: $font-display;
+          font-family: var(--font-read);
           font-weight: 800;
           font-size: 0.8rem;
           color: $color-text-dark;
@@ -207,7 +207,7 @@
         background: #FEF2F2;
         border: 1.5px solid #FECACA;
         color: #DC2626;
-        font-family: $font-display;
+        font-family: var(--font-read);
         font-weight: 800;
         font-size: 0.9rem;
         cursor: pointer;
@@ -233,7 +233,7 @@
           display: flex;
           align-items: center;
           gap: 0.5rem;
-          font-family: $font-display;
+          font-family: var(--font-read);
           font-weight: 800;
           font-size: 0.85rem;
           color: #991B1B;
@@ -249,7 +249,7 @@
           color: #FFFFFF;
           padding: 0.6rem;
           border-radius: 0.75rem;
-          font-family: $font-display;
+          font-family: var(--font-read);
           font-weight: 800;
           text-align: center;
           @include flex-center;

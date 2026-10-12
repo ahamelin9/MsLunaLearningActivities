@@ -36,7 +36,7 @@ export const GROUPS: { title: string; test: (name: string) => boolean }[] = [
   { title: 'Corners', test: n => n.startsWith('--radius-') },
   { title: 'Elevation', test: n => /^--(elevation-|ledge-|glow-ring|press-depth)/.test(n) },
   { title: 'Borders', test: n => /^--(border-|focus-offset)/.test(n) },
-  { title: 'Type', test: n => /^--(text-|font-)/.test(n) },
+  { title: 'Type', test: n => /^--(text-|font-|tracking-)/.test(n) },
   { title: 'Motion', test: n => /^--(dur-|ease-|motion-)/.test(n) },
   { title: 'Touch targets', test: n => n.startsWith('--target-') },
   { title: 'Stacking', test: n => n.startsWith('--z-') }

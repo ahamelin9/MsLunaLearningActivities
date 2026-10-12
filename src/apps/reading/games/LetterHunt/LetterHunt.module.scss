@@ -43,7 +43,7 @@
     height: 46px;
     display: grid;
     place-items: center;
-    font-family: 'Fredoka', sans-serif;
+    font-family: var(--font-read);
     font-size: calc(1.5rem * var(--size, 1));
     font-weight: 600;
     color: #FFFFFF;

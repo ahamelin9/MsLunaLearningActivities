@@ -66,6 +66,13 @@ Everything except colour ([colour.md](colour.md)). The values live in
 | `answer-word` | Andika, bold | Word choices |
 | `answer-letter` | Andika, bold | Letter choices |
 
+In code: `font: var(--text-read)` (each role is a whole `font` shorthand:
+weight, size, line height and family). A tag adds `text-transform: uppercase`
+and `letter-spacing: var(--tracking-tag)`. The families alone are
+`--font-read` and `--font-display`. Both fonts are served from `public/fonts/`
+(`src/styles/base/_fonts.scss`), and Fraunces is always set soft. The Kit page
+shows every role with `I l 1 · a g`.
+
 - **Why Andika:** it was made for beginning readers. `I`, `l` and `1` look
   different, and `a` and `g` are single-storey. Fredoka, the old font, drew `I`
   and `l` as the same plain stroke, which made the Letter Jar unfair.

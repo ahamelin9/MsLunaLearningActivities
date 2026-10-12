@@ -133,6 +133,26 @@ $grain-fade: 1.2px;
 $grain-size: 22px 22px, 31px 31px;
 $grain-offset: 0 0, 11px 17px;
 
+// ── Type (DES-4): two fonts, self-hosted in public/fonts/ ─────────────────
+$font-read: 'Andika', system-ui, sans-serif;  // everything a child reads
+$font-display: 'Fraunces', Georgia, serif;    // titles only, set soft
+$font-display-axes: 'SOFT' 100, 'WONK' 0;
+// weight size/line-height family, from the type scale in decisions.md
+$type: (
+  display-xl: 650 40px/1.1 $font-display,
+  display-l: 600 30px/1.15 $font-display,
+  display-m: 600 24px/1.2 $font-display,
+  display-s: 600 20px/1.25 $font-display,
+  cue: 700 92px/1 $font-display,
+  read: 400 22px/1.45 $font-read,
+  label: 700 18px/1.25 $font-read,
+  label-small: 700 16px/1.25 $font-read,
+  tag: 700 13px/1.2 $font-read,       // always uppercase, with --tracking-tag
+  answer-word: 700 40px/1.1 $font-read,
+  answer-letter: 700 76px/1 $font-read,
+);
+$tracking-tag: 0.08em;
+
 // ── Stacking ───────────────────────────────────────────────────────────────
 $z: (
   ground: 0,

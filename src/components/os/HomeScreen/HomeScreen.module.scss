@@ -104,7 +104,7 @@
     }
 
     .app-title-text {
-      font-family: 'Fredoka', 'Nunito', sans-serif;
+      font-family: var(--font-display);
       font-weight: 700;
       font-size: 1.5rem;
       color: #FFFFFF;
@@ -128,7 +128,7 @@
       -webkit-backdrop-filter: blur(8px);
       border: 1px solid rgba(255, 255, 255, 0.4);
       color: #FFFFFF;
-      font-family: 'Fredoka', 'Nunito', sans-serif;
+      font-family: var(--font-read);
       font-weight: 700;
       font-size: 0.85rem;
       text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);

@@ -64,6 +64,9 @@ mentioned and what the prototype follows"). A future proposal is marked
 | 2026-10-11 | The breakpoints start as `narrow` (under 900px wide) and `short` (under 800px tall) | Claude, Alex OK | Where the four target sizes split; DES-10 settles the set | DES-3, DES-10 |
 | 2026-10-11 | Today's Feed Luna cookie colours go in the illustration palette until DES-14 draws new cookies | Claude, Alex OK | No board shows a cookie | DES-3, DES-14 |
 | 2026-10-11 | The design check also counts colour names and `.css` files. Its primitives, kit-page and exception-marker rules always fail instead of joining the baseline | Claude | Colour names are raw colours too (colour.md, rule 1), and the always-fail rules have nothing to grandfather | DES-19 |
+| 2026-10-11 | Andika (400, 700) and Fraunces (one variable file with every axis) are served from `public/fonts/`, from Fontsource's copies of the Google Fonts files (OFL; licences beside them). Latin only | Claude, Alex OK | Offline classroom iPads; about 160 KB | DES-4 |
+| 2026-10-11 | Until each screen is restyled, its old font declarations point at the roles: titles and headings (`…-title`, `h1`–`h6`, the Hub's grade sign) at Fraunces, everything else at Andika | Alex | Closest to the approved boards now, and every letter a child reads becomes Andika at once | DES-4 |
+| 2026-10-11 | The type roles' weights and line heights: display 600 (display-xl 650, cue 700) at 1.1–1.25; read 400 at 1.45; labels, tags and answers 700 at 1–1.25 | Claude | From the prototype; decisions.md had the sizes only | DES-4 |
 | 2026-10-11 | The after-edit hook compares a file with its committed version, by rule and text, so only values the edit added are reported | Claude | Moving a line or editing an old file shouldn't nag; adding a value should | DES-19 |
 
 ## Standards settled on 2026-10-10 (Alex approved)

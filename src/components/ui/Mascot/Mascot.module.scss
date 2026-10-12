@@ -91,7 +91,7 @@
     }
 
     .mascot-speech-text {
-      font-family: $font-main;
+      font-family: var(--font-read);
       font-weight: 700;
       color: $color-text-dark;
       font-size: 0.95rem;

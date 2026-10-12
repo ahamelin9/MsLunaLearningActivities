@@ -53,7 +53,7 @@
     background: rgba(255, 255, 255, 0.8);
     border: 2px solid rgba(58, 42, 31, 0.18);
     color: $ink;
-    font-family: 'Fredoka', sans-serif;
+    font-family: var(--font-read);
     font-weight: 600;
     font-size: 0.85rem;
     cursor: pointer;
@@ -101,7 +101,7 @@
     border-radius: 999px;
     background: #FFFFFF;
     border: 2px solid rgba(58, 42, 31, 0.2);
-    font-family: 'Fredoka', sans-serif;
+    font-family: var(--font-read);
     font-weight: 600;
     font-size: 0.82rem;
     color: $ink;
@@ -115,7 +115,7 @@
     display: inline-flex;
     align-items: center;
     gap: 0.4rem;
-    font-family: 'Fredoka', sans-serif;
+    font-family: var(--font-display);
     font-weight: 600;
     font-size: 0.95rem;
     color: $ink-soft;
@@ -158,7 +158,7 @@
       box-shadow: 0 4px 0 rgba(58, 42, 31, 0.1);
 
       p {
-        font-family: 'Fredoka', sans-serif;
+        font-family: var(--font-read);
         font-weight: 500;
         font-size: 1rem;
         line-height: 1.35;
@@ -268,7 +268,7 @@
     }
 
     .intro-title {
-      font-family: 'Fredoka', sans-serif;
+      font-family: var(--font-display);
       font-size: 1.9rem;
       font-weight: 600;
       color: $ink;
@@ -294,7 +294,7 @@
       padding: 0.5rem 0.8rem;
 
       .intro-mission {
-        font-family: 'Fredoka', sans-serif;
+        font-family: var(--font-read);
         font-size: 1.05rem;
         font-weight: 500;
         color: $plum-deep;
@@ -324,7 +324,7 @@
 
       .chip-dots { font-size: 0.7rem; color: $amber-deep; letter-spacing: 2px; }
       .chip-dots .dim { color: rgba(58, 42, 31, 0.2); }
-      .chip-label { font-family: 'Fredoka', sans-serif; font-weight: 600; font-size: 0.98rem; }
+      .chip-label { font-family: var(--font-read); font-weight: 600; font-size: 0.98rem; }
       .chip-note { font-size: 0.72rem; color: $ink-soft; }
 
       &:hover { transform: translateY(-2px); }
@@ -382,7 +382,7 @@
     .reward-luna { display: flex; justify-content: center; margin-top: -3.6rem; }
 
     .reward-title {
-      font-family: 'Fredoka', sans-serif;
+      font-family: var(--font-display);
       font-size: 1.6rem;
       font-weight: 600;
       margin-top: 0.3rem;
@@ -429,7 +429,7 @@
       }
 
       .sticker-name {
-        font-family: 'Fredoka', sans-serif;
+        font-family: var(--font-read);
         font-size: 1.15rem;
         font-weight: 600;
       }
@@ -507,7 +507,7 @@
     border-radius: 999px;
     background: #FFFFFF;
     border: 2px solid rgba(58, 42, 31, 0.2);
-    font-family: 'Fredoka', sans-serif;
+    font-family: var(--font-read);
     font-weight: 600;
     font-size: 0.82rem;
     color: $ink;
