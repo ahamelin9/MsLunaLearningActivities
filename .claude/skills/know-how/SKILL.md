@@ -254,6 +254,13 @@ Pitfalls that cost time:
   - `painted()` waits two real frames before the screenshot.
   - Not the fix: `--disable-gpu`. Software drawing made it worse (more
     edge pixels, and the zoom still caught).
+- **Pitfall, the route deals the rounds** (*2026-10-12, DES-9b*): every
+  mount of the library draws the next seeded random numbers (Luna's
+  greeting, the word of the day), so a run that goes home and back into
+  Reading one time fewer deals different letters in every game after it.
+  `ui:shots` always makes that home round trip after the Trophy room, wherever
+  the Trophy room's button lives, so game shots stay comparable when the
+  route to it changes.
 - **Check:** three runs in a row, then `--diff` each pair: 0 changed screens
   at all 4 sizes. To prove the diff can fail, change a 1 px border's colour
   (the status bar's bottom line shows on 24 of 26 screens at y 47), or one

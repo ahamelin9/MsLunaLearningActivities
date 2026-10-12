@@ -49,7 +49,7 @@ them in.
 | 2 | Structure (pure refactors, nothing looks different) | DES-18a–e (done 2026-10-11) | Screenshots you can compare; one folder per page, game and lesson; CSS modules; `games.scss` gone |
 | 3 | Foundations | DES-3 → DES-19 → DES-20 → DES-4 → DES-5 → DES-6 (done 2026-10-11) | Tokens in light and dark; lint enforces the rules after every edit; the Kit page; Andika and Fraunces offline; shared motion; reduced motion |
 | 4 | The kit | DES-7a, DES-7b, DES-7c (done 2026-10-11) | Every kit component on the Kit page in every state |
-| 5 | Frame and shell | DES-8, DES-10, DES-15 (done 2026-10-11), DES-9a (done 2026-10-12) → DES-9b → DES-9c → DES-12 | One header, the layout grid, the new Luna (moved here from Stage 4, Alex 2026-10-11), the restyled home, Settings, trophies and Grade Select; one Luna per screen |
+| 5 | Frame and shell | DES-8, DES-10, DES-15 (done 2026-10-11), DES-9a, DES-9b (done 2026-10-12) → DES-9c → DES-12 | One header, the layout grid, the new Luna (moved here from Stage 4, Alex 2026-10-11), the restyled home, Settings, trophies and Grade Select; one Luna per screen |
 | 6 | The library | DES-21 → **PRG-7 (pulled in)** → DES-13 | The library as on the board: lessons in order, one bar |
 | 7 | Play | DES-22a → DES-11 → DES-22b, DES-22c → DES-23 | GameShell, all 8 games and all 8 lesson types on the kit, with one right/wrong language |
 | 8 | The design system is done | DES-24 | Legacy styles deleted; the check runs strict with no baseline |
@@ -66,20 +66,6 @@ them in.
 - **DES-14** (P2) touches the same folder as DES-22b and can slot in straight after it.
 - **P0 bugs** can still be pulled in between tickets for a break from styling.
 
-
-### DES-9b · Shell restyle, part 2: Settings and the Trophy room
-Story · P0 · M · needs: —
-- **How:**
-  - Settings and the Trophy room become kit Modals with kit buttons, chips and cards, in plain grown-up language.
-  - No board shows them, so Alex OKs the shots.
-  - The achievement badge colours (`data/achievements.ts`) and `TrophyModal`'s inline colours go; badges use roles or `_illustration.scss`.
-  - `components/ui/Button` goes with its last users here. It plays a pop on every tap and the kit's ChunkyButton plays nothing, so a button that should keep its sound calls `soundManager` in its `onClick` (found in DES-7a).
-  - **The Trophy room's way in (Alex, 2026-10-11):** inside the app, a child reaches the collection by tapping the library's squishy shelf (the Squishy Shelf card, PRG-5); the app's header has no trophy button.
-  - **Left by DES-9a (2026-10-12):** the home status bar follows the Home board (time and gear), so nothing opens the Trophy room now. `TrophyModal` is still mounted in `App`, with no opener, and `ui:shots` skips its shot (keeping the number). Give it a way in here, so its restyle can be seen and shot; the squishy shelf itself is PRG-5's. The StarBadge component went with the status bar's stars.
-- **Complete when:**
-  - both screens use kit components and roles only, and their folders show zero;
-  - `components/ui/Button` is deleted;
-  - it's checked in light and dark, and Alex OKs it.
 
 ### DES-9c · Shell restyle, part 3: Grade Select
 Story · P0 · S · needs: —
@@ -257,7 +243,7 @@ Story · P1 · M · needs: DES-11
   - it's checked in light and dark.
 
 ### DES-24 · Retire the legacy styles
-Task · P1 · S · needs: DES-9b, DES-9c, DES-21, DES-22b, DES-22c, DES-23
+Task · P1 · S · needs: DES-9c, DES-21, DES-22b, DES-22c, DES-23
 - **Why:** this is the finish line of the design-system effort (Alex's plan, 2026-10-10).
 - **How:**
   - Delete `src/styles/_variables.scss`, `src/apps/reading/engine/_world.scss`, `src/index.css` (replaced by `styles/base/`), the legacy mixins (`glassmorphism`, `squircle-icon` and the like) and `scripts/design/baseline.json`.
