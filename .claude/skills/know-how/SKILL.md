@@ -227,8 +227,9 @@ Pitfalls that cost time:
   `shell-intro`, `shell-play`, `shell-reward`, `play`, `shell-back`,
   `round-pips`, `win-veil`, `lesson-choice`, `open-settings`, `settings`,
   `open-trophies`, `trophies`, `modal-close`, `app-home` (DES-8), `stage`
-  (GameShell's stage, DES-10). OPS-9 moves the checks in this
-  folder onto them.
+  (GameShell's stage, DES-10), and on the library `change-grade` (the
+  header's grade) and `luna-mute` (the button beside her) (DES-21). OPS-9
+  moves the checks in this folder onto them.
 - **"Does it still fit?"** for a screen whose content grows by grade (Treasure
   Path's 2nd-grade passages): `ui:shots` only plays Kindergarten. Play the game
   at 2nd grade at 1024×768 (the smallest landscape iPad) and compare the
@@ -246,6 +247,26 @@ Pitfalls that cost time:
 - Word chips have no spaces between them in `textContent`. Join their texts
   with `' '`.
 - Scan what a child can see with `document.querySelector('.game-shell').innerText`.
+
+## When does Luna greet on the library, and does her mute work?
+
+*2026-10-12 · DES-21*
+
+- **Symptom:** you need to know she greets only when the library opens from
+  home (not after Grade Select, not back from a game), that a tap repeats the
+  line, that the header's grade leads to Grade Select, and that the button
+  beside her mutes and unmutes her. That's too many paths to listen for.
+- **Fix:** with Vite on 5199, `node .claude/skills/know-how/greeting-check.mjs 5199`
+  walks them all, logging what `pronunciation.say` was asked and counting
+  clip starts per step. It fails on the commit before DES-21, and its mute
+  steps fail when the button is made to do nothing.
+- **Pitfall, a line in parts:** "Shh… some letters are hiding" plays as two
+  clips ("shhh", then the rest), so comparing what was said with the line's
+  text misses it. Match by words (the check's `norm()`), or compare one
+  step's said parts with another's.
+- **Pitfall, a fresh line each visit:** the library picks her greeting as it
+  mounts, so after a game a tap says that visit's line, not the one said
+  from home. Tap her straight after the greeting to test "says it again".
 
 ## Two screenshot runs of the same code don't match
 
@@ -280,6 +301,16 @@ Pitfalls that cost time:
   `ui:shots` always makes that home round trip after the Trophy room, wherever
   the Trophy room's button lives, so game shots stay comparable when the
   route to it changes.
+- **Pitfall, a random draw removed** (*2026-10-12, DES-21*): taking the word
+  of the day off the library removed its `pick()`, so every game after it
+  dealt different letters, and `--diff before after` called every game's play
+  screen changed though no game was touched. Prove it by shooting the last
+  commit with only that draw taken out: `git archive HEAD | tar -x -C <scratch>/head`,
+  link `node_modules`, swap the draw for a constant (DES-21:
+  `useMemo(() => ({ word: 'cat', emoji: '🐈' }), [])`), run
+  `node scripts/ui/shots.mjs --label before-rng` there (and `--theme dark`),
+  copy the folders into `screenshots/`, and `--diff before-rng after`: only the
+  screens the ticket touched should differ. A draw added does the same.
 - **Check:** three runs in a row, then `--diff` each pair: 0 changed screens
   at all 4 sizes. To prove the diff can fail, change a 1 px border's colour
   (the status bar's bottom line shows on 24 of 26 screens at y 47), or one

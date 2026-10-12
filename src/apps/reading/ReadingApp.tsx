@@ -10,7 +10,7 @@ import { GRADES } from '@/data/readingCurriculum';
 import { GradeSelect } from './pages/GradeSelect/GradeSelect';
 import { Hub } from './pages/Hub/Hub';
 import { GameShell } from './engine/GameShell/GameShell';
-import { lessonsFor } from './engine/lessons';
+import { lessonsFor, lessonStates } from './engine/lessons';
 import { surprisePick } from './games';
 
 interface ReadingAppProps {
@@ -66,8 +66,11 @@ export const ReadingApp: React.FC<ReadingAppProps> = ({ progress, onReturnToHome
   // View 1: a lesson or a mini-game, both run by the same shell, which has its own header
   if (activeGame && currentGrade) {
     const { game } = activeGame;
-    // a finished lesson leads on to the next one; a game to one Luna picks
-    const nextLesson = game.lesson ? lessons[lessons.findIndex(l => l.id === game.id) + 1] : undefined;
+    // a finished lesson leads on to the next one, if it's open (PRG-7); a
+    // game to one Luna picks
+    const next = lessons.findIndex(l => l.id === game.id) + 1;
+    const nextOpen = lessonStates(lessons, progress.completedLessons)[next] !== 'locked';
+    const nextLesson = game.lesson && nextOpen ? lessons[next] : undefined;
     return (
       <GameShell
         key={`${game.id}-${activeGame.autoStart}-${activeGame.difficulty}`}

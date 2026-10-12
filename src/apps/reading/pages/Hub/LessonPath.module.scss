@@ -118,7 +118,33 @@
     font-weight: 800;
   }
 
-  &[data-state="done"] { background: #F6FBF3; }
+  &[data-state~="done"] { background: #F6FBF3; }
+
+  // PRG-7: a lesson still to wait for. In the old look until DES-13: faded,
+  // a lock where "✓ done" sits, no lift or sink, and the shared wobble when
+  // tapped. Roles only, so this old file gains no raw values.
+  &[data-state~="locked"] {
+    opacity: 0.55;
+    cursor: default;
+
+    &:hover,
+    &:active {
+      transform: none;
+    }
+  }
+
+  &[data-state~="wobbling"] { animation: var(--motion-wobble); }
+
+  .lesson-lock {
+    position: absolute;
+    top: var(--space-2);
+    right: var(--space-3);
+    z-index: 3;
+    padding: 0 var(--space-2);
+    border-radius: var(--radius-chip);
+    background: var(--well);
+    font: var(--text-label-small);
+  }
 }
 
 .scenery {

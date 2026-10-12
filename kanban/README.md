@@ -72,8 +72,8 @@ be pulled into Phase 1 for a break from styling.
 
 ### Now / Next
 
-- **Now:** DES-21: the library on the kit, as on the Library board (the welcome row with Luna's spoken greeting, Luna's Pick, the Play Shelf on one even grid). The first of Stage 6. Stage 5 (frame and shell) is done (2026-10-12): one header, the layout, the kit's Luna, the home screen, Settings and the Trophy room, Grade Select, and one Luna per screen
-- **Next:** the rest of Stage 6, per "Order to finish the epic" in `epics/DES.md`: PRG-7 (pulled in) → DES-13. Then Stage 7, play: DES-22a → DES-11 → DES-22b, DES-22c → DES-23. SET-1 (the grown-up gate) no longer waits on anything. OPS-9 (know-how checks onto `data-shot`) can start any time: the checks lost their last class names with DES-18d. PRG-7 and SET-1 are pulled in where DES-13 and DES-16 need them. FB-1 (Phase 2) no longer waits on the layout; GAME-1c, Treasure Path's screen, waits on it
+- **Now:** PRG-7 (pulled in): lessons open in order, with Luna's pre-rendered "Let's finish Lesson N first!" on a locked one; its look waits for DES-13. The second of Stage 6. DES-21 (2026-10-12) put the library on the kit: Luna's spoken greeting with a mute beside her, the grade as a header button, the Sticker Tin, Luna's Pick and the Play Shelf
+- **Next:** DES-13, the lesson path on ProgressBar and LessonCard (it also rebuilds DES-21's `LessonPath`), which ends Stage 6. Then Stage 7, play: DES-22a → DES-11 → DES-22b, DES-22c → DES-23. SET-1 (the grown-up gate) no longer waits on anything. OPS-9 (know-how checks onto `data-shot`) can start any time: the checks lost their last class names with DES-18d. PRG-7 and SET-1 are pulled in where DES-13 and DES-16 need them. FB-1 (Phase 2) no longer waits on the layout; GAME-1c, Treasure Path's screen, waits on it
 
 ## Epics
 
@@ -97,7 +97,6 @@ In board order. A new epic gets its file in `epics/` first, then a link here
 | ID | Title | Type | P | Size | Status |
 |---|---|---|---|---|---|
 | **DES** | **Design system & layout** | Epic | **P0** | | |
-| DES-21 | Library on the kit: header, welcome row, Luna's Pick, Play Shelf | Story | P1 | M | In progress |
 | DES-13 | Lesson path on the hub: in order, one bar | Story | P1 | S | Todo |
 | DES-22a | GameShell on the kit: start, stage, perch, reward | Story | P1 | M | Todo |
 | DES-11 | One right/wrong/reveal visual language | Story | P1 | S | Todo |
@@ -122,7 +121,6 @@ In board order. A new epic gets its file in `epics/` first, then a link here
 | BUG-10 | Settings may loop saving when the voice index fails | Bug | P2 | S | Todo |
 | BUG-12 | Day streak rolls over at 7 pm (UTC date) | Bug | P2 | S | Todo |
 | BUG-13 | Trophy dot never clears | Bug | P2 | S | Todo |
-| BUG-14 | "Word of the day" changes on every visit | Bug | P2 | S | Todo |
 | **SET** | **Settings & grown-up area** | Epic | **P0** | | |
 | SET-1 | Grown-up gate for settings | Story | P0 | M | Todo |
 | SET-2 | A child can't silence Luna by accident | Story | P0 | S | Todo |
@@ -153,7 +151,7 @@ In board order. A new epic gets its file in `epics/` first, then a link here
 | PRG-1 | Stars reflect performance | Story | P1 | M | Todo |
 | PRG-5 | Squishies instead of the sticker tin | Story | P1 | M | Todo |
 | PRG-6 | Time per lesson: know it before, see it after | Story | P1 | M | Todo |
-| PRG-7 | Lessons open in order | Story | P1 | M | Todo |
+| PRG-7 | Lessons open in order | Story | P1 | M | In progress |
 | PRG-2 | Points: remove or give them a meaning | Story | P2 | S | Todo |
 | PRG-3 | Achievements worked out in one place | Task | P2 | S | Todo |
 | PRG-4 | Secret platinum trophy for a full squishy shelf | Story | P2 | S | Todo |

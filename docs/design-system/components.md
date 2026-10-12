@@ -77,16 +77,20 @@ and no tail; tapping the line says it again. `layout-audit.mjs` (know-how)
 fails a screen with two. While the milestone moon visits (DES-17), Luna stays
 with `talking={false}` and only the moon talks.
 
+Where space is tight (the library), her line is spoken with no bubble and
+tapping her says it again (DES-21). Beside her there, a kit icon button mutes
+and unmutes her: the same setting as Settings' "Ms. Luna's voice".
+
 Her moods, each a pose of the one drawing (`Luna.tsx`'s `POSES`). Pick one by
 what's happening, and let the line and the mood agree:
 
 | Mood | What it's for | Where it's used today |
 |---|---|---|
-| `happy` | Her everyday face: hello, a start screen, a calm "well done" | the library's greeting, Grade Select, start screens, the perch's default, Feed Luna waiting |
+| `happy` | Her everyday face: hello, a start screen, a calm "well done" | the library (and most of its greetings; each greeting line carries its own mood), Grade Select, start screens, the perch's default, Feed Luna waiting |
 | `cheer` | A right answer to celebrate, a streak, a finished game or lesson | the perch after a win, the done screen, Feed Luna chewing |
 | `think` | Let's look again: a second miss, a clue. Never a telling-off | the perch from the second miss, with the spoken hint |
-| `oops` | A little slip: a first miss, a wrong cookie, her own mishaps (lost glasses). It's about the moment, never the child | the perch on a first miss, Feed Luna spitting out a wrong cookie, the library's quirks |
-| `surprise` | Something found or a fun fact: a reveal, a streak, "letters are hiding!" | the perch on a reveal or a streak, the library's quirks, Luna's Pick |
+| `oops` | A little slip: a first miss, a wrong cookie, her own mishaps (lost glasses). It's about the moment, never the child | the perch on a first miss, Feed Luna spitting out a wrong cookie, the library's greeting "I dusted the shelves AND lost my glasses" |
+| `surprise` | Something found or a fun fact: a reveal, a streak, "letters are hiding!" | the perch on a reveal or a streak, the library's greetings that tease ("some letters are hiding"), Luna's Pick |
 | `listen` | Asking the child to listen again | the perch's "Let's listen one more time" |
 | `idle` | Resting, nothing going on | not used yet (Treasure Path's walker was the last, gone in DES-12) |
 | `sleepy` | Night, or a long pause | not used yet; there if DES-16's night or a wait wants her |

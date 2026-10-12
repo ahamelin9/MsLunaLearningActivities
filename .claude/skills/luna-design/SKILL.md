@@ -145,7 +145,8 @@ changed screens.
   DES-18a).
 - Does Luna's beak move only while a clip plays?
   `node .claude/skills/know-how/luna-talk-check.mjs 5199` (Vite on 5199;
-  DES-15). Her moods and blink are in `kit-check.mjs`.
+  DES-15). Her moods and blink are in `kit-check.mjs`. Her library greeting,
+  the header's grade button and her mute: `greeting-check.mjs` (DES-21).
 - Does a screen fit? `node .claude/skills/know-how/layout-audit.mjs 5199 <grade 0|1|2>`
   (Vite on 5199): nothing scrolls or is cut off mid-round, and no tap target
   outside a game's stage is small, overlapping or in the edge band (DES-10).

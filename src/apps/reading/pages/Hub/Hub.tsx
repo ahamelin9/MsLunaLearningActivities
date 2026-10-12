@@ -7,8 +7,10 @@ import { ChunkyButton, Luna, PaperCard, Tile } from '@/components/kit';
 import { greeting, lunaSay, type LunaLine, type LunaMood } from '../../engine/luna';
 import { STICKERS, stickerById } from '../../engine/stickers';
 import { soundManager } from '@/utils/audio';
+import { pronunciation } from '@/utils/pronunciation';
 import { storageService } from '@/utils/storage';
 import { warmReadingVoice } from '../../engine/warmup';
+import { FINISH_FIRST, lessonStates } from '../../engine/lessons';
 import { LessonPath } from './LessonPath';
 import { ShelfPicture } from './ShelfPicture';
 import styles from './Hub.module.scss';
@@ -88,6 +90,16 @@ export const Hub: React.FC<HubProps> = ({
   const startGame = (game: AnyGameDef) => {
     soundManager.playPop();
     onPlayGame(game);
+  };
+
+  // lessons open in order (PRG-7): a locked one stays shut, and Luna names
+  // the one up next
+  const states = lessonStates(lessons, progress.completedLessons);
+  const finishFirst = () => {
+    const line = FINISH_FIRST[states.indexOf('next') + 1];
+    if (!line) return;
+    setMood('happy');
+    pronunciation.speakSequence([line]);
   };
 
   const voiceOn = progress.settings.speechEnabled;
@@ -178,7 +190,7 @@ export const Hub: React.FC<HubProps> = ({
 
       {/* ---- the lessons come first: the structured teaching, in order (DES-13) ---- */}
       {lessons.length > 0 && (
-        <LessonPath lessons={lessons} progress={progress} gradeTitle={gradeTitle} onStart={startGame} />
+        <LessonPath lessons={lessons} states={states} gradeTitle={gradeTitle} onStart={startGame} onLocked={finishFirst} />
       )}
 
       {/* ---- the Play Shelf: every game the same size, each picture gently alive ---- */}

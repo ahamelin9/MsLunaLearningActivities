@@ -13,6 +13,8 @@
 //     screen's sides and bottom. The header's buttons are left out: they sit
 //     8px from the top, as on the boards. So is the bottom band on the
 //     library, which scrolls: a card at the fold isn't hugging the edge.
+// Lessons open in order (PRG-7), so before the lessons it marks every lesson
+// of the grade done, which keeps them all open.
 //
 //   node .claude/skills/know-how/layout-audit.mjs [port=5199] [grade=0|1|2]
 //
@@ -177,7 +179,23 @@ for (const [width, height] of SIZES) {
     results.push(await page.evaluate(audit, { screen: `${title}, round 1`, midRound: true }));
     await back();
   }
+  // Lessons open in order (PRG-7), so a fresh save opens only the first. Mark
+  // every lesson of this grade done (done lessons stay open), then come back
+  // in from home, so each one can be visited.
+  await page.evaluate(async g => {
+    const { lessonsFor } = await import('/src/apps/reading/engine/lessons.ts');
+    const key = 'ms_luna_learning_progress_v1';
+    const saved = JSON.parse(localStorage.getItem(key));
+    saved.completedLessons = lessonsFor(['kindergarten', 'grade1', 'grade2'][g]).map(l => l.lesson.id);
+    localStorage.setItem(key, JSON.stringify(saved));
+  }, grade);
+  await page.reload({ waitUntil: 'networkidle0' });
+  await page.click(at('open-reading'));
+  await page.waitForSelector(at('hub'));
+  await wait(400);
   const lessons = (await page.$$(at('lesson-tile'))).length;
+  const locked = await page.$$eval(`${at('lesson-tile')}[data-state~="locked"]`, els => els.length);
+  if (locked) throw new Error(`${locked} lesson(s) still locked after marking every lesson done`);
   for (let i = 0; i < lessons; i++) {
     await open('lesson-tile', i);
     await play();

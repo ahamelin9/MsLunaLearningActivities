@@ -50,7 +50,7 @@ them in.
 | 3 | Foundations | DES-3 → DES-19 → DES-20 → DES-4 → DES-5 → DES-6 (done 2026-10-11) | Tokens in light and dark; lint enforces the rules after every edit; the Kit page; Andika and Fraunces offline; shared motion; reduced motion |
 | 4 | The kit | DES-7a, DES-7b, DES-7c (done 2026-10-11) | Every kit component on the Kit page in every state |
 | 5 | Frame and shell | DES-8, DES-10, DES-15 (done 2026-10-11), DES-9a, DES-9b, DES-9c, DES-12 (done 2026-10-12) | One header, the layout grid, the new Luna (moved here from Stage 4, Alex 2026-10-11), the restyled home, Settings, trophies and Grade Select; one Luna per screen |
-| 6 | The library | DES-21 → **PRG-7 (pulled in)** → DES-13 | The library as on the board: lessons in order, one bar |
+| 6 | The library | DES-21 (done 2026-10-12) → **PRG-7 (pulled in)** → DES-13 | The library as on the board: lessons in order, one bar |
 | 7 | Play | DES-22a → DES-11 → DES-22b, DES-22c → DES-23 | GameShell, all 8 games and all 8 lesson types on the kit, with one right/wrong language |
 | 8 | The design system is done | DES-24 | Legacy styles deleted; the check runs strict with no baseline |
 | 9 | What's left of the epic | **SET-1 (pulled in)** → DES-16, then DES-17, then DES-14 | Light/dark follows the iPad with a grown-up choice; the milestone moon; real cookies |
@@ -152,35 +152,6 @@ Story · P1 · M · needs: —
   - her clips are rendered and `voice:audit` passes;
   - the MilestoneMoon folder shows zero in `design:status`.
 
-### DES-21 · Library on the kit: header, welcome row, Luna's Pick, Play Shelf
-Story · P1 · M · needs: —
-- **Why:** the round 2 Library board is approved, but no ticket covered the hub apart from its lesson path (DES-13).
-- **How:**
-  - As on the Library board:
-    - the welcome row (Luna with her spoken greeting). **Spoken, not shown (Alex, 2026-10-09; moved here from DES-12):** where space is tight, as on the library, Luna's greeting is spoken with no always-on speech bubble. A small speaker mark shows she talks, and tapping her says it again;
-    - Luna's Pick;
-    - the Play Shelf: 8 kit Tiles with drawn pictures in place of today's scenery and emoji lanterns.
-  - The Squishy Shelf card and the "Today" panel come with PRG-5 and PRG-6, built from the same kit.
-  - The board's grade chip beside the title in the header was left out by DES-8, since the desk's grade sign still shows the grade. Decide here whether the chip replaces the sign (SET-1 moves changing the grade behind the gate). The header is `components/os/AppHeader`; ReadingApp fills its end.
-  - The hub's own keyframes (`pages/Hub`) move onto the shared motion set.
-  - **From DES-10 (Alex, 2026-10-11):** the Play Shelf sits on one even grid, every tile the same size (today Letter Jar and Treasure Path are double height, and Words Off the Page and Story Corner double width). No title sits on its picture (today Feed Luna, Muddled Cards, Words Off the Page, What's Missing and Story Corner do).
-  - **Settled before building (Alex, 2026-10-12):**
-    - **The lesson path is DES-13's, split by file:** today's lesson section moves unchanged into `pages/Hub/LessonPath.tsx` and its own module, with `SPINE_COLORS` and its old styles. `Hub.tsx` and `Hub.module.scss` go to zero; DES-13 rebuilds LessonPath.
-    - **The Squishy Shelf's space:** a Sticker Tin card stands in, from the kit: "Sticker Tin", "N of 18 found", the last three stickers won on a little plank (tap one to hear its line), and "My trophies" (`open-trophies`). It stretches over the Today space until PRG-6; PRG-5 swaps the stickers for squishies there. The old 18-slot tin goes.
-    - **Grade:** the grade sits beside the header's title, where the board has its chip, and the desk's grade sign goes (so does `badgeEmoji`). **It's a button (Alex, 2026-10-12):** the teacher takes different groups and swaps grades as the schedule needs, so tapping it opens Grade Select with the current grade picked. A kit ChunkyButton (48px, like Home), since the board's chip is too small to tap. Settings' Grade row still works too; whether either goes behind the gate is SET-1's call.
-    - **Her greeting** is spoken when the library opens from the home screen, not straight after Grade Select (it would cut off "Let's start Kindergarten!") and not on coming back from a game. Tapping her says the same line again; her quirks on tap go.
-    - **A mute beside her (Alex, 2026-10-12):** the board's speaker mark read as a mute button, so it is one: a kit icon button beside Luna (speaker when she talks, mute when she doesn't) that switches her voice off and on. It's the same setting as Settings' "Ms. Luna's voice", and muting stops her mid-line. Alex chose it knowing a child can then silence the games, whose targets are only spoken; SET-2 decides whether it's gated.
-    - **Kit over board:** Luna's Pick is the accent ChunkyButton (64px, the dice, "she chooses, you play"); the pictures use the shared sway and float.
-    - **Gone, as the board has none:** the lanterns, the desk books, the word-of-the-day nook (BUG-14 becomes Won't do), and the tiles' taglines, emoji and played stars. Tiles keep each game's own name (the board's "Letter Cookies" is GAME-6).
-- **Complete when:**
-  - the hub matches the Library board (lesson path aside; the Sticker Tin card in the Squishy Shelf's place until PRG-5 and PRG-6) at the four sizes, in light and dark;
-  - the Play Shelf's tiles are all one size, and `layout-audit.mjs` (know-how) lists no "titles on their scenery" at any grade;
-  - `pages/Hub` shows zero in `design:status` apart from `LessonPath`, DES-13's;
-  - Luna's greeting plays when the library opens from home, not after Grade Select or a game, and tapping her plays it again;
-  - tapping the header's grade opens Grade Select with that grade picked, and picking one returns to the library in that grade;
-  - the button beside Luna mutes her (she stops mid-line, and taps stay silent) and unmutes her, and Settings' "Ms. Luna's voice" shows the same;
-  - Alex OKs the shots.
-
 ### DES-22a · GameShell on the kit: start, stage, perch, reward
 Story · P1 · M · needs: —
 - **Why:** every game's start screen is the same centred card with a green that belongs to neither palette, and the reward screen predates the round 2 Done board.
@@ -233,7 +204,7 @@ Story · P1 · M · needs: DES-11
   - it's checked in light and dark.
 
 ### DES-24 · Retire the legacy styles
-Task · P1 · S · needs: DES-21, DES-22b, DES-22c, DES-23
+Task · P1 · S · needs: DES-22b, DES-22c, DES-23
 - **Why:** this is the finish line of the design-system effort (Alex's plan, 2026-10-10).
 - **How:**
   - Delete `src/styles/_variables.scss`, `src/apps/reading/engine/_world.scss`, `src/index.css` (replaced by `styles/base/`), the legacy mixins (`glassmorphism`, `squircle-icon` and the like) and `scripts/design/baseline.json`.
