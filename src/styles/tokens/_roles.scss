@@ -170,6 +170,28 @@ $text-pairs: (
   }
   --tracking-tag: #{p.$tracking-tag};
 
+  // motion: durations, easings, and one shorthand per shared animation, used as
+  //   animation: var(--motion-pop);
+  // The keyframes are in src/styles/motion/_keyframes.scss (global, so CSS
+  // modules don't rename them). DES-6 turns these off under reduced motion.
+  @each $name, $ms in p.$duration {
+    --dur-#{$name}: #{$ms};
+  }
+  @each $name, $curve in p.$easing {
+    --ease-#{$name}: #{$curve};
+  }
+  --motion-pop: luna-pop var(--dur-emphasis) var(--ease-springy);
+  --motion-wobble: luna-wobble var(--dur-emphasis) var(--ease-in-out);
+  --motion-glow: luna-glow var(--dur-loop) var(--ease-in-out) infinite;
+  --motion-float: luna-float var(--dur-loop) var(--ease-in-out) infinite;
+  --motion-sway: luna-sway calc(var(--dur-loop) * 1.5) var(--ease-in-out) infinite;
+  --motion-twinkle: luna-twinkle var(--dur-loop) var(--ease-in-out) infinite;
+  --motion-squish: luna-squish var(--dur-celebrate) var(--ease-standard);
+  --motion-shimmer: luna-shimmer var(--dur-loop) var(--ease-in-out) infinite;
+  --motion-petal-fall: luna-petal-fall var(--dur-petals) var(--ease-in-out) forwards;
+  --motion-grow-in: luna-grow-in var(--dur-enter) var(--ease-springy) both;
+  --motion-talk: luna-talk var(--dur-quick) var(--ease-in-out) infinite;
+
   // stacking
   @each $name, $z in p.$z {
     --z-#{$name}: #{$z};

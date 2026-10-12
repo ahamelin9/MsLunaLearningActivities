@@ -181,6 +181,10 @@ Pitfalls that cost time:
   Under `-e` the arguments shift by one (the first is `process.argv[1]`, not
   `[2]`), so a script reading `argv[2]` starts Vite in the wrong folder and
   every selector times out. Use `process.cwd()` for the repo root.
+- **A puppeteer press does nothing** (*2026-10-11, DES-5*): `page.mouse.down()`
+  at a `boundingBox()` below the fold lands outside the viewport, so `:active`
+  never applies and the check reads the resting style. Scroll the element into
+  view first (`el.scrollIntoView({ block: 'center' })`), then take its box.
 - **Class names stop working from DES-18b:** CSS modules rename them, so the
   selectors above break as each area moves. The stable hooks are `data-shot`
   names (DES-18a): `home`, `open-reading`, `grade-select`, `grade-card`, `hub`,

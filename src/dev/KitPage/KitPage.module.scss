@@ -1,5 +1,6 @@
-// The Kit page (DES-20). Roles, the space scale and em sizes only; the type
-// roles come with DES-4.
+// The Kit page (DES-20). Roles, the space scale and em sizes only.
+
+@use 'styles/mixins' as *;
 
 .page {
   min-height: 100vh;
@@ -169,6 +170,63 @@
 .target {
   background: var(--accent-soft);
   border-style: dashed;
+}
+
+// motion demos (DES-5): each in a little stage, so travel stays on the card
+.stage {
+  display: block;
+  position: relative;
+  overflow: hidden;
+  height: var(--space-16);
+  padding: var(--space-3);
+  margin-bottom: var(--space-2);
+  border-radius: var(--radius-tile);
+  background: var(--well);
+}
+
+.mover {
+  display: block;
+  width: var(--space-10);
+  height: var(--space-10);
+  margin: 0 auto;
+  border-radius: var(--radius-tile);
+  background: var(--action);
+}
+
+.shimmer {
+  display: block;
+  position: relative;
+  overflow: hidden;
+  height: var(--space-10);
+  margin-bottom: var(--space-2);
+  border-radius: var(--radius-chip);
+  border: var(--border-regular) solid var(--rare-edge);
+  background: var(--rare-soft);
+}
+
+.sweep {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -60%;
+  width: 40%;
+  background: var(--shine);
+}
+
+.pressable {
+  @include press;
+  min-height: var(--target-chrome);
+  margin-bottom: var(--space-2);
+  padding: 0 var(--space-4);
+  border-radius: var(--radius-tile);
+  background: var(--action);
+  color: var(--action-ink);
+  font-weight: 700;
+}
+
+.heading .switch {
+  margin-left: var(--space-3);
+  font-size: 0.8em;
 }
 
 .border {

@@ -194,7 +194,7 @@ Each ticket updates its row when it closes (Completion criteria B7 in
 | Design check and contrast check | `scripts/design/` | Done (DES-19, 2026-10-11): both run in `npm run lint`. Baseline 2,365 raw values in 50 files, which may only shrink; 22 text pairs pass 4.5:1 in both modes. `npm run design:status` shows what's left | DES-19 |
 | Kit page | `src/dev/KitPage/` | Done (DES-20, 2026-10-11): `/?kit` in dev only (the production build has none of it). The Tokens tab reads the tokens from `global.scss` itself, with each text role's contrast; the Components tab collects every `.kit.tsx` (none until DES-7a). `ui:shots --kit` shoots light and dark | DES-20 |
 | Type and fonts | tokens, `public/fonts/` | Done (DES-4, 2026-10-11): Andika and Fraunces served from `public/fonts/` (no Google Fonts), 11 type roles, and every old Fredoka/Nunito use points at the font roles (titles Fraunces, the rest Andika). Screens move onto the type roles when restyled | DES-4 |
-| Motion and reduced motion | `src/styles/motion/` | Planned | DES-5, DES-6 |
+| Motion and reduced motion | `src/styles/motion/` | Motion done (DES-5, 2026-10-11): duration, easing and 11 `--motion-*` roles, the shared keyframes, `motionMs()`/`afterMotion()` and the press mixin, all on the Kit page. Areas move onto them when restyled. Reduced motion is DES-6 | DES-5, DES-6 |
 | Kit components | `src/components/kit/` | Planned | DES-7a–c, DES-15, DES-17 |
 | Chrome and layout | header, breakpoints | Planned | DES-8, DES-10 |
 | The tablet shell | `components/os/`, Grade Select | Planned | DES-9a–c |

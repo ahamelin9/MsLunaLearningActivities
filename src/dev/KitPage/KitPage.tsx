@@ -88,6 +88,7 @@ const ALL = tokenNames();
 
 function Tokens() {
   const { ref, values } = useValues(ALL);
+  const [round, setRound] = useState(0); // remounts the motion demos, so the one-shots play again
   const grouped = new Set(ALL.filter(n => GROUPS.some(g => g.test(n))));
   const roles = ALL.filter(n => !grouped.has(n) && parseColour(values[n] ?? ''));
   const pairsFor = (role: string) => PAIRS.filter(([text]) => text === role);
@@ -118,11 +119,16 @@ function Tokens() {
         const names = ALL.filter(test);
         return (
           <div key={title}>
-            <h3 className={styles.heading}>{title}</h3>
+            <h3 className={styles.heading}>
+              {title}
+              {title === 'Motion' && names.length > 0 && (
+                <button className={styles.switch} data-state="off" data-shot="kit-replay" onClick={() => setRound(r => r + 1)}>Play again</button>
+              )}
+            </h3>
             {names.length === 0 ? (
-              <p className={styles.later}>{title === 'Type' ? 'The type roles come with DES-4.' : title === 'Motion' ? 'The motion roles come with DES-5.' : 'None yet.'}</p>
+              <p className={styles.later}>None yet.</p>
             ) : (
-              <ul className={title === 'Illustration palette' ? styles.swatches : styles.demos}>
+              <ul key={title === 'Motion' ? round : undefined} className={title === 'Illustration palette' ? styles.swatches : styles.demos}>
                 {names.map(n => <Demo key={n} name={n} value={values[n] ?? ''} group={title} />)}
               </ul>
             )}
@@ -141,7 +147,7 @@ function Demo({ name, value, group }: { name: string; value: string; group: stri
       case 'Corners': return <span className={styles.corner} style={{ borderRadius: `var(${name})` }} />;
       case 'Elevation':
         if (name.startsWith('--ledge-')) return <span className={styles.lift} style={{ boxShadow: `0 var(${name}) 0 var(--action-edge)`, background: 'var(--action)' }} />;
-        if (name === '--press-depth') return <span className={styles.lift} style={{ transform: `translateY(var(${name}))`, boxShadow: '0 var(--border-hair) 0 var(--action-edge)', background: 'var(--action)' }} />;
+        if (name === '--press-depth') return <button className={styles.pressable} data-shot="kit-press">Press me</button>;
         return <span className={styles.lift} style={{ boxShadow: `var(${name})` }} />;
       case 'Borders': return <span className={styles.border} style={name === '--focus-offset' ? { outline: 'var(--border-thick) solid var(--focus)', outlineOffset: `var(${name})` } : { borderTopWidth: `var(${name})` }} />;
       case 'Type':
@@ -152,7 +158,10 @@ function Demo({ name, value, group }: { name: string; value: string; group: stri
             I l 1 · a g
           </span>
         );
-      case 'Motion': return name.startsWith('--motion-') ? <span className={styles.lift} style={{ animation: `var(${name})` }} /> : null;
+      case 'Motion':
+        if (!name.startsWith('--motion-')) return null;
+        if (name === '--motion-shimmer') return <span className={styles.shimmer}><span className={styles.sweep} style={{ animation: `var(${name})` }} /></span>;
+        return <span className={styles.stage}><span className={styles.mover} style={{ animation: `var(${name})` }} /></span>;
       case 'Touch targets': return <span className={styles.target} style={{ width: `var(${name})`, height: `var(${name})` }} />;
       default: return null;
     }

@@ -25,7 +25,7 @@ Story · P1 · M · needs: FB-1
 - **Complete when:** each tier has at least 3 stories, no answer is copied word for word from a line, and BUG-9 is closed.
 
 ### GAME-3 · Bubble Sounds: smooth, fair bubbles
-Story · P1 · S · needs: DES-5, DES-6
+Story · P1 · S · needs: DES-6
 - **Why:** bubbles move by a `setState` every 60ms, and they can overlap and hide the right bubble.
 - **How:** move the bubbles with CSS transforms or `requestAnimationFrame`, add simple spacing so they don't overlap, and keep a target visible at all times.
 - **Complete when:** bubbles move without a state update per frame, never overlap, and at least one target is always on screen.

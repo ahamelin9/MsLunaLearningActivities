@@ -10,6 +10,21 @@
   outline-offset: var(--focus-offset);
 }
 
+// A pressable thing stands on a hard ledge and sinks onto it when pressed: down
+// by --press-depth, its ledge shrinking to a hairline, over the tap duration
+// (foundations.md, Elevation; DES-5). Ledges: --ledge-small, -medium, -large.
+@mixin press($ledge: var(--ledge-medium), $edge: var(--action-edge)) {
+  box-shadow: 0 $ledge 0 $edge;
+  transition:
+    transform var(--dur-tap) var(--ease-standard),
+    box-shadow var(--dur-tap) var(--ease-standard);
+
+  &:active {
+    transform: translateY(var(--press-depth));
+    box-shadow: 0 var(--border-hair) 0 $edge;
+  }
+}
+
 // The mixins below predate the design system. DES-24 deletes the ones that
 // carry old values (glassmorphism, squircle-icon) with _variables.scss.
 

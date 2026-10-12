@@ -47,7 +47,7 @@ them in.
 |---|---|---|---|
 | 1 | Guardrails | DES-25 (done 2026-10-10) | Claude gets the right standards before any UI edit; people get a pre-commit check |
 | 2 | Structure (pure refactors, nothing looks different) | DES-18a–e (done 2026-10-11) | Screenshots you can compare; one folder per page, game and lesson; CSS modules; `games.scss` gone |
-| 3 | Foundations | DES-3, DES-19, DES-20, DES-4 (done 2026-10-11) → DES-5 → DES-6 | Tokens in light and dark; lint enforces the rules after every edit; the Kit page; Andika and Fraunces offline; shared motion; reduced motion |
+| 3 | Foundations | DES-3, DES-19, DES-20, DES-4, DES-5 (done 2026-10-11) → DES-6 | Tokens in light and dark; lint enforces the rules after every edit; the Kit page; Andika and Fraunces offline; shared motion; reduced motion |
 | 4 | The kit | DES-7a → DES-7b, DES-7c → DES-15 | Every kit component on the Kit page in every state, and the new Luna |
 | 5 | Frame and shell | DES-8 → DES-10 → DES-9a → DES-9b → DES-9c → DES-12 | One header, the layout grid, the restyled home, Settings, trophies and Grade Select; one Luna per screen |
 | 6 | The library | DES-21 → **PRG-7 (pulled in)** → DES-13 | The library as on the board: lessons in order, one bar |
@@ -67,33 +67,8 @@ them in.
 - **P0 bugs** can still be pulled in between tickets for a break from styling.
 
 
-### DES-5 · Motion system
-Story · P0 · M · needs: —
-- **How:**
-  - **Motion roles in the tokens:**
-    - durations tap, enter, emphasis and celebrate, plus a loop length;
-    - easings standard, springy and exit;
-    - one `--motion-*` shorthand per shared animation (`--motion-pop: luna-pop var(--dur-emphasis) var(--ease-springy)`).
-  - **`src/styles/motion/_keyframes.scss`** holds the shared set: pop, wobble, glow, float, sway, twinkle, squish, shimmer, petal-fall, grow-in and talk. It's loaded once by `global.scss`. Modules use the shorthands (`animation: var(--motion-pop)`), which CSS modules don't rename.
-  - Glows use roles inside the keyframes (no hard-coded action colour, unlike the prototype).
-  - **One helper** for JS timers tied to an animation (a wrong answer clears after 600ms to match the wobble). It reads the duration roles, so reduced motion shortens both.
-  - **The press mixin** in `styles/_mixins.scss` (moved here from DES-3, 2026-10-11, because it needs the tap duration): a pressable thing sinks by `--press-depth` and its ledge shrinks to `--border-hair`, over `--dur-tap`.
-  - Areas move onto the shared set when they're restyled. Until then, an area's own keyframes stay in its module, and the ratchet counts them.
-- **Rules (in `foundations.md`):**
-  - Motion is for feedback, celebration and drawing attention.
-  - Things the child is reading never move, except in Bubble Sounds, where movement is the game.
-  - Ambient loops are slow (4s or more) and pause during play.
-  - A celebration may run up to 2.2s (the petals) if it never blocks input for the next round.
-  - Luna's talking animation follows the audio.
-- **Complete when:**
-  - every shared animation plays on the Kit page;
-  - a demo on the Kit page sinks on press with the press mixin, its ledge shrinking to a hairline;
-  - no keyframe in the motion folder uses a raw colour;
-  - the design check refuses a new `@keyframes` outside the motion folder;
-  - on the real iPad, a glow takes the dark colour in dark mode (Alex).
-
 ### DES-6 · Reduced motion, wired end to end
-Story · P0 · S · needs: DES-5
+Story · P0 · S · needs: —
 - **Why:** the `reducedMotion` setting is saved but never read. The device setting is ignored in the games' styles (`games/*/`), the confetti, and the home-screen glow bubbles.
 - **How:**
   - Set `data-reduced-motion` on the app root from either the setting or `prefers-reduced-motion`.
@@ -103,7 +78,7 @@ Story · P0 · S · needs: DES-5
 - **Complete when:** with the flag on, no screen has continuous motion and every game is still playable.
 
 ### DES-7a · Kit, part 1: the basics
-Story · P0 · M · needs: DES-5
+Story · P0 · M · needs: —
 - **Why:** a restyle should mean changing the kit, not every screen. Today `components/ui/Button` is in the old OS style, and every screen draws its own cards and chips.
 - **Each kit component** lives in `src/components/kit/<Name>/` and has:
   - `<Name>.tsx`, opening with a header comment: what it is, its props, its states, the component tokens it declares and the roles they read;
@@ -214,7 +189,7 @@ Story · P0 · M · needs: DES-7a
   - no media query outside the breakpoint mixin.
 
 ### DES-11 · One right/wrong/reveal visual language
-Story · P1 · S · needs: DES-5, DES-7b, DES-22a
+Story · P1 · S · needs: DES-7b, DES-22a
 - **How:** use the same right glow, wrong wobble, win veil and "revealed" style (for FB-2) in every game and lesson, through `Choice` and the shell's flash. Game pieces that aren't Choices (bubbles, cookies, bugs, memory cards, word tiles) use the same state roles, `data-state` and motion. The games and lessons adopt it in DES-22b, DES-22c and DES-23.
   - **A win grows flowers (Alex, 2026-10-09):** a solved round grows a few flowers up the sides of the stage, and petals fall instead of confetti, as on the round 2 Round board. The lesson-done screen uses the same petals. Flowers and petals never cover the answer choices or block the next tap. **Kept for now (Alex, 2026-10-10):** the teacher dropped flowers for progress (DES-13), not for wins; change this only if she asks.
 - **Complete when:**
@@ -286,7 +261,7 @@ Story · P0 · M · needs: DES-7a
   - the Luna folder shows zero in `design:status`.
 
 ### DES-17 · The moon visits for big milestones
-Story · P1 · M · needs: DES-15, DES-5
+Story · P1 · M · needs: DES-15
 - **Why:** the teacher (2026-10-10): the second moon on the round 2 Ms. Luna board, a crescent with a face and black glasses, comes in every once in a while to say "good job" for big milestones. The owl stays Luna.
 - **How:**
   - Draw that moon (round 2 Ms. Luna board, moon 6, marked "Milestone moon") as its own kit component, `src/components/kit/MilestoneMoon/`, in moon gold from `_illustration.scss`, the one colour outside the palette. She needs a happy and a cheer look, both shown on the Kit page. Her mouth moves only while her clip plays.

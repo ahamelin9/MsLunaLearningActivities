@@ -151,6 +151,13 @@ In code: `--target-answer`, `--target-chrome`, `--target-gap` and
 | `petals` | Falling petals after a win |
 | `loop` | The shortest ambient loop |
 
+- **In code:** durations are `--dur-tap` … `--dur-loop`, easings `--ease-standard`,
+  `--ease-springy`, `--ease-soft-spring`, `--ease-exit` and `--ease-in-out`, and
+  each shared animation is a whole `--motion-*` shorthand. The keyframes live in
+  `src/styles/motion/_keyframes.scss` (named `luna-*`). A JS timer uses
+  `motionMs('emphasis')` or `afterMotion('emphasis', fn)` from
+  `src/utils/motion.ts`. A pressable thing uses the `press` mixin from
+  `styles/mixins`. The Kit page plays every one (Play again restarts them).
 - **Easings:** `standard` for most things, `springy` for a pop with a little
   overshoot, `soft-spring` for bars filling, `exit` for things leaving.
 - **The shared animations:** pop, wobble, glow, float, sway, twinkle, squish,

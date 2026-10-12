@@ -29,8 +29,8 @@ export const SRC_EXT = /\.(scss|css|ts|tsx)$/;
 export const HINTS = {
   colour: 'raw colour: use a role (var(--card)) or, in a drawing, an --illo-* colour. See docs/design-system/colour.md',
   size: 'raw size: use the space scale (var(--space-4)) or a radius, border, ledge or target role; media queries go through bp(). See docs/design-system/foundations.md',
-  motion: 'raw duration or easing: use a motion role (DES-5 adds them). See docs/design-system/foundations.md, Motion',
-  keyframes: '@keyframes live only in src/styles/motion/: use a --motion-* role (DES-5). See docs/design-system/foundations.md, Motion',
+  motion: 'raw duration or easing: use a motion role (var(--dur-emphasis), var(--ease-standard), or a whole var(--motion-pop)). See docs/design-system/foundations.md, Motion',
+  keyframes: '@keyframes live only in src/styles/motion/: use a shared animation (animation: var(--motion-pop)), or add one there with Alex\'s OK. See docs/design-system/foundations.md, Motion',
   primitives: 'only src/styles/tokens/ may use the primitives: read a role instead. See docs/design-system/colour.md',
   'kit-page': 'every kit component needs <Name>.kit.tsx showing its states. See docs/design-system/components.md',
   marker: 'design-exception(ID): why — the ID must be on the board or in kanban/CHANGELOG.md, and the reason must be there. See docs/design-system/fitting-in.md'

@@ -67,6 +67,7 @@ mentioned and what the prototype follows"). A future proposal is marked
 | 2026-10-11 | Andika (400, 700) and Fraunces (one variable file with every axis) are served from `public/fonts/`, from Fontsource's copies of the Google Fonts files (OFL; licences beside them). Latin only | Claude, Alex OK | Offline classroom iPads; about 160 KB | DES-4 |
 | 2026-10-11 | Until each screen is restyled, its old font declarations point at the roles: titles and headings (`…-title`, `h1`–`h6`, the Hub's grade sign) at Fraunces, everything else at Andika | Alex | Closest to the approved boards now, and every letter a child reads becomes Andika at once | DES-4 |
 | 2026-10-11 | The type roles' weights and line heights: display 600 (display-xl 650, cue 700) at 1.1–1.25; read 400 at 1.45; labels, tags and answers 700 at 1–1.25 | Claude | From the prototype; decisions.md had the sizes only | DES-4 |
+| 2026-10-11 | The shared animations' distances come from the space scale (rounded up: 9→8, 10→12…) and the falling petals' from the viewport (vh), so the motion folder holds no raw values. Sway runs 1.5 loops (6s); the petals ease in-out and the squish standard (the prototype's one-off curves go) | Claude | One set of scales, as decisions.md asks | DES-5 |
 | 2026-10-11 | The after-edit hook compares a file with its committed version, by rule and text, so only values the edit added are reported | Claude | Moving a line or editing an old file shouldn't nag; adding a value should | DES-19 |
 
 ## Standards settled on 2026-10-10 (Alex approved)

@@ -153,6 +153,24 @@ $type: (
 );
 $tracking-tag: 0.08em;
 
+// ── Motion (DES-5), from decisions.md ──────────────────────────────────────
+$duration: (
+  tap: 120ms,        // press and release
+  quick: 240ms,      // colour changes, small state changes, Luna's talking beat
+  emphasis: 400ms,   // the wrong wobble, the right pop
+  enter: 600ms,      // things arriving
+  celebrate: 700ms,  // big pops, stars landing, a squish
+  petals: 2200ms,    // petals falling after a win
+  loop: 4s,          // the shortest ambient loop
+);
+$easing: (
+  standard: cubic-bezier(0.2, 0, 0, 1),
+  springy: cubic-bezier(0.34, 1.56, 0.64, 1),     // a pop with a little overshoot
+  soft-spring: cubic-bezier(0.34, 1.3, 0.64, 1),  // bars filling
+  exit: cubic-bezier(0.4, 0, 1, 1),               // things leaving
+  in-out: ease-in-out,                            // loops
+);
+
 // ── Stacking ───────────────────────────────────────────────────────────────
 $z: (
   ground: 0,
