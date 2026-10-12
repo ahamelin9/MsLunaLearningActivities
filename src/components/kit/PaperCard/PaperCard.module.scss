@@ -1,0 +1,27 @@
+// PaperCard (DES-7a): component tokens first; the three heights swap only these.
+
+.root {
+  --paper-bg: var(--card);
+  --paper-edge: var(--edge);
+  --paper-elevation: var(--elevation-card);
+  --paper-radius: var(--radius-card);
+  --paper-pad: var(--space-5);
+
+  padding: var(--paper-pad);
+  border: var(--border-regular) solid var(--paper-edge);
+  border-radius: var(--paper-radius);
+  background: var(--paper-bg);
+  box-shadow: var(--paper-elevation);
+  color: var(--ink);
+}
+
+.root[data-variant='flat'] {
+  --paper-elevation: var(--elevation-flat);
+}
+
+// modals and the lesson-done panel only
+.root[data-variant='lifted'] {
+  --paper-elevation: var(--elevation-lifted);
+  --paper-radius: var(--radius-stage);
+  --paper-pad: var(--space-6);
+}

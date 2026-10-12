@@ -97,7 +97,7 @@ In board order. A new epic gets its file in `epics/` first, then a link here
 | ID | Title | Type | P | Size | Status |
 |---|---|---|---|---|---|
 | **DES** | **Design system & layout** | Epic | **P0** | | |
-| DES-7a | Kit, part 1: the basics | Story | P0 | M | Todo |
+| DES-7a | Kit, part 1: the basics | Story | P0 | M | In progress |
 | DES-7b | Kit, part 2: play | Story | P0 | M | Todo |
 | DES-7c | Kit, part 3: progress and rewards | Story | P0 | M | Todo |
 | DES-15 | Draw the chosen Ms. Luna | Story | P0 | M | Todo |

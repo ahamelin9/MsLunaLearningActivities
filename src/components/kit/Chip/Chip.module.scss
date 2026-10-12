@@ -1,0 +1,44 @@
+// Chip (DES-7a): component tokens first; the variants swap only these.
+
+.root {
+  --chip-bg: var(--well);
+  --chip-ink: var(--ink-soft);
+  --chip-icon: currentColor;
+  --chip-font: var(--text-label-small);
+  --chip-pad: var(--space-2);
+
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--chip-pad) var(--space-3) var(--chip-pad) var(--space-2);
+  border-radius: var(--radius-chip);
+  background: var(--chip-bg);
+  color: var(--chip-ink);
+  font: var(--chip-font);
+  white-space: nowrap;
+}
+
+.icon {
+  color: var(--chip-icon);
+}
+
+.root[data-variant='took'] {
+  --chip-bg: var(--right-soft);
+  --chip-ink: var(--right-text);
+}
+
+// "Up next", "12 min today", the up-next lesson's time
+.root[data-variant='accent'] {
+  --chip-bg: var(--accent-soft);
+  --chip-ink: var(--accent-text);
+}
+
+// the stars in the header: a bigger pill with a filled star
+.root[data-variant='count'] {
+  --chip-bg: var(--accent-soft);
+  --chip-ink: var(--ink);
+  --chip-icon: var(--accent-edge);
+  --chip-font: var(--text-label);
+  --chip-pad: var(--space-3);
+  --icon-fill: var(--accent);
+}

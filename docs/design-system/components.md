@@ -32,12 +32,12 @@ list. Restyling the app means changing these, not every screen. The Kit page
 
 | Component | What it is | Variants and states | Ticket |
 |---|---|---|---|
-| `Icon` | The drawn icon set: round-capped strokes in `currentColor`, no colour of its own | check, clock, lock, unlock, chevrons, arrows, home, speaker, ear, replay, gear, info, book, dice, play, star, sparkle | DES-7a |
-| `ChunkyButton` | The pressable button with a hard ledge | action, secondary, quiet (dashed), icon; sizes 48 and 64; pressed, disabled | DES-7a |
-| `PaperCard` | The card surface | flat, card, lifted | DES-7a |
-| `Chip` | A small pill: tag, count or time | time ("about 5 min"), took ("took 4 min"), accent ("Up next"), count (stars). `TimeChip` is a preset | DES-7a |
-| `Tile` | A card with a picture area and a name | the Play Shelf's games | DES-7a |
-| `Modal` | A lifted card over a dimmed screen, with a 48px close button | grown-up screens (Settings, trophies) | DES-7a |
+| `Icon` | The drawn icon set: round-capped strokes in `currentColor`, no colour of its own | check, clock, lock, unlock, chevron and arrow left/right, home, speaker, mute, ear, replay, gear, info, book, dice, play, star, sparkle, close, trophy, lightbulb; sizes 16, 20, 24, 32; filled | DES-7a (done) |
+| `ChunkyButton` | The pressable button with a hard ledge | action, secondary, quiet (dashed), icon; sizes 48 and 64; an icon before or after the words; pressed, disabled | DES-7a (done) |
+| `PaperCard` | The card surface | flat, card, lifted | DES-7a (done) |
+| `Chip` | A small pill: tag, count or time | time ("about 5 min"), took ("took 4 min"), accent ("Up next", "12 min today"), count (stars). `TimeChip` is a preset: `minutes`, `took`, `highlight` | DES-7a (done) |
+| `Tile` | A card with a picture area and a name | the Play Shelf's games; picture tints 1–5; pressed | DES-7a (done) |
+| `Modal` | A lifted card over a dimmed screen, with a 48px close button | grown-up screens (Settings, trophies); open, closed. The one kit root with its own position (fixed); not in a portal, so it keeps its screen's mode | DES-7a (done) |
 | `Choice` | **The only answer button** | letter, word, picture × idle, pressed, wrong, right, revealed, faded/disabled | DES-7b |
 | `ListenCue` | The "?" arch that holds the target's place | waiting, tapped (ripple), found | DES-7b |
 | `SpeechBubble` | Luna's line in a card with a tail | tail left or bottom; optional "Hear my clue" button | DES-7b |
@@ -105,7 +105,11 @@ The module declares its tokens at the top, and variants only swap them:
 
 `<Name>.kit.tsx` renders every variant and state, so the Kit page picks it up
 without being edited. Its default export is a component with no props; the
-page shows it under the folder's name, once per mode.
+page shows it under the folder's name, once per mode. Lay the states out with
+`Specimens` and `Specimen` from `src/dev/KitPage/Specimen.tsx`, so every
+component reads the same way (`onCard` for pieces that sit on cards, `frame`
+for an overlay). A pressed state is held with `data-state="pressed"`, which the
+`press` mixin treats like `:active`.
 
 ## Adding a component
 

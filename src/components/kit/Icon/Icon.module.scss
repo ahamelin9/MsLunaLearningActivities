@@ -1,0 +1,29 @@
+// Icon (DES-7a): component tokens first. Sizes come from the space scale.
+
+.root {
+  --icon-size: var(--space-6);
+  --icon-stroke: 2.2; // the round 2 line, in the 24 grid's units
+
+  flex: none;
+  width: var(--icon-size);
+  height: var(--icon-size);
+  fill: none;
+  stroke: currentColor;
+  stroke-width: var(--icon-stroke);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.root[data-size='16'] { --icon-size: var(--space-4); }
+.root[data-size='20'] { --icon-size: var(--space-5); }
+.root[data-size='32'] { --icon-size: var(--space-8); }
+
+// a filled shape takes the second colour a kit parent gives it, or its own
+.root[data-filled] {
+  fill: var(--icon-fill, currentColor);
+}
+
+.root [data-dot] {
+  fill: currentColor;
+  stroke: none;
+}

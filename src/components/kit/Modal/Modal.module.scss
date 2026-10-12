@@ -1,0 +1,39 @@
+// Modal (DES-7a): component tokens first. The card is a lifted PaperCard; this
+// module only places it and dims what's behind.
+
+.root {
+  --modal-dim: var(--shade-deep); // the lifted card's shade, over the whole screen
+  --modal-width: calc(var(--space-16) * 8);
+
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-modal);
+  display: grid;
+  place-items: center;
+  padding: var(--target-edge);
+  background: var(--modal-dim);
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  width: min(100%, var(--modal-width));
+  max-height: 100%;
+  overflow: auto;
+
+  &:focus-visible {
+    outline: none;
+  }
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.title {
+  flex: 1;
+  font: var(--text-display-m);
+}

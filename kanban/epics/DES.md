@@ -148,7 +148,7 @@ Story · P0 · M · needs: DES-7a, DES-9a
   - Settings and the Trophy room become kit Modals with kit buttons, chips and cards, in plain grown-up language.
   - No board shows them, so Alex OKs the shots.
   - The achievement badge colours (`data/achievements.ts`) and `TrophyModal`'s inline colours go; badges use roles or `_illustration.scss`.
-  - `components/ui/Button` goes with its last users here.
+  - `components/ui/Button` goes with its last users here. It plays a pop on every tap and the kit's ChunkyButton plays nothing, so a button that should keep its sound calls `soundManager` in its `onClick` (found in DES-7a).
 - **Complete when:**
   - both screens use kit components and roles only, and their folders show zero;
   - `components/ui/Button` is deleted;
@@ -337,6 +337,7 @@ Task · P1 · S · needs: DES-9a, DES-9b, DES-9c, DES-21, DES-22b, DES-22c, DES-
 - **Why:** this is the finish line of the design-system effort (Alex's plan, 2026-10-10).
 - **How:**
   - Delete `src/styles/_variables.scss`, `src/apps/reading/engine/_world.scss`, `src/index.css` (replaced by `styles/base/`), the legacy mixins (`glassmorphism`, `squircle-icon` and the like) and `scripts/design/baseline.json`.
+  - Delete `components/ui/Icons`, once the restyles have moved every screen onto the kit's Icon (DES-7a). No ticket owns it before this one.
   - The design check then runs strict, with no baseline.
 - **Complete when:**
   - `npm run lint` passes with no baseline: every colour, size, radius, border, shadow, duration and breakpoint in `src` comes from the token files;

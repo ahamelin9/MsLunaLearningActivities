@@ -1,0 +1,76 @@
+// ChunkyButton (DES-7a): component tokens first; variants and sizes swap only
+// these. The press is the shared mixin: it sinks by --press-depth and the
+// ledge shrinks to a hairline.
+
+@use 'styles/mixins' as *;
+
+.root {
+  --button-bg: var(--card);
+  --button-ink: var(--ink);
+  --button-border: var(--edge);
+  --button-border-style: solid;
+  --button-edge: var(--edge);
+  --button-ledge: var(--ledge-small);
+  --button-height: var(--target-chrome);
+  --button-pad: var(--space-5);
+
+  @include press(var(--button-ledge), var(--button-edge));
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-width: var(--button-height);
+  min-height: var(--button-height);
+  padding: 0 var(--button-pad);
+  border: var(--border-regular) var(--button-border-style) var(--button-border);
+  border-radius: var(--radius-tile);
+  background: var(--button-bg);
+  color: var(--button-ink);
+  font: var(--text-label);
+  white-space: nowrap;
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+
+  // an icon on one side sits a step closer to the edge, as on the boards
+  &[data-icon='start'] { padding-left: var(--space-4); }
+  &[data-icon='end'] { padding-right: var(--space-4); }
+
+  &:disabled,
+  &:disabled:active {
+    cursor: default;
+    opacity: 0.5;
+    transform: none;
+    box-shadow: 0 var(--button-ledge) 0 var(--button-edge);
+  }
+}
+
+.root[data-size='64'] {
+  --button-height: var(--target-answer);
+  --button-ledge: var(--ledge-medium);
+}
+
+.root[data-variant='action'] {
+  --button-bg: var(--action);
+  --button-ink: var(--action-ink);
+  --button-border: var(--action);
+  --button-edge: var(--action-edge);
+  --button-ledge: var(--ledge-medium);
+}
+
+// a step back from the main thing: dashed, no ledge, on the ground
+.root[data-variant='quiet'] {
+  --button-bg: transparent;
+  --button-ink: var(--ink-soft);
+  --button-border: var(--soil);
+  --button-border-style: dashed;
+  --button-edge: transparent;
+  --button-ledge: 0;
+}
+
+// a square with only an icon: the header's gear
+.root[data-variant='icon'] {
+  --button-ink: var(--ink-soft);
+  --button-pad: 0;
+}

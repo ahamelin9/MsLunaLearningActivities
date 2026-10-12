@@ -13,13 +13,15 @@
 // A pressable thing stands on a hard ledge and sinks onto it when pressed: down
 // by --press-depth, its ledge shrinking to a hairline, over the tap duration
 // (foundations.md, Elevation; DES-5). Ledges: --ledge-small, -medium, -large.
+// `data-state="pressed"` holds the press, so the Kit page can show it (DES-7a).
 @mixin press($ledge: var(--ledge-medium), $edge: var(--action-edge)) {
   box-shadow: 0 $ledge 0 $edge;
   transition:
     transform var(--dur-tap) var(--ease-standard),
     box-shadow var(--dur-tap) var(--ease-standard);
 
-  &:active {
+  &:active,
+  &[data-state~='pressed'] {
     transform: translateY(var(--press-depth));
     box-shadow: 0 var(--border-hair) 0 $edge;
   }

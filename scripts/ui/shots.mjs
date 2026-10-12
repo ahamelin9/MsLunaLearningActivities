@@ -6,7 +6,8 @@
 //   npm run ui:shots -- --label before        -> screenshots/before/
 //   npm run ui:shots -- --label after         -> screenshots/after/
 //   npm run ui:shots -- --diff before after   -> screenshots/diff-before-after/
-//   npm run ui:shots -- --kit --label kit     -> screenshots/kit/kit/{light,dark}.png (DES-20)
+//   npm run ui:shots -- --kit --label kit     -> screenshots/kit/kit/{light,dark}.png, the tokens (DES-20),
+//                                                and components-{light,dark}.png (DES-7a)
 //   npm run ui:shots -- --reduced-motion      -> the same run with Reduce Motion on; fails if anything still moves (DES-6)
 //
 // It starts its own Vite dev server and drives the Chrome already installed
@@ -623,9 +624,11 @@ async function shoot(label, reduced = false) {
 }
 
 /**
- * The Kit page (DES-20), light and dark, as two full-page shots at 1180×820 in
- * screenshots/<label>/kit/. Only that folder is replaced, so the kit can sit
- * beside a label's screens, and --diff compares it like another size.
+ * The Kit page (DES-20), light and dark, as full-page shots at 1180×820 in
+ * screenshots/<label>/kit/: the Tokens tab as {light,dark}.png and the
+ * Components tab as components-{light,dark}.png (DES-7a). Only that folder is
+ * replaced, so the kit can sit beside a label's screens, and --diff compares it
+ * like another size.
  */
 async function shootKit(label) {
   const outDir = join(ROOT, 'screenshots', label, 'kit');
@@ -642,12 +645,15 @@ async function shootKit(label) {
   const devtools = await page.createCDPSession();
   await devtools.send('Animation.enable');
   await devtools.send('Animation.setPlaybackRate', { playbackRate: 0 });
-  for (const mode of ['light', 'dark']) {
-    await page.goto(`${url}?kit&mode=${mode}`, { waitUntil: 'networkidle0' });
-    await page.waitForSelector(at('kit-page'));
-    await page.evaluate(() => document.fonts.ready.then(() => new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)))));
-    await page.screenshot({ path: join(outDir, `${mode}.png`), fullPage: true });
-    console.log(`  kit  ${mode}.png`);
+  for (const tab of ['tokens', 'components']) {
+    for (const mode of ['light', 'dark']) {
+      const file = tab === 'tokens' ? `${mode}.png` : `${tab}-${mode}.png`;
+      await page.goto(`${url}?kit&tab=${tab}&mode=${mode}`, { waitUntil: 'networkidle0' });
+      await page.waitForSelector(at('kit-page'));
+      await page.evaluate(() => document.fonts.ready.then(() => new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)))));
+      await page.screenshot({ path: join(outDir, file), fullPage: true });
+      console.log(`  kit  ${file}`);
+    }
   }
   await browser.close();
   await server.close();

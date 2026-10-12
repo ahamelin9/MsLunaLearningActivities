@@ -1,0 +1,67 @@
+// The Kit page's specimen layout (DES-7a). Roles, the space scale and em sizes only.
+
+.group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-bottom: var(--space-4);
+}
+
+.title {
+  font-size: 0.9em;
+  color: var(--ink-soft);
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: var(--space-4);
+
+  &[data-variant='card'] {
+    padding: var(--space-3);
+    border: var(--border-regular) solid var(--edge);
+    border-radius: var(--radius-card);
+    background: var(--card);
+  }
+}
+
+.specimen {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-width: 0;
+
+  &[data-variant='wide'] {
+    flex: 1 1 18em;
+  }
+
+  // a box of its own: the transform makes it the containing block for a fixed
+  // overlay, so an open Modal fills this box, not the page
+  &[data-variant='frame'] {
+    flex: 1 1 24em;
+
+    .sample {
+      position: relative;
+      transform: translateZ(0);
+      overflow: hidden;
+      min-height: 26em;
+      padding: 0;
+      border: var(--border-hair) dashed var(--edge);
+      border-radius: var(--radius-tile);
+    }
+  }
+}
+
+.sample {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3);
+}
+
+.label {
+  font-size: 0.8em;
+  color: var(--ink-soft);
+  overflow-wrap: anywhere;
+}

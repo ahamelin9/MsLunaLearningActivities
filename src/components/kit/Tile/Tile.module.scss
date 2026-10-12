@@ -1,0 +1,44 @@
+// Tile (DES-7a): component tokens first; the tints swap only --tile-tint.
+
+@use 'styles/mixins' as *;
+
+.root {
+  --tile-bg: var(--card);
+  --tile-ink: var(--ink);
+  --tile-edge: var(--edge);
+  --tile-tint: var(--picture-1);
+  --tile-picture: calc(var(--space-16) + var(--space-2)); // the board's picture band
+
+  @include press(var(--ledge-small), var(--tile-edge));
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  text-align: left;
+  border: var(--border-regular) solid var(--tile-edge);
+  border-radius: var(--radius-card);
+  background: var(--tile-bg);
+  color: var(--tile-ink);
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+.root[data-tint='2'] { --tile-tint: var(--picture-2); }
+.root[data-tint='3'] { --tile-tint: var(--picture-3); }
+.root[data-tint='4'] { --tile-tint: var(--picture-4); }
+.root[data-tint='5'] { --tile-tint: var(--picture-5); }
+
+.picture {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: var(--tile-picture);
+  overflow: hidden;
+  background: var(--tile-tint);
+}
+
+.name {
+  padding: var(--space-3) var(--space-4);
+  font: var(--text-label);
+}

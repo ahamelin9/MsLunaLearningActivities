@@ -70,6 +70,10 @@ mentioned and what the prototype follows"). A future proposal is marked
 | 2026-10-11 | The shared animations' distances come from the space scale (rounded up: 9→8, 10→12…) and the falling petals' from the viewport (vh), so the motion folder holds no raw values. Sway runs 1.5 loops (6s); the petals ease in-out and the squish standard (the prototype's one-off curves go) | Claude | One set of scales, as decisions.md asks | DES-5 |
 | 2026-10-11 | The Less Motion switch goes in Settings now, without a gate; SET-1's grown-up gate will cover it with the rest of Settings. Reduced motion is on when the switch or the iPad's own setting is | Alex | SET-1 doesn't exist yet, and gating all of Settings later covers it | DES-6, SET-1 |
 | 2026-10-11 | The after-edit hook compares a file with its committed version, by rule and text, so only values the edit added are reported | Claude | Moving a line or editing an old file shouldn't nag; adding a value should | DES-19 |
+| 2026-10-11 | The kit's Icon set is the boards' drawings plus close, mute, trophy, lightbulb, play, sparkle and a new book, all in the 2.2 line. The old set's Math, Science and Art icons aren't carried over | Claude | Reading only, no school subjects (2026-10-08); the board's book, a bare cover, read as a square at 24px | DES-7a |
+| 2026-10-11 | The Modal dims the screen with `--shade-deep`, the lifted card's own shade, and is the one kit root that sets its own position (fixed, over the screen). It renders where it's used, not in a portal, so it keeps that screen's light or dark | Claude | Reuse before a new role (fitting-in.md); an overlay has to cover the screen | DES-7a |
+| 2026-10-11 | "Up next" is the accent Chip, `--accent-soft` with `--accent-text`, as colour.md says. The Library board drew it in solid `--accent` | Claude | The written standard wins over the frozen board | DES-7a, DES-7c |
+| 2026-10-11 | `data-state="pressed"` holds the press mixin's pressed look, as `:active` does, so the Kit page can show a pressed state without a finger on it | Claude | Every state on the Kit page (components.md, rule 7) | DES-7a |
 
 ## Standards settled on 2026-10-10 (Alex approved)
 

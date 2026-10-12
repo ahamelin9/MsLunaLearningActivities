@@ -118,8 +118,10 @@ so changing a `## Rules` section changes what Claude is shown.
 - **Handle something that doesn't fit:** see [fitting-in.md](fitting-in.md).
 - **See everything:** run `npm run dev` and open `/?kit` (DES-20): the Tokens
   and Components tabs, in light, dark or side by side (`&mode=light|dark|both`).
-  `npm run ui:shots -- --kit --label <name>` saves both modes as full-page shots
-  in `screenshots/<name>/kit/`, which `--diff` compares like a screen size.
+  `npm run ui:shots -- --kit --label <name>` saves both tabs in both modes as
+  full-page shots in `screenshots/<name>/kit/` (`light.png` and `dark.png` for
+  the tokens, `components-light.png` and `components-dark.png`), which `--diff`
+  compares like a screen size.
 - **Check your work:** `npm run lint` runs eslint, the design check and the
   contrast check. `npm run design:status` shows what's left per area (DES-19).
   A failure? See "Reading a design check failure" below.
