@@ -49,7 +49,7 @@ them in.
 | 2 | Structure (pure refactors, nothing looks different) | DES-18a–e (done 2026-10-11) | Screenshots you can compare; one folder per page, game and lesson; CSS modules; `games.scss` gone |
 | 3 | Foundations | DES-3 → DES-19 → DES-20 → DES-4 → DES-5 → DES-6 (done 2026-10-11) | Tokens in light and dark; lint enforces the rules after every edit; the Kit page; Andika and Fraunces offline; shared motion; reduced motion |
 | 4 | The kit | DES-7a, DES-7b, DES-7c (done 2026-10-11) | Every kit component on the Kit page in every state |
-| 5 | Frame and shell | DES-8, DES-10 (done 2026-10-11) → DES-15 → DES-9a → DES-9b → DES-9c → DES-12 | One header, the layout grid, the new Luna (moved here from Stage 4, Alex 2026-10-11), the restyled home, Settings, trophies and Grade Select; one Luna per screen |
+| 5 | Frame and shell | DES-8, DES-10, DES-15 (done 2026-10-11) → DES-9a → DES-9b → DES-9c → DES-12 | One header, the layout grid, the new Luna (moved here from Stage 4, Alex 2026-10-11), the restyled home, Settings, trophies and Grade Select; one Luna per screen |
 | 6 | The library | DES-21 → **PRG-7 (pulled in)** → DES-13 | The library as on the board: lessons in order, one bar |
 | 7 | Play | DES-22a → DES-11 → DES-22b, DES-22c → DES-23 | GameShell, all 8 games and all 8 lesson types on the kit, with one right/wrong language |
 | 8 | The design system is done | DES-24 | Legacy styles deleted; the check runs strict with no baseline |
@@ -68,7 +68,7 @@ them in.
 
 
 ### DES-9a · Shell restyle, part 1: home screen and status bar
-Story · P0 · M · needs: DES-15
+Story · P0 · M · needs: —
 - **Why:** the home screen keeps its iPad feel (Alex, 2026-10-08) but drops the purple gradients. It stays like today, with just the one Reading app icon (the teacher, 2026-10-10, chose the original over the "a little more" board). No school-subject apps (OPS-3).
 - **How:**
   - As on the round 2 Home board: the iPad feel (status bar, the one Reading app icon, home indicator) in the sand and cocoa palette. Day shows the sun and dunes. The night scene comes with DES-16. No purple gradients or blurred blobs.
@@ -95,7 +95,7 @@ Story · P0 · M · needs: DES-9a
   - it's checked in light and dark, and Alex OKs it.
 
 ### DES-9c · Shell restyle, part 3: Grade Select
-Story · P0 · S · needs: DES-15
+Story · P0 · S · needs: —
 - **How:**
   - Grade Select talks to the child, not to grown-ups: no "digraphs" and no "dashboard".
   - Kit cards, with Luna (DES-15) instead of the emoji `components/ui/Mascot`. Since DES-15 the Mascot already draws the kit's Luna in place of its emoji; its purple circle and bubble are what go here.
@@ -119,7 +119,7 @@ Story · P1 · S · needs: DES-22a
   - it's checked in light and dark. (That every game and lesson looks the same is checked in DES-22b, DES-22c and DES-23.)
 
 ### DES-12 · Luna on screen: one Luna, clear moods
-Story · P1 · S · needs: DES-9c, DES-15
+Story · P1 · S · needs: DES-9c
 - **Why:** Feed Luna shows two owls at once (the one on the stage and the one on the perch).
 - **How:** at most one Luna per screen; the perch Luna hides when the game's stage has its own. Document what each mood is for. Make sure the talking animation always follows the audio.
   - **From DES-15 (2026-10-11):** the talking already follows the audio. The kit's Luna moves her beak only while a clip plays (`luna-talk-check.mjs` in know-how), so two Lunas on one screen talk together. Two screens show two today: Feed Luna (the stage and the perch) and Treasure Path (the walker on the stones and the perch).
@@ -176,21 +176,8 @@ Story · P1 · M · needs: SET-1
   - the Settings choice overrides the iPad and survives a reload;
   - every screen is checked in dark on the real iPad (Alex).
 
-### DES-15 · Draw the chosen Ms. Luna
-Story · P0 · M · needs: —
-- **Why:** the teacher picked the round 2 prototype's owl (2026-10-10, "she loved it"): the rounder owl in round black frames, caramel feathers. Today's `LunaOwl` drawing and the emoji `components/ui/Mascot` both retire. The moon is her own ticket (DES-17).
-- **How:**
-  - Redraw `LunaOwl` as that owl and move it into the kit as `src/components/kit/Luna/` (a Writing app will use her too). The reference is `owl()` in `.claude/skills/luna-design/prototype/gen.py` and owl 1 on the round 2 Ms. Luna board (marked "Her pick").
-  - Her colours come from `--illo-*` in `_illustration.scss`, set through classes, never `fill="#…"`.
-  - Keep all 8 moods (idle, happy, cheer, think, oops, surprise, listen, sleepy), the blink, and the talking animation, which follows the audio. Her `.kit.tsx` shows every mood.
-- **Complete when:**
-  - the round 2 owl appears on every screen that shows Luna;
-  - each of the 8 moods looks different on the Kit page;
-  - her beak only moves while a clip is playing;
-  - the Luna folder shows zero in `design:status`.
-
 ### DES-17 · The moon visits for big milestones
-Story · P1 · M · needs: DES-15
+Story · P1 · M · needs: —
 - **Why:** the teacher (2026-10-10): the second moon on the round 2 Ms. Luna board, a crescent with a face and black glasses, comes in every once in a while to say "good job" for big milestones. The owl stays Luna.
 - **How:**
   - Draw that moon (round 2 Ms. Luna board, moon 6, marked "Milestone moon") as its own kit component, `src/components/kit/MilestoneMoon/`, in moon gold from `_illustration.scss`, the one colour outside the palette. She needs a happy and a cheer look, both shown on the Kit page. Her mouth moves only while her clip plays: she can follow `useSpeaking()` as Luna does (DES-15), and Luna gets `talking={false}` while the moon visits, or both would talk.

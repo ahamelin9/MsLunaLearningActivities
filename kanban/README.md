@@ -72,8 +72,8 @@ be pulled into Phase 1 for a break from styling.
 
 ### Now / Next
 
-- **Now:** DES-15: draw the chosen Ms. Luna, Stage 5's third ticket. DES-8 gave the app one header and DES-10 settled the layout (two breakpoints, `layout-audit.mjs`), both 2026-10-11
-- **Next:** DES-9a → DES-9b → DES-9c → DES-12, per "Order to finish the epic" in `epics/DES.md`. OPS-9 (know-how checks onto `data-shot`) can start any time: the checks lost their last class names with DES-18d. PRG-7 and SET-1 are pulled in where DES-13 and DES-16 need them. FB-1 (Phase 2) no longer waits on the layout; GAME-1c, Treasure Path's screen, waits on it
+- **Now:** DES-9a: the home screen and status bar, Stage 5's fourth ticket. Done so far in Stage 5 (2026-10-11): DES-8 (one header), DES-10 (the layout, `layout-audit.mjs`) and DES-15 (the kit's Luna, whose beak follows the voice)
+- **Next:** DES-9b → DES-9c → DES-12, per "Order to finish the epic" in `epics/DES.md`. OPS-9 (know-how checks onto `data-shot`) can start any time: the checks lost their last class names with DES-18d. PRG-7 and SET-1 are pulled in where DES-13 and DES-16 need them. FB-1 (Phase 2) no longer waits on the layout; GAME-1c, Treasure Path's screen, waits on it
 
 ## Epics
 
@@ -97,7 +97,6 @@ In board order. A new epic gets its file in `epics/` first, then a link here
 | ID | Title | Type | P | Size | Status |
 |---|---|---|---|---|---|
 | **DES** | **Design system & layout** | Epic | **P0** | | |
-| DES-15 | Draw the chosen Ms. Luna | Story | P0 | M | In progress |
 | DES-9a | Shell restyle, part 1: home screen and status bar | Story | P0 | M | Todo |
 | DES-9b | Shell restyle, part 2: Settings and the Trophy room | Story | P0 | M | Todo |
 | DES-9c | Shell restyle, part 3: Grade Select | Story | P0 | S | Todo |

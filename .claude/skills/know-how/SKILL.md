@@ -148,6 +148,13 @@ Copy `speech-check.cjs` from this folder and edit its scenario. It already:
   `await import('/src/utils/pronunciation.ts')`. Under Vite that is the same
   instance the app uses. It then wraps `pronunciation.say`, whose second
   argument is the text.
+  - **Pitfall, a second copy** (*2026-10-11, DES-15*): once Vite has
+    hot-reloaded a module, the page loads it as `…/pronunciation.ts?t=…`, and
+    the bare path imports a fresh second copy that nothing on screen listens
+    to. A wrap or a call on it then does nothing, and the check fails for no
+    reason. Import the URL the page actually loaded:
+    `performance.getEntriesByType('resource').map(e => e.name).find(n => n.includes('/src/utils/pronunciation.ts'))`
+    (as `kit-check.mjs` does), or restart Vite.
 - times every clip by wrapping `AudioBufferSourceNode.prototype.start/stop`.
 
 Selectors that work (the shell's and the hub's classes went with DES-18b
@@ -283,6 +290,34 @@ Pitfalls that cost time:
   `<body>`, Tab carries on from where the dialog was, not from the top of the
   page, and a click elsewhere earlier in the script moves focus too. Read
   `document.activeElement` straight after the step you're testing.
+
+## Luna's beak moves when no clip is playing (or stops mid-sentence)
+
+*2026-10-11 · DES-15*
+
+- **Symptom:** her beak flaps before a line is heard, keeps going after it,
+  or stops while she's still talking.
+- **Cause:** screens used to switch `talking` on before the clip had loaded,
+  and off on their own 3.6–3.8s timers; Feed Luna moved it while she chewed.
+- **Fix:** don't drive it from a screen. The clip player reports when one of
+  her clips starts and when the last one ends (`pronunciation.onSpeaking`,
+  fired in `playBuffer` and `stop()`), and the kit's `Luna` follows it through
+  `useSpeaking()`. A screen passes `talking={false}` only to keep her quiet
+  while someone else speaks (the moon, DES-17).
+- **Check:** `node .claude/skills/know-how/luna-talk-check.mjs 5199` (Vite on
+  5199) logs every clip start and end and samples her every 20ms while she
+  speaks on the library, a start screen and a round. It fails if she talks
+  with no clip playing, allowing one frame either side.
+- **Pitfall, proving it can fail:** the last commit passed it too, because
+  the old timers mostly erred the other way: they stopped her early (179 of
+  523 clip samples), which this check doesn't flag. Prove it by switching
+  the fix off instead: delete the `setSpeaking(false)` in `playBuffer`'s
+  `finish`, and her beak runs on for seconds after the clips.
+- **Pitfall, "do these two look different?":** element screenshots of two
+  specimens never match byte for byte, even with the same pose, because each
+  sits at a different sub-pixel. `kit-check.mjs` compares her moods by their
+  SVG markup, where every pose lives, and fails when happy is made the same
+  as idle.
 
 ## Does every screen fit on every iPad?
 

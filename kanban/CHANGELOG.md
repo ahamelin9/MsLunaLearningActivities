@@ -163,3 +163,11 @@ only record of them. One line each: date, ID, title, and `Done` or
   | `narrow` | up to 899px wide | 820×1180 and 744×1133, portrait |
   | `short` | up to 799px tall | 1024×768, landscape |
   | anything else | — | no `@media` outside `tokens/_breakpoints.scss`; reduced motion is `[data-reduced-motion]` |
+- **2026-10-11** — DES-15 Draw the chosen Ms. Luna — Done. `src/components/kit/Luna/` is the teacher's pick: owl 1 from the round 2 Ms. Luna board, caramel feathers in round black frames, every colour from `--illo-luna-*`. She has 8 moods posed from that one drawing (the boards drew only idle and the Done board's cheer), each different on the Kit page; `kit-check.mjs` proves it and fails when two match. She replaced LunaOwl on every screen (the library, start screens, the perch, the done screen, Feed Luna), and the emoji Lunas too: Grade Select's Mascot draws her, and so does Treasure Path's walker. Her beak now follows the clip player (`pronunciation.onSpeaking`, `useSpeaking()`), not screen timers. `luna-talk-check.mjs` (know-how) saw it move in exactly the 536 samples a clip played, and fails with the fix off. A new shared `blink` joined the motion set. She floats only where nothing is being played. The sleepy "z" is `--ink-soft`, so it reads in dark. Only screens showing her changed (21 per size); reduced motion stands still; the layout audit passes. Baseline 2,175 → 2,061. Alex OKed her moods and screens. Two screens still show two owls (Feed Luna, Treasure Path): DES-12. Kept as a rule (Alex, 2026-10-11), since every screen and the moon (DES-17) relies on it:
+
+  | Luna's… | Rule |
+  |---|---|
+  | beak | moves only while one of her clips plays, by itself; `talking={false}` keeps her quiet while someone else speaks |
+  | float | only where nothing is being played (the library, start screens); still on her perch in a round |
+  | blink | idle, happy, think and listen; never under reduced motion |
+  | moods | idle, happy, cheer, think, oops, surprise, listen, sleepy, all in `Luna.tsx`'s `POSES` |
