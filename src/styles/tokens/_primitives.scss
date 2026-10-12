@@ -192,7 +192,8 @@ $target: (
 // ── Breakpoints ────────────────────────────────────────────────────────────
 // Media queries can't read custom properties, so these are used only through
 // the bp() mixin (tokens/_breakpoints.scss, forwarded by styles/_mixins.scss).
-// Chosen from the four ui:shots sizes; DES-10 settles the final set.
+// Chosen from the four ui:shots sizes. DES-10 settled on these two: no screen
+// needs a third, and nothing else in src may write a media query.
 $breakpoints: (
   narrow: '(max-width: 899px)',  // portrait iPads: 820 and 744 wide
   short: '(max-height: 799px)',  // the 1024×768 iPad in landscape

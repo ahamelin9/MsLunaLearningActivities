@@ -740,22 +740,3 @@
   from { transform: scale(0.3) rotate(30deg); opacity: 0; }
   to { transform: scale(1) rotate(-4deg); opacity: 1; }
 }
-
-@media (max-width: 720px) {
-  .reading-hub {
-    padding: 0.5rem 0.7rem 1.5rem;
-
-    .game-yard {
-      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-      grid-auto-rows: 120px;
-    }
-
-    .game-thing[data-shape="book"] { grid-column: span 2; }
-
-    .hub-desk { padding: 0.5rem 0.6rem 0.9rem; }
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .reading-hub * { animation: none !important; }
-}

@@ -134,6 +134,10 @@ changed screens.
   it fails if any screen keeps moving (DES-6).
 - `npm run ui:shots` at the four iPad sizes, and `--diff` for refactors (from
   DES-18a).
+- Does a screen fit? `node .claude/skills/know-how/layout-audit.mjs 5199 <grade 0|1|2>`
+  (Vite on 5199): nothing scrolls or is cut off mid-round, and no tap target
+  outside a game's stage is small, overlapping or in the edge band (DES-10).
+  Its "(stage)" lines are the games' and lessons' own pieces.
 - `node .claude/skills/know-how/module-refs-check.mjs "$PWD" <folders>`: every
   `styles.x` points at a real class (a typo is silently `undefined`), and no
   `className="…"` string is left. For a refactor, the know-how entry "A move to

@@ -200,7 +200,8 @@ Pitfalls that cost time:
   `hub-rug`, `hub-tin`, `lesson-tile`, `game-tile`, `tile-title`,
   `shell-intro`, `shell-play`, `shell-reward`, `play`, `shell-back`,
   `round-pips`, `win-veil`, `lesson-choice`, `open-settings`, `settings`,
-  `open-trophies`, `trophies`, `modal-close`, `app-home` (DES-8). OPS-9 moves the checks in this
+  `open-trophies`, `trophies`, `modal-close`, `app-home` (DES-8), `stage`
+  (GameShell's stage, DES-10). OPS-9 moves the checks in this
   folder onto them.
 - **"Does it still fit?"** for a screen whose content grows by grade (Treasure
   Path's 2nd-grade passages): `ui:shots` only plays Kindergarten. Play the game
@@ -282,6 +283,52 @@ Pitfalls that cost time:
   `<body>`, Tab carries on from where the dialog was, not from the top of the
   page, and a click elsewhere earlier in the script moves focus too. Read
   `document.activeElement` straight after the step you're testing.
+
+## Does every screen fit on every iPad?
+
+*2026-10-11 · DES-10*
+
+- **Symptom:** you need to know that nothing scrolls mid-round, the library's
+  first screenful shows the next lesson and Luna's Pick, and no tap target is
+  small, overlapping or in the edge band, at 4 sizes and 3 grades. That's
+  too many screens to judge by eye.
+- **Fix:** with Vite on 5199, run
+  `node .claude/skills/know-how/layout-audit.mjs 5199 <0|1|2>` once per grade.
+  Its "(stage)" lines are the games' and lessons' own pieces inside
+  `data-shot="stage"`; they're listed for DES-21, DES-22b/c, DES-23 and
+  GAME-3 and don't fail the run.
+- **Pitfall, scroll isn't the only way not to fit:** the first version only
+  looked for scrolling, and a stage made 1,400px tall still passed. GameShell's
+  root has `overflow: hidden`, so a stage too tall for the screen is cut off,
+  not scrolled. The audit now also fails anything mid-round (the shell, the
+  stage, any button) that runs past the screen. A game's own piece coming in
+  from off screen is listed, not failed: Bubble Sounds' bubbles rise from
+  below.
+- **Pitfall, the library scrolls:** a card ending at the fold isn't hugging the
+  edge, so the bottom band isn't judged there.
+- **Check:** it passes at every grade today, and fails with GameShell's
+  `.shell-stage { min-height }` set to 1400px for a moment.
+
+## New chrome changed every screen: did the screen under it move?
+
+*2026-10-11 · DES-8*
+
+- **Symptom:** a change to the header or another frame piece makes
+  `ui:shots --diff` call every screen changed, so it can't say whether the
+  library or a game under the frame changed too.
+- **Cause:** the content moved up or down as a whole (DES-8: the chrome above
+  the library went from 102px to 64px), so every pixel is compared with the
+  one 38 rows away.
+- **Fix:** line the two shots up by their own top edges and compare from there:
+  `node .claude/skills/know-how/shifted-compare.mjs <before.png> <after.png> <topBefore> <topAfter> [rows] [out.png]`.
+  Take the tops from the shots or a `getBoundingClientRect()`. Compare only the
+  rows both show; DES-8's "before" also lost 28px at the bottom to the home
+  strip. A shadow the old chrome cast shows up as the first few rows (DES-8:
+  rows 0–2), so start a few rows lower to judge the rest.
+- **Check:** DES-8's library at 1180×820: `106 68 686` passes, and `106 69 686`
+  (one row off) fails with 80,000 pixels, so it can fail. A screen whose own
+  height changed (a game stage that grew) can't be lined up this way; judge
+  it by eye.
 
 ## An arch comes out with square bottom corners
 

@@ -188,10 +188,18 @@ What the moments look like:
 - **The four target sizes:** iPad landscape (1180×820), portrait (820×1180),
   the older iPad (1024×768) and the iPad mini (744×1133). `npm run ui:shots`
   captures all four.
-- **Breakpoints:** as few as those four sizes need, decided in DES-10. They're
+- **Breakpoints:** two, settled in DES-10: `narrow` (the portrait iPads, up to
+  899px wide) and `short` (the 1024×768 iPad, up to 799px tall). They're
   written once in the tokens and used only through the breakpoint mixin:
-  `@use 'styles/mixins' as *;` then `@include bp(narrow) { … }`. DES-3 starts
-  with `narrow` (the portrait iPads) and `short` (the 1024×768 iPad).
+  `@use 'styles/mixins' as *;` then `@include bp(narrow) { … }`. Any other
+  `@media` fails `npm run lint`. Reduced motion needs none: `[data-reduced-motion]`
+  covers both the Settings switch and the iPad's setting.
+- **Checking a layout:** `node .claude/skills/know-how/layout-audit.mjs 5199 <grade>`,
+  with Vite on 5199, visits the library, every game and every lesson of a
+  grade at the four sizes. It fails on anything that scrolls or is cut off
+  mid-round, and on small, overlapping or edge-hugging targets outside a
+  game's stage. It also lists those inside a stage, for the games' and
+  lessons' own tickets.
 - **Stacking:** the z roles, lowest first: `--z-ground`, `--z-raised`,
   `--z-float`, `--z-header`, `--z-celebrate` (petals and the win veil, which
   never take taps) and `--z-modal`.

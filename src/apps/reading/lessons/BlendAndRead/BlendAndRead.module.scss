@@ -18,7 +18,3 @@
 
   &[data-state="active"] { @include chunky($amber, $amber-deep, #46280A); }
 }
-
-@media (max-width: 700px) {
-  .lesson-block { width: 62px; .block-letters { font-size: 1.9rem; } }
-}

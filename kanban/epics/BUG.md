@@ -49,12 +49,6 @@ P2 · S · likely, not yet reproduced
 - **Verify:** reproduce it with the network off before fixing.
 - **Complete when:** with the voice index blocked (offline), opening Settings saves at most once and the page stays responsive.
 
-### BUG-11 · Launch and close sounds play twice
-P2 · S
-- **Cause:** `HomeScreen.tsx:19` and `App.tsx:43` both play the launch sound. `AppWindow` and `App` both play the close pop.
-- **When:** fix as part of DES-8.
-- **Complete when:** opening an app plays one sound, and closing it plays one sound.
-
 ### BUG-12 · Day streak rolls over at 7 pm
 P2 · S
 - **Cause:** `computeStreak` in `utils/storage.ts` uses the UTC date.

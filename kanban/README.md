@@ -58,7 +58,7 @@ the reason written on the ticket.
 | Phase | Focus | Epics | Why this order |
 |---|---|---|---|
 | **1 — now** | Design foundation | DES | Agreed as the next priority. Sets the look, layout and motion that every later screen change builds on. |
-| 2 | Feedback & confirmed bugs | FB, BUG P0/P1 | The biggest correctness problems. FB-1 touches GameShell, so it lands after DES-8/DES-10 settle its layout. |
+| 2 | Feedback & confirmed bugs | FB, BUG P0/P1 | The biggest correctness problems. FB-1 touches GameShell, so it waited for its layout, settled by DES-8 and DES-10 (2026-10-11). |
 | 3 | Settings & grown-up area | SET | Keeps a child from breaking play (mute, reset, grade). |
 | 4 | Difficulty & content model | LVL, CNT | One content source and an honest difficulty dial, before games and lessons grow. |
 | 5 | Games to standard | GAME | Reworks built on FB and CNT. |
@@ -72,8 +72,8 @@ be pulled into Phase 1 for a break from styling.
 
 ### Now / Next
 
-- **Now:** DES-8: one set of chrome, the start of Stage 5. Stage 4's kit is done (DES-7a–c, 2026-10-11): 14 components on the Kit page, none used by a screen yet
-- **Next:** DES-10, then DES-15 (the new Luna, moved into Stage 5: DES-9a, DES-9c and DES-12 need her), then DES-9a → DES-9b → DES-9c → DES-12, per "Order to finish the epic" in `epics/DES.md`. OPS-9 (know-how checks onto `data-shot`) can start any time: the checks lost their last class names with DES-18d. PRG-7 and SET-1 are pulled in where DES-13 and DES-16 need them. GAME-1c, Treasure Path's screen, waits on FB-1, which waits on the DES-8/DES-10 layout
+- **Now:** DES-15: draw the chosen Ms. Luna, Stage 5's third ticket. DES-8 gave the app one header and DES-10 settled the layout (two breakpoints, `layout-audit.mjs`), both 2026-10-11
+- **Next:** DES-9a → DES-9b → DES-9c → DES-12, per "Order to finish the epic" in `epics/DES.md`. OPS-9 (know-how checks onto `data-shot`) can start any time: the checks lost their last class names with DES-18d. PRG-7 and SET-1 are pulled in where DES-13 and DES-16 need them. FB-1 (Phase 2) no longer waits on the layout; GAME-1c, Treasure Path's screen, waits on it
 
 ## Epics
 
@@ -98,8 +98,6 @@ In board order. A new epic gets its file in `epics/` first, then a link here
 |---|---|---|---|---|---|
 | **DES** | **Design system & layout** | Epic | **P0** | | |
 | DES-15 | Draw the chosen Ms. Luna | Story | P0 | M | Todo |
-| DES-8 | One set of chrome | Story | P0 | M | In progress |
-| DES-10 | Layout grid and breakpoints | Story | P0 | M | Todo |
 | DES-9a | Shell restyle, part 1: home screen and status bar | Story | P0 | M | Todo |
 | DES-9b | Shell restyle, part 2: Settings and the Trophy room | Story | P0 | M | Todo |
 | DES-9c | Shell restyle, part 3: Grade Select | Story | P0 | S | Todo |
@@ -128,7 +126,6 @@ In board order. A new epic gets its file in `epics/` first, then a link here
 | BUG-22 | Story Corner says "she reed three books" | Bug | P1 | S | Todo |
 | BUG-9 | Story Corner K warm-up plays one story twice | Bug | P2 | S | Todo |
 | BUG-10 | Settings may loop saving when the voice index fails | Bug | P2 | S | Todo |
-| BUG-11 | Launch and close sounds play twice | Bug | P2 | S | Todo |
 | BUG-12 | Day streak rolls over at 7 pm (UTC date) | Bug | P2 | S | Todo |
 | BUG-13 | Trophy dot never clears | Bug | P2 | S | Todo |
 | BUG-14 | "Word of the day" changes on every visit | Bug | P2 | S | Todo |

@@ -1,7 +1,7 @@
 # FB — Shell feedback & hints (Phase 2)
 
 ### FB-1 · One answer-feedback path in GameShell
-Story · P0 · M · needs: DES-8/DES-10 layout settled · fixes BUG-1
+Story · P0 · M · needs: — (the layout it waited on is settled: DES-8, DES-10) · fixes BUG-1
 - **Why:** a game that speaks and then calls `api.win()` or `api.miss()` gets cut off, because the shell's speech interrupts it. This was confirmed in the browser for Letter Jar and Treasure Path. The same thing happens in Bubble Sounds, What's Missing, Story Corner, Words Off the Page and Feed Luna. Lessons avoid it only because `useAnswer` in `lessons/shared/lessonHooks.ts` waits for the speech to finish.
 - **How:**
   - Add `api.answer({ correct, say?: SpeechPart[], hint?, reveal? })` to `GameApi`. The shell says `say`, waits for it to end (with a watchdog timer), then reacts.

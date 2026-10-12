@@ -397,22 +397,6 @@
   100% { transform: rotate(-4deg) scale(1); }
 }
 
-@media (max-width: 720px) {
-  .game-shell {
-    padding: 0.7rem;
-
-    .luna-perch .perch-bubble p { font-size: 0.92rem; }
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .game-shell *,
-  .game-shell *::before {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-  }
-}
-
 @keyframes thinkingDot {
   0%, 100% { transform: translateY(0); opacity: 0.35; }
   50% { transform: translateY(-3px); opacity: 1; }

@@ -49,7 +49,7 @@ them in.
 | 2 | Structure (pure refactors, nothing looks different) | DES-18a–e (done 2026-10-11) | Screenshots you can compare; one folder per page, game and lesson; CSS modules; `games.scss` gone |
 | 3 | Foundations | DES-3 → DES-19 → DES-20 → DES-4 → DES-5 → DES-6 (done 2026-10-11) | Tokens in light and dark; lint enforces the rules after every edit; the Kit page; Andika and Fraunces offline; shared motion; reduced motion |
 | 4 | The kit | DES-7a, DES-7b, DES-7c (done 2026-10-11) | Every kit component on the Kit page in every state |
-| 5 | Frame and shell | DES-8 → DES-10 → DES-15 → DES-9a → DES-9b → DES-9c → DES-12 | One header, the layout grid, the new Luna (moved here from Stage 4, Alex 2026-10-11), the restyled home, Settings, trophies and Grade Select; one Luna per screen |
+| 5 | Frame and shell | DES-8, DES-10 (done 2026-10-11) → DES-15 → DES-9a → DES-9b → DES-9c → DES-12 | One header, the layout grid, the new Luna (moved here from Stage 4, Alex 2026-10-11), the restyled home, Settings, trophies and Grade Select; one Luna per screen |
 | 6 | The library | DES-21 → **PRG-7 (pulled in)** → DES-13 | The library as on the board: lessons in order, one bar |
 | 7 | Play | DES-22a → DES-11 → DES-22b, DES-22c → DES-23 | GameShell, all 8 games and all 8 lesson types on the kit, with one right/wrong language |
 | 8 | The design system is done | DES-24 | Legacy styles deleted; the check runs strict with no baseline |
@@ -67,21 +67,8 @@ them in.
 - **P0 bugs** can still be pulled in between tickets for a break from styling.
 
 
-### DES-8 · One set of chrome
-Story · P0 · M · needs: —
-- **Why:** inside the app there are two header bars, stars and mute shown twice, `VoiceIndicator` shown twice, and four ways home: the status pill, the Home button, the home-indicator bar, and "Library". Together these take about 130px of an 820px-tall screen.
-- **How:**
-  - Inside an app: one header with Home, the title, stars, and the settings gear (gated), built from ChunkyButton, Chip and Icon, as on the round 2 Library and Round boards.
-  - The status bar shrinks to the clock, or disappears. The "Luna is ready" voice indicator goes too (Alex, 2026-10-09: the problem it flagged is fixed).
-  - Keep one way home plus "Library" inside games.
-  - Fix BUG-11 while you're in there.
-- **Complete when:**
-  - each control appears exactly once;
-  - the game stage gets back at least 80px of height in landscape;
-  - the header is built from kit components and roles only, its folders show zero in `design:status`, and it's checked in light and dark.
-
 ### DES-9a · Shell restyle, part 1: home screen and status bar
-Story · P0 · M · needs: DES-8, DES-15
+Story · P0 · M · needs: DES-15
 - **Why:** the home screen keeps its iPad feel (Alex, 2026-10-08) but drops the purple gradients. It stays like today, with just the one Reading app icon (the teacher, 2026-10-10, chose the original over the "a little more" board). No school-subject apps (OPS-3).
 - **How:**
   - As on the round 2 Home board: the iPad feel (status bar, the one Reading app icon, home indicator) in the sand and cocoa palette. Day shows the sun and dunes. The night scene comes with DES-16. No purple gradients or blurred blobs.
@@ -120,17 +107,6 @@ Story · P0 · S · needs: DES-15
   - no grade colour is left in the curriculum data;
   - it's checked in light and dark, and Alex OKs it.
 
-### DES-10 · Layout grid and breakpoints
-Story · P0 · M · needs: —
-- **How:**
-  - Lay out the hub and game stage for the four `ui:shots` sizes (1180×820, 820×1180, 1024×768, 744×1133), using the breakpoint mixin from the tokens (as few breakpoints as the four sizes need; today's 640/700/720/860 retire).
-  - Hub: the next lesson and Luna's Pick are visible without scrolling.
-  - Play Rug: tiles sit on a consistent grid. Titles must not overlap their scenery (they do today on Feed Luna and Muddled Cards), and Treasure Path's tile must not be oversized.
-  - Game stages fit the screen with no scrolling during play.
-- **Complete when:**
-  - at all four sizes, nothing overlaps, nothing scrolls mid-round, and all touch targets meet the target roles;
-  - no media query outside the breakpoint mixin.
-
 ### DES-11 · One right/wrong/reveal visual language
 Story · P1 · S · needs: DES-22a
 - **How:** use the same right glow, wrong wobble, win veil and "revealed" style (for FB-2) in every game and lesson, through `Choice` and the shell's flash. Game pieces that aren't Choices (bubbles, cookies, bugs, memory cards, word tiles) use the same state roles, `data-state` and motion. The games and lessons adopt it in DES-22b, DES-22c and DES-23.
@@ -151,7 +127,7 @@ Story · P1 · S · needs: DES-9c, DES-15
 - **Complete when:** no screen shows two owls, and the moon appears only during a milestone visit.
 
 ### DES-13 · Lesson path on the hub: in order, one bar
-Story · P1 · S · needs: DES-10, PRG-7
+Story · P1 · S · needs: PRG-7
 - **Why:** the teacher found seeds to flowers too confusing and picked "One bar" from the round 2 Progress board (2026-10-10). Lessons now go in order (PRG-7), so each one only needs to say done, up next or locked.
 - **How:** as on the round 2 Library, Round and Done boards:
   - **The bar:** one bar above the lessons, one segment per lesson, with "N of 6 lessons done". It fills as each lesson is done.
@@ -235,7 +211,7 @@ Story · P1 · M · needs: DES-15
   - the MilestoneMoon folder shows zero in `design:status`.
 
 ### DES-21 · Library on the kit: header, welcome row, Luna's Pick, Play Shelf
-Story · P1 · M · needs: DES-8, DES-10
+Story · P1 · M · needs: —
 - **Why:** the round 2 Library board is approved, but no ticket covered the hub apart from its lesson path (DES-13).
 - **How:**
   - As on the Library board:
@@ -245,13 +221,15 @@ Story · P1 · M · needs: DES-8, DES-10
   - The Squishy Shelf card and the "Today" panel come with PRG-5 and PRG-6, built from the same kit.
   - The board's grade chip beside the title in the header was left out by DES-8, since the desk's grade sign still shows the grade. Decide here whether the chip replaces the sign (SET-1 moves changing the grade behind the gate). The header is `components/os/AppHeader`; ReadingApp fills its end.
   - The hub's own keyframes (`pages/Hub`) move onto the shared motion set.
+  - **From DES-10 (Alex, 2026-10-11):** the Play Shelf sits on one even grid, every tile the same size (today Letter Jar and Treasure Path are double height, and Words Off the Page and Story Corner double width). No title sits on its picture (today Feed Luna, Muddled Cards, Words Off the Page, What's Missing and Story Corner do).
 - **Complete when:**
   - the hub matches the Library board (lesson path aside) at the four sizes, in light and dark;
+  - the Play Shelf's tiles are all one size, and `layout-audit.mjs` (know-how) lists no "titles on their scenery" at any grade;
   - `pages/Hub` shows zero in `design:status`;
   - Alex OKs the shots.
 
 ### DES-22a · GameShell on the kit: start, stage, perch, reward
-Story · P1 · M · needs: DES-8
+Story · P1 · M · needs: —
 - **Why:** every game's start screen is the same centred card with a green that belongs to neither palette, and the reward screen predates the round 2 Done board.
 - **How:**
   - **Start screen:** built from the kit. No board shows it, so Alex OKs it.
@@ -270,16 +248,20 @@ Story · P1 · M · needs: DES-11, DES-22a
   - Its game pieces (bugs, bubbles, cookies, memory cards) stay in its folder but use the state roles, `data-state` and the shared motion (DES-11).
   - Its scenery uses roles and `_illustration.scss`, and Icon replaces emoji in the interface.
   - `engine/content.ts`'s colours go with these games.
+  - **Touch targets (from DES-10):** every piece a child taps meets the target roles. On 2026-10-11, `layout-audit.mjs` found Letter Jar's smallest letters at 43–47px and its "Say it again" pill 39px tall; Bubble Sounds' overlapping bubbles are GAME-3's.
 - **Complete when:**
   - in each of the 4 games, a right and a wrong answer look like they do everywhere else;
+  - `.claude/skills/know-how/layout-audit.mjs` lists no "(stage)" line for these games at the four sizes and three grades, except Bubble Sounds' overlaps if GAME-3 isn't done;
   - the 4 game folders show zero in `design:status`;
   - they're checked in light and dark at the four sizes.
 
 ### DES-22c · Games on the kit, part 2: Words Off the Page, What's Missing?, Treasure Path, Story Corner
 Story · P1 · M · needs: DES-11, DES-22a
 - **How:** the same as DES-22b, for these 4 games. Treasure Path's stopgap passage view stays until GAME-1c designs its real screen.
+  - **Touch targets (from DES-10):** on 2026-10-11, `layout-audit.mjs` found Words Off the Page's word tiles and empty slots 46px tall, the "🔊" prompt pills 39px tall (Hear the whole sentence, Read it to me) and Story Corner's "Next line" 38px.
 - **Complete when:**
   - in each of the 4 games, a right and a wrong answer look like they do everywhere else;
+  - `.claude/skills/know-how/layout-audit.mjs` lists no "(stage)" line for these games at the four sizes and three grades;
   - the 4 game folders show zero in `design:status`;
   - they're checked in light and dark at the four sizes.
 
@@ -289,8 +271,10 @@ Story · P1 · M · needs: DES-11
   - All 8 lesson types use Choice, ListenCue, SpeechBubble and PaperCard.
   - The shared `lessons/shared` module shrinks to layout only.
   - The lesson-specific wrong shake retires for the shared wobble.
+  - **Touch targets (from DES-10):** on 2026-10-11, `layout-audit.mjs` found every lesson's "🔊" prompt pill 40–43px tall, and 2nd grade's Lesson 3 answers 43px tall (an answer needs 64).
 - **Complete when:**
   - every answer button in every lesson type is a `Choice`;
+  - `.claude/skills/know-how/layout-audit.mjs` lists no "(stage)" line for any lesson at the four sizes and three grades;
   - `lessons/` shows zero in `design:status`;
   - a right and a wrong answer look the same as in the games;
   - it's checked in light and dark.

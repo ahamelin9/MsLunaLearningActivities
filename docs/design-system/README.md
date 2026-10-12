@@ -169,9 +169,10 @@ What a failure says, and what to do:
   `node scripts/design/check.mjs --update`: it accepts the move when the total
   doesn't rise.
 - **A line with no count**, which fails whatever the baseline: `@use` of the
-  primitives outside `src/styles/tokens/`, a kit folder with no `.kit.tsx`, or
-  a `design-exception` marker whose ticket ID is on neither the board nor the
-  changelog, or that gives no reason.
+  primitives outside `src/styles/tokens/`, a kit folder with no `.kit.tsx`, an
+  `@media` outside the breakpoint mixin (use `@include bp(narrow)` or
+  `bp(short)`; DES-10), or a `design-exception` marker whose ticket ID is on
+  neither the board nor the changelog, or that gives no reason.
 - **On a pass, "N file(s) now below their baseline"**: raw values were moved
   onto tokens. Run `--update` to lock the lower count in, so it can't creep
   back.
@@ -202,7 +203,7 @@ Each ticket updates its row when it closes (Completion criteria B7 in
 | Type and fonts | tokens, `public/fonts/` | Done (DES-4, 2026-10-11): Andika and Fraunces served from `public/fonts/` (no Google Fonts), 11 type roles, and every old Fredoka/Nunito use points at the font roles (titles Fraunces, the rest Andika). Screens move onto the type roles when restyled | DES-4 |
 | Motion and reduced motion | `src/styles/motion/` | Done (DES-5, DES-6, 2026-10-11): duration, easing and 11 `--motion-*` roles, the shared keyframes, `motionMs()`/`afterMotion()` and the press mixin, all on the Kit page. Reduced motion (the Settings switch or the iPad's) stops every screen's motion, proven by `ui:shots --reduced-motion`; Bubble Sounds slows down | DES-5, DES-6 |
 | Kit components | `src/components/kit/` | Parts 1–3 done (DES-7a–c, 2026-10-11): Icon, ChunkyButton, PaperCard, Chip and TimeChip, Tile, Modal; Choice, ListenCue, SpeechBubble, StarRow; ProgressBar, LessonCard, Squishy and SquishyDots. Each shows every state on the Kit page, the kit is at 0 in `design:status`, and `kit-check.mjs` (know-how) checks their behaviour in a browser. No screen uses them until the restyles. Still to come: Luna (DES-15) and MilestoneMoon (DES-17) | DES-7a–c, DES-15, DES-17 |
-| Chrome and layout | header, breakpoints | Planned | DES-8, DES-10 |
+| Chrome and layout | `components/os/AppHeader`, breakpoints | Header done (DES-8, 2026-10-11): one 64px header inside the app from kit pieces and roles (0 in `design:status`). It shows Home, the title, stars and the gear on the library, and Library, the title, the rounds bar and Again in a round. No status bar, mute or home strip inside the app, and the stage is 116px taller. Checked in light and dark (`ui:shots --theme dark`). Layout done (DES-10, 2026-10-11): two breakpoints, `narrow` and `short`, and lint fails any other `@media`. `layout-audit.mjs` (know-how) passes at 3 grades and 4 sizes: nothing scrolls or is cut off mid-round, and the library's next lesson and Luna's Pick show without scrolling. The Play Shelf's grid is DES-21's, and targets inside the stages are DES-22b/c's and DES-23's | DES-8, DES-10 |
 | The tablet shell | `components/os/`, Grade Select | Planned | DES-9a–c |
 | Library | `apps/reading/pages/Hub/` | Planned | DES-21, DES-13 |
 | GameShell and games | `engine/GameShell/`, `games/` | Planned | DES-22a–c, DES-11 |

@@ -111,8 +111,3 @@
   25% { transform: translateX(-10px); }
   75% { transform: translateX(10px); }
 }
-
-@media (max-width: 700px) {
-  .story .storybook { flex-direction: column; }
-  .story .book-spine { display: none; }
-}

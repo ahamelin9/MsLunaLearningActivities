@@ -69,7 +69,6 @@
     transition: transform 0.16s ease;
   }
 
-
   .mood-sparks {
     fill: #FDE047;
     opacity: 0;
@@ -215,10 +214,4 @@
 @keyframes lidBlink {
   0%, 93%, 100% { transform: translateY(-14px); }
   95.5% { transform: translateY(0.5px); }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .luna-owl * {
-    animation: none !important;
-  }
 }

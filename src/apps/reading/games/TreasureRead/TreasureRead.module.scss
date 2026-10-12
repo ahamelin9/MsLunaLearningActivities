@@ -164,8 +164,3 @@
   from { transform: translateY(-22px) rotate(-8deg); opacity: 0; }
   to { transform: translateY(0) rotate(0); opacity: 1; }
 }
-
-@media (max-width: 700px) {
-  .treasure .treasure-scroll .scroll-sentence { font-size: 1.15rem; }
-  .treasure .treasure-scroll .treasure-passage { font-size: 1.05rem; }
-}

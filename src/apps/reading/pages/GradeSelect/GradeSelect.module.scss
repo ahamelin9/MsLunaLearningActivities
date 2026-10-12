@@ -40,9 +40,6 @@
       color: $color-text-dark;
       line-height: 1.2;
 
-      @media (max-width: 640px) {
-        font-size: 1.75rem;
-      }
     }
 
     .header-desc {
@@ -58,7 +55,8 @@
     grid-template-columns: repeat(3, 1fr);
     gap: 1.5rem;
 
-    @media (max-width: 860px) {
+    // the portrait iPads stack the grades (DES-10)
+    @include bp(narrow) {
       grid-template-columns: 1fr;
     }
 
@@ -187,4 +185,3 @@
     }
   }
 }
-

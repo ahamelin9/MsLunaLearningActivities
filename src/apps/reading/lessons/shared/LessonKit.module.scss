@@ -149,13 +149,3 @@
   70% { transform: scale(1.12); opacity: 1; }
   100% { transform: scale(1); }
 }
-
-@media (max-width: 700px) {
-  .lesson-choice { min-width: 86px; min-height: 86px; .choice-emoji { font-size: 2.4rem; } .choice-letter { font-size: 2.6rem; } }
-  .lesson-card .card-word { font-size: 2rem; }
-  .lesson-sentence { font-size: 1.3rem; }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .lesson * { animation: none !important; }
-}

@@ -424,7 +424,7 @@ export const GameShell: React.FC<GameShellProps> = ({
         data-flash={flash ?? undefined}
         data-shot="shell-play"
       >
-        <div className={styles.shellStage}>
+        <div className={styles.shellStage} data-shot="stage">
           {round !== undefined && <PlayComponent key={roundIndex} round={round} api={api} />}
         </div>
 

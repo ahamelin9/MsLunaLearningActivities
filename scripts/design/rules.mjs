@@ -13,6 +13,8 @@
 // Always fail, whatever the baseline:
 //   primitives an @use/@forward/@import of the primitives outside src/styles/tokens/
 //   kit-page   a kit folder with no <Name>.kit.tsx
+//   media      an @media outside src/styles/tokens/_breakpoints.scss: breakpoints
+//              go through bp(), and reduced motion through data-reduced-motion (DES-10)
 //   marker     a design-exception(ID) whose ID is neither on the board nor in
 //              the changelog, or that gives no reason
 //
@@ -33,6 +35,7 @@ export const HINTS = {
   keyframes: '@keyframes live only in src/styles/motion/: use a shared animation (animation: var(--motion-pop)), or add one there with Alex\'s OK. See docs/design-system/foundations.md, Motion',
   primitives: 'only src/styles/tokens/ may use the primitives: read a role instead. See docs/design-system/colour.md',
   'kit-page': 'every kit component needs <Name>.kit.tsx showing its states. See docs/design-system/components.md',
+  media: 'media queries go only through the breakpoint mixin: @include bp(narrow) { … } or bp(short), from styles/mixins. Reduced motion needs none: [data-reduced-motion] covers it (base/_reduced-motion.scss). See docs/design-system/foundations.md, Layout',
   marker: 'design-exception(ID): why — the ID must be on the board or in kanban/CHANGELOG.md, and the reason must be there. See docs/design-system/fitting-in.md'
 };
 
@@ -66,6 +69,7 @@ const DURATION = /(?<![\w.$#-])-?(\d*\.?\d+)(ms|s)(?![\w-])/gi;
 const EASING = /(?<![\w-])(?:cubic-bezier\(|steps\(|linear\(|(?:ease(?:-in-out|-in|-out)?|step-start|step-end|linear)(?![\w(-]))/gi;
 const KEYFRAMES = /@(?:-webkit-)?keyframes\b/gi;
 const PRIMITIVES = /@(?:use|forward|import)\s+['"][^'"]*primitives['"]/gi;
+const MEDIA = /@media\b/gi;
 const MARKER = /design-exception\(([^)]*)\)\s*(?::\s*(\S.*?))?\s*(?:\*\/|\}|$)/g;
 
 const isZero = n => Number(n) === 0;
@@ -137,6 +141,7 @@ export function checkText(root, rel, text) {
   const inTokens = rel.startsWith('src/styles/tokens/');
   const rawColoursOk = rel === 'src/styles/tokens/_primitives.scss' || rel === 'src/styles/tokens/_illustration.scss';
   const inMotion = rel.startsWith('src/styles/motion/');
+  const isBreakpoints = rel === 'src/styles/tokens/_breakpoints.scss';
 
   const rawLines = text.split('\n');
   const lines = stripComments(text, css).split('\n');
@@ -181,6 +186,7 @@ export function checkText(root, rel, text) {
       for (const m of line.matchAll(PRIMITIVES)) add(n, 'primitives', m[0]);
     }
     if (!inMotion) for (const m of line.matchAll(KEYFRAMES)) add(n, 'keyframes', m[0]);
+    if (!isBreakpoints) for (const m of line.matchAll(MEDIA)) add(n, 'media', m[0]);
   });
 
   return { violations: found, markers, legacy: LEGACY_USE.test(text) };
