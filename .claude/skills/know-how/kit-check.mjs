@@ -4,7 +4,9 @@
 // reduced motion), ListenCue keeping its answer hidden and rippling, StarRow
 // landing. DES-7c: ProgressBar's count and fill, LessonCard's states (the
 // "Up next" tag centred even under reduced motion, a locked card wobbling),
-// Squishy's squish, ghost and colours, the shimmering tag.
+// Squishy's squish, ghost and colours, the shimmering tag. DES-15: Luna's 8
+// moods all differ, her palette colours, the blink, the talk (held, and
+// following the voice), pop, wobble and float, the press, and reduced motion.
 // Start Vite on 5199 first, then from the repo root:
 //   node .claude/skills/know-how/kit-check.mjs
 // Exits 1 on any ❌.
@@ -230,6 +232,70 @@ ok('a shimmering tag sweeps with the shared shimmer', await page.evaluate(() => 
   const t = document.querySelector('[data-shimmer]');
   return getComputedStyle(t, '::after').animationName === 'luna-shimmer';
 }));
+
+// ── Luna (DES-15) ──────────────────────────────────────────────────────────
+const MOODS = ['idle', 'happy', 'cheer', 'think', 'oops', 'surprise', 'listen', 'sleepy'];
+const luna = m => page.evaluateHandle(m => document.querySelector(`button[aria-label="Ms. Luna, ${m}"]`), m);
+// a mood is its pose, and every pose is in her drawing's markup (screenshots
+// can't tell: each specimen sits at a different sub-pixel, so even two
+// identical poses never match byte for byte)
+const frames = [];
+for (const m of MOODS) frames.push(await (await luna(m)).evaluate(b => b.querySelector('svg').outerHTML));
+const same = [];
+for (let i = 0; i < MOODS.length; i++) for (let j = i + 1; j < MOODS.length; j++) if (frames[i] === frames[j]) same.push(`${MOODS[i]} = ${MOODS[j]}`);
+ok('her 8 moods all look different', same.length === 0, same.join(', '));
+ok('her feathers come from the illustration palette', await (await luna('idle')).evaluate(b => {
+  const body = b.querySelector('svg g ellipse:nth-of-type(3)');
+  const probe = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+  probe.style.fill = 'var(--illo-luna-feather)';
+  b.querySelector('svg').append(probe);
+  const want = getComputedStyle(probe).fill;
+  probe.remove();
+  return getComputedStyle(body).fill === want;
+}));
+// her parts, found by what they animate
+const animOf = (el, test) => el.evaluate((b, test) => {
+  const parts = [b.firstElementChild, ...b.querySelectorAll('g')];
+  return parts.map(p => getComputedStyle(p).animationName).filter(n => n !== 'none').join(' ') || 'none';
+}, test);
+const idleAnim = await animOf(await luna('idle'));
+ok('idle blinks and stays put', idleAnim === 'luna-blink', idleAnim);
+ok('sleepy and cheer don\'t blink (their eyes are lines)', !(await animOf(await luna('sleepy'))).includes('blink') && !(await animOf(await luna('cheer'))).includes('blink'));
+ok('cheer and surprise pop, oops wobbles', (await animOf(await luna('cheer'))) === 'luna-pop' && (await animOf(await luna('surprise'))).startsWith('luna-pop') && (await animOf(await luna('oops'))).startsWith('luna-wobble'));
+const fig = l => page.evaluateHandle(l => [...document.querySelectorAll('figure')].find(f => f.textContent.includes(l)).querySelector('[data-mood]'), l);
+const talker = await fig('talking (only while');
+const floater = await fig('float (off-round');
+const follower = await fig('follows the voice');
+ok('held talking moves her beak', (await animOf(talker)).includes('luna-talk'), await animOf(talker));
+ok('not talking, her beak is still', !idleAnim.includes('luna-talk'));
+ok('float bobs her with the shared float', (await animOf(floater)).includes('luna-float'));
+// the app's own instance: after a hot reload Vite serves it as …/pronunciation.ts?t=…,
+// and a bare import('/src/utils/pronunciation.ts') would load a second copy
+const speak = on => page.evaluate(async on => {
+  const url = performance.getEntriesByType('resource').map(e => e.name).find(n => n.includes('/src/utils/pronunciation.ts'));
+  (await import(url)).pronunciation.setSpeaking(on);
+}, on);
+ok('left to follow the voice, she is still while no clip plays', !(await animOf(follower)).includes('luna-talk'));
+await speak(true);
+await sleep(100);
+ok('… and talks while a clip plays', (await animOf(follower)).includes('luna-talk'), await animOf(follower));
+await speak(false);
+await sleep(100);
+ok('… and stops when it ends', !(await animOf(follower)).includes('luna-talk'));
+const tap = await luna('happy');
+await tap.evaluate(e => e.scrollIntoView({ block: 'center' }));
+const tb = await tap.boundingBox();
+await page.mouse.move(tb.x + tb.width / 2, tb.y + tb.height / 2);
+await page.mouse.down();
+await sleep(300);
+const sunk = await tap.evaluate(b => getComputedStyle(b.querySelector('svg')).transform);
+await page.mouse.up();
+ok('tapped, she sinks a little', sunk.startsWith('matrix(0.94'), sunk);
+await page.evaluate(() => document.documentElement.setAttribute('data-reduced-motion', ''));
+await sleep(100);
+const rm = [await animOf(talker), await animOf(floater), await animOf(await luna('idle'))];
+ok('reduced motion: no talk, float or blink', rm.every(a => a === 'none'), rm.join(' | '));
+await page.evaluate(() => document.documentElement.removeAttribute('data-reduced-motion'));
 
 await browser.close();
 console.log(results.every(Boolean) ? '\nALL PASS' : '\nSOME FAILED');

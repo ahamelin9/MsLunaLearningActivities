@@ -161,8 +161,13 @@ In code: `--target-answer`, `--target-chrome`, `--target-gap` and
 - **Easings:** `standard` for most things, `springy` for a pop with a little
   overshoot, `soft-spring` for bars filling, `exit` for things leaving.
 - **The shared animations:** pop, wobble, glow, float, sway, twinkle, squish,
-  shimmer, petal-fall, grow-in and talk. Each is a `--motion-*` role, used as
-  `animation: var(--motion-pop)`.
+  shimmer, petal-fall, grow-in, talk and blink (Luna's eyes, DES-15). Each is
+  a `--motion-*` role, used as `animation: var(--motion-pop)`.
+- **Luna's beak follows the voice:** the voice code reports when one of her
+  clips starts and when the last one ends (`pronunciation.onSpeaking`, read
+  through `useSpeaking()`), and the kit's Luna moves her beak only then.
+  Screens don't drive it. `.claude/skills/know-how/luna-talk-check.mjs`
+  proves it in a browser.
 
 What the moments look like:
 - **A win:** the answer pops, Luna hops, flowers grow up the sides of the stage

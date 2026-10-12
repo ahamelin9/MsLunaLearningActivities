@@ -98,7 +98,7 @@ Story · P0 · M · needs: DES-9a
 Story · P0 · S · needs: DES-15
 - **How:**
   - Grade Select talks to the child, not to grown-ups: no "digraphs" and no "dashboard".
-  - Kit cards, with Luna (DES-15) instead of the emoji `components/ui/Mascot`.
+  - Kit cards, with Luna (DES-15) instead of the emoji `components/ui/Mascot`. Since DES-15 the Mascot already draws the kit's Luna in place of its emoji; its purple circle and bubble are what go here.
   - The curriculum's gradient colours (`data/readingCurriculum.ts`) go.
   - No board shows it, so Alex OKs the shots.
 - **Complete when:**
@@ -122,6 +122,7 @@ Story · P1 · S · needs: DES-22a
 Story · P1 · S · needs: DES-9c, DES-15
 - **Why:** Feed Luna shows two owls at once (the one on the stage and the one on the perch).
 - **How:** at most one Luna per screen; the perch Luna hides when the game's stage has its own. Document what each mood is for. Make sure the talking animation always follows the audio.
+  - **From DES-15 (2026-10-11):** the talking already follows the audio. The kit's Luna moves her beak only while a clip plays (`luna-talk-check.mjs` in know-how), so two Lunas on one screen talk together. Two screens show two today: Feed Luna (the stage and the perch) and Treasure Path (the walker on the stones and the perch).
   - **Spoken, not shown (Alex, 2026-10-09):** where space is tight, as on the library, Luna's greeting is spoken with no always-on speech bubble. A small speaker mark shows she talks, and tapping her says it again.
   - **The milestone moon is a visitor (DES-17):** while she visits, the owl stays and watches, and only the moon talks. One talker at a time.
 - **Complete when:** no screen shows two owls, and the moon appears only during a milestone visit.
@@ -192,7 +193,7 @@ Story · P0 · M · needs: —
 Story · P1 · M · needs: DES-15
 - **Why:** the teacher (2026-10-10): the second moon on the round 2 Ms. Luna board, a crescent with a face and black glasses, comes in every once in a while to say "good job" for big milestones. The owl stays Luna.
 - **How:**
-  - Draw that moon (round 2 Ms. Luna board, moon 6, marked "Milestone moon") as its own kit component, `src/components/kit/MilestoneMoon/`, in moon gold from `_illustration.scss`, the one colour outside the palette. She needs a happy and a cheer look, both shown on the Kit page. Her mouth moves only while her clip plays.
+  - Draw that moon (round 2 Ms. Luna board, moon 6, marked "Milestone moon") as its own kit component, `src/components/kit/MilestoneMoon/`, in moon gold from `_illustration.scss`, the one colour outside the palette. She needs a happy and a cheer look, both shown on the Kit page. Her mouth moves only while her clip plays: she can follow `useSpeaking()` as Luna does (DES-15), and Luna gets `talking={false}` while the moon visits, or both would talk.
   - **Milestones (proposal; Alex left the choice to Claude, 2026-10-10):**
     - the first lesson a child ever finishes;
     - half of a grade's lessons done;
@@ -257,7 +258,7 @@ Story · P1 · M · needs: DES-11, DES-22a
 
 ### DES-22c · Games on the kit, part 2: Words Off the Page, What's Missing?, Treasure Path, Story Corner
 Story · P1 · M · needs: DES-11, DES-22a
-- **How:** the same as DES-22b, for these 4 games. Treasure Path's stopgap passage view stays until GAME-1c designs its real screen.
+- **How:** the same as DES-22b, for these 4 games. Treasure Path's stopgap passage view stays until GAME-1c designs its real screen. Its walker is the kit's Luna since DES-15 (36px, `talking={false}`); its hop is still the game's own keyframes.
   - **Touch targets (from DES-10):** on 2026-10-11, `layout-audit.mjs` found Words Off the Page's word tiles and empty slots 46px tall, the "🔊" prompt pills 39px tall (Hear the whole sentence, Read it to me) and Story Corner's "Next line" 38px.
 - **Complete when:**
   - in each of the 4 games, a right and a wrong answer look like they do everywhere else;

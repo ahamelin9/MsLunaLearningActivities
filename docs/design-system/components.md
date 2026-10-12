@@ -45,7 +45,7 @@ list. Restyling the app means changing these, not every screen. The Kit page
 | `ProgressBar` | One bar in segments | lessons (with "N of M lessons done"), rounds (thin, for a lesson's top bar and the up-next card). `done` and `total` come from the data; the fill grows with the soft spring | DES-7c (done) |
 | `LessonCard` | A lesson on the library | done (check badge, "took N min"), up next (glowing border, a centred "Up next" tag, "about N min", a rounds bar once started), locked (dashed on the well, lock badge, wobbles on tap and doesn't sink); pressed | DES-7c (done) |
 | `Squishy` | A collectible squishy | ball, cat, bunny, bear, butter block, peach, cloud, little moon; oat, caramel, toffee, cream (usual), blush, butter (rare, a sparkle), honey (super rare, a gold sparkle); sizes 64, 96, 128; squishes on tap; ghost (its shape, greyed) and "?" slot wobble; `SquishyDots` for the colours found and still to find. Its colours come only from `_illustration.scss` | DES-7c (done) |
-| `Luna` | Ms. Luna, the owl | 8 moods (idle, happy, cheer, think, oops, surprise, listen, sleepy); blink; talking | DES-15 |
+| `Luna` | Ms. Luna, the owl the teacher picked (round 2, owl 1) | 8 moods (idle, happy, cheer, think, oops, surprise, listen, sleepy), each a pose of one drawing; blinks in idle, happy, think and listen; talking follows the voice by itself (her beak moves only while a clip plays; `talking={false}` keeps her quiet while someone else speaks); `float` for screens where nothing is being played; any `size`; tappable with `onClick`. Her colours come only from `--illo-luna-*` | DES-15 (done) |
 | `MilestoneMoon` | The crescent moon with glasses who visits for big milestones | happy, cheer, talking | DES-17 |
 
 ## One answer language

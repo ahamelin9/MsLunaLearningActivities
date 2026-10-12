@@ -191,6 +191,8 @@ $text-pairs: (
   --motion-petal-fall: luna-petal-fall var(--dur-petals) var(--ease-in-out) forwards;
   --motion-grow-in: luna-grow-in var(--dur-enter) var(--ease-springy) both;
   --motion-talk: luna-talk var(--dur-quick) var(--ease-in-out) infinite;
+  // Luna's blink, about every 5s: a slow loop with a quick close (DES-15)
+  --motion-blink: luna-blink calc(var(--dur-loop) * 1.3) var(--ease-in-out) infinite;
 
   // stacking
   @each $name, $z in p.$z {
@@ -220,7 +222,7 @@ $text-pairs: (
   @each $name, $ms in p.$duration {
     --dur-#{$name}: 0ms;
   }
-  @each $name in (pop, wobble, glow, float, sway, twinkle, squish, shimmer, petal-fall, grow-in, talk) {
+  @each $name in (pop, wobble, glow, float, sway, twinkle, squish, shimmer, petal-fall, grow-in, talk, blink) {
     --motion-#{$name}: none;
   }
 }

@@ -4,7 +4,7 @@ import type { UserProgress } from '@/types/user';
 import type { AnyGameDef, GameShape } from '../../engine/types';
 import { GRADES } from '@/data/readingCurriculum';
 import { GAMES } from '../../games';
-import { LunaOwl } from '../../engine/LunaOwl/LunaOwl';
+import { Luna } from '@/components/kit';
 import { greeting, lunaSay, maybeQuirk, type LunaMood } from '../../engine/luna';
 import { STICKERS, stickerById } from '../../engine/stickers';
 import { pick, tierFor, wordsUpTo } from '../../engine/content';
@@ -129,7 +129,6 @@ export const Hub: React.FC<HubProps> = ({
   const [line, setLine] = useState(() => greeting());
   const wordOfTheDay = useMemo(() => pick(wordsUpTo(tierFor(grade, 2))), [grade]);
   const [mood, setMood] = useState<LunaMood>('happy');
-  const [talking, setTalking] = useState(false);
 
   // Get Luna's voice ready for this grade while the child is still choosing.
   useEffect(() => warmReadingVoice(grade), [grade]);
@@ -137,15 +136,13 @@ export const Hub: React.FC<HubProps> = ({
   /**
    * `parts`, when given, is what Luna says in place of `text`: a line built
    * around a word is said as clips that exist, not as a sentence per word.
+   * Her beak follows the clips by itself (the kit's Luna, DES-15).
    */
   const say = (text: string, nextMood: LunaMood = 'happy', parts?: SpeechPart[]) => {
     setLine({ text, mood: nextMood });
     setMood(nextMood);
-    setTalking(true);
-    const onEnd = () => setTalking(false);
-    if (parts) pronunciation.speakSequence(parts, { onEnd });
-    else soundManager.speak(text.replace(/[…]/g, '...'), { onEnd });
-    window.setTimeout(() => setTalking(false), 3800);
+    if (parts) pronunciation.speakSequence(parts);
+    else soundManager.speak(text.replace(/[…]/g, '...'));
   };
 
   const nudgeLuna = () => {
@@ -172,7 +169,7 @@ export const Hub: React.FC<HubProps> = ({
       {/* ---- Luna's desk ---- */}
       <header className={styles.hubDesk}>
         <div className={styles.deskLuna}>
-          <LunaOwl mood={mood} size={128} talking={talking} onClick={nudgeLuna} />
+          <Luna mood={mood} size={128} float onClick={nudgeLuna} />
           <div className={styles.deskBooks} aria-hidden="true">
             <span />
             <span />

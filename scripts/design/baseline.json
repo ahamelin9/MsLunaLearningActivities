@@ -1,6 +1,6 @@
 {
   "about": "Raw values each file may still have while the legacy styles go away (DES-19). It may only shrink: node scripts/design/check.mjs --update. DES-24 deletes it.",
-  "total": 2175,
+  "total": 2061,
   "files": {
     "src/App.module.scss": 6,
     "src/apps/preview/ComingSoonApp/ComingSoonApp.module.scss": 24,
@@ -9,7 +9,6 @@
     "src/apps/reading/engine/content.ts": 7,
     "src/apps/reading/engine/GameShell/GameShell.module.scss": 202,
     "src/apps/reading/engine/GameShell/GameShell.tsx": 1,
-    "src/apps/reading/engine/LunaOwl/LunaOwl.module.scss": 114,
     "src/apps/reading/games/BubbleSounds/BubbleSounds.module.scss": 82,
     "src/apps/reading/games/BuildSentence/BuildSentence.module.scss": 66,
     "src/apps/reading/games/FeedLuna/FeedLuna.module.scss": 69,

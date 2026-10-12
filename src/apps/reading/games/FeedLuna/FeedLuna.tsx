@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import type { GameApi, GameDef } from '../../engine/types';
 import { lettersFor, pick, shuffle, tierFor, wordsUpTo, type LetterItem, type WordItem } from '../../engine/content';
 import { pickWrong, textChoice } from '../../engine/distractors';
-import { LunaOwl } from '../../engine/LunaOwl/LunaOwl';
+import { Luna } from '@/components/kit';
 import { soundManager } from '@/utils/audio';
 import { pronunciation, type SpeechPart } from '@/utils/pronunciation';
 import { GameSurface } from '../shared/GameSurface/GameSurface';
@@ -207,7 +207,7 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
     >
       <div className={styles.feedTop}>
         <div className={styles.feedLuna}>
-          <LunaOwl mood={chewing ? 'cheer' : spat ? 'oops' : 'happy'} size={152} talking={chewing} />
+          <Luna mood={chewing ? 'cheer' : spat ? 'oops' : 'happy'} size={152} />
           <div ref={beakRef} className={styles.beakZone}
             data-state={dataState(dragging ? 'armed' : false, chewing ? 'chewing' : false)}>
             <span aria-hidden="true">{chewing ? '😋' : 'drop here'}</span>

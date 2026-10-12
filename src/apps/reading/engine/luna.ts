@@ -4,15 +4,9 @@
 
 import { pick } from './content';
 
-export type LunaMood =
-  | 'idle'
-  | 'happy'
-  | 'cheer'
-  | 'think'
-  | 'oops'
-  | 'surprise'
-  | 'listen'
-  | 'sleepy';
+// her 8 moods are drawn by the kit's Luna (DES-15), which owns the list
+export type { LunaMood } from '@/components/kit/Luna/Luna';
+import type { LunaMood } from '@/components/kit/Luna/Luna';
 
 export interface LunaLine {
   text: string;

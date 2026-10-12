@@ -4,7 +4,6 @@ import type { UserProgress } from '@/types/user';
 import type { AnyGameDef, GameApi, GameContext } from '../types';
 import type { Difficulty } from '../content';
 import { lunaSay, type LunaMood } from '../luna';
-import { LunaOwl } from '../LunaOwl/LunaOwl';
 import { nextSticker, type Sticker } from '../stickers';
 import { soundManager } from '@/utils/audio';
 import { pronunciation, type SpeechPart } from '@/utils/pronunciation';
@@ -12,7 +11,7 @@ import { warmGameIntro } from '../warmup';
 import { storageService } from '@/utils/storage';
 import { launchConfetti } from '@/utils/confetti';
 import { StarIcon } from '@/components/ui/Icons/Icons';
-import { ChunkyButton } from '@/components/kit';
+import { ChunkyButton, Luna } from '@/components/kit';
 import { AppHeader } from '@/components/os/AppHeader/AppHeader';
 import { cx } from '@/utils/cx';
 import styles from './GameShell.module.scss';
@@ -63,7 +62,6 @@ export const GameShell: React.FC<GameShellProps> = ({
   const [flash, setFlash] = useState<'win' | 'miss' | null>(null);
   const [bubble, setBubble] = useState<string>(game.mission);
   const [mood, setMood] = useState<LunaMood>('happy');
-  const [talking, setTalking] = useState(false);
   const [preparing, setPreparing] = useState(false);
   const [winStreak, setWinStreak] = useState(0);
 
@@ -97,21 +95,16 @@ export const GameShell: React.FC<GameShellProps> = ({
    * Luna's line in the bubble, spoken. `then` follows it aloud without
    * joining the bubble: a hint, or a sticker's line. Speaking it as its own
    * part also means it plays a clip that exists, where the two glued into one
-   * string would be a sentence nobody rendered.
+   * string would be a sentence nobody rendered. Her beak follows the clips by
+   * itself (the kit's Luna, DES-15).
    */
-  const speak = useCallback(
-    (text: string, nextMood: LunaMood = 'happy', then: SpeechPart[] = []) => {
-      setBubble(text);
-      setMood(nextMood);
-      setTalking(true);
-      const line = text.replace(/[…]/g, '...');
-      const onEnd = () => setTalking(false);
-      if (then.length) pronunciation.speakSequence([{ text: line }, ...then], { onEnd });
-      else soundManager.speak(line, { onEnd });
-      later(() => setTalking(false), 3600);
-    },
-    [later]
-  );
+  const speak = useCallback((text: string, nextMood: LunaMood = 'happy', then: SpeechPart[] = []) => {
+    setBubble(text);
+    setMood(nextMood);
+    const line = text.replace(/[…]/g, '...');
+    if (then.length) pronunciation.speakSequence([{ text: line }, ...then]);
+    else soundManager.speak(line);
+  }, []);
 
   // The start screen is the moment to prepare what this game will say.
   useEffect(() => {
@@ -314,7 +307,7 @@ export const GameShell: React.FC<GameShellProps> = ({
             <p className={styles.introTagline}>{game.tagline}</p>
 
             <div className={styles.introLuna}>
-              <LunaOwl mood="happy" size={78} onClick={() => speak(game.mission, 'happy')} />
+              <Luna mood="happy" size={78} float onClick={() => speak(game.mission, 'happy')} />
               <p className={styles.introMission}>“{game.mission}”</p>
             </div>
 
@@ -365,7 +358,7 @@ export const GameShell: React.FC<GameShellProps> = ({
 
           <div className={styles.rewardPanel}>
             <div className={styles.rewardLuna}>
-              <LunaOwl mood="cheer" size={110} talking={talking} />
+              <Luna mood="cheer" size={110} />
             </div>
 
             <h2 className={styles.rewardTitle}>{game.title} — done!</h2>
@@ -429,12 +422,7 @@ export const GameShell: React.FC<GameShellProps> = ({
         </div>
 
         <div className={styles.lunaPerch}>
-          <LunaOwl
-            mood={mood}
-            size={82}
-            talking={talking}
-            onClick={() => speak(bubble, mood)}
-          />
+          <Luna mood={mood} size={82} onClick={() => speak(bubble, mood)} />
           <div className={styles.perchBubble}>
             <p>
               {bubble}

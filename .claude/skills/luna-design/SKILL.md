@@ -134,6 +134,9 @@ changed screens.
   it fails if any screen keeps moving (DES-6).
 - `npm run ui:shots` at the four iPad sizes, and `--diff` for refactors (from
   DES-18a).
+- Does Luna's beak move only while a clip plays?
+  `node .claude/skills/know-how/luna-talk-check.mjs 5199` (Vite on 5199;
+  DES-15). Her moods and blink are in `kit-check.mjs`.
 - Does a screen fit? `node .claude/skills/know-how/layout-audit.mjs 5199 <grade 0|1|2>`
   (Vite on 5199): nothing scrolls or is cut off mid-round, and no tap target
   outside a game's stage is small, overlapping or in the edge band (DES-10).

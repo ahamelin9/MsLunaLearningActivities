@@ -1,6 +1,7 @@
 import React from 'react';
 import { Volume2Icon } from '../Icons/Icons';
 import { soundManager } from '@/utils/audio';
+import { Luna, type LunaMood } from '@/components/kit';
 import styles from './Mascot.module.scss';
 
 interface MascotProps {
@@ -9,6 +10,14 @@ interface MascotProps {
   onSpeak?: () => void;
   size?: 'sm' | 'md' | 'lg';
 }
+
+const MOODS: Record<NonNullable<MascotProps['expression']>, LunaMood> = {
+  happy: 'happy',
+  thinking: 'think',
+  celebrate: 'cheer',
+  encouraging: 'happy'
+};
+const LUNA_SIZE = { sm: 40, md: 56, lg: 76 };
 
 export const Mascot: React.FC<MascotProps> = ({
   speechText,
@@ -33,9 +42,8 @@ export const Mascot: React.FC<MascotProps> = ({
         title="Tap Ms. Luna to listen!"
         aria-label="Tap Ms. Luna to listen"
       >
-        <span>
-          {expression === 'celebrate' ? '🎉' : expression === 'thinking' ? '🦉' : expression === 'encouraging' ? '✨' : '🦉'}
-        </span>
+        {/* the drawn Luna in place of the emoji owl (DES-15); DES-9c retires the Mascot */}
+        <Luna mood={MOODS[expression]} size={LUNA_SIZE[size]} />
         <div className={styles.mascotSoundIndicator}>
           <Volume2Icon size={14} />
         </div>

@@ -83,3 +83,11 @@
   0%, 100% { transform: scaleY(1); }
   50% { transform: scaleY(1.5); }
 }
+
+// Luna's eyes: a quick blink near the end of each slow loop (DES-15, as on the
+// round 2 Ms. Luna board)
+@keyframes luna-blink {
+  0%, 90%, 100% { transform: scaleY(1); }
+  93% { transform: scaleY(0.1); }
+  96% { transform: scaleY(1); }
+}

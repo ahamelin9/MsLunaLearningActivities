@@ -1,0 +1,97 @@
+// Luna (DES-15): component tokens first; her moods, float and talking swap
+// only these. Every colour is from the illustration palette, so she looks
+// like herself in light and dark (colour.md, Illustrations). Her poses are in
+// Luna.tsx; the motions here run on wrappers, so they never undo a pose.
+
+@use 'styles/mixins' as *;
+
+.root {
+  --luna-move: none;
+  --luna-blink: none;
+  --luna-talk: none;
+
+  display: inline-block;
+  flex: none;
+  padding: 0;
+  border: none;
+  background: none;
+  line-height: 0;
+
+  &:focus-visible {
+    @include focus-ring;
+    border-radius: var(--radius-card);
+  }
+}
+
+button.root {
+  cursor: pointer;
+}
+
+// a slow bob where nothing is being played (the library, a start screen)
+.root[data-float] { --luna-move: var(--motion-float); }
+
+// her eyes blink in the moods where they're open and at rest
+.root[data-mood='idle'],
+.root[data-mood='happy'],
+.root[data-mood='think'],
+.root[data-mood='listen'] { --luna-blink: var(--motion-blink); }
+
+// a mood's own one-off motion wins over the float
+.root[data-mood='cheer'],
+.root[data-mood='surprise'] { --luna-move: var(--motion-pop); }
+.root[data-mood='oops'] { --luna-move: var(--motion-wobble); }
+
+// only while one of her clips plays (Luna.tsx follows the voice)
+.root[data-state~='talking'] { --luna-talk: var(--motion-talk); }
+
+.figure {
+  display: block;
+  width: 100%;
+  height: 100%;
+  transform-origin: 50% 100%;
+  animation: var(--luna-move);
+}
+
+.svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  transition: transform var(--dur-tap) var(--ease-standard);
+}
+
+// tapped, she sinks a little
+button.root:active .svg {
+  transform: scale(0.94);
+}
+
+.eyes {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: var(--luna-blink);
+}
+
+.beakMove {
+  transform-box: fill-box;
+  transform-origin: 50% 0;
+  animation: var(--luna-talk);
+}
+
+// ── her colours ────────────────────────────────────────────────────────────
+.shadow { fill: var(--illo-shadow); }
+.ear { fill: var(--illo-luna-feather-deep); stroke: var(--illo-luna-feather-deep); }
+.wing { fill: var(--illo-luna-feather-deep); }
+.body { fill: var(--illo-luna-feather); }
+.belly { fill: var(--illo-luna-belly); }
+.chevrons { fill: none; stroke: var(--illo-luna-feather); }
+.eyeWhite { fill: var(--illo-luna-eye); }
+.pupil { fill: var(--illo-luna-pupil); }
+.glint { fill: var(--illo-shine); }
+.eyeLine { fill: none; stroke: var(--illo-luna-pupil); }
+.lid { fill: var(--illo-luna-feather); }
+.frame { fill: none; stroke: var(--illo-frames); }
+.cheek { fill: var(--illo-luna-cheek); }
+.beak { fill: var(--illo-luna-beak); stroke: var(--illo-luna-beak); }
+.foot { fill: var(--illo-luna-beak); }
+// the sleepy "z" floats beside her, on the screen, so it takes a role that reads in both modes
+.zzz { fill: none; stroke: var(--ink-soft); }

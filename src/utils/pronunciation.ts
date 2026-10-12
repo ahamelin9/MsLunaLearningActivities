@@ -84,6 +84,8 @@ class PronunciationService {
   private status: VoiceStatus = { state: 'idle' };
   private listeners = new Set<(s: VoiceStatus) => void>();
   private busyListeners = new Set<(busy: boolean) => void>();
+  private speakingListeners = new Set<(speaking: boolean) => void>();
+  private speaking = false;
 
   private ctx: AudioContext | null = null;
   private currentSource: AudioBufferSourceNode | null = null;
@@ -164,6 +166,29 @@ class PronunciationService {
     this.busyListeners.add(listener);
     listener(this.liveRequests > 0);
     return () => this.busyListeners.delete(listener);
+  }
+
+  /**
+   * True from the moment one of Luna's clips starts until the last one playing
+   * ends, so her beak moves only while a clip is playing (DES-15). A pause
+   * between the parts of a sequence closes it; the browser voice never opens it.
+   */
+  onSpeaking(listener: (speaking: boolean) => void): () => void {
+    this.speakingListeners.add(listener);
+    listener(this.speaking);
+    return () => this.speakingListeners.delete(listener);
+  }
+
+  private setSpeaking(speaking: boolean) {
+    if (this.speaking === speaking) return;
+    this.speaking = speaking;
+    this.speakingListeners.forEach(l => {
+      try {
+        l(speaking);
+      } catch {
+        // a broken listener must not break speech
+      }
+    });
   }
 
   private setBusy(busy: boolean) {
@@ -285,6 +310,8 @@ class PronunciationService {
         finished = true;
         window.clearTimeout(backup);
         if (this.currentSource === source) this.currentSource = null;
+        // another clip may have started in its place: Luna is still talking
+        if (!this.currentSource) this.setSpeaking(false);
         onEnd?.();
       };
       const backup = window.setTimeout(finish, buffer.duration * 1000 + 400);
@@ -292,6 +319,7 @@ class PronunciationService {
       source.onended = finish;
       this.currentSource = source;
       source.start();
+      this.setSpeaking(true);
       return true;
     } catch {
       onEnd?.();
@@ -671,6 +699,7 @@ class PronunciationService {
       // already finished
     }
     this.currentSource = null;
+    this.setSpeaking(false);
     if (this.browserSpeechAvailable()) {
       try {
         window.speechSynthesis.cancel();
