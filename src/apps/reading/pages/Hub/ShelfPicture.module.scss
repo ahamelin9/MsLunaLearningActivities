@@ -1,0 +1,95 @@
+// The Play Shelf's drawn pictures (DES-21): illustration colours and roles
+// through classes, never fill="#…" in the markup (colour.md, Illustrations).
+// They move with the shared sway and float, which reduced motion turns off.
+
+// a drawing keeps its shape and shrinks to fit a narrow tile (portrait iPads)
+.picture {
+  max-width: calc(100% - var(--space-4));
+  height: auto;
+}
+
+// ---- fills ----
+.cream { fill: var(--illo-tile-cream); }
+.toffee { fill: var(--illo-tile-toffee); }
+.walnut { fill: var(--illo-tile-walnut); }
+.olive { fill: var(--illo-tile-olive); }
+.clay { fill: var(--illo-tile-clay); }
+.line { fill: var(--illo-line); }
+
+// ---- things, with their outlines ----
+.glass {
+  fill: var(--illo-tile-cream);
+  stroke: var(--illo-tile-olive);
+}
+
+.bubble {
+  fill: var(--illo-tile-cream);
+  stroke: var(--illo-tile-toffee);
+}
+
+.cookie {
+  fill: var(--illo-tile-caramel);
+  stroke: var(--illo-tile-brown);
+}
+
+.cookie-light {
+  fill: var(--illo-tile-almond);
+  stroke: var(--illo-tile-brown);
+}
+
+.card-face {
+  fill: var(--illo-tile-cream);
+  stroke: var(--illo-tile-toffee);
+}
+
+.leaf {
+  fill: var(--illo-tile-sage);
+  stroke: var(--illo-tile-olive);
+}
+
+.page {
+  fill: var(--illo-tile-cream);
+  stroke: var(--illo-tile-brown);
+}
+
+// What's Missing?'s empty spot and Treasure Path's X: the accent's text colour,
+// so they show on the picture tint in both modes
+.gone {
+  fill: none;
+  stroke: var(--accent-text);
+}
+
+.mark {
+  fill: none;
+  stroke: var(--accent-text);
+}
+
+.path {
+  fill: none;
+  stroke: var(--illo-stem);
+}
+
+// a letter or word drawn in the reading font
+.letter {
+  font-family: var(--font-read);
+  font-weight: 700;
+}
+
+// ---- motion: the shared loops, each piece a little behind the one before ----
+.sway {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: var(--motion-sway);
+}
+
+.float {
+  animation: var(--motion-float);
+}
+
+.later {
+  animation-delay: calc(var(--dur-loop) * -0.33);
+}
+
+.latest {
+  animation-delay: calc(var(--dur-loop) * -0.66);
+}

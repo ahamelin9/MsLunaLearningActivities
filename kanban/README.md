@@ -97,7 +97,7 @@ In board order. A new epic gets its file in `epics/` first, then a link here
 | ID | Title | Type | P | Size | Status |
 |---|---|---|---|---|---|
 | **DES** | **Design system & layout** | Epic | **P0** | | |
-| DES-21 | Library on the kit: header, welcome row, Luna's Pick, Play Shelf | Story | P1 | M | Todo |
+| DES-21 | Library on the kit: header, welcome row, Luna's Pick, Play Shelf | Story | P1 | M | In progress |
 | DES-13 | Lesson path on the hub: in order, one bar | Story | P1 | S | Todo |
 | DES-22a | GameShell on the kit: start, stage, perch, reward | Story | P1 | M | Todo |
 | DES-11 | One right/wrong/reveal visual language | Story | P1 | S | Todo |

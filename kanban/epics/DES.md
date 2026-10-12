@@ -94,7 +94,7 @@ Story · P1 · S · needs: PRG-7
   - finishing Lesson 1 fills one segment, shows it done with its time, and opens Lesson 2;
   - a lesson left part-way shows its rounds bar;
   - the hub, the round's top bar and the done screen show no seeds or flowers;
-  - the path is built from ProgressBar, LessonCard and roles only, its code shows zero in `design:status`, and it's checked in light and dark.
+  - the path is built from ProgressBar, LessonCard and roles only, its code shows zero in `design:status` (`pages/Hub` at zero, the `LessonPath` DES-21 left included), and it's checked in light and dark.
 
 ### DES-14 · Feed Luna's cookies look like real, different cookies
 Story · P2 · S · needs: DES-22b
@@ -164,10 +164,21 @@ Story · P1 · M · needs: —
   - The board's grade chip beside the title in the header was left out by DES-8, since the desk's grade sign still shows the grade. Decide here whether the chip replaces the sign (SET-1 moves changing the grade behind the gate). The header is `components/os/AppHeader`; ReadingApp fills its end.
   - The hub's own keyframes (`pages/Hub`) move onto the shared motion set.
   - **From DES-10 (Alex, 2026-10-11):** the Play Shelf sits on one even grid, every tile the same size (today Letter Jar and Treasure Path are double height, and Words Off the Page and Story Corner double width). No title sits on its picture (today Feed Luna, Muddled Cards, Words Off the Page, What's Missing and Story Corner do).
+  - **Settled before building (Alex, 2026-10-12):**
+    - **The lesson path is DES-13's, split by file:** today's lesson section moves unchanged into `pages/Hub/LessonPath.tsx` and its own module, with `SPINE_COLORS` and its old styles. `Hub.tsx` and `Hub.module.scss` go to zero; DES-13 rebuilds LessonPath.
+    - **The Squishy Shelf's space:** a Sticker Tin card stands in, from the kit: "Sticker Tin", "N of 18 found", the last three stickers won on a little plank (tap one to hear its line), and "My trophies" (`open-trophies`). It stretches over the Today space until PRG-6; PRG-5 swaps the stickers for squishies there. The old 18-slot tin goes.
+    - **Grade:** the grade sits beside the header's title, where the board has its chip, and the desk's grade sign goes (so does `badgeEmoji`). **It's a button (Alex, 2026-10-12):** the teacher takes different groups and swaps grades as the schedule needs, so tapping it opens Grade Select with the current grade picked. A kit ChunkyButton (48px, like Home), since the board's chip is too small to tap. Settings' Grade row still works too; whether either goes behind the gate is SET-1's call.
+    - **Her greeting** is spoken when the library opens from the home screen, not straight after Grade Select (it would cut off "Let's start Kindergarten!") and not on coming back from a game. Tapping her says the same line again; her quirks on tap go.
+    - **A mute beside her (Alex, 2026-10-12):** the board's speaker mark read as a mute button, so it is one: a kit icon button beside Luna (speaker when she talks, mute when she doesn't) that switches her voice off and on. It's the same setting as Settings' "Ms. Luna's voice", and muting stops her mid-line. Alex chose it knowing a child can then silence the games, whose targets are only spoken; SET-2 decides whether it's gated.
+    - **Kit over board:** Luna's Pick is the accent ChunkyButton (64px, the dice, "she chooses, you play"); the pictures use the shared sway and float.
+    - **Gone, as the board has none:** the lanterns, the desk books, the word-of-the-day nook (BUG-14 becomes Won't do), and the tiles' taglines, emoji and played stars. Tiles keep each game's own name (the board's "Letter Cookies" is GAME-6).
 - **Complete when:**
-  - the hub matches the Library board (lesson path aside) at the four sizes, in light and dark;
+  - the hub matches the Library board (lesson path aside; the Sticker Tin card in the Squishy Shelf's place until PRG-5 and PRG-6) at the four sizes, in light and dark;
   - the Play Shelf's tiles are all one size, and `layout-audit.mjs` (know-how) lists no "titles on their scenery" at any grade;
-  - `pages/Hub` shows zero in `design:status`;
+  - `pages/Hub` shows zero in `design:status` apart from `LessonPath`, DES-13's;
+  - Luna's greeting plays when the library opens from home, not after Grade Select or a game, and tapping her plays it again;
+  - tapping the header's grade opens Grade Select with that grade picked, and picking one returns to the library in that grade;
+  - the button beside Luna mutes her (she stops mid-line, and taps stay silent) and unmutes her, and Settings' "Ms. Luna's voice" shows the same;
   - Alex OKs the shots.
 
 ### DES-22a · GameShell on the kit: start, stage, perch, reward

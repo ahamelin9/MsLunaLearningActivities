@@ -2,7 +2,8 @@
  * Tile: a pressable card with a picture area and a name, for the Play Shelf.
  *
  * Props:  name: the words under the picture · picture: what's drawn above
- *         (DES-21 brings the drawn pictures) · tint: 1–5, the picture area's
+ *         (the library draws each game's: pages/Hub/ShelfPicture, DES-21)
+ *         · tint: 1–5, the picture area's
  *         soft colour (default 1) · plus any <button> attribute (onClick,
  *         data-shot); className is layout only
  * States: idle · pressed (:active, sinks onto its ledge) · picked:

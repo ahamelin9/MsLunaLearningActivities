@@ -1,0 +1,154 @@
+// The library's lessons as they looked before the restyle, moved here
+// unchanged from Hub.module.scss by DES-21. DES-13 rebuilds them on
+// ProgressBar and LessonCard and deletes these old styles.
+
+@use 'apps/reading/engine/world' as *;
+
+.hub-lessons {
+  padding: 1.1rem 1rem 1.3rem;
+  border-radius: 30px 30px 26px 26px / 22px;
+  background:
+    repeating-linear-gradient(180deg, transparent 0 27px, rgba(79, 168, 216, 0.1) 27px 28px),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.7), rgba(234, 244, 250, 0.9));
+  border: 4px solid rgba(79, 168, 216, 0.35);
+  color: $ink;
+  font-family: var(--font-read);
+
+  h2 {
+    font-family: var(--font-display);
+    font-weight: 600;
+  }
+}
+
+.rug-heading {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  font-size: 1.4rem;
+  margin-bottom: 0.9rem;
+  padding-left: 0.3rem;
+
+  small { font-size: 0.8rem; color: $ink-soft; font-family: var(--font-read); font-weight: 700; }
+}
+
+.lesson-yard {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  grid-auto-rows: 146px;
+  gap: 0.8rem;
+}
+
+.game-thing {
+  position: relative;
+  overflow: hidden;
+  padding: 0.6rem 0.7rem;
+  cursor: pointer;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  border: 3px solid rgba(58, 42, 31, 0.22);
+  border-radius: 20px;
+  background: #FFFDF4;
+  box-shadow: 0 5px 0 rgba(58, 42, 31, 0.14), 0 10px 20px rgba(58, 42, 31, 0.14);
+  transform: rotate(var(--tilt, 0deg));
+  transition: transform 0.18s cubic-bezier(0.3, 1.4, 0.5, 1), box-shadow 0.18s ease;
+
+  &:hover {
+    transform: rotate(0deg) translateY(-5px) scale(1.02);
+    box-shadow: 0 8px 0 rgba(58, 42, 31, 0.14), 0 16px 26px rgba(58, 42, 31, 0.2);
+    z-index: 2;
+  }
+
+  &:active { transform: translateY(3px) scale(0.99); }
+
+  .thing-body { position: relative; z-index: 2; }
+
+  .thing-emoji {
+    display: block;
+    font-size: 1.7rem;
+    line-height: 1;
+    filter: drop-shadow(0 3px 3px rgba(58, 42, 31, 0.25));
+  }
+
+  .thing-title {
+    display: block;
+    font-family: var(--font-read);
+    font-size: 1.08rem;
+    font-weight: 600;
+    line-height: 1.15;
+    margin-top: 0.2rem;
+  }
+
+  .thing-tagline {
+    display: block;
+    font-size: 0.76rem;
+    color: $ink-soft;
+    line-height: 1.25;
+    margin-top: 0.1rem;
+  }
+}
+
+// An exercise book rather than a toy: upright, a painted spine, ruled lines.
+.game-thing[data-shape="lesson"] {
+  padding-left: 1.4rem;
+  border-radius: 8px 18px 18px 8px;
+  background: #FFFEF8;
+
+  .thing-kicker {
+    display: block;
+    font-size: 0.62rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--spine, #{$berry});
+    filter: brightness(0.8);
+  }
+
+  .lesson-done {
+    position: absolute;
+    top: 8px;
+    right: 10px;
+    z-index: 3;
+    padding: 0.1rem 0.5rem;
+    border-radius: 999px;
+    background: $moss;
+    color: #FFFFFF;
+    font-size: 0.72rem;
+    font-weight: 800;
+  }
+
+  &[data-state="done"] { background: #F6FBF3; }
+}
+
+.scenery {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.lesson-scenery {
+  .lesson-spine {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 12px;
+    background: var(--spine, #{$berry});
+    box-shadow: inset -3px 0 4px rgba(0, 0, 0, 0.18);
+  }
+  .lesson-lines {
+    position: absolute;
+    inset: 0 0 0 12px;
+    background: repeating-linear-gradient(180deg, transparent 0 21px, rgba(79, 168, 216, 0.16) 21px 22px);
+  }
+  .lesson-mark {
+    position: absolute;
+    right: 10%;
+    top: 12%;
+    font-size: 3rem;
+    opacity: 0.22;
+    transform: rotate(-10deg);
+  }
+}

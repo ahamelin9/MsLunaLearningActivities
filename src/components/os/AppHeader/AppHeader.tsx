@@ -4,8 +4,9 @@
  * library, a game's rounds and Again.
  *
  * Props:  back: 'home' (leaves the app) | 'library' (from a game) · onBack
- *         title · rounds?: { won, current, total }, a game's rounds as a bar
- *         and "Round 2 of 4" · children: the end of the header
+ *         title · beside?: what sits next to the title (the library's grade
+ *         button, DES-21) · rounds?: { won, current, total }, a game's rounds
+ *         as a bar and "Round 2 of 4" · children: the end of the header
  * Built from ChunkyButton and ProgressBar, with roles and the space scale
  * only. It lives with the tablet shell rather than in the kit (Alex,
  * 2026-10-11). It stays at the top while the screen under it scrolls.
@@ -20,11 +21,12 @@ interface AppHeaderProps {
   back: 'home' | 'library';
   onBack: () => void;
   title: string;
+  beside?: ReactNode;
   rounds?: { won: number; current: number; total: number };
   children?: ReactNode;
 }
 
-export function AppHeader({ back, onBack, title, rounds, children }: AppHeaderProps) {
+export function AppHeader({ back, onBack, title, beside, rounds, children }: AppHeaderProps) {
   const round = rounds && `Round ${rounds.current} of ${rounds.total}`;
   return (
     <header className={styles.root}>
@@ -39,6 +41,7 @@ export function AppHeader({ back, onBack, title, rounds, children }: AppHeaderPr
       )}
 
       <h1 className={styles.title}>{title}</h1>
+      {beside}
 
       <div className={styles.end}>
         {rounds && (

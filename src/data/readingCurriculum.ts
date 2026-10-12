@@ -1,9 +1,9 @@
 import type { GradeInfo, GradeLevel, ReadingSkill } from '../types/reading';
 
 export const GRADES: GradeInfo[] = [
-  { id: 'kindergarten', title: 'Kindergarten', badgeEmoji: '🔤' },
-  { id: 'grade1', title: '1st Grade', badgeEmoji: '🚀' },
-  { id: 'grade2', title: '2nd Grade', badgeEmoji: '👑' }
+  { id: 'kindergarten', title: 'Kindergarten' },
+  { id: 'grade1', title: '1st Grade' },
+  { id: 'grade2', title: '2nd Grade' }
 ];
 
 export const READING_CURRICULUM: Record<GradeLevel, ReadingSkill[]> = {

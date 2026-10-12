@@ -1,157 +1,88 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import type { GradeLevel } from '@/types/reading';
 import type { UserProgress } from '@/types/user';
 import type { AnyGameDef, GameShape } from '../../engine/types';
-import { GRADES } from '@/data/readingCurriculum';
 import { GAMES } from '../../games';
-import { ChunkyButton, Luna } from '@/components/kit';
-import { greeting, lunaSay, maybeQuirk, type LunaMood } from '../../engine/luna';
+import { ChunkyButton, Luna, PaperCard, Tile } from '@/components/kit';
+import { greeting, lunaSay, type LunaLine, type LunaMood } from '../../engine/luna';
 import { STICKERS, stickerById } from '../../engine/stickers';
-import { pick, tierFor, wordsUpTo } from '../../engine/content';
 import { soundManager } from '@/utils/audio';
-import { pronunciation, type SpeechPart } from '@/utils/pronunciation';
+import { storageService } from '@/utils/storage';
 import { warmReadingVoice } from '../../engine/warmup';
-import { cx } from '@/utils/cx';
+import { LessonPath } from './LessonPath';
+import { ShelfPicture } from './ShelfPicture';
 import styles from './Hub.module.scss';
 
 interface HubProps {
   grade: GradeLevel;
+  gradeTitle: string;
   progress: UserProgress;
   /** this grade's guided lessons, in teaching order (engine/lessons.ts) */
   lessons: AnyGameDef[];
+  /** say her greeting as the library opens: only when it opens from home (DES-21) */
+  greet: boolean;
   onPlayGame: (game: AnyGameDef) => void;
   onSurprise: () => void;
-  onChangeGrade: () => void;
-  /** the sticker tin leads to the Trophy room (DES-9b; the squishy shelf, PRG-5) */
+  /** the Sticker Tin leads to the Trophy room (DES-9b; the squishy shelf, PRG-5) */
   onOpenTrophies: () => void;
 }
 
-/** Painted spines for the lesson books, cycled so no two neighbours match. */
-const SPINE_COLORS = ['#E4572E', '#4AA05A', '#4FA8D8', '#7C3AED', '#C97B12', '#B2566E'];
+/** How many of the latest stickers stand on the Sticker Tin's plank. */
+const ON_THE_PLANK = 3;
 
-/** Each shape gets its own little piece of scenery inside the tile. */
-const Scenery: React.FC<{ shape: GameShape; emoji: string }> = ({ shape, emoji }) => {
-  switch (shape) {
-    case 'jar':
-      return (
-        <span className={cx(styles.scenery, styles.jarScenery)} aria-hidden="true">
-          <span className={styles.jarLid} />
-          <span className={styles.jarBody}>
-            <i>B</i>
-            <i>m</i>
-            <i>S</i>
-            <i>t</i>
-          </span>
-        </span>
-      );
-    case 'bubbles':
-      return (
-        <span className={cx(styles.scenery, styles.bubbleScenery)} aria-hidden="true">
-          <i style={{ left: '10%', animationDelay: '0s' }}>a</i>
-          <i style={{ left: '42%', animationDelay: '0.6s' }}>s</i>
-          <i style={{ left: '70%', animationDelay: '1.2s' }}>m</i>
-        </span>
-      );
-    case 'cards':
-      return (
-        <span className={cx(styles.scenery, styles.cardScenery)} aria-hidden="true">
-          <i />
-          <i />
-          <i />
-        </span>
-      );
-    case 'plate':
-      return (
-        <span className={cx(styles.scenery, styles.plateScenery)} aria-hidden="true">
-          <i>b</i>
-          <i>D</i>
-        </span>
-      );
-    case 'map':
-      return (
-        <span className={cx(styles.scenery, styles.mapScenery)} aria-hidden="true">
-          <span className={styles.mapPath} />
-          <span className={styles.mapX}>✕</span>
-        </span>
-      );
-    case 'desk':
-      return (
-        <span className={cx(styles.scenery, styles.deskScenery)} aria-hidden="true">
-          <i>🧦</i>
-          <i>🔑</i>
-          <i>🍎</i>
-        </span>
-      );
-    case 'book':
-      return (
-        <span className={cx(styles.scenery, styles.bookScenery)} aria-hidden="true">
-          <span className={styles.bookLeft}>
-            <i />
-            <i />
-            <i />
-          </span>
-          <span className={styles.bookRight}>
-            <i />
-            <i />
-            <i />
-          </span>
-        </span>
-      );
-    case 'page':
-      return (
-        <span className={cx(styles.scenery, styles.pageScenery)} aria-hidden="true">
-          <i>The</i>
-          <i>cat</i>
-          <i>is</i>
-          <i>big</i>
-        </span>
-      );
-    case 'lesson':
-      // an exercise book: a painted spine and ruled lines, the lesson's picture faint on the page
-      return (
-        <span className={cx(styles.scenery, styles.lessonScenery)} aria-hidden="true">
-          <span className={styles.lessonSpine} />
-          <span className={styles.lessonLines} />
-          <span className={styles.lessonMark}>{emoji}</span>
-        </span>
-      );
-  }
+/** Each game's picture tint on its Play Shelf Tile, as on the board. */
+const SHELF_TINTS: Record<GameShape, 1 | 2 | 3 | 4 | 5> = {
+  jar: 1,
+  bubbles: 2,
+  plate: 3,
+  cards: 4,
+  page: 5,
+  desk: 2,
+  map: 1,
+  book: 3,
+  lesson: 1
 };
 
+/**
+ * Luna's library (DES-21), as on the round 2 Library board: the welcome row
+ * (Luna, who says her greeting with no bubble; the Sticker Tin, standing in
+ * for the Squishy Shelf until PRG-5; Luna's Pick), the lessons (LessonPath,
+ * DES-13's) and the Play Shelf, all from the kit.
+ */
 export const Hub: React.FC<HubProps> = ({
   grade,
+  gradeTitle,
   progress,
   lessons,
+  greet,
   onPlayGame,
   onSurprise,
-  onChangeGrade,
   onOpenTrophies
 }) => {
-  const gradeInfo = GRADES.find(g => g.id === grade) || GRADES[0];
-
-  const [line, setLine] = useState(() => greeting());
-  const wordOfTheDay = useMemo(() => pick(wordsUpTo(tierFor(grade, 2))), [grade]);
-  const [mood, setMood] = useState<LunaMood>('happy');
+  // her greeting for this visit: said as the library opens from home, and
+  // again whenever she's tapped
+  const [hello] = useState<LunaLine>(() => greeting());
+  const [mood, setMood] = useState<LunaMood>(greet ? hello.mood : 'happy');
 
   // Get Luna's voice ready for this grade while the child is still choosing.
   useEffect(() => warmReadingVoice(grade), [grade]);
 
-  /**
-   * `parts`, when given, is what Luna says in place of `text`: a line built
-   * around a word is said as clips that exist, not as a sentence per word.
-   * Her beak follows the clips by itself (the kit's Luna, DES-15).
-   */
-  const say = (text: string, nextMood: LunaMood = 'happy', parts?: SpeechPart[]) => {
-    setLine({ text, mood: nextMood });
-    setMood(nextMood);
-    if (parts) pronunciation.speakSequence(parts);
-    else soundManager.speak(text.replace(/[…]/g, '...'));
+  /** Luna says a line; her beak follows the clip by itself (the kit's Luna, DES-15). */
+  const speak = (line: LunaLine) => soundManager.speak(line.text.replace(/[…]/g, '...'));
+  const say = (line: LunaLine) => {
+    setMood(line.mood);
+    speak(line);
   };
 
-  const nudgeLuna = () => {
+  // as the library opens (her mood already matches the line)
+  useEffect(() => {
+    if (greet) speak(hello);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const hearAgain = () => {
     soundManager.playPop();
-    const next = maybeQuirk(0.45) ?? greeting();
-    say(next.text, next.mood);
+    say(hello);
   };
 
   const startGame = (game: AnyGameDef) => {
@@ -159,196 +90,115 @@ export const Hub: React.FC<HubProps> = ({
     onPlayGame(game);
   };
 
+  const voiceOn = progress.settings.speechEnabled;
+  const owned = STICKERS.filter(s => progress.stickers.includes(s.id));
+  // the latest ones won, newest last, as they were peeled
+  const latest = progress.stickers
+    .slice(-ON_THE_PLANK)
+    .map(id => stickerById(id))
+    .filter(s => s !== undefined);
+
   return (
-    <div className={styles.readingHub} data-shot="hub">
-      <div className={styles.hubLanterns} aria-hidden="true">
-        <span>🏮</span>
-        <span>✨</span>
-        <span>🏮</span>
-        <span>⭐</span>
-        <span>🏮</span>
-      </div>
-
-      {/* ---- Luna's desk ---- */}
-      <header className={styles.hubDesk}>
-        <div className={styles.deskLuna}>
-          <Luna mood={mood} size={128} float onClick={nudgeLuna} />
-          <div className={styles.deskBooks} aria-hidden="true">
-            <span />
-            <span />
-            <span />
-          </div>
-        </div>
-
-        <div className={styles.deskSpeech} onClick={nudgeLuna} role="button" tabIndex={0}>
-          <p>{line.text}</p>
-          <span className={styles.speechTap}>tap me</span>
-        </div>
-
-        <div className={styles.deskControls}>
-          <button className={styles.gradeSign} onClick={onChangeGrade} title="Change grade">
-            <span className={styles.signRope} aria-hidden="true" />
-            <span className={styles.signEmoji}>{gradeInfo.badgeEmoji}</span>
-            <span className={styles.signText}>{gradeInfo.title}</span>
-            <span className={styles.signSwap}>swap</span>
-          </button>
-
-          <button
-            className={styles.lunasPick}
+    <div className={styles.page} data-shot="hub">
+      {/* ---- welcome: Luna, the Sticker Tin and Luna's Pick ---- */}
+      <div className={styles.welcome}>
+        <span className={styles.luna}>
+          <Luna mood={mood} size={108} float onClick={hearAgain} label={`Hear Ms. Luna: ${hello.text}`} />
+          {/* she talks with no bubble; beside her, her voice switches off and on
+              (Alex, 2026-10-12): the same setting as Settings' "Ms. Luna's voice" */}
+          <ChunkyButton
+            variant="icon"
+            icon={voiceOn ? 'speaker' : 'mute'}
+            aria-label={voiceOn ? 'Mute Ms. Luna' : 'Unmute Ms. Luna'}
+            data-shot="luna-mute"
             onClick={() => {
-              soundManager.playStarChime();
-              const pickLine = lunaSay('surprisePick');
-              say(pickLine.text, pickLine.mood);
-              window.setTimeout(onSurprise, 500);
+              soundManager.playPop();
+              storageService.updateSettings({ speechEnabled: !voiceOn });
             }}
-          >
-            <span className={styles.pickGlow} aria-hidden="true" />
-            <span className={styles.pickEmoji}>🎲</span>
-            <span className={styles.pickText}>Luna’s Pick!</span>
-            <span className={styles.pickSub}>she chooses, you play</span>
-          </button>
-        </div>
-      </header>
+          />
+        </span>
 
-      {/* ---- the lessons come first: the structured teaching, in order ---- */}
-      {lessons.length > 0 && (
-        <section className={styles.hubLessons}>
-          <h2 className={styles.rugHeading}>
-            <span>Luna’s Lessons</span>
-            <small>
-              {lessons.length} lessons for {gradeInfo.title} — start with the first
-            </small>
-          </h2>
-
-          <div className={styles.lessonYard}>
-            {lessons.map((lesson, i) => {
-              const done = lesson.lesson ? progress.completedLessons.includes(lesson.lesson.id) : false;
-              return (
-                <button
-                  key={lesson.id}
-                  className={styles.gameThing}
-                  data-shape="lesson"
-                  data-state={done ? 'done' : undefined}
-                  data-shot="lesson-tile"
-                  style={{ '--spine': SPINE_COLORS[i % SPINE_COLORS.length] } as React.CSSProperties}
-                  onClick={() => startGame(lesson)}
-                >
-                  <Scenery shape={lesson.shape} emoji={lesson.emoji} />
-
-                  <span className={styles.thingBody}>
-                    <span className={styles.thingKicker}>Lesson {i + 1}</span>
-                    <span className={styles.thingEmoji}>{lesson.emoji}</span>
-                    <span className={styles.thingTitle}>{lesson.title}</span>
-                    <span className={styles.thingTagline}>{lesson.tagline}</span>
-                  </span>
-
-                  {done && (
-                    <span className={styles.lessonDone} title="Finished">
-                      ✓ done
-                    </span>
-                  )}
-                </button>
-              );
-            })}
-          </div>
-        </section>
-      )}
-
-      {/* ---- the play rug: every game is an object, not a card ---- */}
-      <section className={styles.hubRug} data-shot="hub-rug">
-        <h2 className={styles.rugHeading}>
-          <span>The Play Rug</span>
-          <small>{GAMES.length} games — pick one</small>
-        </h2>
-
-        <div className={styles.gameYard}>
-          {GAMES.map((game, i) => {
-            const plays = progress.gamePlays?.[game.id] ?? 0;
-            return (
-              <button
-                key={game.id}
-                className={styles.gameThing}
-                data-shape={game.shape}
-                data-shot="game-tile"
-                style={{ '--tilt': `${((i % 3) - 1) * 0.7}deg` } as React.CSSProperties}
-                onClick={() => startGame(game)}
-              >
-                <Scenery shape={game.shape} emoji={game.emoji} />
-
-                <span className={styles.thingBody}>
-                  <span className={styles.thingEmoji}>{game.emoji}</span>
-                  <span className={styles.thingTitle} data-shot="tile-title">{game.title}</span>
-                  <span className={styles.thingTagline}>{game.tagline}</span>
-                </span>
-
-                {plays > 0 && (
-                  <span className={styles.thingPlayed} title={`played ${plays} times`}>
-                    {plays > 3 ? '⭐⭐⭐' : '⭐'.repeat(plays)}
-                  </span>
-                )}
-              </button>
-            );
-          })}
-
-          {/* a small nook that fills the rug and still teaches a word */}
-          <button
-            className={cx(styles.gameThing, styles.nook)}
-            onClick={() => {
-              soundManager.playLetterTap();
-              const word = wordOfTheDay.word;
-              const shown = `Today's word is ${word}!`;
-              say(shown, 'happy', [{ text: 'Today’s word is' }, { word }]);
-            }}
-          >
-            <span className={styles.nookKicker}>Word of the day</span>
-            <span className={styles.nookEmoji}>{wordOfTheDay.emoji}</span>
-            <span className={styles.nookWord}>{wordOfTheDay.word}</span>
-            <span className={styles.nookTap}>tap to hear it</span>
-          </button>
-        </div>
-      </section>
-
-      {/* ---- sticker tin ---- */}
-      <section className={styles.hubTin} data-shot="hub-tin">
-        <div className={styles.tinHead}>
-          <h2>Luna’s Sticker Tin</h2>
-          <span className={styles.tinActions}>
-            <span className={styles.tinCount}>
-              {progress.stickers.length} of {STICKERS.length}
+        <PaperCard className={styles.tin} data-shot="hub-tin">
+          <div className={styles.tinInside}>
+            <span className={styles.tinName}>
+              <span className={styles.tinTitle}>Sticker Tin</span>
+              <span className={styles.tinCount}>
+                <strong>
+                  {owned.length} of {STICKERS.length}
+                </strong>{' '}
+                found
+              </span>
             </span>
+
+            <span className={styles.shelf}>
+              <span className={styles.stickers}>
+                {latest.map(sticker => (
+                  <ChunkyButton
+                    key={sticker.id}
+                    variant="icon"
+                    aria-label={sticker.name}
+                    onClick={() => {
+                      soundManager.playLetterTap();
+                      say({ text: sticker.line, mood: 'happy' });
+                    }}
+                  >
+                    <span className={styles.sticker}>{sticker.emoji}</span>
+                  </ChunkyButton>
+                ))}
+                {Array.from({ length: ON_THE_PLANK - latest.length }, (_, i) => (
+                  <span key={i} className={styles.slot} aria-hidden="true" />
+                ))}
+              </span>
+              <span className={styles.plank} aria-hidden="true" />
+            </span>
+
             <ChunkyButton icon="trophy" onClick={onOpenTrophies} data-shot="open-trophies">
               My trophies
             </ChunkyButton>
+          </div>
+        </PaperCard>
+
+        <ChunkyButton
+          variant="accent"
+          size={64}
+          icon="dice"
+          className={styles.pick}
+          onClick={() => {
+            soundManager.playStarChime();
+            say(lunaSay('surprisePick'));
+            window.setTimeout(onSurprise, 500);
+          }}
+        >
+          <span className={styles.pickWords}>
+            <span>Luna’s Pick</span>
+            <span className={styles.pickSub}>she chooses, you play</span>
           </span>
-        </div>
+        </ChunkyButton>
+      </div>
 
-        <div className={styles.tinSlots}>
-          {STICKERS.map(sticker => {
-            const owned = progress.stickers.includes(sticker.id);
-            return (
-              <span
-                key={sticker.id}
-                className={styles.tinSlot}
-                data-state={owned ? 'owned' : undefined}
-                title={owned ? sticker.name : 'Still to find'}
-                onClick={() => {
-                  if (!owned) return;
-                  soundManager.playLetterTap();
-                  const s = stickerById(sticker.id);
-                  if (s) say(s.line, 'happy');
-                }}
-              >
-                {owned ? sticker.emoji : '·'}
-              </span>
-            );
-          })}
-        </div>
+      {/* ---- the lessons come first: the structured teaching, in order (DES-13) ---- */}
+      {lessons.length > 0 && (
+        <LessonPath lessons={lessons} progress={progress} gradeTitle={gradeTitle} onStart={startGame} />
+      )}
 
-        {progress.stickers.length === 0 && (
-          <p className={styles.tinNote}>Finish any lesson or game to peel your first sticker.</p>
-        )}
+      {/* ---- the Play Shelf: every game the same size, each picture gently alive ---- */}
+      <section className={styles.playShelf} data-shot="hub-rug">
+        <h2 className={styles.heading}>
+          The Play Shelf <span className={styles.count}>{GAMES.length} games</span>
+        </h2>
+        <div className={styles.games}>
+          {GAMES.map(game => (
+            <Tile
+              key={game.id}
+              name={game.title}
+              tint={SHELF_TINTS[game.shape]}
+              picture={<ShelfPicture shape={game.shape} />}
+              data-shot="game-tile"
+              onClick={() => startGame(game)}
+            />
+          ))}
+        </div>
       </section>
-
     </div>
   );
 };

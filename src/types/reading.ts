@@ -3,7 +3,6 @@ export type GradeLevel = 'kindergarten' | 'grade1' | 'grade2';
 export interface GradeInfo {
   id: GradeLevel;
   title: string;
-  badgeEmoji: string;
 }
 
 export type QuestionType =
