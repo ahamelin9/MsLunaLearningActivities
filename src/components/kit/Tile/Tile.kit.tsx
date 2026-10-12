@@ -31,6 +31,13 @@ export default function TileKit() {
           <Tile name="Story Corner" picture={<Icon name="book" size={32} />} data-state="pressed" style={{ flex: 1 }} />
         </Specimen>
       </Specimens>
+      <Specimens title="a pick-one set: the picked one is aria-pressed (DES-9c)">
+        {(['Kindergarten', '1st Grade', '2nd Grade'] as const).map((name, i) => (
+          <Specimen key={name} label={i === 1 ? 'picked' : 'not picked'} wide>
+            <Tile name={name} tint={(i + 1) as 1 | 2 | 3} picture={<Icon name="star" size={32} />} aria-pressed={i === 1} style={{ flex: 1 }} />
+          </Specimen>
+        ))}
+      </Specimens>
     </>
   );
 }

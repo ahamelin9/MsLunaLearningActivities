@@ -9,6 +9,7 @@
 // following the voice), pop, wobble and float, the press, and reduced motion.
 // DES-9b: the Switch flips and slides its knob (at once under reduced motion),
 // and a selected ChunkyButton (aria-pressed) takes the action colour.
+// DES-9c: a picked Tile (aria-pressed) takes the action colour too.
 // Start Vite on 5199 first, then from the repo root:
 //   node .claude/skills/know-how/kit-check.mjs
 // Exits 1 on any ❌.
@@ -324,6 +325,25 @@ ok('the picked button in a row takes the action colour, the others don\'t', awai
   const bg = b => getComputedStyle(b).backgroundColor;
   const picked = row.find(b => b.getAttribute('aria-pressed') === 'true');
   return row.length === 3 && bg(picked) === action && row.filter(b => b !== picked).every(b => bg(b) !== action);
+}));
+
+// ── the picked Tile (DES-9c, Grade Select) ─────────────────────────────────
+ok('the picked Tile in a set takes the action colour, the others don\'t', await page.evaluate(() => {
+  const set = [...document.querySelectorAll('button[data-tint]')].filter(b => b.hasAttribute('aria-pressed'));
+  const probe = document.createElement('span');
+  probe.style.background = 'var(--action)';
+  set[0].parentElement.append(probe);
+  const action = getComputedStyle(probe).backgroundColor;
+  probe.remove();
+  const bg = b => getComputedStyle(b).backgroundColor;
+  const picked = set.find(b => b.getAttribute('aria-pressed') === 'true');
+  return set.length === 3 && bg(picked) === action && set.filter(b => b !== picked).every(b => bg(b) !== action);
+}));
+ok('… and its picture keeps the ink, not the action ink', await page.evaluate(() => {
+  const set = [...document.querySelectorAll('button[data-tint]')].filter(b => b.hasAttribute('aria-pressed'));
+  const ink = b => getComputedStyle(b.firstElementChild).color;
+  const picked = set.find(b => b.getAttribute('aria-pressed') === 'true');
+  return ink(picked) === ink(set.find(b => b !== picked)) && ink(picked) !== getComputedStyle(picked).color;
 }));
 
 await browser.close();

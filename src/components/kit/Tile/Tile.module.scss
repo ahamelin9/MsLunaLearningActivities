@@ -7,6 +7,7 @@
   --tile-ink: var(--ink);
   --tile-edge: var(--edge);
   --tile-tint: var(--picture-1);
+  --tile-picture-ink: var(--ink); // a picture keeps its ink when picked
   --tile-picture: calc(var(--space-16) + var(--space-2)); // the board's picture band
 
   @include press(var(--ledge-small), var(--tile-edge));
@@ -29,6 +30,15 @@
 .root[data-tint='4'] { --tile-tint: var(--picture-4); }
 .root[data-tint='5'] { --tile-tint: var(--picture-5); }
 
+// a pick-one set (DES-9c, Grade Select): the picked Tile (aria-pressed) takes
+// the action look, as a picked ChunkyButton does; its picture keeps its tint
+// and its ink
+.root[aria-pressed='true'] {
+  --tile-bg: var(--action);
+  --tile-ink: var(--action-ink);
+  --tile-edge: var(--action-edge);
+}
+
 .picture {
   display: flex;
   align-items: center;
@@ -36,6 +46,7 @@
   height: var(--tile-picture);
   overflow: hidden;
   background: var(--tile-tint);
+  color: var(--tile-picture-ink);
 }
 
 .name {

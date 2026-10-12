@@ -49,7 +49,7 @@ them in.
 | 2 | Structure (pure refactors, nothing looks different) | DES-18a–e (done 2026-10-11) | Screenshots you can compare; one folder per page, game and lesson; CSS modules; `games.scss` gone |
 | 3 | Foundations | DES-3 → DES-19 → DES-20 → DES-4 → DES-5 → DES-6 (done 2026-10-11) | Tokens in light and dark; lint enforces the rules after every edit; the Kit page; Andika and Fraunces offline; shared motion; reduced motion |
 | 4 | The kit | DES-7a, DES-7b, DES-7c (done 2026-10-11) | Every kit component on the Kit page in every state |
-| 5 | Frame and shell | DES-8, DES-10, DES-15 (done 2026-10-11), DES-9a, DES-9b (done 2026-10-12) → DES-9c → DES-12 | One header, the layout grid, the new Luna (moved here from Stage 4, Alex 2026-10-11), the restyled home, Settings, trophies and Grade Select; one Luna per screen |
+| 5 | Frame and shell | DES-8, DES-10, DES-15 (done 2026-10-11), DES-9a, DES-9b, DES-9c (done 2026-10-12) → DES-12 | One header, the layout grid, the new Luna (moved here from Stage 4, Alex 2026-10-11), the restyled home, Settings, trophies and Grade Select; one Luna per screen |
 | 6 | The library | DES-21 → **PRG-7 (pulled in)** → DES-13 | The library as on the board: lessons in order, one bar |
 | 7 | Play | DES-22a → DES-11 → DES-22b, DES-22c → DES-23 | GameShell, all 8 games and all 8 lesson types on the kit, with one right/wrong language |
 | 8 | The design system is done | DES-24 | Legacy styles deleted; the check runs strict with no baseline |
@@ -67,19 +67,6 @@ them in.
 - **P0 bugs** can still be pulled in between tickets for a break from styling.
 
 
-### DES-9c · Shell restyle, part 3: Grade Select
-Story · P0 · S · needs: —
-- **How:**
-  - Grade Select talks to the child, not to grown-ups: no "digraphs" and no "dashboard".
-  - Kit cards, with Luna (DES-15) instead of the emoji `components/ui/Mascot`. Since DES-15 the Mascot already draws the kit's Luna in place of its emoji; its purple circle and bubble are what go here.
-  - The curriculum's gradient colours (`data/readingCurriculum.ts`) go.
-  - No board shows it, so Alex OKs the shots.
-- **Complete when:**
-  - Grade Select uses kit components and roles only, and its folder shows zero;
-  - `Mascot` is deleted;
-  - no grade colour is left in the curriculum data;
-  - it's checked in light and dark, and Alex OKs it.
-
 ### DES-11 · One right/wrong/reveal visual language
 Story · P1 · S · needs: DES-22a
 - **How:** use the same right glow, wrong wobble, win veil and "revealed" style (for FB-2) in every game and lesson, through `Choice` and the shell's flash. Game pieces that aren't Choices (bubbles, cookies, bugs, memory cards, word tiles) use the same state roles, `data-state` and motion. The games and lessons adopt it in DES-22b, DES-22c and DES-23.
@@ -92,7 +79,7 @@ Story · P1 · S · needs: DES-22a
   - it's checked in light and dark. (That every game and lesson looks the same is checked in DES-22b, DES-22c and DES-23.)
 
 ### DES-12 · Luna on screen: one Luna, clear moods
-Story · P1 · S · needs: DES-9c
+Story · P1 · S · needs: —
 - **Why:** Feed Luna shows two owls at once (the one on the stage and the one on the perch).
 - **How:** at most one Luna per screen; the perch Luna hides when the game's stage has its own. Document what each mood is for. Make sure the talking animation always follows the audio.
   - **From DES-15 (2026-10-11):** the talking already follows the audio. The kit's Luna moves her beak only while a clip plays (`luna-talk-check.mjs` in know-how), so two Lunas on one screen talk together. Two screens show two today: Feed Luna (the stage and the perch) and Treasure Path (the walker on the stones and the perch).
@@ -243,7 +230,7 @@ Story · P1 · M · needs: DES-11
   - it's checked in light and dark.
 
 ### DES-24 · Retire the legacy styles
-Task · P1 · S · needs: DES-9c, DES-21, DES-22b, DES-22c, DES-23
+Task · P1 · S · needs: DES-21, DES-22b, DES-22c, DES-23
 - **Why:** this is the finish line of the design-system effort (Alex's plan, 2026-10-10).
 - **How:**
   - Delete `src/styles/_variables.scss`, `src/apps/reading/engine/_world.scss`, `src/index.css` (replaced by `styles/base/`), the legacy mixins (`glassmorphism`, `squircle-icon` and the like) and `scripts/design/baseline.json`.

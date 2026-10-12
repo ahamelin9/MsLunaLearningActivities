@@ -185,3 +185,9 @@ only record of them. One line each: date, ID, title, and `Done` or
   |---|---|
   | on/off | the kit's `Switch` |
   | pick one of a few | a row of ChunkyButtons, the picked one `aria-pressed` |
+- **2026-10-12** — DES-9c Shell restyle, part 3: Grade Select — Done, and with it the tablet shell (DES-9a–c). Grade Select now talks to the child. Luna (the kit's) asks "Hi! Which grade are you in?" in a kit SpeechBubble, said when the screen opens and when she's tapped. The old welcome had no clip (the Mascot's `speechText` was a path the voice inventory never read), so it played the robot voice; the new line is a `{ text }` part, rendered, and `voice:audit` passes. The grades are three kit Tiles showing a big K, 1 and 2 on picture tints 1–3, and the current grade is the picked Tile: `aria-pressed` gives it the action look, a new kit state whose picture keeps its tint and ink. `kit-check.mjs` checks both and fails with either style off. The Mascot is deleted, and the headings, age pills, "Select Grade", the "settings or dashboard" line and every grade's jargon went, so `color`, `gradient`, `subtitle`, `description` and `ageRange` left `GRADES` and `GradeInfo`; `badgeEmoji` stays for the library's grade sign until DES-21. The folder is at 0, and the baseline went 1,544 → 1,420. Only Grade Select changed (in light and dark at all 4 sizes); it fits with no scrolling and 64px targets, reduced motion stands still, and Luna's beak follows the clip. Alex OKed the shots. Kept as a rule (Alex, 2026-10-12), next to DES-9b's:
+
+  | Picking one of a few | Built from |
+  |---|---|
+  | a grown-up control (Settings) | a row of ChunkyButtons, the picked one `aria-pressed` |
+  | a child's choice, with a picture (Grade Select) | kit Tiles, the picked one `aria-pressed`; its picture keeps its ink |

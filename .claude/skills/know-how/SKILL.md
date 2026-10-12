@@ -58,7 +58,11 @@ build, or a tool that misbehaved. Skip routine fixes.
   - `lunaLine: '…'` literals handed to `api.win/miss/tick` (BUG-18);
   - bare `string[]` answers under `comprehensionQuestion.options` (BUG-5);
   - a fixed line handed straight to `speakText('…')`, `speakSentence('…')`
-    or `soundManager.speak('…')` (BUG-15, 2026-10-10).
+    or `soundManager.speak('…')` (BUG-15, 2026-10-10);
+  - a line passed as a component prop that speaks it later: Grade Select's
+    Mascot took `speechText="Welcome! …"` (DES-9c, 2026-10-12; deleted with
+    it). Write a fixed line as a `{ text: '…' }` part instead: the inventory
+    reads those wherever they sit.
   - **Fix, in this order:** teach the audit to see the path and watch it
     **fail**, then add it to the inventory, `npm run voice:render`, and
     `npm run voice:audit` passes. Fixing the inventory first proves nothing.
@@ -197,6 +201,12 @@ Pitfalls that cost time:
   Under `-e` the arguments shift by one (the first is `process.argv[1]`, not
   `[2]`), so a script reading `argv[2]` starts Vite in the wrong folder and
   every selector times out. Use `process.cwd()` for the repo root.
+- **A screen's opening line is "said" twice** (*2026-10-12, DES-9c*): under
+  Vite, React's StrictMode runs a mount effect twice, so a line spoken from
+  `useEffect` shows up twice in `pronunciation.say`'s log. The second call
+  stops the first before its clip loads, so only one clip plays. Count clips
+  (`AudioBufferSourceNode.start`), not `say` calls; the production build
+  says it once.
 - **A puppeteer press does nothing** (*2026-10-11, DES-5*): `page.mouse.down()`
   at a `boundingBox()` below the fold lands outside the viewport, so `:active`
   never applies and the check reads the resting style. Scroll the element into

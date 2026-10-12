@@ -5,12 +5,16 @@
  *         (DES-21 brings the drawn pictures) · tint: 1–5, the picture area's
  *         soft colour (default 1) · plus any <button> attribute (onClick,
  *         data-shot); className is layout only
- * States: idle · pressed (:active, sinks onto its ledge)
- * Tokens: --tile-bg, --tile-ink, --tile-edge, --tile-tint, --tile-picture
- * Reads:  --card, --ink, --edge, --picture-1 … --picture-5, --radius-card,
- *         --border-regular, --ledge-small, --press-depth, --text-label,
- *         --space-2, --space-3, --space-4, --space-16
- * Board:  Library, the Play Shelf's eight games
+ * States: idle · pressed (:active, sinks onto its ledge) · picked:
+ *         aria-pressed="true" takes the action look, for a pick-one set
+ *         (Grade Select; DES-9c)
+ * Tokens: --tile-bg, --tile-ink, --tile-edge, --tile-tint, --tile-picture-ink,
+ *         --tile-picture
+ * Reads:  --card, --ink, --edge, --action, --action-ink, --action-edge,
+ *         --picture-1 … --picture-5, --radius-card, --border-regular,
+ *         --ledge-small, --press-depth, --text-label, --space-2, --space-3,
+ *         --space-4, --space-16
+ * Board:  Library, the Play Shelf's eight games; no board for Grade Select
  */
 
 import type { ButtonHTMLAttributes, ReactNode } from 'react';

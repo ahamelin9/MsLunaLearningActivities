@@ -1,36 +1,9 @@
 import type { GradeInfo, GradeLevel, ReadingSkill } from '../types/reading';
 
 export const GRADES: GradeInfo[] = [
-  {
-    id: 'kindergarten',
-    title: 'Kindergarten',
-    subtitle: 'Letter Sounds & Early Reading',
-    description: 'Match letter sounds (like mmmm and ssss), hunt for letters, blend 3-letter words, and explore rhymes!',
-    ageRange: 'Ages 4–6',
-    badgeEmoji: '🔤',
-    color: '#FF6B6B',
-    gradient: 'linear-gradient(135deg, #FF6B6B 0%, #FFA07A 100%)'
-  },
-  {
-    id: 'grade1',
-    title: '1st Grade',
-    subtitle: 'Digraphs, Magic E & Sentences',
-    description: 'Master digraphs (sh, ch, th), magic Silent E words, read complete sentences, and enjoy decodable stories!',
-    ageRange: 'Ages 6–7',
-    badgeEmoji: '🚀',
-    color: '#4D96FF',
-    gradient: 'linear-gradient(135deg, #4D96FF 0%, #6BCB77 100%)'
-  },
-  {
-    id: 'grade2',
-    title: '2nd Grade',
-    subtitle: 'Vowel Teams & Story Readers',
-    description: 'Learn vowel teams (ai, ea, oa, igh), compound words, read delightful chapter stories, and answer comprehension questions!',
-    ageRange: 'Ages 7–8',
-    badgeEmoji: '👑',
-    color: '#9D4EDD',
-    gradient: 'linear-gradient(135deg, #9D4EDD 0%, #FF70A6 100%)'
-  }
+  { id: 'kindergarten', title: 'Kindergarten', badgeEmoji: '🔤' },
+  { id: 'grade1', title: '1st Grade', badgeEmoji: '🚀' },
+  { id: 'grade2', title: '2nd Grade', badgeEmoji: '👑' }
 ];
 
 export const READING_CURRICULUM: Record<GradeLevel, ReadingSkill[]> = {
