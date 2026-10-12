@@ -47,7 +47,7 @@ them in.
 |---|---|---|---|
 | 1 | Guardrails | DES-25 (done 2026-10-10) | Claude gets the right standards before any UI edit; people get a pre-commit check |
 | 2 | Structure (pure refactors, nothing looks different) | DES-18a–e (done 2026-10-11) | Screenshots you can compare; one folder per page, game and lesson; CSS modules; `games.scss` gone |
-| 3 | Foundations | DES-3, DES-19, DES-20, DES-4, DES-5 (done 2026-10-11) → DES-6 | Tokens in light and dark; lint enforces the rules after every edit; the Kit page; Andika and Fraunces offline; shared motion; reduced motion |
+| 3 | Foundations | DES-3 → DES-19 → DES-20 → DES-4 → DES-5 → DES-6 (done 2026-10-11) | Tokens in light and dark; lint enforces the rules after every edit; the Kit page; Andika and Fraunces offline; shared motion; reduced motion |
 | 4 | The kit | DES-7a → DES-7b, DES-7c → DES-15 | Every kit component on the Kit page in every state, and the new Luna |
 | 5 | Frame and shell | DES-8 → DES-10 → DES-9a → DES-9b → DES-9c → DES-12 | One header, the layout grid, the restyled home, Settings, trophies and Grade Select; one Luna per screen |
 | 6 | The library | DES-21 → **PRG-7 (pulled in)** → DES-13 | The library as on the board: lessons in order, one bar |
@@ -66,16 +66,6 @@ them in.
 - **DES-14** (P2) touches the same folder as DES-22b and can slot in straight after it.
 - **P0 bugs** can still be pulled in between tickets for a break from styling.
 
-
-### DES-6 · Reduced motion, wired end to end
-Story · P0 · S · needs: —
-- **Why:** the `reducedMotion` setting is saved but never read. The device setting is ignored in the games' styles (`games/*/`), the confetti, and the home-screen glow bubbles.
-- **How:**
-  - Set `data-reduced-motion` on the app root from either the setting or `prefers-reduced-motion`.
-  - Under it, the motion roles turn every loop and transform to `none` and durations to `0ms`, and confetti is skipped.
-  - Bubble Sounds slows its bubbles down instead of stopping them.
-  - Add the toggle to Settings, behind the gate from SET-1.
-- **Complete when:** with the flag on, no screen has continuous motion and every game is still playable.
 
 ### DES-7a · Kit, part 1: the basics
 Story · P0 · M · needs: —

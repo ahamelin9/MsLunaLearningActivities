@@ -72,8 +72,8 @@ be pulled into Phase 1 for a break from styling.
 
 ### Now / Next
 
-- **Now:** DES-6: reduced motion, wired end to end, the last of Stage 3 (tokens, checks, Kit page, fonts and motion are in)
-- **Next:** Stage 4 in "Order to finish the epic" at the top of `epics/DES.md`: DES-7a, then DES-7b and DES-7c, then DES-15. OPS-9 (know-how checks onto `data-shot`) can start any time: the checks lost their last class names with DES-18d. PRG-7 and SET-1 are pulled in where DES-13 and DES-16 need them. GAME-1c, Treasure Path's screen, waits on FB-1, which waits on the DES-8/DES-10 layout
+- **Now:** DES-7a: kit, part 1, the basics, the start of Stage 4 (Stage 3 is done: tokens, the design and contrast checks, the Kit page, Andika and Fraunces, motion and reduced motion, DES-3 to DES-6)
+- **Next:** DES-7b and DES-7c, then stop (Alex, 2026-10-11: DES-15, the new Luna, waits for the restyle). Stage 5 after that, per "Order to finish the epic" in `epics/DES.md`. OPS-9 (know-how checks onto `data-shot`) can start any time: the checks lost their last class names with DES-18d. PRG-7 and SET-1 are pulled in where DES-13 and DES-16 need them. GAME-1c, Treasure Path's screen, waits on FB-1, which waits on the DES-8/DES-10 layout
 
 ## Epics
 
@@ -97,7 +97,6 @@ In board order. A new epic gets its file in `epics/` first, then a link here
 | ID | Title | Type | P | Size | Status |
 |---|---|---|---|---|---|
 | **DES** | **Design system & layout** | Epic | **P0** | | |
-| DES-6 | Reduced motion, wired end to end | Story | P0 | S | Todo |
 | DES-7a | Kit, part 1: the basics | Story | P0 | M | Todo |
 | DES-7b | Kit, part 2: play | Story | P0 | M | Todo |
 | DES-7c | Kit, part 3: progress and rewards | Story | P0 | M | Todo |

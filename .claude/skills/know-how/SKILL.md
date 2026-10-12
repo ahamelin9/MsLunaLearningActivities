@@ -162,6 +162,12 @@ Prove the check can fail: switch the fix off for a moment (for example, set
 its constant to something huge), rerun, and watch it go ❌, then put the fix
 back. A check that passes either way proves nothing. OPS-6 did this.
 
+To check the app still works offline (fonts and all, as on a classroom iPad
+with no Wi-Fi), run `offline-check.mjs` from this folder (DES-4): it blocks
+every request that leaves the machine and reports the font faces that loaded
+and anything the app tried to fetch outside. "blocked requests: none" is the
+pass.
+
 To test something the app can't trigger on demand, such as an old voice
 index, intercept the request in puppeteer (`page.setRequestInterception`)
 and serve your own response. `stale-index-check.cjs` is the example.
@@ -242,6 +248,24 @@ Pitfalls that cost time:
   (the status bar's bottom line shows on 24 of 26 screens at y 47), or one
   pixel of a copied run with `pixel-poke.cjs` in this folder: 9 per channel
   shows up as 1 pixel, 8 doesn't.
+
+## A reduced-motion check says animations still run, but nothing moves
+
+*2026-10-11 · DES-6*
+
+- **Symptom:** `npm run ui:shots -- --reduced-motion` lists animations as still
+  moving, each shown as `0ms × 1`, and it keeps listing them even with the
+  reduced-motion reset taken out.
+- **Cause:** two things at once. The run freezes CSS animations
+  (`Animation.setPlaybackRate` 0), so even a 0ms animation never reaches
+  "finished". And GameShell's own older `prefers-reduced-motion` block sets
+  `0.01ms`, which prints as 0 once rounded and wins over the global reset's
+  `0ms` (both `!important`, and GameShell's is more specific).
+- **Fix:** judge what can move, not the play state. `stillMoving()` in
+  `scripts/ui/shots.mjs` counts an animation only if it loops or lasts a frame
+  (16ms) or more, and prints its exact duration.
+- **Check:** the run passes with `base/_reduced-motion.scss` loaded, and fails
+  at all four sizes with its `@use` taken out of `global.scss` for a moment.
 
 ## A move to CSS modules: proving nothing changed, even what no screenshot shows
 

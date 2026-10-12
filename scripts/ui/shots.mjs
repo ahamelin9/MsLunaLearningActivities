@@ -7,6 +7,7 @@
 //   npm run ui:shots -- --label after         -> screenshots/after/
 //   npm run ui:shots -- --diff before after   -> screenshots/diff-before-after/
 //   npm run ui:shots -- --kit --label kit     -> screenshots/kit/kit/{light,dark}.png (DES-20)
+//   npm run ui:shots -- --reduced-motion      -> the same run with Reduce Motion on; fails if anything still moves (DES-6)
 //
 // It starts its own Vite dev server and drives the Chrome already installed
 // on this machine (puppeteer-core downloads no browser of its own). Set
@@ -64,6 +65,7 @@ function parseArgs(argv) {
     console.error(
       'Usage: npm run ui:shots -- [--label <name>]\n' +
         '       npm run ui:shots -- --kit [--label <name>]\n' +
+        '       npm run ui:shots -- --reduced-motion [--label <name>]\n' +
         '       npm run ui:shots -- --diff <label-a> <label-b>\n' +
         'Labels use letters, digits, . _ - only.'
     );
@@ -76,10 +78,11 @@ function parseArgs(argv) {
     return { mode: 'diff', a, b };
   }
   const kit = argv.includes('--kit');
+  const reduced = argv.includes('--reduced-motion');
   const i = argv.indexOf('--label');
   const label = i === -1 ? (kit ? 'kit' : 'latest') : argv[i + 1];
   if (!label || !name.test(label)) usage();
-  return { mode: kit ? 'kit' : 'shoot', label };
+  return { mode: kit ? 'kit' : 'shoot', label, reduced };
 }
 
 const slug = text =>
@@ -310,6 +313,23 @@ function shown(selector) {
 }
 
 /** Holds endless animations at their start and finishes the rest. */
+/** Animations still running or looping: under reduced motion there must be none (DES-6). */
+function stillMoving() {
+  return document
+    .getAnimations()
+    .filter(a => {
+      const t = a.effect?.getComputedTiming?.();
+      // the run's frozen animation clock keeps even a 0ms one "running", so
+      // what counts is a loop or a duration of a frame or more (an old
+      // reduced-motion block's 0.01ms can't be seen)
+      return t && a.playState !== 'finished' && (t.iterations === Infinity || Number(t.duration) >= 16);
+    })
+    .map(a => {
+      const t = a.effect.getComputedTiming();
+      return `${a.animationName || a.transitionProperty || 'an animation'} (${t.duration}ms × ${t.iterations})`;
+    });
+}
+
 function holdAnimations() {
   for (const animation of document.getAnimations()) {
     try {
@@ -441,7 +461,7 @@ function driver(page) {
 }
 
 /** One run through the app at one size. */
-async function shootViewport(browser, url, viewport, outDir) {
+async function shootViewport(browser, url, viewport, outDir, reduced = false) {
   const size = `${viewport.width}x${viewport.height}`;
   const dir = join(outDir, size);
   mkdirSync(dir, { recursive: true });
@@ -450,6 +470,9 @@ async function shootViewport(browser, url, viewport, outDir) {
   const page = await context.newPage();
   await page.setViewport({ ...viewport, deviceScaleFactor: 1, hasTouch: true });
   await page.emulateTimezone('UTC');
+  // DES-6: the iPad's own Reduce Motion, so every screen must stand still
+  if (reduced) await page.emulateMediaFeatures([{ name: 'prefers-reduced-motion', value: 'reduce' }]);
+  const moving = [];
   await page.evaluateOnNewDocument(installPageClock, { start: CLOCK_START, seed: RANDOM_SEED });
   // CSS animations would otherwise run on the browser's real clock; standing
   // still, each one is only ever where holdAnimations puts it
@@ -466,6 +489,10 @@ async function shootViewport(browser, url, viewport, outDir) {
     // the pointer rests off to the side, so nothing is caught mid-hover
     await page.mouse.move(viewport.width - 1, viewport.height - 1);
     await advance(SETTLE_MS);
+    if (reduced) {
+      const still = await page.evaluate(stillMoving);
+      if (still.length) moving.push(`${name}: ${still.join(', ')}`);
+    }
     await page.evaluate(holdAnimations);
     await quiet();
     await page.evaluate(() => window.__pageClock.painted());
@@ -538,6 +565,8 @@ async function shootViewport(browser, url, viewport, outDir) {
     await solveLesson(page, drive);
     await until('shell-reward');
     await shot('reward');
+    step = 'reduced motion';
+    if (moving.length) throw new Error(`still moving with reduced motion:\n  ${moving.join('\n  ')}`);
   } catch (err) {
     await page.screenshot({ path: join(dir, `FAILED-${step}.png`) }).catch(() => {});
     throw new Error(`${size}, at "${step}": ${err.message}`);
@@ -569,7 +598,7 @@ async function solveLesson(page, { click, waitFor }) {
   throw new Error('the lesson never reached its reward screen');
 }
 
-async function shoot(label) {
+async function shoot(label, reduced = false) {
   const outDir = join(ROOT, 'screenshots', label);
   rmSync(outDir, { recursive: true, force: true });
 
@@ -581,7 +610,7 @@ async function shoot(label) {
   // the four sizes run side by side, each in its own fresh profile
   const started = Date.now();
   const results = await Promise.allSettled(
-    VIEWPORTS.map(viewport => shootViewport(browser, url, viewport, outDir))
+    VIEWPORTS.map(viewport => shootViewport(browser, url, viewport, outDir, reduced))
   );
   await browser.close();
   await server.close();
@@ -590,7 +619,7 @@ async function shoot(label) {
   for (const f of failures) console.error(`\nui:shots failed — ${f.reason.message}`);
   if (failures.length) process.exit(1);
   const secs = Math.round((Date.now() - started) / 1000);
-  console.log(`\nDone in ${secs}s: screenshots/${label}/`);
+  console.log(`\nDone in ${secs}s: screenshots/${label}/${reduced ? ' (reduced motion: nothing kept moving on any screen)' : ''}`);
 }
 
 /**
@@ -696,7 +725,7 @@ async function main() {
   }
   if (args.mode === 'diff') await diff(args.a, args.b);
   else if (args.mode === 'kit') await shootKit(args.label);
-  else await shoot(args.label);
+  else await shoot(args.label, args.reduced);
   // a puppeteer run can keep the process alive after it's done
   process.exit(0);
 }

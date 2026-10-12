@@ -174,8 +174,14 @@ What the moments look like:
 - **Squishies squish** when tapped: squash, stretch, settle.
 - **The milestone moon glides in,** says her line and glides out (DES-17).
 - **Reduced motion:** loops stop, petals and sparkles hide, and things fade
-  instead of travelling. It comes from the Settings switch or the iPad's
-  setting (DES-6).
+  instead of travelling. It comes from the Settings switch (Less Motion) or the
+  iPad's setting (DES-6), as `data-reduced-motion` on `<html>`. Under it every
+  duration role is `0ms` and every `--motion-*` is `none`; older styles end
+  their animations at once (`base/_reduced-motion.scss`). Motion a game drives
+  by script reads `isReducedMotion()` from `src/utils/motion.ts` and slows to
+  `REDUCED_MOTION_PACE` (Bubble Sounds' bubbles). `npm run ui:shots --
+  --reduced-motion` plays every screen with it on and fails if anything still
+  moves.
 
 ## Layout
 

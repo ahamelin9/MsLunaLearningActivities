@@ -5,6 +5,7 @@ import { pickWrong, textChoice } from '../../engine/distractors';
 import { soundManager } from '@/utils/audio';
 import { pronunciation } from '@/utils/pronunciation';
 import { cx } from '@/utils/cx';
+import { isReducedMotion, REDUCED_MOTION_PACE } from '@/utils/motion';
 import { GameSurface } from '../shared/GameSurface/GameSurface';
 import styles from './BubbleSounds.module.scss';
 
@@ -38,7 +39,8 @@ function makeBubble(round: Round, forceTarget = false): Bubble {
     isTarget,
     x: 8 + Math.random() * 84,
     y: 104 + Math.random() * 40,
-    speed: round.speed * (0.8 + Math.random() * 0.5),
+    // with less motion the bubbles slow down, since their rising is the game (DES-6)
+    speed: round.speed * (0.8 + Math.random() * 0.5) * (isReducedMotion() ? REDUCED_MOTION_PACE : 1),
     size: 0.85 + Math.random() * 0.4,
     drift: Math.random() * 2 - 1,
     popped: false

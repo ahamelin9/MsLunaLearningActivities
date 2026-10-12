@@ -6,6 +6,7 @@ import { APP_REGISTRY } from './apps/registry';
 import { storageService } from './utils/storage';
 import { soundManager } from './utils/audio';
 import { pronunciation } from './utils/pronunciation';
+import { useReducedMotion } from './utils/motion';
 import { StatusBar } from './components/os/StatusBar/StatusBar';
 import { HomeScreen } from './components/os/HomeScreen/HomeScreen';
 import { AppWindow } from './components/os/AppWindow/AppWindow';
@@ -20,6 +21,9 @@ export function App() {
   const [activeApp, setActiveApp] = useState<AppDefinition | null>(null);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isTrophyOpen, setIsTrophyOpen] = useState(false);
+
+  // less motion: the Settings switch or the iPad's own setting (DES-6)
+  useReducedMotion(progress.settings.reducedMotion);
 
   // Ms. Luna's voice is a set of pre-rendered clips, so it can be loaded
   // immediately rather than waiting for a tap: decoding audio works on a

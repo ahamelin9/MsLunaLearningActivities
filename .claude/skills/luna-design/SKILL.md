@@ -120,6 +120,8 @@ changed screens.
 - `npm run design:status`: what's left per area and folder.
 - The Kit page, light and dark side by side: `npm run dev`, open `/?kit`
   (DES-20). `npm run ui:shots -- --kit --label <name>` saves it in both modes.
+- `npm run ui:shots -- --reduced-motion`: the same run with Reduce Motion on;
+  it fails if any screen keeps moving (DES-6).
 - `npm run ui:shots` at the four iPad sizes, and `--diff` for refactors (from
   DES-18a).
 - `node .claude/skills/know-how/module-refs-check.mjs "$PWD" <folders>`: every

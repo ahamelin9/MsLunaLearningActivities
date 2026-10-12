@@ -211,3 +211,16 @@ $text-pairs: (
 [data-theme="dark"] {
   @include roles(dark);
 }
+
+// Reduced motion (DES-6): every duration is 0ms and every shared animation is
+// off, so things appear without travelling. Repeated under a themed element,
+// because roles() sets the durations again there.
+[data-reduced-motion],
+[data-reduced-motion] [data-theme] {
+  @each $name, $ms in p.$duration {
+    --dur-#{$name}: 0ms;
+  }
+  @each $name in (pop, wobble, glow, float, sway, twinkle, squish, shimmer, petal-fall, grow-in, talk) {
+    --motion-#{$name}: none;
+  }
+}

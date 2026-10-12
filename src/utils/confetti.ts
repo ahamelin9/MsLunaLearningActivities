@@ -1,5 +1,7 @@
 // Lightweight, Zero-Dependency Canvas Particle Confetti Engine
 
+import { isReducedMotion } from './motion';
+
 export interface ConfettiParticle {
   x: number;
   y: number;
@@ -18,7 +20,7 @@ const COLORS = [
 ];
 
 export function launchConfetti(canvas: HTMLCanvasElement | null, durationMs = 3000) {
-  if (!canvas) return;
+  if (!canvas || isReducedMotion()) return; // no confetti with less motion (DES-6)
   const ctx = canvas.getContext('2d');
   if (!ctx) return;
 

@@ -1,0 +1,14 @@
+// Reduced motion for the styles that don't use the motion roles yet (DES-6).
+// Until each area moves onto them, every animation and transition ends at
+// once: loops stop, and things appear in their final place without
+// travelling. Nothing waits on an animation's end event, so play goes on.
+// Bubble Sounds' bubbles rise by script, and slow down instead (motion.ts).
+
+[data-reduced-motion] *,
+[data-reduced-motion] *::before,
+[data-reduced-motion] *::after {
+  animation-duration: 0ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0ms !important;
+  scroll-behavior: auto !important;
+}

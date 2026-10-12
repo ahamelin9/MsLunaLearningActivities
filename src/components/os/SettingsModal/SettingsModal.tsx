@@ -119,6 +119,27 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             </button>
           </div>
 
+          {/* Less Motion (DES-6): also on when the iPad's own Reduce Motion is */}
+          <div className={styles.settingItemRow}>
+            <div className={styles.itemLeft}>
+              <span className={styles.itemEmoji}>🍃</span>
+              <div className={styles.itemText}>
+                <span className={styles.itemTitle}>Less Motion</span>
+                <span className={styles.itemDesc}>Stops bouncing and moving pictures; bubbles rise slower</span>
+              </div>
+            </div>
+            <button
+              onClick={() => handleUpdateSetting({ reducedMotion: !progress.settings.reducedMotion })}
+              className={styles.toggleSwitchBtn}
+              data-state={progress.settings.reducedMotion ? 'on' : 'off'}
+              aria-pressed={progress.settings.reducedMotion}
+              aria-label="Less motion"
+              data-shot="less-motion"
+            >
+              <div className={styles.toggleSwitchHandle} />
+            </button>
+          </div>
+
           {/* Voice Speed */}
           <div className={styles.settingItemRow}>
             <div className={styles.itemLeft}>
