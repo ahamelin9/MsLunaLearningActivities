@@ -72,8 +72,8 @@ be pulled into Phase 1 for a break from styling.
 
 ### Now / Next
 
-- **Now:** DES-9a: the home screen and status bar, Stage 5's fourth ticket. Done so far in Stage 5 (2026-10-11): DES-8 (one header), DES-10 (the layout, `layout-audit.mjs`) and DES-15 (the kit's Luna, whose beak follows the voice)
-- **Next:** DES-9b → DES-9c → DES-12, per "Order to finish the epic" in `epics/DES.md`. OPS-9 (know-how checks onto `data-shot`) can start any time: the checks lost their last class names with DES-18d. PRG-7 and SET-1 are pulled in where DES-13 and DES-16 need them. FB-1 (Phase 2) no longer waits on the layout; GAME-1c, Treasure Path's screen, waits on it
+- **Now:** DES-9b: Settings and the Trophy room on the kit, and the Trophy room's way in (nothing opens it since DES-9a). Done so far in Stage 5: DES-8 (one header), DES-10 (the layout), DES-15 (the kit's Luna) and DES-9a (the home screen as on the Home board, 2026-10-12)
+- **Next:** DES-9c → DES-12, per "Order to finish the epic" in `epics/DES.md`. OPS-9 (know-how checks onto `data-shot`) can start any time: the checks lost their last class names with DES-18d. PRG-7 and SET-1 are pulled in where DES-13 and DES-16 need them. FB-1 (Phase 2) no longer waits on the layout; GAME-1c, Treasure Path's screen, waits on it
 
 ## Epics
 
@@ -97,8 +97,7 @@ In board order. A new epic gets its file in `epics/` first, then a link here
 | ID | Title | Type | P | Size | Status |
 |---|---|---|---|---|---|
 | **DES** | **Design system & layout** | Epic | **P0** | | |
-| DES-9a | Shell restyle, part 1: home screen and status bar | Story | P0 | M | In progress |
-| DES-9b | Shell restyle, part 2: Settings and the Trophy room | Story | P0 | M | Todo |
+| DES-9b | Shell restyle, part 2: Settings and the Trophy room | Story | P0 | M | In progress |
 | DES-9c | Shell restyle, part 3: Grade Select | Story | P0 | S | Todo |
 | DES-12 | Luna on screen: one Luna, clear moods | Story | P1 | S | Todo |
 | DES-21 | Library on the kit: header, welcome row, Luna's Pick, Play Shelf | Story | P1 | M | Todo |
@@ -119,7 +118,6 @@ In board order. A new epic gets its file in `epics/` first, then a link here
 | **BUG** | **Bugs** | | | | |
 | BUG-1 | Game speech is cut off by Luna's reaction | Bug | P0 | — | Todo (via FB-1) |
 | BUG-2 | Feed Luna: one wrong tap counts as two misses | Bug | P0 | S | Todo |
-| BUG-7 | Status-bar mute needs two taps to unmute | Bug | P1 | S | Todo |
 | BUG-8 | Story lessons ignore the Beginner speed | Bug | P1 | S | Todo |
 | BUG-21 | Bubble Sounds only ever asks for the first 12 letters | Bug | P1 | S | Todo |
 | BUG-22 | Story Corner says "she reed three books" | Bug | P1 | S | Todo |
@@ -169,6 +167,5 @@ In board order. A new epic gets its file in `epics/` first, then a link here
 | OPS-9 | Know-how browser checks find things by `data-shot` | Task | P1 | S | Todo |
 | OPS-1 | Delete dead code | Task | P2 | S | Todo |
 | OPS-2 | README and stale copy | Task | P2 | S | Todo |
-| OPS-3 | Decide the "Coming Soon" apps | Task | P2 | S | Todo |
 | OPS-7 | Drop Treasure Path's leftovers from the sentence bank | Task | P2 | S | Todo |
 | OPS-8 | Retarget the backlog guard check's two stale cases | Task | P2 | S | Todo |

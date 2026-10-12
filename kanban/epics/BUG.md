@@ -13,12 +13,6 @@ P0 · S
 - **Effect:** the hint plays after the first mistake.
 - **Complete when:** one wrong tap counts as one miss, and drag, tap and keyboard each still work.
 
-### BUG-7 · Status-bar mute needs two taps to unmute
-P1 · S
-- **Cause:** the icon treats sound as "on" only when *both* sound and narration are on, but the toggle (`utils/storage.ts:111`) treats *either* as on.
-- **Fix:** use one rule for both. It may be easier to drop the button once SET-2 lands.
-- **Complete when:** from any mix of the two sound settings, one tap leaves the app in the state its icon shows.
-
 ### BUG-8 · Story lessons ignore the Beginner speed
 P1 · S
 - **Cause:** `lessons/StoryReader/StoryReader.tsx` (its line and word readers) hard-code `rate: 0.9` and `0.85`, which always lands on Normal.

@@ -39,6 +39,7 @@ Story · P1 · M · needs: —
   - Squishies not found yet: easier ones show as a greyed shape, harder ones as a "?" slot. Tapping either has Luna say a hint, never the answer to a round.
   - A new rare or super-rare squishy on the reward screen gets a shimmering, sparkling tag.
   - **Ways in to the shelf (Alex, 2026-10-09):** a Squishy Shelf card on the library (the last three found, on a little plank, with the count) and "See my shelf" on the lesson-done screen. The small header pill goes. (The home-screen bunny went with the "a little more" home screen, which the teacher passed on, 2026-10-10.)
+  - **Keep the Trophy room's way in (DES-9b, 2026-10-12):** today the library's sticker tin has a "My trophies" kit button (`data-shot="open-trophies"`), the only way into the Trophy room. When the Squishy Shelf card replaces the tin, it keeps a way in, and `ui:shots` keeps finding it.
   - Tapping a squishy on the shelf squishes it and Luna says its line (pre-rendered). With reduced motion it gives a small press instead.
   - Old saves keep their count: each sticker id maps to a squishy, so no child loses anything. The saved field can stay `stickers`.
   - Lessons and games keep their signature reward (`SIGNATURE_STICKER` in `engine/lessons.ts`, `nextSticker` in `engine/stickers.ts`).

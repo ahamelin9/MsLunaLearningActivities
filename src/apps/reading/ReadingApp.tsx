@@ -17,6 +17,8 @@ interface ReadingAppProps {
   onReturnToHome: () => void;
   /** the header's gear; the grown-up gate comes with SET-1 */
   onOpenSettings: () => void;
+  /** the sticker tin's way into the Trophy room (DES-9b) */
+  onOpenTrophies: () => void;
   onGradeChange?: (grade: GradeLevel) => void;
 }
 
@@ -27,7 +29,7 @@ interface ActiveGame {
   banner?: string;
 }
 
-export const ReadingApp: React.FC<ReadingAppProps> = ({ progress, onReturnToHome, onOpenSettings, onGradeChange }) => {
+export const ReadingApp: React.FC<ReadingAppProps> = ({ progress, onReturnToHome, onOpenSettings, onOpenTrophies, onGradeChange }) => {
   const [activeGame, setActiveGame] = useState<ActiveGame | null>(null);
   const [isChangingGrade, setIsChangingGrade] = useState(false);
 
@@ -109,6 +111,7 @@ export const ReadingApp: React.FC<ReadingAppProps> = ({ progress, onReturnToHome
         onPlayGame={play}
         onSurprise={() => handleSurprise()}
         onChangeGrade={() => setIsChangingGrade(true)}
+        onOpenTrophies={onOpenTrophies}
       />
     </>
   );

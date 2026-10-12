@@ -668,6 +668,8 @@
       margin-bottom: 0.6rem;
 
       h2 { font-size: 1.15rem; }
+      // the count and the way into the Trophy room (DES-9b)
+      .tin-actions { display: flex; align-items: center; gap: var(--space-3); }
       .tin-count { font-size: 0.85rem; font-weight: 800; color: $amber-deep; }
     }
 

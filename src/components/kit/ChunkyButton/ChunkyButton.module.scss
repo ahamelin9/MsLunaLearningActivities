@@ -68,6 +68,14 @@
   --button-ledge: var(--ledge-medium);
 }
 
+// a pick-one row (DES-9b): the picked button (aria-pressed) takes the action look
+.root[aria-pressed='true'] {
+  --button-bg: var(--action);
+  --button-ink: var(--action-ink);
+  --button-border: var(--action);
+  --button-edge: var(--action-edge);
+}
+
 // a step back from the main thing: dashed, no ledge, on the ground
 .root[data-variant='quiet'] {
   --button-bg: transparent;

@@ -32,7 +32,6 @@ export interface Achievement {
   title: string;
   description: string;
   iconEmoji: string;
-  badgeColor: string;
   category: 'stars' | 'lessons' | 'streak' | 'skills' | 'special';
   requirement: (progress: UserProgress) => boolean;
 }

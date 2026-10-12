@@ -1,204 +1,97 @@
-@use 'styles/variables' as *;
-@use 'styles/mixins' as *;
+// The Trophy room (DES-9b): the kit Modal holds it; this lays out the stats
+// and the badges with roles and the space scale. A won badge sits on the soft
+// accent, a locked one on the well with a lock.
 
-// A copy of SettingsModal's backdrop and pop-in, which CSS modules can't share,
-// until the kit Modal replaces both (DES-9b).
-.modal-backdrop-blur {
-  position: fixed;
-  inset: 0;
-  background: rgba(15, 23, 42, 0.65);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  @include flex-center;
-  padding: 1.25rem;
-  z-index: 100;
-  animation: modalFadeIn 0.2s ease-out;
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-3);
 }
 
-.trophy-modal-card {
-  max-width: 580px;
-  width: 100%;
-  background: #FFFFFF;
-  border-radius: 2rem;
-  padding: 1.75rem;
-  box-shadow: $shadow-xl;
-  border: 4px solid #FEF3C7;
+.stat {
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
-  max-height: 90vh;
-  overflow-y: auto;
-  animation: modalPopIn 0.28s cubic-bezier(0.16, 1, 0.3, 1);
-
-  .trophy-header {
-    @include flex-between;
-    border-bottom: 1.5px solid #FEF3C7;
-    padding-bottom: 0.85rem;
-
-    .trophy-title-group {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-
-      .trophy-badge-icon {
-        width: 48px;
-        height: 48px;
-        border-radius: 1rem;
-        background: #FEF3C7;
-        color: #D97706;
-        @include flex-center;
-      }
-
-      .modal-title {
-        font-family: var(--font-display);
-        font-weight: 800;
-        font-size: 1.35rem;
-        color: $color-text-dark;
-      }
-
-      .modal-subtitle {
-        font-size: 0.8rem;
-        font-weight: 600;
-        color: $color-text-muted;
-      }
-    }
-  }
-
-  .trophy-stats-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 0.65rem;
-
-    .trophy-stat-card {
-      padding: 0.85rem 0.5rem;
-      border-radius: 1.25rem;
-      text-align: center;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 0.2rem;
-
-      &.card-stars {
-        background: #FFFBEB;
-        border: 1px solid #FDE68A;
-      }
-      &.card-streak {
-        background: #FAF5FF;
-        border: 1px solid #E9D5FF;
-      }
-      &.card-lessons {
-        background: #EFF6FF;
-        border: 1px solid #BFDBFE;
-      }
-
-      .stat-number {
-        font-family: var(--font-read);
-        font-weight: 800;
-        font-size: 1.4rem;
-        color: $color-text-dark;
-      }
-
-      .stat-desc {
-        font-size: 0.75rem;
-        font-weight: 700;
-        color: $color-text-muted;
-      }
-    }
-  }
-
-  .badges-list-section {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-
-    .badges-section-title {
-      font-family: var(--font-display);
-      font-weight: 800;
-      font-size: 0.75rem;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      color: $color-text-muted;
-    }
-
-    .badges-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 0.65rem;
-
-      .badge-item-card {
-        padding: 0.75rem 0.85rem;
-        border-radius: 1.25rem;
-        border: 2px solid #E2E8F0;
-        background: #F8FAFC;
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-        transition: transform 0.15s ease;
-
-        &[data-state="unlocked"] {
-          background: #FFFFFF;
-          border-color: #FDE68A;
-          box-shadow: 0 4px 10px rgba(245, 158, 11, 0.1);
-
-          &:hover {
-            transform: translateY(-2px);
-          }
-        }
-
-        &[data-state="locked"] {
-          opacity: 0.6;
-        }
-
-        .badge-icon-box {
-          width: 44px;
-          height: 44px;
-          border-radius: 0.9rem;
-          @include flex-center;
-          font-size: 1.4rem;
-          flex-shrink: 0;
-          box-shadow: $shadow-sm;
-        }
-
-        .badge-details {
-          display: flex;
-          flex-direction: column;
-          min-width: 0;
-
-          .badge-title {
-            font-family: var(--font-display);
-            font-weight: 800;
-            font-size: 0.9rem;
-            color: $color-text-dark;
-            display: flex;
-            align-items: center;
-            gap: 0.3rem;
-          }
-
-          .badge-desc {
-            font-size: 0.75rem;
-            font-weight: 600;
-            color: $color-text-muted;
-            line-height: 1.2;
-          }
-        }
-      }
-    }
-  }
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-3);
+  background: var(--well);
+  text-align: center;
 }
 
-
-@keyframes modalFadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+// the star is filled, as in the header's count
+.statIcon {
+  color: var(--accent-edge);
+  --icon-fill: var(--accent);
 }
 
-@keyframes modalPopIn {
-  0% {
-    opacity: 0;
-    transform: scale(0.9) translateY(16px);
-  }
-  100% {
-    opacity: 1;
-    transform: scale(1) translateY(0);
-  }
+.statValue {
+  font: var(--text-display-l);
+}
+
+.statLabel {
+  font: var(--text-label-small);
+  color: var(--ink-soft);
+}
+
+.heading {
+  font: var(--text-tag);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-tag);
+  color: var(--accent-text);
+}
+
+.badges {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.badge {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.badgePicture {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: var(--space-12);
+  height: var(--space-12);
+  border-radius: var(--radius-chip);
+  background: var(--accent-soft);
+  font: var(--text-display-m);
+}
+
+.badge[data-state='locked'] .badgePicture {
+  background: var(--well);
+  color: var(--ink-soft);
+}
+
+.badgeText {
+  display: flex;
+  flex-direction: column;
+}
+
+.badgeTitle {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  font: var(--text-label);
+}
+
+.badge[data-state='locked'] .badgeTitle {
+  color: var(--ink-soft);
+}
+
+.badgeCheck {
+  color: var(--right-text);
+}
+
+.badgeDesc {
+  font: var(--text-label-small);
+  color: var(--ink-soft);
 }

@@ -54,6 +54,13 @@ export default function ChunkyButtonKit() {
           </Specimens>
         </div>
       ))}
+      <Specimens title="a pick-one row: the picked one is aria-pressed (DES-9b)">
+        {['Beginner', 'Normal', 'Quick'].map(label => (
+          <Specimen key={label} label={label === 'Normal' ? 'selected' : 'not selected'}>
+            <ChunkyButton aria-pressed={label === 'Normal'}>{label}</ChunkyButton>
+          </Specimen>
+        ))}
+      </Specimens>
     </>
   );
 }

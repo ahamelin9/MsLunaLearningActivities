@@ -81,6 +81,10 @@ export function App() {
               progress={progress}
               onReturnToHome={handleCloseApp}
               onOpenSettings={handleOpenSettings}
+              onOpenTrophies={() => {
+                soundManager.playPop();
+                setIsTrophyOpen(true);
+              }}
               onGradeChange={handleGradeChange}
             />
           </AppWindow>
@@ -95,8 +99,8 @@ export function App() {
         onGradeChange={handleGradeChange}
       />
 
-      {/* the Trophy room: nothing opens it since DES-9a followed the Home board;
-          DES-9b gives it its way in (the library's squishy shelf, PRG-5) */}
+      {/* the Trophy room opens from the library's sticker tin (DES-9b); PRG-5's
+          squishy shelf takes that over */}
       <TrophyModal
         isOpen={isTrophyOpen}
         progress={progress}

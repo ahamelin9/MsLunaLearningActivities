@@ -37,9 +37,3 @@ Task · P2 · S
 - **How:** point both cases at text that's on the board and in `epics/DES.md` today (two rows next to each other; a one-line `- **Complete when:**`), ideally rows less likely to move, and keep the script's note on what to do when a target goes.
 - **Complete when:** the guard check shows all 14 cases as expected.
 
-### OPS-3 · Decide the "Coming Soon" apps
-Task · P2 · S
-- **Why:** Math, Science and Art are registered, but the home screen only shows Reading, so `ComingSoonApp` can't be reached.
-- **Decided (Alex, 2026-10-08):** remove them. This is an ESL teacher's app and reading is the core. Other subjects will never be added. Later apps will only surround ESL reading (activities that support a child's English as a whole), so the home screen leaves room for those, not for school subjects.
-- **How:** delete the Math, Science and Art entries from `apps/registry.ts`, `apps/preview/ComingSoonApp.*`, and the unused icons that only they use.
-- **Complete when:** the registry holds only Reading, `ComingSoonApp` is gone, and build and lint pass.

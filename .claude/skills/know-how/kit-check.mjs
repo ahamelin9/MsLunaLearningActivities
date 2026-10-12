@@ -7,6 +7,8 @@
 // Squishy's squish, ghost and colours, the shimmering tag. DES-15: Luna's 8
 // moods all differ, her palette colours, the blink, the talk (held, and
 // following the voice), pop, wobble and float, the press, and reduced motion.
+// DES-9b: the Switch flips and slides its knob (at once under reduced motion),
+// and a selected ChunkyButton (aria-pressed) takes the action colour.
 // Start Vite on 5199 first, then from the repo root:
 //   node .claude/skills/know-how/kit-check.mjs
 // Exits 1 on any ❌.
@@ -296,6 +298,33 @@ await sleep(100);
 const rm = [await animOf(talker), await animOf(floater), await animOf(await luna('idle'))];
 ok('reduced motion: no talk, float or blink', rm.every(a => a === 'none'), rm.join(' | '));
 await page.evaluate(() => document.documentElement.removeAttribute('data-reduced-motion'));
+
+// ── Switch and the picked button (DES-9b) ──────────────────────────────────
+const flip = await page.evaluateHandle(() => document.querySelector('button[role="switch"][aria-label="Try me"]'));
+await flip.evaluate(e => e.scrollIntoView({ block: 'center' }));
+const knobX = () => flip.evaluate(b => new DOMMatrix(getComputedStyle(b.querySelector('span span')).transform).m41);
+const offX = await knobX();
+await flip.click();
+await sleep(400);
+const onX = await knobX();
+ok('a Switch flips when tapped', (await flip.evaluate(b => b.getAttribute('aria-checked'))) === 'true');
+ok('… and its knob slides across', onX > offX + 10, `${offX} → ${onX}`);
+await page.evaluate(() => document.documentElement.setAttribute('data-reduced-motion', ''));
+ok('reduced motion: the knob jumps, no slide', await flip.evaluate(b => getComputedStyle(b.querySelector('span span')).transitionDuration === '0s'));
+await page.evaluate(() => document.documentElement.removeAttribute('data-reduced-motion'));
+await flip.click();
+ok('… and flips back', (await flip.evaluate(b => b.getAttribute('aria-checked'))) === 'false');
+ok('the picked button in a row takes the action colour, the others don\'t', await page.evaluate(() => {
+  const row = [...document.querySelectorAll('button')].filter(b => ['Beginner', 'Normal', 'Quick'].includes(b.textContent.trim()) && b.hasAttribute('aria-pressed'));
+  const probe = document.createElement('span');
+  probe.style.background = 'var(--action)';
+  row[0].parentElement.append(probe);
+  const action = getComputedStyle(probe).backgroundColor;
+  probe.remove();
+  const bg = b => getComputedStyle(b).backgroundColor;
+  const picked = row.find(b => b.getAttribute('aria-pressed') === 'true');
+  return row.length === 3 && bg(picked) === action && row.filter(b => b !== picked).every(b => bg(b) !== action);
+}));
 
 await browser.close();
 console.log(results.every(Boolean) ? '\nALL PASS' : '\nSOME FAILED');

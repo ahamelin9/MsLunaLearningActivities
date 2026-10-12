@@ -6,6 +6,8 @@
  *         children: the words (none for 'icon', which needs an aria-label)
  *         plus any <button> attribute; className is layout only
  * States: idle · pressed (:active, sinks onto its ledge) · disabled (faded)
+ *         · selected: aria-pressed="true" takes the action look, for a
+ *         pick-one row (voice speed, grade; DES-9b)
  * Tokens: --button-bg, --button-ink, --button-border, --button-border-style,
  *         --button-edge, --button-ledge, --button-height, --button-pad
  * Reads:  --card, --ink, --ink-soft, --edge, --soil, --action, --action-ink,

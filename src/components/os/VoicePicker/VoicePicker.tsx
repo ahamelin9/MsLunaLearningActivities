@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import type { UserSettings } from '@/types/user';
 import { DEFAULT_VOICE_ID, LUNA_VOICES, pronunciation, type VoiceStatus } from '@/utils/pronunciation';
 import { soundManager } from '@/utils/audio';
-import { SpeakerIcon, CheckIcon } from '@/components/ui/Icons/Icons';
+import { ChunkyButton } from '@/components/kit';
 import styles from './VoicePicker.module.scss';
 
 interface VoicePickerProps {
@@ -82,21 +82,20 @@ export const VoicePicker: React.FC<VoicePickerProps> = ({ settings, onChange }) 
     }
   })();
 
+  const activeVoice = voices.find(v => v.id === voiceId);
+
   return (
-    <div className={styles.voicePicker}>
-      <div className={styles.voiceStatus} data-state={status.state}>
-        <span className={styles.statusDot} aria-hidden="true" />
-        <span className={styles.statusText}>{statusLine}</span>
-
-        {status.state === 'loading' && (
-          <span className={styles.statusBar} aria-hidden="true">
-            <span className={styles.statusFill} style={{ width: `${status.progress}%` }} />
+    <div className={styles.root}>
+      <div className={styles.row}>
+        <span className={styles.text}>
+          <span className={styles.name}>Which voice</span>
+          <span className={styles.status} data-state={status.state}>
+            <span className={styles.dot} aria-hidden="true" />
+            {statusLine}
           </span>
-        )}
-
+        </span>
         {(status.state === 'idle' || status.state === 'unavailable') && (
-          <button
-            className={styles.statusAction}
+          <ChunkyButton
             onClick={() => {
               soundManager.playPop();
               void pronunciation.init().then(ok => {
@@ -105,61 +104,46 @@ export const VoicePicker: React.FC<VoicePickerProps> = ({ settings, onChange }) 
             }}
           >
             Turn on voice
-          </button>
+          </ChunkyButton>
         )}
       </div>
 
-      <div className={styles.languageRow} role="group" aria-label="Accent">
+      <span className={styles.choices} role="group" aria-label="Accent">
         {(['en-US', 'en-GB'] as const)
           .filter(code => available.some(v => v.language === code))
           .map(code => (
-          <button
-            key={code}
-            className={styles.languageChip}
-            data-state={language === code ? 'active' : undefined}
-            onClick={() => {
-              soundManager.playPop();
-              const first = available.find(v => v.language === code);
-              onChange({ voiceLanguage: code, voiceId: first?.id ?? voiceId });
-              if (first) pronunciation.setVoice(first.id);
-            }}
-          >
-            {code === 'en-US' ? '🇺🇸 American' : '🇬🇧 British'}
-          </button>
-        ))}
-      </div>
-
-      <div className={styles.voiceList}>
-        {voices.map(voice => {
-          const isActive = voiceId === voice.id;
-          return (
-            <button
-              key={voice.id}
-              className={styles.voiceOption}
-              data-state={isActive ? 'active' : undefined}
-              onClick={() => preview(voice.id)}
+            <ChunkyButton
+              key={code}
+              aria-pressed={language === code}
+              onClick={() => {
+                soundManager.playPop();
+                const first = available.find(v => v.language === code);
+                onChange({ voiceLanguage: code, voiceId: first?.id ?? voiceId });
+                if (first) pronunciation.setVoice(first.id);
+              }}
             >
-              <span>
-                <span className={styles.voiceName}>
-                  {voice.name}
-                  {isActive && <CheckIcon size={13} />}
-                </span>
-                <span className={styles.voiceDesc}>{voice.description}</span>
-              </span>
-              <span
-                className={styles.voicePlay}
-                data-state={previewing === voice.id ? 'playing' : undefined}
-              >
-                <SpeakerIcon size={15} />
-              </span>
-            </button>
-          );
-        })}
-      </div>
+              {code === 'en-US' ? 'American' : 'British'}
+            </ChunkyButton>
+          ))}
+      </span>
 
-      <p className={styles.voiceNote}>
-        Tap a voice to hear it. Ms. Luna speaks from audio built into the app — nothing is
-        sent to a server.
+      <span className={styles.choices} role="group" aria-label="Voice">
+        {voices.map(voice => (
+          <ChunkyButton
+            key={voice.id}
+            icon="speaker"
+            aria-pressed={voiceId === voice.id}
+            data-state={previewing === voice.id ? 'playing' : undefined}
+            onClick={() => preview(voice.id)}
+          >
+            {voice.name}
+          </ChunkyButton>
+        ))}
+      </span>
+
+      <p className={styles.desc}>
+        {activeVoice && <>{activeVoice.description}. </>}
+        Tap a voice to hear it. Ms. Luna’s voice is built into the app: nothing is sent to a server.
       </p>
     </div>
   );

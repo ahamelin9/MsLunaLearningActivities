@@ -540,14 +540,13 @@ async function shootViewport(browser, url, viewport, outDir, reduced = false, th
     await click('modal-close');
     await gone('settings');
 
-    // since DES-8 the Trophy room opens from the home screen only, so the run
-    // goes home for it and back into Reading. Since DES-9a nothing opens it
-    // (the Home board has no trophy button) until DES-9b gives it a way in:
-    // the shot is skipped, but its number and the trip home stay, so every
-    // later screen keeps its file name and its rounds
+    // The Trophy room: since DES-9b it opens from the library's sticker tin;
+    // the run still looks on the home screen too, and skips the shot (keeping
+    // its number) when nothing opens it. Either way the run then goes home and
+    // back into Reading, as it has since DES-8: the trip deals the next random
+    // numbers, so keeping it keeps every game's rounds the same run to run.
     let trophiesHere = await page.evaluate(shown, at('open-trophies'));
-    const wentHome = !trophiesHere;
-    if (wentHome) {
+    if (!trophiesHere) {
       await click('app-home');
       await until('home');
       trophiesHere = await page.evaluate(shown, at('open-trophies'));
@@ -562,10 +561,12 @@ async function shootViewport(browser, url, viewport, outDir, reduced = false, th
       n += 1;
       console.log(`  ${size}  ${String(n).padStart(2, '0')}-trophies.png skipped: nothing opens the Trophy room yet`);
     }
-    if (wentHome) {
-      await click('open-reading');
-      await until('hub');
+    if (await page.evaluate(shown, at('app-home'))) {
+      await click('app-home');
+      await until('home');
     }
+    await click('open-reading');
+    await until('hub');
 
     // ---- every game: its start screen and its first round ----
     const titles = await page.$$eval(`${at('game-tile')} ${at('tile-title')}`, els =>

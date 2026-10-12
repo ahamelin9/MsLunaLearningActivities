@@ -1,6 +1,6 @@
 {
   "about": "Raw values each file may still have while the legacy styles go away (DES-19). It may only shrink: node scripts/design/check.mjs --update. DES-24 deletes it.",
-  "total": 1861,
+  "total": 1544,
   "files": {
     "src/apps/reading/engine/_world.scss": 74,
     "src/apps/reading/engine/content.ts": 7,
@@ -24,15 +24,8 @@
     "src/apps/reading/pages/GradeSelect/GradeSelect.tsx": 1,
     "src/apps/reading/pages/Hub/Hub.module.scss": 370,
     "src/apps/reading/pages/Hub/Hub.tsx": 6,
-    "src/components/os/SettingsModal/SettingsModal.module.scss": 124,
-    "src/components/os/SettingsModal/SettingsModal.tsx": 1,
-    "src/components/os/TrophyModal/TrophyModal.module.scss": 71,
-    "src/components/os/TrophyModal/TrophyModal.tsx": 6,
-    "src/components/os/VoicePicker/VoicePicker.module.scss": 62,
-    "src/components/ui/Button/Button.module.scss": 47,
     "src/components/ui/Icons/Icons.tsx": 1,
     "src/components/ui/Mascot/Mascot.module.scss": 51,
-    "src/data/achievements.ts": 6,
     "src/data/readingCurriculum.ts": 20,
     "src/index.css": 32,
     "src/styles/_mixins.scss": 20,

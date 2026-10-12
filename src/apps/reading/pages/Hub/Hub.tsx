@@ -4,7 +4,7 @@ import type { UserProgress } from '@/types/user';
 import type { AnyGameDef, GameShape } from '../../engine/types';
 import { GRADES } from '@/data/readingCurriculum';
 import { GAMES } from '../../games';
-import { Luna } from '@/components/kit';
+import { ChunkyButton, Luna } from '@/components/kit';
 import { greeting, lunaSay, maybeQuirk, type LunaMood } from '../../engine/luna';
 import { STICKERS, stickerById } from '../../engine/stickers';
 import { pick, tierFor, wordsUpTo } from '../../engine/content';
@@ -22,6 +22,8 @@ interface HubProps {
   onPlayGame: (game: AnyGameDef) => void;
   onSurprise: () => void;
   onChangeGrade: () => void;
+  /** the sticker tin leads to the Trophy room (DES-9b; the squishy shelf, PRG-5) */
+  onOpenTrophies: () => void;
 }
 
 /** Painted spines for the lesson books, cycled so no two neighbours match. */
@@ -122,7 +124,8 @@ export const Hub: React.FC<HubProps> = ({
   lessons,
   onPlayGame,
   onSurprise,
-  onChangeGrade
+  onChangeGrade,
+  onOpenTrophies
 }) => {
   const gradeInfo = GRADES.find(g => g.id === grade) || GRADES[0];
 
@@ -309,8 +312,13 @@ export const Hub: React.FC<HubProps> = ({
       <section className={styles.hubTin} data-shot="hub-tin">
         <div className={styles.tinHead}>
           <h2>Luna’s Sticker Tin</h2>
-          <span className={styles.tinCount}>
-            {progress.stickers.length} of {STICKERS.length}
+          <span className={styles.tinActions}>
+            <span className={styles.tinCount}>
+              {progress.stickers.length} of {STICKERS.length}
+            </span>
+            <ChunkyButton icon="trophy" onClick={onOpenTrophies} data-shot="open-trophies">
+              My trophies
+            </ChunkyButton>
           </span>
         </div>
 

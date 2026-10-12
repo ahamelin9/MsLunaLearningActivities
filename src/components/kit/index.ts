@@ -16,3 +16,4 @@ export { ProgressBar } from './ProgressBar/ProgressBar';
 export { LessonCard } from './LessonCard/LessonCard';
 export { Squishy, SquishyDots, type SquishyColour, type SquishyKind } from './Squishy/Squishy';
 export { Luna, type LunaMood } from './Luna/Luna';
+export { Switch } from './Switch/Switch';
