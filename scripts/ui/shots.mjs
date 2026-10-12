@@ -6,6 +6,7 @@
 //   npm run ui:shots -- --label before        -> screenshots/before/
 //   npm run ui:shots -- --label after         -> screenshots/after/
 //   npm run ui:shots -- --diff before after   -> screenshots/diff-before-after/
+//   npm run ui:shots -- --kit --label kit     -> screenshots/kit/kit/{light,dark}.png (DES-20)
 //
 // It starts its own Vite dev server and drives the Chrome already installed
 // on this machine (puppeteer-core downloads no browser of its own). Set
@@ -62,6 +63,7 @@ function parseArgs(argv) {
   const usage = () => {
     console.error(
       'Usage: npm run ui:shots -- [--label <name>]\n' +
+        '       npm run ui:shots -- --kit [--label <name>]\n' +
         '       npm run ui:shots -- --diff <label-a> <label-b>\n' +
         'Labels use letters, digits, . _ - only.'
     );
@@ -73,10 +75,11 @@ function parseArgs(argv) {
     if (!name.test(a ?? '') || !name.test(b ?? '')) usage();
     return { mode: 'diff', a, b };
   }
+  const kit = argv.includes('--kit');
   const i = argv.indexOf('--label');
-  const label = i === -1 ? 'latest' : argv[i + 1];
+  const label = i === -1 ? (kit ? 'kit' : 'latest') : argv[i + 1];
   if (!label || !name.test(label)) usage();
-  return { mode: 'shoot', label };
+  return { mode: kit ? 'kit' : 'shoot', label };
 }
 
 const slug = text =>
@@ -590,6 +593,38 @@ async function shoot(label) {
   console.log(`\nDone in ${secs}s: screenshots/${label}/`);
 }
 
+/**
+ * The Kit page (DES-20), light and dark, as two full-page shots at 1180×820 in
+ * screenshots/<label>/kit/. Only that folder is replaced, so the kit can sit
+ * beside a label's screens, and --diff compares it like another size.
+ */
+async function shootKit(label) {
+  const outDir = join(ROOT, 'screenshots', label, 'kit');
+  rmSync(outDir, { recursive: true, force: true });
+  mkdirSync(outDir, { recursive: true });
+
+  const server = await createServer({ root: ROOT, logLevel: 'error', server: { open: false } });
+  await server.listen();
+  const url = server.resolvedUrls.local[0];
+  const browser = await launchChrome();
+  const page = await browser.newPage();
+  await page.setViewport({ width: 1180, height: 820, deviceScaleFactor: 1 });
+  // motion demos stand still, so the same tokens give the same pixels
+  const devtools = await page.createCDPSession();
+  await devtools.send('Animation.enable');
+  await devtools.send('Animation.setPlaybackRate', { playbackRate: 0 });
+  for (const mode of ['light', 'dark']) {
+    await page.goto(`${url}?kit&mode=${mode}`, { waitUntil: 'networkidle0' });
+    await page.waitForSelector(at('kit-page'));
+    await page.evaluate(() => document.fonts.ready.then(() => new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)))));
+    await page.screenshot({ path: join(outDir, `${mode}.png`), fullPage: true });
+    console.log(`  kit  ${mode}.png`);
+  }
+  await browser.close();
+  await server.close();
+  console.log(`\nDone: screenshots/${label}/kit/`);
+}
+
 // ---------------------------------------------------------------------------
 // Comparing two runs
 // ---------------------------------------------------------------------------
@@ -660,6 +695,7 @@ async function main() {
     process.exit(1);
   }
   if (args.mode === 'diff') await diff(args.a, args.b);
+  else if (args.mode === 'kit') await shootKit(args.label);
   else await shoot(args.label);
   // a puppeteer run can keep the process alive after it's done
   process.exit(0);

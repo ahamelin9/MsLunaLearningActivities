@@ -72,8 +72,8 @@ be pulled into Phase 1 for a break from styling.
 
 ### Now / Next
 
-- **Now:** DES-20: the Kit page (dev only) and its screenshots (Stage 3; the tokens are in, and lint now enforces them after every edit)
-- **Next:** follow "Order to finish the epic" at the top of `epics/DES.md`: DES-4, DES-5, DES-6. OPS-9 (know-how checks onto `data-shot`) can start any time: the checks lost their last class names with DES-18d. PRG-7 and SET-1 are pulled in where DES-13 and DES-16 need them. GAME-1c, Treasure Path's screen, waits on FB-1, which waits on the DES-8/DES-10 layout
+- **Now:** DES-4: typography and local fonts (Stage 3; tokens, lint checks and the Kit page are in)
+- **Next:** follow "Order to finish the epic" at the top of `epics/DES.md`: DES-5, DES-6. OPS-9 (know-how checks onto `data-shot`) can start any time: the checks lost their last class names with DES-18d. PRG-7 and SET-1 are pulled in where DES-13 and DES-16 need them. GAME-1c, Treasure Path's screen, waits on FB-1, which waits on the DES-8/DES-10 layout
 
 ## Epics
 
@@ -97,7 +97,6 @@ In board order. A new epic gets its file in `epics/` first, then a link here
 | ID | Title | Type | P | Size | Status |
 |---|---|---|---|---|---|
 | **DES** | **Design system & layout** | Epic | **P0** | | |
-| DES-20 | Kit page (dev only) and its screenshots | Task | P0 | M | Todo |
 | DES-4 | Typography and local fonts | Story | P0 | S | Todo |
 | DES-5 | Motion system | Story | P0 | M | Todo |
 | DES-6 | Reduced motion, wired end to end | Story | P0 | S | Todo |

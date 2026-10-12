@@ -1,12 +1,24 @@
-import { StrictMode } from 'react'
+import { StrictMode, Suspense, lazy } from 'react'
 import { createRoot } from 'react-dom/client'
 import './styles/global.scss'
 import './index.css'
 import App from './App.tsx'
 
+// The Kit page, `/?kit` (DES-20): dev only, so the production build drops it
+const KitPage =
+  import.meta.env.DEV && new URLSearchParams(location.search).has('kit')
+    ? lazy(() => import('./dev/KitPage/KitPage'))
+    : null
+
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <App />
+    {KitPage ? (
+      <Suspense fallback={null}>
+        <KitPage />
+      </Suspense>
+    ) : (
+      <App />
+    )}
   </StrictMode>,
 )
 

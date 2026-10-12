@@ -104,7 +104,8 @@ The module declares its tokens at the top, and variants only swap them:
 ```
 
 `<Name>.kit.tsx` renders every variant and state, so the Kit page picks it up
-without being edited.
+without being edited. Its default export is a component with no props; the
+page shows it under the folder's name, once per mode.
 
 ## Adding a component
 

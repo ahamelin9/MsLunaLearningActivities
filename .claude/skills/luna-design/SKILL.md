@@ -118,7 +118,8 @@ changed screens.
   "Reading a design check failure" in `docs/design-system/README.md`;
   `node scripts/design/check.mjs <file>` lists one file's raw values with hints.
 - `npm run design:status`: what's left per area and folder.
-- The Kit page, light and dark side by side (from DES-20).
+- The Kit page, light and dark side by side: `npm run dev`, open `/?kit`
+  (DES-20). `npm run ui:shots -- --kit --label <name>` saves it in both modes.
 - `npm run ui:shots` at the four iPad sizes, and `--diff` for refactors (from
   DES-18a).
 - `node .claude/skills/know-how/module-refs-check.mjs "$PWD" <folders>`: every

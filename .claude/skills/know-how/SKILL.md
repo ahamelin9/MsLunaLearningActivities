@@ -175,6 +175,12 @@ Pitfalls that cost time:
   `pkill -f vite`: that would also stop Alex's server on 5173. Cause not
   tracked down yet; `ui:shots` now ends with `process.exit` (DES-18a), and a
   copied check can do the same.
+- **A check copied to the scratchpad can't find puppeteer-core** (*2026-10-11,
+  DES-20*): Node looks for packages next to the script, and the scratchpad has
+  none. Run it from the repo instead: `node --input-type=module -e "$(cat <scratch>/check.mjs)" <args>`.
+  Under `-e` the arguments shift by one (the first is `process.argv[1]`, not
+  `[2]`), so a script reading `argv[2]` starts Vite in the wrong folder and
+  every selector times out. Use `process.cwd()` for the repo root.
 - **Class names stop working from DES-18b:** CSS modules rename them, so the
   selectors above break as each area moves. The stable hooks are `data-shot`
   names (DES-18a): `home`, `open-reading`, `grade-select`, `grade-card`, `hub`,

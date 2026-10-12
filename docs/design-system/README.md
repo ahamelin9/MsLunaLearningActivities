@@ -116,7 +116,10 @@ so changing a `## Rules` section changes what Claude is shown.
 - **Add a kit component:** follow "Adding a component" in [components.md](components.md).
 - **Build or restyle a screen:** follow the steps in [screens.md](screens.md).
 - **Handle something that doesn't fit:** see [fitting-in.md](fitting-in.md).
-- **See everything:** run `npm run dev` and open `/?kit` (DES-20).
+- **See everything:** run `npm run dev` and open `/?kit` (DES-20): the Tokens
+  and Components tabs, in light, dark or side by side (`&mode=light|dark|both`).
+  `npm run ui:shots -- --kit --label <name>` saves both modes as full-page shots
+  in `screenshots/<name>/kit/`, which `--diff` compares like a screen size.
 - **Check your work:** `npm run lint` runs eslint, the design check and the
   contrast check. `npm run design:status` shows what's left per area (DES-19).
   A failure? See "Reading a design check failure" below.
@@ -189,7 +192,7 @@ Each ticket updates its row when it closes (Completion criteria B7 in
 | Source tree and CSS modules | `src/` | Done (2026-10-11): every page, game and lesson type has its own folder and CSS module, and no global class is left in `src/` (`module-refs-check.mjs`). Only the legacy partials and `index.css` stay global until DES-24 | DES-18b–e |
 | Tokens | `src/styles/tokens/` | Done (DES-3, 2026-10-11): primitives, roles in light and dark (the build fails if one is missing), the illustration palette, `bp()`, `global.scss` and `base/`. Every colour on the round 2 boards has a token (`tokens-check.mjs`). The app is pinned light on `<html>`; nothing reads the tokens yet | DES-3 |
 | Design check and contrast check | `scripts/design/` | Done (DES-19, 2026-10-11): both run in `npm run lint`. Baseline 2,365 raw values in 50 files, which may only shrink; 22 text pairs pass 4.5:1 in both modes. `npm run design:status` shows what's left | DES-19 |
-| Kit page | `src/dev/KitPage/` | Planned | DES-20 |
+| Kit page | `src/dev/KitPage/` | Done (DES-20, 2026-10-11): `/?kit` in dev only (the production build has none of it). The Tokens tab reads the tokens from `global.scss` itself, with each text role's contrast; the Components tab collects every `.kit.tsx` (none until DES-7a). `ui:shots --kit` shoots light and dark | DES-20 |
 | Type and fonts | tokens, `public/fonts/` | Planned | DES-4 |
 | Motion and reduced motion | `src/styles/motion/` | Planned | DES-5, DES-6 |
 | Kit components | `src/components/kit/` | Planned | DES-7a–c, DES-15, DES-17 |

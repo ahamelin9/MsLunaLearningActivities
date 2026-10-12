@@ -47,7 +47,7 @@ them in.
 |---|---|---|---|
 | 1 | Guardrails | DES-25 (done 2026-10-10) | Claude gets the right standards before any UI edit; people get a pre-commit check |
 | 2 | Structure (pure refactors, nothing looks different) | DES-18a–e (done 2026-10-11) | Screenshots you can compare; one folder per page, game and lesson; CSS modules; `games.scss` gone |
-| 3 | Foundations | DES-3, DES-19 (done 2026-10-11) → DES-20 → DES-4 → DES-5 → DES-6 | Tokens in light and dark; lint enforces the rules after every edit; the Kit page; Andika and Fraunces offline; shared motion; reduced motion |
+| 3 | Foundations | DES-3, DES-19, DES-20 (done 2026-10-11) → DES-4 → DES-5 → DES-6 | Tokens in light and dark; lint enforces the rules after every edit; the Kit page; Andika and Fraunces offline; shared motion; reduced motion |
 | 4 | The kit | DES-7a → DES-7b, DES-7c → DES-15 | Every kit component on the Kit page in every state, and the new Luna |
 | 5 | Frame and shell | DES-8 → DES-10 → DES-9a → DES-9b → DES-9c → DES-12 | One header, the layout grid, the restyled home, Settings, trophies and Grade Select; one Luna per screen |
 | 6 | The library | DES-21 → **PRG-7 (pulled in)** → DES-13 | The library as on the board: lessons in order, one bar |
@@ -65,20 +65,6 @@ them in.
 - **DES-17's full-shelf milestone moved to PRG-4,** so the moon doesn't wait on squishies (PRG-5, Phase 7).
 - **DES-14** (P2) touches the same folder as DES-22b and can slot in straight after it.
 - **P0 bugs** can still be pulled in between tickets for a break from styling.
-
-### DES-20 · Kit page (dev only) and its screenshots
-Task · P0 · M · needs: —
-- **Why:** one place to see every token and component, in every state, in light and dark, so a restyle can be judged at a glance.
-- **How:**
-  - `src/dev/KitPage/`, opened with `?kit` only when `import.meta.env.DEV`, and lazy-loaded so the production build has none of it.
-  - **Tokens tab:** colour roles in light and dark side by side with their contrast ratios, the illustration palette, type, space, radii, elevation and motion demos.
-  - **Components tab:** collects every `src/components/kit/*/*.kit.tsx` with `import.meta.glob`, so a new component shows up by itself.
-  - Light, dark and side-by-side switches.
-  - `npm run ui:shots -- --kit` captures it in light and dark at 1180×820.
-- **Complete when:**
-  - `npm run dev` with `?kit` shows the Tokens tab in light, dark and side by side;
-  - a grep of `dist/` after `npm run build` finds no Kit page code;
-  - `npm run ui:shots -- --kit --label kit` writes a light and a dark shot.
 
 ### DES-4 · Typography and local fonts
 Story · P0 · S · needs: —
@@ -131,7 +117,7 @@ Story · P0 · S · needs: DES-5
 - **Complete when:** with the flag on, no screen has continuous motion and every game is still playable.
 
 ### DES-7a · Kit, part 1: the basics
-Story · P0 · M · needs: DES-5, DES-20
+Story · P0 · M · needs: DES-5
 - **Why:** a restyle should mean changing the kit, not every screen. Today `components/ui/Button` is in the old OS style, and every screen draws its own cards and chips.
 - **Each kit component** lives in `src/components/kit/<Name>/` and has:
   - `<Name>.tsx`, opening with a header comment: what it is, its props, its states, the component tokens it declares and the roles they read;
