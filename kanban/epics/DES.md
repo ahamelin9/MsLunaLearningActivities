@@ -48,7 +48,7 @@ them in.
 | 1 | Guardrails | DES-25 (done 2026-10-10) | Claude gets the right standards before any UI edit; people get a pre-commit check |
 | 2 | Structure (pure refactors, nothing looks different) | DES-18a–e (done 2026-10-11) | Screenshots you can compare; one folder per page, game and lesson; CSS modules; `games.scss` gone |
 | 3 | Foundations | DES-3 → DES-19 → DES-20 → DES-4 → DES-5 → DES-6 (done 2026-10-11) | Tokens in light and dark; lint enforces the rules after every edit; the Kit page; Andika and Fraunces offline; shared motion; reduced motion |
-| 4 | The kit | DES-7a → DES-7b, DES-7c → DES-15 | Every kit component on the Kit page in every state, and the new Luna |
+| 4 | The kit | DES-7a (done 2026-10-11) → DES-7b, DES-7c → DES-15 | Every kit component on the Kit page in every state, and the new Luna |
 | 5 | Frame and shell | DES-8 → DES-10 → DES-9a → DES-9b → DES-9c → DES-12 | One header, the layout grid, the restyled home, Settings, trophies and Grade Select; one Luna per screen |
 | 6 | The library | DES-21 → **PRG-7 (pulled in)** → DES-13 | The library as on the board: lessons in order, one bar |
 | 7 | Play | DES-22a → DES-11 → DES-22b, DES-22c → DES-23 | GameShell, all 8 games and all 8 lesson types on the kit, with one right/wrong language |
@@ -67,32 +67,10 @@ them in.
 - **P0 bugs** can still be pulled in between tickets for a break from styling.
 
 
-### DES-7a · Kit, part 1: the basics
-Story · P0 · M · needs: —
-- **Why:** a restyle should mean changing the kit, not every screen. Today `components/ui/Button` is in the old OS style, and every screen draws its own cards and chips.
-- **Each kit component** lives in `src/components/kit/<Name>/` and has:
-  - `<Name>.tsx`, opening with a header comment: what it is, its props, its states, the component tokens it declares and the roles they read;
-  - `<Name>.module.scss`: component tokens at the top (`--button-bg: var(--action)`), with variants swapping only those;
-  - `<Name>.kit.tsx`: every state, for the Kit page.
-
-  States go in `data-state`. A parent's `className` may set layout only, and a kit root never sets its own margin. Every component is exported from `kit/index.ts`, the kit list.
-- **This part:**
-  - **Icon:** the drawn set from `components/ui/Icons.tsx`, redrawn to the prototype's 2.2 stroke with round caps, in `currentColor`, with no colour props or default colour. Plus the icons the boards use: check, clock, lock, unlock, chevrons, arrows, home, speaker, ear, replay, gear, info, book, dice, play, star, sparkle.
-  - **ChunkyButton:** variants action, secondary, quiet (dashed) and icon; sizes 48 and 64; the press sinks by `--press-depth` and the ledge shrinks.
-  - **PaperCard:** flat, card and lifted.
-  - **Chip:** time "about N min", took "took N min", accent tag ("Up next"), count (stars). TimeChip is a preset of it.
-  - **Tile:** a picture area and a name, for the Play Shelf.
-  - **Modal:** a lifted card with a 48px close button. No board shows one, so Alex OKs it on the Kit page.
-- **Complete when:**
-  - each component shows every state in light and dark on the Kit page;
-  - each has its header and its `.kit.tsx`;
-  - `npm run design:status` shows zero for `components/kit`;
-  - Alex OKs the Kit page shots.
-
 ### DES-7b · Kit, part 2: play
-Story · P0 · M · needs: DES-7a
+Story · P0 · M · needs: —
 - **Why:** answer buttons are styled six separate ways today (`lesson-choice`, `cookie`, `treasure-option`, `missing-choice`, `story-answer`, `word-tile`), with two different wrong shakes and no "revealed" state.
-- **This part** (same kit rules as DES-7a):
+- **This part** (the kit rules in `docs/design-system/components.md`, as DES-7a built them):
   - **Choice**, the one answer button: letter, word or picture, in the states idle, pressed, wrong, right, revealed (for FB-2: a dashed accent ring with a soft accent fill, for Alex to OK), and faded/disabled. Sizes follow the target and type roles: answer letters 48px or more, words 32px or more, targets 64px or more with 12px between them.
   - **ListenCue**, the "?" arch: waiting (dashed action border, ear, "?", "tap to listen", a slow pulse), tapped (a ripple), and found (right-soft, the answer, "found it!").
   - **SpeechBubble:** tail left or bottom, with an optional "Hear my clue" button.
@@ -104,9 +82,9 @@ Story · P0 · M · needs: DES-7a
   - Alex OKs the revealed state.
 
 ### DES-7c · Kit, part 3: progress and rewards
-Story · P0 · M · needs: DES-7a
+Story · P0 · M · needs: —
 - **Why:** DES-13 (one bar, lessons in order), PRG-5 (squishies), PRG-6 (times) and PRG-7 (locked lessons) all need these pieces drawn once.
-- **This part** (same kit rules as DES-7a):
+- **This part** (the kit rules in `docs/design-system/components.md`, as DES-7a built them):
   - **ProgressBar:** the lessons size, with segments and "N of M lessons done", and the rounds size for a lesson's top bar. The count comes from the data, never from the design.
   - **LessonCard:** done (check badge, "took N min"), up next (glowing border, "Up next" tag that stays centred with reduced motion, "about N min", a thin rounds bar once started) and locked (dashed, lock badge, "about N min", a wobble on tap).
   - **Squishy:** the kinds on the boards (squish ball, mochi cat, bunny, bear, butter block, peach, cloud, little moon) in usual, rare and super-rare colours from `_illustration.scss`. It squishes on tap. A not-found squishy shows as a greyed ghost, a harder one as a "?" slot, and a rarity tag can shimmer. Colour dots show found, grey (a usual colour still to find) and "?" (a rare one still to find).
@@ -117,7 +95,7 @@ Story · P0 · M · needs: DES-7a
   - Alex OKs the Kit page shots.
 
 ### DES-8 · One set of chrome
-Story · P0 · M · needs: DES-7a
+Story · P0 · M · needs: —
 - **Why:** inside the app there are two header bars, stars and mute shown twice, `VoiceIndicator` shown twice, and four ways home: the status pill, the Home button, the home-indicator bar, and "Library". Together these take about 130px of an 820px-tall screen.
 - **How:**
   - Inside an app: one header with Home, the title, stars, and the settings gear (gated), built from ChunkyButton, Chip and Icon, as on the round 2 Library and Round boards.
@@ -143,7 +121,7 @@ Story · P0 · M · needs: DES-8, DES-15
   - it's checked in light and dark.
 
 ### DES-9b · Shell restyle, part 2: Settings and the Trophy room
-Story · P0 · M · needs: DES-7a, DES-9a
+Story · P0 · M · needs: DES-9a
 - **How:**
   - Settings and the Trophy room become kit Modals with kit buttons, chips and cards, in plain grown-up language.
   - No board shows them, so Alex OKs the shots.
@@ -155,7 +133,7 @@ Story · P0 · M · needs: DES-7a, DES-9a
   - it's checked in light and dark, and Alex OKs it.
 
 ### DES-9c · Shell restyle, part 3: Grade Select
-Story · P0 · S · needs: DES-7a, DES-15
+Story · P0 · S · needs: DES-15
 - **How:**
   - Grade Select talks to the child, not to grown-ups: no "digraphs" and no "dashboard".
   - Kit cards, with Luna (DES-15) instead of the emoji `components/ui/Mascot`.
@@ -168,7 +146,7 @@ Story · P0 · S · needs: DES-7a, DES-15
   - it's checked in light and dark, and Alex OKs it.
 
 ### DES-10 · Layout grid and breakpoints
-Story · P0 · M · needs: DES-7a
+Story · P0 · M · needs: —
 - **How:**
   - Lay out the hub and game stage for the four `ui:shots` sizes (1180×820, 820×1180, 1024×768, 744×1133), using the breakpoint mixin from the tokens (as few breakpoints as the four sizes need; today's 640/700/720/860 retire).
   - Hub: the next lesson and Luna's Pick are visible without scrolling.
@@ -221,6 +199,15 @@ Story · P2 · S · needs: DES-22b
 - **How:** a few cookie designs (chocolate chip, sprinkles, jam, and so on), mixed in each round, drawn in the DES-2 style, with their colours in `_illustration.scss`. The letter stays just as easy to read.
 - **Complete when:** a round shows at least two different cookie designs, and every letter still meets the DES-2 type minimums.
 
+### DES-26 · Make the arch radius work at any size
+Task · P2 · S · needs: —
+- **Why:** `--radius-arch` is `999px 999px 22px 22px`. When the corners add up to more than the box, the browser shrinks all four in proportion, so the bottom corners come out about 2px, not the 22px `foundations.md` describes (the round 2 board's "?" cue has the same flaw). Found in DES-7b: ListenCue works round it with its own arch, built from its width.
+- **How:** a primitive change, so Alex OKs it first (ladder step 4). Give the arch a form that keeps a half-circle top and card corners at any width: for example a `arch($width)` mixin beside `bp()`, or container units. Then ListenCue reads it again instead of its own `--cue-radius`.
+- **Complete when:**
+  - on the Kit page, an arch 192px wide and one 400px wide both show a half-circle top and 22px bottom corners, in light and dark;
+  - ListenCue uses the shared arch, and its shots don't change;
+  - `components/kit` is still at zero.
+
 ### DES-16 · Light and dark mode
 Story · P1 · M · needs: SET-1
 - **Why:** Alex wants a real dark mode (2026-10-09), and building the components on role tokens from the start keeps every screen working in both.
@@ -238,7 +225,7 @@ Story · P1 · M · needs: SET-1
   - every screen is checked in dark on the real iPad (Alex).
 
 ### DES-15 · Draw the chosen Ms. Luna
-Story · P0 · M · needs: DES-7a
+Story · P0 · M · needs: —
 - **Why:** the teacher picked the round 2 prototype's owl (2026-10-10, "she loved it"): the rounder owl in round black frames, caramel feathers. Today's `LunaOwl` drawing and the emoji `components/ui/Mascot` both retire. The moon is her own ticket (DES-17).
 - **How:**
   - Redraw `LunaOwl` as that owl and move it into the kit as `src/components/kit/Luna/` (a Writing app will use her too). The reference is `owl()` in `.claude/skills/luna-design/prototype/gen.py` and owl 1 on the round 2 Ms. Luna board (marked "Her pick").
@@ -273,7 +260,7 @@ Story · P1 · M · needs: DES-15
   - the MilestoneMoon folder shows zero in `design:status`.
 
 ### DES-21 · Library on the kit: header, welcome row, Luna's Pick, Play Shelf
-Story · P1 · M · needs: DES-7a, DES-8, DES-10
+Story · P1 · M · needs: DES-8, DES-10
 - **Why:** the round 2 Library board is approved, but no ticket covered the hub apart from its lesson path (DES-13).
 - **How:**
   - As on the Library board:

@@ -1,0 +1,100 @@
+// Choice (DES-7b): component tokens first; the kinds and states swap only these.
+// The one answer language (components.md): wrong wobbles in the try-again
+// tint, right pops in the right fill with the glow ring, revealed is a dashed
+// accent ring on a soft accent fill.
+
+@use 'styles/mixins' as *;
+
+.root {
+  --choice-bg: var(--card);
+  --choice-ink: var(--ink);
+  --choice-border: var(--edge);
+  --choice-border-style: solid;
+  --choice-edge: var(--edge);
+  --choice-size: calc(var(--space-16) * 2 + var(--space-2)); // the Round board's 136px letters
+  --choice-font: var(--text-answer-letter);
+  --choice-motion: none;
+
+  @include press(var(--ledge-large), var(--choice-edge));
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+  min-width: var(--choice-size);
+  min-height: var(--choice-size);
+  padding: var(--space-3) var(--space-4);
+  border: var(--border-thick) var(--choice-border-style) var(--choice-border);
+  border-radius: var(--radius-card);
+  background: var(--choice-bg);
+  color: var(--choice-ink);
+  font: var(--choice-font);
+  animation: var(--choice-motion);
+  transition:
+    transform var(--dur-tap) var(--ease-standard),
+    box-shadow var(--dur-tap) var(--ease-standard),
+    background-color var(--dur-quick) var(--ease-standard),
+    border-color var(--dur-quick) var(--ease-standard),
+    opacity var(--dur-quick) var(--ease-standard);
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+
+  &:disabled,
+  &:disabled:active {
+    cursor: default;
+    transform: none;
+    box-shadow: 0 var(--ledge-large) 0 var(--choice-edge);
+  }
+}
+
+// ── kinds ──────────────────────────────────────────────────────────────────
+.root[data-kind='word'] {
+  --choice-size: calc(var(--space-16) + var(--space-8));
+  --choice-font: var(--text-answer-word);
+
+  padding-inline: var(--space-6);
+}
+
+// a picture is as big as a letter; its words come only once it's solved
+.caption {
+  font: var(--text-label);
+  animation: var(--motion-pop);
+}
+
+.face {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+// ── states ─────────────────────────────────────────────────────────────────
+.root[data-state~='wrong'] {
+  --choice-bg: var(--try-again-soft);
+  --choice-border: var(--try-again-edge);
+  --choice-motion: var(--motion-wobble);
+}
+
+.root[data-state~='right'] {
+  --choice-bg: var(--right);
+  --choice-ink: var(--right-ink);
+  --choice-border: var(--right);
+  --choice-edge: var(--right-edge);
+  --choice-motion: var(--motion-pop);
+
+  box-shadow: 0 var(--ledge-large) 0 var(--choice-edge), var(--glow-ring);
+}
+
+// FB-2 points at the answer after repeated misses; it can still be tapped
+.root[data-state~='revealed'] {
+  --choice-bg: var(--accent-soft);
+  --choice-border: var(--accent-edge);
+  --choice-border-style: dashed;
+  --choice-edge: var(--accent-edge);
+}
+
+.root[data-state~='faded'],
+.root:disabled {
+  opacity: 0.4;
+}

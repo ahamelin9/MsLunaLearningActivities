@@ -59,6 +59,15 @@
   --button-ledge: var(--ledge-medium);
 }
 
+// Luna's own buttons: "Hear my clue", Luna's Pick (DES-7b)
+.root[data-variant='accent'] {
+  --button-bg: var(--accent);
+  --button-ink: var(--accent-ink);
+  --button-border: var(--accent);
+  --button-edge: var(--accent-edge);
+  --button-ledge: var(--ledge-medium);
+}
+
 // a step back from the main thing: dashed, no ledge, on the ground
 .root[data-variant='quiet'] {
   --button-bg: transparent;

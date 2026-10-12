@@ -1,0 +1,156 @@
+// The kit's behaviour on the Kit page, in a real browser. DES-7a: the press, a
+// disabled button, the Modal (focus in and back, Escape, the X, the dim) and
+// the focus ring. DES-7b: Choice's wrong wobble and right pop (and under
+// reduced motion), ListenCue keeping its answer hidden and rippling, StarRow
+// landing. Start Vite on 5199 first, then from the repo root:
+//   node .claude/skills/know-how/kit-check.mjs
+// Exits 1 on any ❌. DES-7c adds its components' checks here.
+import puppeteer from 'puppeteer-core';
+
+const URL = 'http://localhost:5199/?kit&tab=components&mode=light';
+const results = [];
+const ok = (name, pass, detail = '') => { results.push(pass); console.log(`${pass ? '✅' : '❌'} ${name}${detail ? `  (${detail})` : ''}`); };
+
+const browser = await puppeteer.launch({ executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome', headless: true, args: ['--mute-audio'] });
+const page = await browser.newPage();
+await page.setViewport({ width: 1180, height: 820 });
+await page.goto(URL, { waitUntil: 'networkidle0' });
+const focusOnLoad = await page.evaluate(() => document.activeElement?.getAttribute('role') === 'dialog');
+
+// 1. a real press sinks the button onto its ledge
+const btn = await page.evaluateHandle(() => [...document.querySelectorAll('button')].find(b => b.textContent.trim() === 'Play again' && !b.disabled && !b.dataset.state));
+await btn.evaluate(el => el.scrollIntoView({ block: 'center' }));
+const style = () => btn.evaluate(el => { const s = getComputedStyle(el); return { t: s.transform, sh: s.boxShadow }; });
+const idle = await style();
+const box = await btn.boundingBox();
+await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+await page.mouse.down();
+await new Promise(r => setTimeout(r, 400));
+const pressed = await style();
+await page.mouse.up();
+await new Promise(r => setTimeout(r, 400));
+const back = await style();
+ok('press sinks by --press-depth', pressed.t.includes('3)') && idle.t === 'none', `idle ${idle.t}, pressed ${pressed.t}`);
+ok('ledge shrinks to a hairline on press', pressed.sh.includes(' 0px 1px 0px') && idle.sh.includes(' 0px 5px 0px'), `idle ${idle.sh} → ${pressed.sh}`);
+ok('it comes back up', back.t === 'none');
+
+// 2. a disabled button doesn't sink
+const dis = await page.evaluateHandle(() => [...document.querySelectorAll('button')].find(b => b.textContent.trim() === 'Play again' && b.disabled));
+await dis.evaluate(el => el.scrollIntoView({ block: 'center' }));
+const dbox = await dis.boundingBox();
+await page.mouse.move(dbox.x + dbox.width / 2, dbox.y + dbox.height / 2);
+await page.mouse.down();
+await new Promise(r => setTimeout(r, 400));
+const dt = await dis.evaluate(el => getComputedStyle(el).transform);
+await page.mouse.up();
+ok('disabled stays put', dt === 'none', dt);
+
+// 3. the Modal: open on load, focus inside, Escape / X / the dim close it, focus goes back
+const dialogs = () => page.$$eval('[role=dialog]', d => d.length);
+ok('modal open on load', (await dialogs()) === 1);
+ok('focus moves into the dialog when it opens', focusOnLoad);
+await page.keyboard.press('Escape');
+ok('Escape closes it', (await dialogs()) === 0);
+const openIt = await page.evaluateHandle(() => [...document.querySelectorAll('button')].find(b => b.textContent.trim() === 'Open it'));
+await openIt.evaluate(el => el.scrollIntoView({ block: 'center' }));
+await openIt.click();
+ok('Open it opens it again', (await dialogs()) === 1);
+const close = await page.$('[data-shot="modal-close"]');
+ok('close button is 48px', JSON.stringify(await close.evaluate(el => [el.offsetWidth, el.offsetHeight])) === '[48,48]');
+ok('close button has a name', (await close.evaluate(el => el.getAttribute('aria-label'))) === 'Close');
+await close.click();
+ok('the X closes it', (await dialogs()) === 0);
+ok('focus goes back to Open it', await page.evaluate(() => document.activeElement?.textContent?.trim() === 'Open it'));
+await openIt.click();
+const dim = await page.evaluate(() => { const r = document.querySelector('[role=dialog]').parentElement.getBoundingClientRect(); return { x: r.x + 8, y: r.y + 8 }; });
+await page.mouse.click(dim.x, dim.y);
+ok('a tap on the dim closes it', (await dialogs()) === 0);
+await openIt.click();
+const inside = await page.evaluate(() => { const r = document.querySelector('[role=dialog] p').getBoundingClientRect(); return { x: r.x + 4, y: r.y + 4 }; });
+await page.mouse.click(inside.x, inside.y);
+ok('a tap inside the card does not', (await dialogs()) === 1);
+ok('the dim is --shade-deep', await page.evaluate(() => {
+  const dimEl = document.querySelector('[role=dialog]').parentElement;
+  const probe = document.createElement('span'); probe.style.background = 'var(--shade-deep)'; dimEl.parentElement.append(probe);
+  const want = getComputedStyle(probe).backgroundColor; probe.remove();
+  return getComputedStyle(dimEl).backgroundColor === want;
+}));
+
+// 4. keyboard focus shows the ring
+await page.goto(URL, { waitUntil: 'networkidle0' });
+await page.keyboard.press('Escape'); // close the light panel's modal
+await page.evaluate(() => document.body.focus());
+let ring = 'none';
+let tileRing = 'none';
+for (let i = 0; i < 80 && (ring === 'none' || tileRing === 'none'); i++) {
+  await page.keyboard.press('Tab');
+  const r = await page.evaluate(() => {
+    const a = document.activeElement;
+    const kind = a?.dataset.tint ? 'tile' : a?.dataset.variant && a.tagName === 'BUTTON' ? 'button' : null;
+    return kind && { kind, ring: getComputedStyle(a).outlineStyle + ' ' + getComputedStyle(a).outlineWidth };
+  });
+  if (r?.kind === 'button') ring = r.ring;
+  if (r?.kind === 'tile') tileRing = r.ring;
+}
+ok('a ChunkyButton shows the focus ring when tabbed to', ring === 'solid 3px', ring);
+ok('a Tile shows the focus ring when tabbed to', tileRing === 'solid 3px', tileRing);
+
+// 5. Tile pressed state and the Icon's label rule
+ok('icons without a label are hidden from screen readers', await page.evaluate(() => [...document.querySelectorAll('svg[viewBox="0 0 24 24"]')].every(s => s.getAttribute('aria-hidden') === 'true' || s.getAttribute('aria-label'))));
+ok('every kit Tile carries data-shot="tile-title"', await page.evaluate(() => [...document.querySelectorAll('button[data-tint]')].every(t => t.querySelector('[data-shot="tile-title"]'))));
+
+// ── DES-7b ────────────────────────────────────────────────────────────────
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const choice = l => page.evaluateHandle(l => [...document.querySelectorAll('button[aria-label]')].find(b => b.getAttribute('aria-label') === `letter ${l}`), l);
+const anim = el => el.evaluate(e => getComputedStyle(e).animationName);
+await page.goto(URL, { waitUntil: 'networkidle0' });
+await page.keyboard.press('Escape');
+let s = await choice('S');
+await s.evaluate(el => el.scrollIntoView({ block: 'center' }));
+await s.click();
+ok('a wrong Choice shows wrong', (await s.evaluate(e => e.dataset.state)) === 'wrong');
+ok('wrong uses the shared wobble', (await anim(s)) === 'luna-wobble', await anim(s));
+await sleep(600);
+ok('wrong clears when the wobble ends', (await s.evaluate(e => e.dataset.state)) === undefined);
+const m = await choice('M');
+await m.click();
+ok('the right Choice shows right', (await m.evaluate(e => e.dataset.state)) === 'right');
+ok('right uses the shared pop', (await anim(m)) === 'luna-pop', await anim(m));
+ok('right wears the glow ring', (await m.evaluate(e => getComputedStyle(e).boxShadow)).split('rgb').length === 3);
+s = await choice('S');
+ok('the others fade and can\'t be tapped', (await s.evaluate(e => e.dataset.state === 'faded' && e.disabled)));
+ok('a revealed Choice can still be tapped', await page.evaluate(() => [...document.querySelectorAll('button[data-state~="revealed"]')].every(b => !b.disabled)));
+
+const cue = await page.evaluateHandle(() => [...document.querySelectorAll('button[aria-label="Hear it again"]')].at(-1));
+ok('a waiting cue keeps its answer hidden', await page.evaluate(() => [...document.querySelectorAll('button[aria-label="Hear it again"]')].every(b => !/M|ship/.test(b.textContent))));
+ok('a waiting cue pulses with the shared glow', (await anim(cue)) === 'luna-glow');
+await cue.evaluate(el => el.scrollIntoView({ block: 'center' }));
+await cue.click();
+const rippleNow = await cue.evaluate(b => { const r = b.nextElementSibling; return r ? getComputedStyle(r).animationName + ' ' + getComputedStyle(r).animationIterationCount : 'none'; });
+ok('a tap ripples once', rippleNow === 'luna-glow 1', rippleNow);
+await sleep(900);
+ok('the ripple clears after one beat', await cue.evaluate(b => !b.nextElementSibling));
+const foundBtn = await page.evaluateHandle(() => [...document.querySelectorAll('button')].find(b => b.textContent.trim() === 'Found it'));
+await foundBtn.click();
+const foundText = await page.evaluate(() => [...document.querySelectorAll('[data-state~="found"] button')].at(-1)?.textContent);
+ok('found shows the answer and "found it!"', foundText === 'Mfound it!', foundText);
+
+const stars = await page.evaluate(() => [...document.querySelectorAll('[role="img"][aria-label$="stars"]')].map(r => r.getAttribute('aria-label')));
+ok('StarRow says how many stars', stars.includes('0 of 3 stars') && stars.includes('3 of 3 stars'));
+const landing = await page.evaluate(() => [...document.querySelector('[data-state="landing"]').querySelectorAll('svg')].map(s => `${getComputedStyle(s).animationName}@${getComputedStyle(s).animationDelay}`));
+ok('stars land one after another with the shared pop', landing.join(' ') === 'luna-pop@0s luna-pop@0.15s luna-pop@0.3s', landing.join(' '));
+
+// reduced motion: no wobble, and wrong still clears
+await page.goto(URL, { waitUntil: 'networkidle0' });
+await page.keyboard.press('Escape');
+await page.evaluate(() => document.documentElement.setAttribute('data-reduced-motion', ''));
+s = await choice('B');
+await s.evaluate(el => el.scrollIntoView({ block: 'center' }));
+await s.click();
+const rmAnim = await anim(s);
+await sleep(100);
+ok('reduced motion: no wobble, and wrong clears at once', rmAnim === 'none' && (await s.evaluate(e => e.dataset.state)) === undefined, rmAnim);
+
+await browser.close();
+console.log(results.every(Boolean) ? '\nALL PASS' : '\nSOME FAILED');
+process.exit(results.every(Boolean) ? 0 : 1);

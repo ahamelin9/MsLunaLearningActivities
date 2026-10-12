@@ -17,6 +17,7 @@
 .root[data-size='16'] { --icon-size: var(--space-4); }
 .root[data-size='20'] { --icon-size: var(--space-5); }
 .root[data-size='32'] { --icon-size: var(--space-8); }
+.root[data-size='40'] { --icon-size: var(--space-10); } // the ListenCue's ear
 
 // a filled shape takes the second colour a kit parent gives it, or its own
 .root[data-filled] {

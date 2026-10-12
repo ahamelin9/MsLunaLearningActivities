@@ -1,0 +1,54 @@
+// SpeechBubble (DES-7b): component tokens first. The tail is a square turned
+// 45°, with the card's border on its two outer sides, overlapping the card's
+// edge by half and painted over it.
+
+.root {
+  --bubble-bg: var(--card);
+  --bubble-edge: var(--edge);
+  --bubble-tail: var(--space-5);
+
+  display: inline-flex;
+  align-items: center;
+}
+
+.card {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-5) var(--space-6);
+  border: var(--border-regular) solid var(--bubble-edge);
+  border-radius: var(--radius-card);
+  background: var(--bubble-bg);
+  box-shadow: var(--elevation-card);
+  color: var(--ink);
+}
+
+.line {
+  font: var(--text-read);
+}
+
+.tail {
+  z-index: var(--z-raised);
+  flex: none;
+  width: var(--bubble-tail);
+  height: var(--bubble-tail);
+  margin-right: calc(var(--bubble-tail) / -2);
+  background: var(--bubble-bg);
+  border-left: var(--border-regular) solid var(--bubble-edge);
+  border-bottom: var(--border-regular) solid var(--bubble-edge);
+  transform: rotate(45deg);
+}
+
+// the tail under the card, a little in from the left, pointing down at Luna
+.root[data-variant='bottom'] {
+  flex-direction: column-reverse;
+  align-items: flex-start;
+
+  .tail {
+    margin-right: 0;
+    margin-top: calc(var(--bubble-tail) / -2);
+    margin-left: var(--space-8);
+    border-left: none;
+    border-right: var(--border-regular) solid var(--bubble-edge);
+  }
+}

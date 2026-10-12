@@ -72,8 +72,8 @@ be pulled into Phase 1 for a break from styling.
 
 ### Now / Next
 
-- **Now:** DES-7a: kit, part 1, the basics, the start of Stage 4 (Stage 3 is done: tokens, the design and contrast checks, the Kit page, Andika and Fraunces, motion and reduced motion, DES-3 to DES-6)
-- **Next:** DES-7b and DES-7c, then stop (Alex, 2026-10-11: DES-15, the new Luna, waits for the restyle). Stage 5 after that, per "Order to finish the epic" in `epics/DES.md`. OPS-9 (know-how checks onto `data-shot`) can start any time: the checks lost their last class names with DES-18d. PRG-7 and SET-1 are pulled in where DES-13 and DES-16 need them. GAME-1c, Treasure Path's screen, waits on FB-1, which waits on the DES-8/DES-10 layout
+- **Now:** DES-7b: kit, part 2, play (Choice, ListenCue, SpeechBubble, StarRow). DES-7a, the basics, is done (2026-10-11)
+- **Next:** DES-7c, then stop (Alex, 2026-10-11: DES-15, the new Luna, waits for the restyle). Stage 5 after that, per "Order to finish the epic" in `epics/DES.md`. OPS-9 (know-how checks onto `data-shot`) can start any time: the checks lost their last class names with DES-18d. PRG-7 and SET-1 are pulled in where DES-13 and DES-16 need them. GAME-1c, Treasure Path's screen, waits on FB-1, which waits on the DES-8/DES-10 layout
 
 ## Epics
 
@@ -97,8 +97,7 @@ In board order. A new epic gets its file in `epics/` first, then a link here
 | ID | Title | Type | P | Size | Status |
 |---|---|---|---|---|---|
 | **DES** | **Design system & layout** | Epic | **P0** | | |
-| DES-7a | Kit, part 1: the basics | Story | P0 | M | In progress |
-| DES-7b | Kit, part 2: play | Story | P0 | M | Todo |
+| DES-7b | Kit, part 2: play | Story | P0 | M | In progress |
 | DES-7c | Kit, part 3: progress and rewards | Story | P0 | M | Todo |
 | DES-15 | Draw the chosen Ms. Luna | Story | P0 | M | Todo |
 | DES-8 | One set of chrome | Story | P0 | M | Todo |
@@ -118,6 +117,7 @@ In board order. A new epic gets its file in `epics/` first, then a link here
 | DES-16 | Light and dark mode | Story | P1 | M | Todo |
 | DES-17 | The moon visits for big milestones | Story | P1 | M | Todo |
 | DES-14 | Feed Luna's cookies look like real, different cookies | Story | P2 | S | Todo |
+| DES-26 | Make the arch radius work at any size | Task | P2 | S | Todo |
 | **FB** | **Shell feedback & hints** | Epic | **P0** | | |
 | FB-1 | One answer-feedback path in GameShell | Story | P0 | M | Todo |
 | FB-2 | "Show me" after repeated misses | Story | P0 | S | Todo |

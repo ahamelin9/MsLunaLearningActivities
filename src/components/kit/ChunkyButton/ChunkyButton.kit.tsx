@@ -22,6 +22,13 @@ export default function ChunkyButtonKit() {
               </Specimen>
             ))}
           </Specimens>
+          <Specimens title={`accent · ${size}`}>
+            {STATES.map(s => (
+              <Specimen key={s.label} label={s.label}>
+                <ChunkyButton variant="accent" size={size} icon="ear" {...s.props}>Hear my clue</ChunkyButton>
+              </Specimen>
+            ))}
+          </Specimens>
           <Specimens title={`secondary · ${size}`}>
             {STATES.map(s => (
               <Specimen key={s.label} label={s.label}>

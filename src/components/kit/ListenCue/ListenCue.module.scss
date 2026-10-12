@@ -1,0 +1,85 @@
+// ListenCue (DES-7b): component tokens first; found swaps only these. The
+// arch and its ripple share one grid cell, so nothing needs positioning.
+
+@use 'styles/mixins' as *;
+
+.root {
+  --cue-bg: var(--card);
+  --cue-border: var(--action);
+  --cue-border-style: dashed;
+  --cue-ink: var(--accent-text);
+  --cue-motion: var(--motion-glow); // the slow "listen" pulse
+  --cue-width: calc(var(--space-16) * 3);
+  --cue-height: calc(var(--space-16) * 3 + var(--space-6));
+  // the arch from its own width: a half-circle top on card corners. Not
+  // --radius-arch, whose 999px tops shrink its bottom corners to ~2px (DES-26)
+  --cue-radius: calc(var(--cue-width) / 2) calc(var(--cue-width) / 2) var(--radius-card) var(--radius-card);
+
+  display: inline-grid;
+
+  > * {
+    grid-area: 1 / 1;
+  }
+}
+
+.arch {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+  width: var(--cue-width);
+  height: var(--cue-height);
+  border: var(--border-thick) var(--cue-border-style) var(--cue-border);
+  border-radius: var(--cue-radius);
+  background: var(--cue-bg);
+  color: var(--cue-ink);
+  animation: var(--cue-motion);
+  transition:
+    background-color var(--dur-quick) var(--ease-standard),
+    border-color var(--dur-quick) var(--ease-standard);
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+.mark {
+  font: var(--text-cue);
+}
+
+.small {
+  font: var(--text-label-small);
+  color: var(--ink-soft);
+}
+
+.answer {
+  font: var(--text-answer-letter);
+}
+
+.root[data-kind='word'] .answer {
+  font: var(--text-answer-word);
+}
+
+// tapped: a halo grows out from the arch and fades, once
+.ripple {
+  border-radius: var(--cue-radius);
+  pointer-events: none;
+  animation: var(--motion-glow);
+  animation-duration: var(--dur-celebrate);
+  animation-iteration-count: 1;
+  animation-fill-mode: both;
+}
+
+// found: the answer in the right colours, with the shared pop
+.root[data-state~='found'] {
+  --cue-bg: var(--right-soft);
+  --cue-border: var(--right);
+  --cue-border-style: solid;
+  --cue-ink: var(--right-text);
+  --cue-motion: var(--motion-pop);
+
+  .small {
+    color: var(--right-text);
+  }
+}

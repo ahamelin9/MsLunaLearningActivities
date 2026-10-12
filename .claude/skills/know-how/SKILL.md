@@ -249,6 +249,37 @@ Pitfalls that cost time:
   pixel of a copied run with `pixel-poke.cjs` in this folder: 9 per channel
   shows up as 1 pixel, 8 doesn't.
 
+## Proving no screen changed when nobody took a "before"
+
+*2026-10-11 · DES-7a*
+
+- **Symptom:** a ticket that shouldn't change any screen (a new kit component,
+  a mixin edit) is already built, and there's no `screenshots/before/` from
+  the last commit to diff against.
+- **Cause:** `ui:shots` shoots the tree it lives in, so it can't shoot the old
+  code once the working tree has moved on. `git stash` would do it, but Claude
+  doesn't touch git state.
+- **Fix:** shoot an unpacked copy of the last commit, and borrow the repo's
+  `node_modules`:
+
+  ```bash
+  git archive HEAD | tar -x -C <scratch>/head
+  ln -s "$PWD/node_modules" <scratch>/head/node_modules
+  (cd <scratch>/head && node scripts/ui/shots.mjs --label before)
+  cp -R <scratch>/head/screenshots/before screenshots/before
+  npm run ui:shots -- --label after
+  npm run ui:shots -- --diff before after
+  ```
+
+  Running them one after the other is safe: each run starts its own Vite on a
+  free port.
+- **Check:** "0 changed screens at 4 sizes". The kit's own behaviour (press,
+  Modal, focus ring) is `kit-check.mjs` in this folder, against Vite on 5199.
+  Pitfall in a focus check: after a dialog closes and focus falls back to
+  `<body>`, Tab carries on from where the dialog was, not from the top of the
+  page, and a click elsewhere earlier in the script moves focus too. Read
+  `document.activeElement` straight after the step you're testing.
+
 ## A reduced-motion check says animations still run, but nothing moves
 
 *2026-10-11 · DES-6*

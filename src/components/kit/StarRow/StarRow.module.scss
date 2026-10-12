@@ -1,0 +1,42 @@
+// StarRow (DES-7b): component tokens first. The star is the Icon's drawing;
+// an earned one takes the illustration palette's star colours.
+
+.root {
+  --star-size: var(--space-12);
+  --star-fill: var(--well);
+  --star-edge: var(--soil-deep); // an empty star still shows on cream and oat
+  --star-stroke: 1.2; // the Done board's line, in the 24 grid's units
+  --star-gap: var(--space-2);
+  --star-stagger: calc(var(--dur-tap) * 1.25); // between one star landing and the next
+
+  display: inline-flex;
+  gap: var(--star-gap);
+}
+
+.root[data-size='24'] {
+  --star-size: var(--space-6);
+  --star-stroke: 2;
+  --star-gap: var(--space-1);
+}
+
+.star {
+  width: var(--star-size);
+  height: var(--star-size);
+  fill: var(--star-fill);
+  stroke: var(--star-edge);
+  stroke-width: var(--star-stroke);
+  stroke-linejoin: round;
+
+  &[data-state='earned'] {
+    fill: var(--illo-star);
+    stroke: var(--illo-star-edge);
+  }
+}
+
+// landing: each earned star pops in after the one before
+.root[data-state='landing'] .star[data-state='earned'] {
+  animation: var(--motion-pop);
+  animation-duration: var(--dur-celebrate);
+  animation-delay: calc(var(--star-stagger) * var(--i));
+  animation-fill-mode: both;
+}

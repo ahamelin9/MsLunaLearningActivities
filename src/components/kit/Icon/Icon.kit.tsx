@@ -14,7 +14,7 @@ export default function IconKit() {
         ))}
       </Specimens>
       <Specimens title="Sizes">
-        {([16, 20, 24, 32] as const).map(size => (
+        {([16, 20, 24, 32, 40] as const).map(size => (
           <Specimen key={size} label={String(size)}><Icon name="clock" size={size} /></Specimen>
         ))}
         <Specimen label="star, filled"><Icon name="star" size={32} filled /></Specimen>

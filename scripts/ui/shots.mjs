@@ -626,7 +626,8 @@ async function shoot(label, reduced = false) {
 /**
  * The Kit page (DES-20), light and dark, as full-page shots at 1180×820 in
  * screenshots/<label>/kit/: the Tokens tab as {light,dark}.png and the
- * Components tab as components-{light,dark}.png (DES-7a). Only that folder is
+ * Components tab as components-{light,dark}.png (DES-7a). One-off animations
+ * are shown at their end and loops at their start (DES-7b). Only that folder is
  * replaced, so the kit can sit beside a label's screens, and --diff compares it
  * like another size.
  */
@@ -650,6 +651,13 @@ async function shootKit(label) {
       const file = tab === 'tokens' ? `${mode}.png` : `${tab}-${mode}.png`;
       await page.goto(`${url}?kit&tab=${tab}&mode=${mode}`, { waitUntil: 'networkidle0' });
       await page.waitForSelector(at('kit-page'));
+      // one-off animations (a pop, stars landing) show their end, loops their start
+      await page.evaluate(() => {
+        for (const a of document.getAnimations()) {
+          const { iterations, endTime } = a.effect.getComputedTiming();
+          if (iterations !== Infinity) a.currentTime = endTime;
+        }
+      });
       await page.evaluate(() => document.fonts.ready.then(() => new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)))));
       await page.screenshot({ path: join(outDir, file), fullPage: true });
       console.log(`  kit  ${file}`);

@@ -8,3 +8,7 @@ export { PaperCard } from './PaperCard/PaperCard';
 export { Chip, TimeChip } from './Chip/Chip';
 export { Tile } from './Tile/Tile';
 export { Modal } from './Modal/Modal';
+export { Choice, type ChoiceState } from './Choice/Choice';
+export { ListenCue } from './ListenCue/ListenCue';
+export { SpeechBubble } from './SpeechBubble/SpeechBubble';
+export { StarRow } from './StarRow/StarRow';
