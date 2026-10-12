@@ -72,8 +72,8 @@ be pulled into Phase 1 for a break from styling.
 
 ### Now / Next
 
-- **Now:** DES-8: one set of chrome, the start of Stage 5. Stage 4's kit is done (DES-7a–c, 2026-10-11): 14 components on the Kit page, none used by a screen yet. DES-15, the new Luna, waits for the restyle (Alex, 2026-10-11)
-- **Next:** DES-10, then DES-15 before DES-9a: DES-9a, DES-9c and DES-12 need the new Luna. The rest of Stage 5 per "Order to finish the epic" in `epics/DES.md`. OPS-9 (know-how checks onto `data-shot`) can start any time: the checks lost their last class names with DES-18d. PRG-7 and SET-1 are pulled in where DES-13 and DES-16 need them. GAME-1c, Treasure Path's screen, waits on FB-1, which waits on the DES-8/DES-10 layout
+- **Now:** DES-8: one set of chrome, the start of Stage 5. Stage 4's kit is done (DES-7a–c, 2026-10-11): 14 components on the Kit page, none used by a screen yet
+- **Next:** DES-10, then DES-15 (the new Luna, moved into Stage 5: DES-9a, DES-9c and DES-12 need her), then DES-9a → DES-9b → DES-9c → DES-12, per "Order to finish the epic" in `epics/DES.md`. OPS-9 (know-how checks onto `data-shot`) can start any time: the checks lost their last class names with DES-18d. PRG-7 and SET-1 are pulled in where DES-13 and DES-16 need them. GAME-1c, Treasure Path's screen, waits on FB-1, which waits on the DES-8/DES-10 layout
 
 ## Epics
 
