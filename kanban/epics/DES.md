@@ -48,7 +48,7 @@ them in.
 | 1 | Guardrails | DES-25 (done 2026-10-10) | Claude gets the right standards before any UI edit; people get a pre-commit check |
 | 2 | Structure (pure refactors, nothing looks different) | DES-18a–e (done 2026-10-11) | Screenshots you can compare; one folder per page, game and lesson; CSS modules; `games.scss` gone |
 | 3 | Foundations | DES-3 → DES-19 → DES-20 → DES-4 → DES-5 → DES-6 (done 2026-10-11) | Tokens in light and dark; lint enforces the rules after every edit; the Kit page; Andika and Fraunces offline; shared motion; reduced motion |
-| 4 | The kit | DES-7a, DES-7b (done 2026-10-11) → DES-7c → DES-15 | Every kit component on the Kit page in every state, and the new Luna |
+| 4 | The kit | DES-7a, DES-7b, DES-7c (done 2026-10-11) → DES-15 (waits for the restyle, Alex 2026-10-11; due before DES-9a) | Every kit component on the Kit page in every state, and the new Luna |
 | 5 | Frame and shell | DES-8 → DES-10 → DES-9a → DES-9b → DES-9c → DES-12 | One header, the layout grid, the restyled home, Settings, trophies and Grade Select; one Luna per screen |
 | 6 | The library | DES-21 → **PRG-7 (pulled in)** → DES-13 | The library as on the board: lessons in order, one bar |
 | 7 | Play | DES-22a → DES-11 → DES-22b, DES-22c → DES-23 | GameShell, all 8 games and all 8 lesson types on the kit, with one right/wrong language |
@@ -66,19 +66,6 @@ them in.
 - **DES-14** (P2) touches the same folder as DES-22b and can slot in straight after it.
 - **P0 bugs** can still be pulled in between tickets for a break from styling.
 
-
-### DES-7c · Kit, part 3: progress and rewards
-Story · P0 · M · needs: —
-- **Why:** DES-13 (one bar, lessons in order), PRG-5 (squishies), PRG-6 (times) and PRG-7 (locked lessons) all need these pieces drawn once.
-- **This part** (the kit rules in `docs/design-system/components.md`, as DES-7a built them):
-  - **ProgressBar:** the lessons size, with segments and "N of M lessons done", and the rounds size for a lesson's top bar. The count comes from the data, never from the design.
-  - **LessonCard:** done (check badge, "took N min"), up next (glowing border, "Up next" tag that stays centred with reduced motion, "about N min", a thin rounds bar once started) and locked (dashed, lock badge, "about N min", a wobble on tap).
-  - **Squishy:** the kinds on the boards (squish ball, mochi cat, bunny, bear, butter block, peach, cloud, little moon) in usual, rare and super-rare colours from `_illustration.scss`. It squishes on tap. A not-found squishy shows as a greyed ghost, a harder one as a "?" slot, and a rarity tag can shimmer. Colour dots show found, grey (a usual colour still to find) and "?" (a rare one still to find).
-- **Complete when:**
-  - every state of each component shows in light and dark on the Kit page;
-  - the Squishy's colours come only from `_illustration.scss`;
-  - `components/kit` is still at zero;
-  - Alex OKs the Kit page shots.
 
 ### DES-8 · One set of chrome
 Story · P0 · M · needs: —
@@ -162,7 +149,7 @@ Story · P1 · S · needs: DES-9c, DES-15
 - **Complete when:** no screen shows two owls, and the moon appears only during a milestone visit.
 
 ### DES-13 · Lesson path on the hub: in order, one bar
-Story · P1 · S · needs: DES-7c, DES-10, PRG-7
+Story · P1 · S · needs: DES-10, PRG-7
 - **Why:** the teacher found seeds to flowers too confusing and picked "One bar" from the round 2 Progress board (2026-10-10). Lessons now go in order (PRG-7), so each one only needs to say done, up next or locked.
 - **How:** as on the round 2 Library, Round and Done boards:
   - **The bar:** one bar above the lessons, one segment per lesson, with "N of 6 lessons done". It fills as each lesson is done.

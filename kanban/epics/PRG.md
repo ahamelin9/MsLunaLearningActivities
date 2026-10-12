@@ -30,7 +30,7 @@ Story · P2 · S · needs: PRG-3, PRG-5, DES-17
 - **Complete when:** with one squishy missing, no screen hints at the trophy; collecting the last one unlocks it, Luna says her line, the milestone moon visits once, and it stays in the Trophy room after a reload.
 
 ### PRG-5 · Squishies instead of the sticker tin
-Story · P1 · M · needs: DES-7c
+Story · P1 · M · needs: —
 - **Why:** the teacher wants the collectible to be squishies rather than emoji stickers (2026-10-09): squish balls, mochi animals, butter blocks and the like, with rare colours too. Today's tin is 18 emoji (`engine/stickers.ts`).
 - **How:**
   - Replace the emoji with drawn squishies in the DES-2 style, generic shapes with no brand names or logos (round squish ball, mochi cat, bunny and bear, butter block, dumpling, peach, cloud, a little moon, and so on).
@@ -42,6 +42,7 @@ Story · P1 · M · needs: DES-7c
   - Tapping a squishy on the shelf squishes it and Luna says its line (pre-rendered). With reduced motion it gives a small press instead.
   - Old saves keep their count: each sticker id maps to a squishy, so no child loses anything. The saved field can stay `stickers`.
   - Lessons and games keep their signature reward (`SIGNATURE_STICKER` in `engine/lessons.ts`, `nextSticker` in `engine/stickers.ts`).
+  - **Built from the kit (DES-7c):** `Squishy`, `SquishyDots` and the Chip's `rare`/`super-rare` tags with `shimmer`. The kit draws eight kinds in the seven palette colours that have outlines (oat, caramel, toffee, cream; blush, butter; honey). Still to add here: outline colours for cocoa, sage, sky and lilac (Alex OKs them on the Kit page), the super-rare swirl, more kinds (dumpling…), and the small press under reduced motion, where the kit's squish is simply off.
 - **Complete when:**
   - no emoji appears on the shelf, the reward screen or the home screen;
   - finishing a lesson or game puts a squishy on the shelf;

@@ -84,9 +84,13 @@ build only what the ticket asks.
 ### Add a kit component
 Follow "Adding a component" in `components.md`:
 1. Make the folder with `<Name>.tsx` (with its header comment),
-   `.module.scss` (tokens first) and `.kit.tsx` (every state).
+   `.module.scss` (tokens first) and `.kit.tsx` (every state, laid out with
+   `Specimens`/`Specimen` from `src/dev/KitPage/Specimen.tsx`; a pressed
+   state is held with `data-state="pressed"`).
 2. Export it from `kit/index.ts`.
 3. Check it on the Kit page in light and dark, then run `npm run lint`.
+   Add its behaviour (taps, motion, reduced motion) to
+   `.claude/skills/know-how/kit-check.mjs`, and watch a check fail once.
 4. Add it to the table in `components.md`.
 
 ### Build or restyle a screen
@@ -119,7 +123,13 @@ changed screens.
   `node scripts/design/check.mjs <file>` lists one file's raw values with hints.
 - `npm run design:status`: what's left per area and folder.
 - The Kit page, light and dark side by side: `npm run dev`, open `/?kit`
-  (DES-20). `npm run ui:shots -- --kit --label <name>` saves it in both modes.
+  (DES-20). `npm run ui:shots -- --kit --label <name>` saves both tabs in both
+  modes. With Vite on 5199, `node .claude/skills/know-how/kit-sections.mjs
+  <outDir> <Name>…` gives close-ups of components, and `kit-check.mjs` next
+  to it checks the kit's behaviour in a browser (DES-7a–c).
+- A ticket that should change no screen, with no "before" taken: shoot an
+  unpacked HEAD and `--diff` (know-how, "Proving no screen changed when nobody
+  took a before").
 - `npm run ui:shots -- --reduced-motion`: the same run with Reduce Motion on;
   it fails if any screen keeps moving (DES-6).
 - `npm run ui:shots` at the four iPad sizes, and `--diff` for refactors (from
