@@ -48,7 +48,7 @@ them in.
 | 1 | Guardrails | DES-25 (done 2026-10-10) | Claude gets the right standards before any UI edit; people get a pre-commit check |
 | 2 | Structure (pure refactors, nothing looks different) | DES-18a–e (done 2026-10-11) | Screenshots you can compare; one folder per page, game and lesson; CSS modules; `games.scss` gone |
 | 3 | Foundations | DES-3 → DES-19 → DES-20 → DES-4 → DES-5 → DES-6 (done 2026-10-11) | Tokens in light and dark; lint enforces the rules after every edit; the Kit page; Andika and Fraunces offline; shared motion; reduced motion |
-| 4 | The kit | DES-7a (done 2026-10-11) → DES-7b, DES-7c → DES-15 | Every kit component on the Kit page in every state, and the new Luna |
+| 4 | The kit | DES-7a, DES-7b (done 2026-10-11) → DES-7c → DES-15 | Every kit component on the Kit page in every state, and the new Luna |
 | 5 | Frame and shell | DES-8 → DES-10 → DES-9a → DES-9b → DES-9c → DES-12 | One header, the layout grid, the restyled home, Settings, trophies and Grade Select; one Luna per screen |
 | 6 | The library | DES-21 → **PRG-7 (pulled in)** → DES-13 | The library as on the board: lessons in order, one bar |
 | 7 | Play | DES-22a → DES-11 → DES-22b, DES-22c → DES-23 | GameShell, all 8 games and all 8 lesson types on the kit, with one right/wrong language |
@@ -66,20 +66,6 @@ them in.
 - **DES-14** (P2) touches the same folder as DES-22b and can slot in straight after it.
 - **P0 bugs** can still be pulled in between tickets for a break from styling.
 
-
-### DES-7b · Kit, part 2: play
-Story · P0 · M · needs: —
-- **Why:** answer buttons are styled six separate ways today (`lesson-choice`, `cookie`, `treasure-option`, `missing-choice`, `story-answer`, `word-tile`), with two different wrong shakes and no "revealed" state.
-- **This part** (the kit rules in `docs/design-system/components.md`, as DES-7a built them):
-  - **Choice**, the one answer button: letter, word or picture, in the states idle, pressed, wrong, right, revealed (for FB-2: a dashed accent ring with a soft accent fill, for Alex to OK), and faded/disabled. Sizes follow the target and type roles: answer letters 48px or more, words 32px or more, targets 64px or more with 12px between them.
-  - **ListenCue**, the "?" arch: waiting (dashed action border, ear, "?", "tap to listen", a slow pulse), tapped (a ripple), and found (right-soft, the answer, "found it!").
-  - **SpeechBubble:** tail left or bottom, with an optional "Hear my clue" button.
-  - **StarRow:** 0 to 3 stars, which can animate in.
-- **Complete when:**
-  - every state of each component shows in light and dark on the Kit page;
-  - wrong uses the shared wobble and right the shared pop (DES-5);
-  - `components/kit` is still at zero;
-  - Alex OKs the revealed state.
 
 ### DES-7c · Kit, part 3: progress and rewards
 Story · P0 · M · needs: —
@@ -157,7 +143,7 @@ Story · P0 · M · needs: —
   - no media query outside the breakpoint mixin.
 
 ### DES-11 · One right/wrong/reveal visual language
-Story · P1 · S · needs: DES-7b, DES-22a
+Story · P1 · S · needs: DES-22a
 - **How:** use the same right glow, wrong wobble, win veil and "revealed" style (for FB-2) in every game and lesson, through `Choice` and the shell's flash. Game pieces that aren't Choices (bubbles, cookies, bugs, memory cards, word tiles) use the same state roles, `data-state` and motion. The games and lessons adopt it in DES-22b, DES-22c and DES-23.
   - **A win grows flowers (Alex, 2026-10-09):** a solved round grows a few flowers up the sides of the stage, and petals fall instead of confetti, as on the round 2 Round board. The lesson-done screen uses the same petals. Flowers and petals never cover the answer choices or block the next tap. **Kept for now (Alex, 2026-10-10):** the teacher dropped flowers for progress (DES-13), not for wins; change this only if she asks.
 - **Complete when:**
@@ -275,7 +261,7 @@ Story · P1 · M · needs: DES-8, DES-10
   - Alex OKs the shots.
 
 ### DES-22a · GameShell on the kit: start, stage, perch, reward
-Story · P1 · M · needs: DES-7b, DES-8
+Story · P1 · M · needs: DES-8
 - **Why:** every game's start screen is the same centred card with a green that belongs to neither palette, and the reward screen predates the round 2 Done board.
 - **How:**
   - **Start screen:** built from the kit. No board shows it, so Alex OKs it.
@@ -308,7 +294,7 @@ Story · P1 · M · needs: DES-11, DES-22a
   - they're checked in light and dark at the four sizes.
 
 ### DES-23 · Lessons on the kit
-Story · P1 · M · needs: DES-7b, DES-11
+Story · P1 · M · needs: DES-11
 - **How:**
   - All 8 lesson types use Choice, ListenCue, SpeechBubble and PaperCard.
   - The shared `lessons/shared` module shrinks to layout only.

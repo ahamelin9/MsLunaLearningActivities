@@ -1,0 +1,121 @@
+// LessonCard (DES-7c): component tokens first; the three states swap only
+// these. The badge and the "Up next" tag overhang the top edge.
+
+@use 'styles/mixins' as *;
+
+.root {
+  --lesson-bg: var(--card);
+  --lesson-border: var(--edge);
+  --lesson-border-width: var(--border-regular);
+  --lesson-border-style: solid;
+  --lesson-edge: var(--edge);
+  --lesson-ledge: var(--ledge-small);
+  --lesson-number: var(--ink-soft);
+  --lesson-title: var(--ink);
+  --lesson-motion: none;
+
+  @include press(var(--lesson-ledge), var(--lesson-edge));
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+  min-height: calc(var(--space-16) * 2 + var(--space-6));
+  padding: var(--space-5) var(--space-2) var(--space-3);
+  border: var(--lesson-border-width) var(--lesson-border-style) var(--lesson-border);
+  border-radius: var(--radius-card);
+  background: var(--lesson-bg);
+  color: var(--lesson-title);
+  text-align: center;
+  animation: var(--lesson-motion);
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+.number {
+  font: var(--text-tag);
+  letter-spacing: var(--tracking-tag);
+  text-transform: uppercase;
+  color: var(--lesson-number);
+}
+
+.title {
+  font: var(--text-label-small);
+}
+
+.rounds {
+  align-self: stretch;
+  margin: var(--space-1) var(--space-3) 0;
+}
+
+.time {
+  margin-top: auto;
+}
+
+// centred by its own margins, not a transform, so reduced motion can't move it
+.tag {
+  position: absolute;
+  top: calc(var(--space-4) * -1);
+  left: 0;
+  right: 0;
+  width: max-content;
+  margin-inline: auto;
+}
+
+.badge {
+  position: absolute;
+  top: calc(var(--space-3) * -1);
+  right: var(--space-3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--space-8);
+  height: var(--space-8);
+  border-radius: var(--radius-chip);
+
+  &[data-variant='done'] {
+    background: var(--right);
+    color: var(--right-ink);
+  }
+
+  &[data-variant='locked'] {
+    border: var(--border-regular) solid var(--edge);
+    background: var(--card);
+    color: var(--ink-soft);
+  }
+}
+
+// ── states ─────────────────────────────────────────────────────────────────
+.root[data-state~='done'] {
+  --lesson-number: var(--right-text);
+}
+
+// the glowing border on the one lesson to play next
+.root[data-state~='next'] {
+  --lesson-border: var(--action);
+  --lesson-border-width: var(--border-thick);
+  --lesson-ledge: 0;
+  --lesson-edge: transparent;
+  --lesson-number: var(--accent-text);
+  --lesson-motion: var(--motion-glow);
+}
+
+.root[data-state~='locked'] {
+  --lesson-bg: var(--well);
+  --lesson-border-style: dashed;
+  --lesson-ledge: 0;
+  --lesson-edge: transparent;
+  --lesson-title: var(--ink-soft);
+
+  cursor: default;
+
+  &:active {
+    transform: none;
+  }
+}
+
+.root[data-state~='wobbling'] {
+  --lesson-motion: var(--motion-wobble);
+}

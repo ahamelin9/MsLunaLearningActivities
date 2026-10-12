@@ -72,8 +72,8 @@ be pulled into Phase 1 for a break from styling.
 
 ### Now / Next
 
-- **Now:** DES-7b: kit, part 2, play (Choice, ListenCue, SpeechBubble, StarRow). DES-7a, the basics, is done (2026-10-11)
-- **Next:** DES-7c, then stop (Alex, 2026-10-11: DES-15, the new Luna, waits for the restyle). Stage 5 after that, per "Order to finish the epic" in `epics/DES.md`. OPS-9 (know-how checks onto `data-shot`) can start any time: the checks lost their last class names with DES-18d. PRG-7 and SET-1 are pulled in where DES-13 and DES-16 need them. GAME-1c, Treasure Path's screen, waits on FB-1, which waits on the DES-8/DES-10 layout
+- **Now:** DES-7c: kit, part 3, progress and rewards (ProgressBar, LessonCard, Squishy). DES-7a and DES-7b are done (2026-10-11)
+- **Next:** stop after DES-7c (Alex, 2026-10-11: DES-15, the new Luna, waits for the restyle). Stage 5 after that, per "Order to finish the epic" in `epics/DES.md`. OPS-9 (know-how checks onto `data-shot`) can start any time: the checks lost their last class names with DES-18d. PRG-7 and SET-1 are pulled in where DES-13 and DES-16 need them. GAME-1c, Treasure Path's screen, waits on FB-1, which waits on the DES-8/DES-10 layout
 
 ## Epics
 
@@ -97,8 +97,7 @@ In board order. A new epic gets its file in `epics/` first, then a link here
 | ID | Title | Type | P | Size | Status |
 |---|---|---|---|---|---|
 | **DES** | **Design system & layout** | Epic | **P0** | | |
-| DES-7b | Kit, part 2: play | Story | P0 | M | In progress |
-| DES-7c | Kit, part 3: progress and rewards | Story | P0 | M | Todo |
+| DES-7c | Kit, part 3: progress and rewards | Story | P0 | M | In progress |
 | DES-15 | Draw the chosen Ms. Luna | Story | P0 | M | Todo |
 | DES-8 | One set of chrome | Story | P0 | M | Todo |
 | DES-10 | Layout grid and breakpoints | Story | P0 | M | Todo |

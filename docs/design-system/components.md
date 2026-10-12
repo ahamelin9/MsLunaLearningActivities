@@ -35,16 +35,16 @@ list. Restyling the app means changing these, not every screen. The Kit page
 | `Icon` | The drawn icon set: round-capped strokes in `currentColor`, no colour of its own | check, clock, lock, unlock, chevron and arrow left/right, home, speaker, mute, ear, replay, gear, info, book, dice, play, star, sparkle, close, trophy, lightbulb; sizes 16, 20, 24, 32; filled | DES-7a (done) |
 | `ChunkyButton` | The pressable button with a hard ledge | action, accent (Luna's own: "Hear my clue", Luna's Pick), secondary, quiet (dashed), icon; sizes 48 and 64; an icon before or after the words; pressed, disabled | DES-7a (done), accent DES-7b |
 | `PaperCard` | The card surface | flat, card, lifted | DES-7a (done) |
-| `Chip` | A small pill: tag, count or time | time ("about 5 min"), took ("took 4 min"), accent ("Up next", "12 min today"), count (stars). `TimeChip` is a preset: `minutes`, `took`, `highlight` | DES-7a (done) |
+| `Chip` | A small pill: tag, count or time | time ("about 5 min"), took ("took 4 min"), accent ("Up next", "12 min today"), count (stars), rare and super-rare (a squishy's colour tag, with `shimmer`); `ground="well"` for a chip on a well. `TimeChip` is a preset: `minutes`, `took`, `highlight` | DES-7a (done), rarity tags DES-7c |
 | `Tile` | A card with a picture area and a name | the Play Shelf's games; picture tints 1–5; pressed | DES-7a (done) |
 | `Modal` | A lifted card over a dimmed screen, with a 48px close button | grown-up screens (Settings, trophies); open, closed. The one kit root with its own position (fixed); not in a portal, so it keeps its screen's mode | DES-7a (done) |
 | `Choice` | **The only answer button** | letter, word, picture × idle, pressed, wrong, right, revealed, faded/disabled. Controlled: the screen sets `state` and clears `wrong` with `afterMotion('emphasis', …)`. A picture's `caption` is passed only once solved | DES-7b (done) |
 | `ListenCue` | The "?" arch that holds the target's place | waiting (a slow glow), tapped (the glow once, as a ripple), found; a letter or a word. It renders its `answer` only when found | DES-7b (done) |
 | `SpeechBubble` | Luna's line in a card with a tail | tail left or bottom; optional "Hear my clue" button (`onClue`) | DES-7b (done) |
 | `StarRow` | 0 to 3 stars | 24 or 48; still, or landing one by one (`animate`); earned stars in `--illo-star` | DES-7b (done) |
-| `ProgressBar` | One bar in segments | lessons (with "N of M lessons done"), rounds (thin, for a lesson's top bar) | DES-7c |
-| `LessonCard` | A lesson on the library | done, up next (with a rounds bar once started), locked (wobbles on tap) | DES-7c |
-| `Squishy` | A collectible squishy | the kinds on the boards; usual, rare, super rare; squish; ghost; "?" slot; colour dots | DES-7c |
+| `ProgressBar` | One bar in segments | lessons (with "N of M lessons done"), rounds (thin, for a lesson's top bar and the up-next card). `done` and `total` come from the data; the fill grows with the soft spring | DES-7c (done) |
+| `LessonCard` | A lesson on the library | done (check badge, "took N min"), up next (glowing border, a centred "Up next" tag, "about N min", a rounds bar once started), locked (dashed on the well, lock badge, wobbles on tap and doesn't sink); pressed | DES-7c (done) |
+| `Squishy` | A collectible squishy | ball, cat, bunny, bear, butter block, peach, cloud, little moon; oat, caramel, toffee, cream (usual), blush, butter (rare, a sparkle), honey (super rare, a gold sparkle); sizes 64, 96, 128; squishes on tap; ghost (its shape, greyed) and "?" slot wobble; `SquishyDots` for the colours found and still to find. Its colours come only from `_illustration.scss` | DES-7c (done) |
 | `Luna` | Ms. Luna, the owl | 8 moods (idle, happy, cheer, think, oops, surprise, listen, sleepy); blink; talking | DES-15 |
 | `MilestoneMoon` | The crescent moon with glasses who visits for big milestones | happy, cheer, talking | DES-17 |
 

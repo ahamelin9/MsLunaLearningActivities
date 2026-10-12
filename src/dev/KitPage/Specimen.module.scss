@@ -18,11 +18,17 @@
   align-items: flex-start;
   gap: var(--space-4);
 
-  &[data-variant='card'] {
+  &[data-variant='card'],
+  &[data-variant='well'] {
     padding: var(--space-3);
     border: var(--border-regular) solid var(--edge);
     border-radius: var(--radius-card);
     background: var(--card);
+  }
+
+  &[data-variant='well'] {
+    border-style: dashed;
+    background: var(--well);
   }
 }
 
@@ -34,6 +40,11 @@
 
   &[data-variant='wide'] {
     flex: 1 1 18em;
+
+    // what's in it takes the width too (a bar, a card)
+    .sample > * {
+      flex: 1;
+    }
   }
 
   // a box of its own: the transform makes it the containing block for a fixed

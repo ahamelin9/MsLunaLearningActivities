@@ -12,3 +12,6 @@ export { Choice, type ChoiceState } from './Choice/Choice';
 export { ListenCue } from './ListenCue/ListenCue';
 export { SpeechBubble } from './SpeechBubble/SpeechBubble';
 export { StarRow } from './StarRow/StarRow';
+export { ProgressBar } from './ProgressBar/ProgressBar';
+export { LessonCard } from './LessonCard/LessonCard';
+export { Squishy, SquishyDots, type SquishyColour, type SquishyKind } from './Squishy/Squishy';

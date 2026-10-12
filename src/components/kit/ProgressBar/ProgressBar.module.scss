@@ -1,0 +1,61 @@
+// ProgressBar (DES-7c): component tokens first; the sizes swap only these.
+// The fill and the segment ticks are placed by share (0–1) from the data.
+
+.root {
+  --bar-height: var(--space-6);
+  --bar-track: var(--well);
+  --bar-edge: var(--edge);
+  --bar-fill: var(--right);
+  --bar-tick: var(--card);
+
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.root[data-size='rounds'] {
+  --bar-height: var(--space-4);
+}
+
+.track {
+  position: relative;
+  flex: 1;
+  min-width: var(--space-16);
+  height: var(--bar-height);
+  overflow: hidden;
+  border: var(--border-regular) solid var(--bar-edge);
+  border-radius: var(--radius-chip);
+  background: var(--bar-track);
+}
+
+.fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: calc(var(--share) * 100%);
+  border-radius: var(--radius-chip);
+  background: var(--bar-fill);
+  transition: width var(--dur-enter) var(--ease-soft-spring);
+}
+
+// one between each segment, in the card colour, so the segments read as steps
+.tick {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: calc(var(--at) * 100%);
+  width: var(--border-thick);
+  transform: translateX(-50%);
+  background: var(--bar-tick);
+}
+
+.count {
+  flex: none;
+  font: var(--text-label-small);
+  color: var(--ink-soft);
+  white-space: nowrap;
+}
+
+.number {
+  font: var(--text-label);
+  color: var(--ink);
+}

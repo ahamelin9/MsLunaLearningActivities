@@ -1,8 +1,10 @@
-// Chip (DES-7a): component tokens first; the variants swap only these.
+// Chip (DES-7a, rarity tags DES-7c): component tokens first; the variants swap
+// only these.
 
 .root {
   --chip-bg: var(--well);
   --chip-ink: var(--ink-soft);
+  --chip-ring: transparent;
   --chip-icon: currentColor;
   --chip-font: var(--text-label-small);
   --chip-pad: var(--space-2);
@@ -13,6 +15,7 @@
   padding: var(--chip-pad) var(--space-3) var(--chip-pad) var(--space-2);
   border-radius: var(--radius-chip);
   background: var(--chip-bg);
+  box-shadow: 0 0 0 var(--border-regular) var(--chip-ring);
   color: var(--chip-ink);
   font: var(--chip-font);
   white-space: nowrap;
@@ -20,6 +23,11 @@
 
 .icon {
   color: var(--chip-icon);
+}
+
+// a time chip on a well (a locked lesson) sits on card, so it still shows
+.root[data-ground='well'] {
+  --chip-bg: var(--card);
 }
 
 .root[data-variant='took'] {
@@ -41,4 +49,42 @@
   --chip-font: var(--text-label);
   --chip-pad: var(--space-3);
   --icon-fill: var(--accent);
+}
+
+// rarity tags: a squishy's rare or super-rare colour, with its sparkle
+.root[data-variant='rare'] {
+  --chip-bg: var(--rare-soft);
+  --chip-ink: var(--rare-text);
+  --chip-ring: var(--rare-edge);
+  --chip-icon: var(--illo-spark-rare-deep);
+  --icon-fill: var(--illo-spark-rare);
+}
+
+.root[data-variant='super-rare'] {
+  --chip-bg: var(--super-rare-soft);
+  --chip-ink: var(--super-rare-text);
+  --chip-ring: var(--super-rare-edge);
+  --chip-icon: var(--illo-spark-super-edge);
+  --icon-fill: var(--illo-spark-super);
+}
+
+// a light sweep across the tag, every loop
+.root[data-shimmer] {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: -60%;
+    width: 40%;
+    background: var(--shine);
+    opacity: 0.6;
+    transform: skewX(-18deg);
+    animation: var(--motion-shimmer);
+    pointer-events: none;
+  }
 }

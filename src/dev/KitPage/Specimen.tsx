@@ -6,19 +6,19 @@
 //     <Specimen label="action"><ChunkyButton variant="action">Play</ChunkyButton></Specimen>
 //   </Specimens>
 //
-// `onCard` sets a row on a card, for pieces that sit on cards on the boards
-// (a chip's --well matches the light ground). `wide` lets a state take a row's
+// `on` sets a row on a card or a well, for pieces that sit on one on the
+// boards (a chip's --well matches the light ground; a locked lesson is a well). `wide` lets a state take a row's
 // spare width; `frame` gives it a box of its own that a fixed overlay (the
 // Modal) fills instead of the whole page.
 
 import type { ReactNode } from 'react';
 import styles from './Specimen.module.scss';
 
-export function Specimens({ title, onCard = false, children }: { title?: string; onCard?: boolean; children: ReactNode }) {
+export function Specimens({ title, on, children }: { title?: string; on?: 'card' | 'well'; children: ReactNode }) {
   return (
     <section className={styles.group}>
       {title && <h4 className={styles.title}>{title}</h4>}
-      <div className={styles.row} data-variant={onCard ? 'card' : undefined}>{children}</div>
+      <div className={styles.row} data-variant={on}>{children}</div>
     </section>
   );
 }

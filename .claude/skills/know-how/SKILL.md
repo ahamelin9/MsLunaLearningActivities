@@ -280,6 +280,36 @@ Pitfalls that cost time:
   page, and a click elsewhere earlier in the script moves focus too. Read
   `document.activeElement` straight after the step you're testing.
 
+## An arch comes out with square bottom corners
+
+*2026-10-11 · DES-7b (DES-26)*
+
+- **Symptom:** something given `border-radius: var(--radius-arch)` has its
+  round top, but its bottom corners look almost square.
+- **Cause:** the token is `999px 999px 22px 22px`. When two neighbouring
+  corners add up to more than the box's side, the browser shrinks every corner
+  by the same factor, so the 22px comes out about 2px. The round 2 board's "?"
+  cue has the same flaw.
+- **Fix:** until DES-26 fixes the token, build the arch from the element's own
+  width: `calc(width / 2) calc(width / 2) var(--radius-card) var(--radius-card)`
+  (ListenCue's `--cue-radius`).
+- **Check:** a close-up with `kit-sections.mjs` in this folder: the bottom
+  corners are as round as a card's.
+
+## In the Kit page shots, a right answer looks smaller than it is
+
+*2026-10-11 · DES-7b*
+
+- **Symptom:** a right Choice or a found ListenCue shows at 90% size in
+  `screenshots/<label>/kit/`.
+- **Cause:** the shots stop every animation at its first frame (so they match
+  run to run), and the shared pop starts at scale 0.9.
+- **Fix:** `shootKit` in `scripts/ui/shots.mjs` jumps one-off animations to
+  their end (`currentTime = endTime`) and leaves loops at their start.
+  `kit-sections.mjs` (close-ups of named Kit page sections, light and dark)
+  does the same.
+- **Check:** a right Choice is the same size as an idle one in the shot.
+
 ## A reduced-motion check says animations still run, but nothing moves
 
 *2026-10-11 · DES-6*

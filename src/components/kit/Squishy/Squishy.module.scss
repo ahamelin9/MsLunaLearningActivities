@@ -1,0 +1,203 @@
+// Squishy (DES-7c): component tokens first; colours and states swap only
+// these. Every colour is from the illustration palette (_illustration.scss),
+// except the ghost, the "?" slot and the dots still to find, which are
+// interface (they show what's missing, not a squishy).
+
+@use 'styles/mixins' as *;
+
+.root {
+  --sq-size: calc(var(--space-16) + var(--space-8));
+  --sq-fill: var(--illo-squishy-oat);
+  --sq-edge: var(--illo-squishy-oat-edge);
+  --sq-top: var(--sq-fill);
+  --sq-motion: none;
+
+  display: inline-grid;
+  place-items: end center;
+  width: var(--sq-size);
+
+  > * {
+    grid-area: 1 / 1;
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+    border-radius: var(--radius-card);
+  }
+}
+
+.root[data-size='64'] { --sq-size: var(--space-16); }
+.root[data-size='128'] { --sq-size: calc(var(--space-16) * 2); }
+
+// ── its colour ─────────────────────────────────────────────────────────────
+.root[data-colour='caramel'] { --sq-fill: var(--illo-squishy-caramel); --sq-edge: var(--illo-squishy-caramel-edge); }
+.root[data-colour='toffee'] { --sq-fill: var(--illo-squishy-toffee); --sq-edge: var(--illo-squishy-toffee-edge); }
+.root[data-colour='cream'] { --sq-fill: var(--illo-squishy-cream); --sq-edge: var(--illo-squishy-cream-edge); }
+.root[data-colour='blush'] { --sq-fill: var(--illo-squishy-blush); --sq-edge: var(--illo-squishy-blush-edge); }
+.root[data-colour='honey'] { --sq-fill: var(--illo-squishy-honey); --sq-edge: var(--illo-squishy-honey-edge); }
+.root[data-colour='butter'] {
+  --sq-fill: var(--illo-squishy-butter);
+  --sq-edge: var(--illo-squishy-butter-edge);
+  --sq-top: var(--illo-squishy-butter-top);
+}
+
+// ── the drawing ────────────────────────────────────────────────────────────
+.art {
+  display: block;
+  transform-origin: 50% 100%;
+  animation: var(--sq-motion);
+}
+
+.drawing {
+  display: block;
+  width: var(--sq-size);
+  height: calc(var(--sq-size) * 0.92); // the drawings' 100 × 92 grid
+}
+
+.body,
+.top {
+  fill: var(--sq-fill);
+  stroke: var(--sq-edge);
+  stroke-width: 3;
+  stroke-linejoin: round;
+}
+
+.top { fill: var(--sq-top); }
+.halfScale { stroke-width: 6; } // the Little Moon is drawn at half scale
+
+.shadow { fill: var(--illo-shadow); }
+.eye { fill: var(--illo-line); }
+
+.mouth {
+  fill: none;
+  stroke: var(--illo-line);
+  stroke-width: 2.4;
+  stroke-linecap: round;
+}
+
+.shine { fill: var(--illo-shine); opacity: 0.7; }
+.muzzle { fill: var(--illo-squishy-muzzle); }
+.innerEar { fill: var(--illo-squishy-ear); opacity: 0.7; }
+.cheek { fill: var(--illo-squishy-cheek); opacity: 0.6; }
+
+.whisker {
+  stroke: var(--sq-edge);
+  stroke-width: 1.8;
+  stroke-linecap: round;
+}
+
+.crease {
+  fill: none;
+  stroke: var(--sq-edge);
+  stroke-width: 2.5;
+  opacity: 0.6;
+}
+
+.leaf {
+  fill: var(--illo-squishy-leaf);
+  stroke: var(--illo-squishy-leaf-edge);
+  stroke-width: 2;
+  stroke-linejoin: round;
+}
+
+// a rare or super-rare colour wears a sparkle that twinkles
+.badge {
+  --icon-fill: var(--illo-spark-rare);
+
+  align-self: start;
+  justify-self: end;
+  color: var(--illo-spark-rare-deep);
+  animation: var(--motion-twinkle);
+
+  &[data-variant='super'] {
+    --icon-fill: var(--illo-spark-super);
+
+    color: var(--illo-spark-super-edge);
+  }
+}
+
+// ── states ─────────────────────────────────────────────────────────────────
+// not found yet: its own shape, greyed, with no face
+.root[data-state~='ghost'] {
+  .body,
+  .top {
+    fill: var(--edge);
+    stroke: none;
+  }
+
+  .shadow,
+  .shine,
+  .eye,
+  .mouth,
+  .muzzle,
+  .innerEar,
+  .cheek,
+  .whisker,
+  .crease,
+  .leaf {
+    display: none;
+  }
+}
+
+// a harder one: a dashed "?" slot
+.slot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: calc(var(--sq-size) * 0.85);
+  height: calc(var(--sq-size) * 0.77);
+  border: var(--border-regular) dashed var(--soil);
+  border-radius: var(--radius-card) var(--radius-card) var(--radius-tile) var(--radius-tile);
+  background: var(--well);
+  color: var(--ink-soft);
+  font: var(--text-display-l);
+}
+
+.root[data-state~='squish'] { --sq-motion: var(--motion-squish); }
+.root[data-state~='wobble'] { --sq-motion: var(--motion-wobble); }
+
+// ── the colour dots ────────────────────────────────────────────────────────
+.dots {
+  display: inline-flex;
+  gap: var(--space-1);
+}
+
+.dot {
+  --dot: var(--illo-squishy-oat);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--space-5);
+  height: var(--space-5);
+  border: var(--border-hair) solid var(--illo-squishy-dot-edge);
+  border-radius: var(--radius-chip);
+  background: var(--dot);
+
+  &[data-colour='caramel'] { --dot: var(--illo-squishy-caramel); }
+  &[data-colour='toffee'] { --dot: var(--illo-squishy-toffee); }
+  &[data-colour='cream'] { --dot: var(--illo-squishy-cream); }
+  &[data-colour='cocoa'] { --dot: var(--illo-squishy-cocoa); }
+  &[data-colour='blush'] { --dot: var(--illo-squishy-blush); }
+  &[data-colour='butter'] { --dot: var(--illo-squishy-butter); }
+  &[data-colour='sage'] { --dot: var(--illo-squishy-sage); }
+  &[data-colour='sky'] { --dot: var(--illo-squishy-sky); }
+  &[data-colour='lilac'] { --dot: var(--illo-squishy-lilac); }
+  &[data-colour='honey'] { --dot: var(--illo-squishy-honey); }
+
+  // a usual colour still to find
+  &[data-colour='grey'] {
+    --dot: var(--edge);
+
+    border-color: var(--edge);
+  }
+
+  // a rare one still to find
+  &[data-colour='rare-unknown'] {
+    --dot: transparent;
+
+    border: var(--border-regular) dashed var(--soil);
+    color: var(--ink-soft);
+    font: var(--text-tag);
+  }
+}

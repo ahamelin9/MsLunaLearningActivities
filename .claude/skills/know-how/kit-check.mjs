@@ -2,9 +2,12 @@
 // disabled button, the Modal (focus in and back, Escape, the X, the dim) and
 // the focus ring. DES-7b: Choice's wrong wobble and right pop (and under
 // reduced motion), ListenCue keeping its answer hidden and rippling, StarRow
-// landing. Start Vite on 5199 first, then from the repo root:
+// landing. DES-7c: ProgressBar's count and fill, LessonCard's states (the
+// "Up next" tag centred even under reduced motion, a locked card wobbling),
+// Squishy's squish, ghost and colours, the shimmering tag.
+// Start Vite on 5199 first, then from the repo root:
 //   node .claude/skills/know-how/kit-check.mjs
-// Exits 1 on any ❌. DES-7c adds its components' checks here.
+// Exits 1 on any ❌.
 import puppeteer from 'puppeteer-core';
 
 const URL = 'http://localhost:5199/?kit&tab=components&mode=light';
@@ -150,6 +153,83 @@ await s.click();
 const rmAnim = await anim(s);
 await sleep(100);
 ok('reduced motion: no wobble, and wrong clears at once', rmAnim === 'none' && (await s.evaluate(e => e.dataset.state)) === undefined, rmAnim);
+
+// ── DES-7c ────────────────────────────────────────────────────────────────
+await page.goto(URL, { waitUntil: 'networkidle0' });
+await page.keyboard.press('Escape');
+const bar = await page.evaluate(() => {
+  const t = [...document.querySelectorAll('[role="progressbar"]')].find(b => b.getAttribute('aria-label') === '3 of 6 lessons done');
+  const fill = t.firstElementChild.getBoundingClientRect().width;
+  const inner = t.clientWidth;
+  return { now: t.getAttribute('aria-valuenow'), max: t.getAttribute('aria-valuemax'), share: fill / inner, ticks: t.children.length - 1 };
+});
+ok('ProgressBar reads its count from the data', bar.now === '3' && bar.max === '6', JSON.stringify(bar));
+ok('the fill is done / total of the track', Math.abs(bar.share - 0.5) < 0.02, bar.share.toFixed(3));
+ok('one tick between each segment', bar.ticks === 5);
+ok('the fill grows with the soft spring', await page.evaluate(() => {
+  const f = document.querySelector('[role="progressbar"]').firstElementChild;
+  const s = getComputedStyle(f);
+  return s.transitionProperty === 'width' && s.transitionDuration === '0.6s' && s.transitionTimingFunction.includes('0.34, 1.3');
+}));
+
+const card = label => page.evaluateHandle(l => [...document.querySelectorAll('button[aria-label^="Lesson"]')].find(b => b.getAttribute('aria-label').includes(l) && !b.dataset.state.includes('pressed')), label);
+const centred = () => page.evaluate(() => {
+  const b = [...document.querySelectorAll('button[aria-label*="up next"]')][0];
+  const tag = [...b.children].find(c => c.textContent === 'Up next');
+  const [a, c] = [tag.getBoundingClientRect(), b.getBoundingClientRect()];
+  return Math.abs((a.left + a.width / 2) - (c.left + c.width / 2));
+});
+ok('the "Up next" tag is centred', (await centred()) < 1, (await centred()).toFixed(2));
+const next = await card('up next');
+ok('up next glows', (await anim(next)) === 'luna-glow');
+const done = await card('done, took 4 minutes');
+ok('done says its time and shows "took 4 min"', (await done.evaluate(b => b.textContent.includes('took 4 min'))));
+const locked = await card('locked');
+await locked.evaluate(el => el.scrollIntoView({ block: 'center' }));
+const lbox = await locked.boundingBox();
+await page.mouse.move(lbox.x + lbox.width / 2, lbox.y + lbox.height / 2);
+await page.mouse.down();
+await sleep(150);
+const lockedPressed = await locked.evaluate(e => getComputedStyle(e).transform);
+await page.mouse.up();
+ok('a locked card doesn\'t sink', lockedPressed === 'none', lockedPressed);
+ok('a tapped locked card wobbles', (await locked.evaluate(e => e.dataset.state)).includes('wobbling') && (await anim(locked)) === 'luna-wobble');
+await sleep(600);
+ok('the wobble clears', !(await locked.evaluate(e => e.dataset.state)).includes('wobbling'));
+await page.evaluate(() => document.documentElement.setAttribute('data-reduced-motion', ''));
+ok('reduced motion: the tag stays centred and nothing glows', (await centred()) < 1 && (await anim(next)) === 'none');
+await page.evaluate(() => document.documentElement.removeAttribute('data-reduced-motion'));
+
+const sq = l => page.evaluateHandle(l => document.querySelector(`button[aria-label="${l}"]`), l);
+const cat = await sq('Mochi Cat, caramel');
+await cat.evaluate(el => el.scrollIntoView({ block: 'center' }));
+await cat.click();
+const catArt = await cat.evaluate(b => getComputedStyle(b.firstElementChild).animationName);
+ok('a found squishy squishes when tapped', catArt === 'luna-squish', catArt);
+await sleep(900);
+ok('the squish clears', !(await cat.evaluate(b => b.dataset.state)).includes('squish'));
+ok('its colours come from the illustration palette', await cat.evaluate(b => {
+  const body = b.querySelector('ellipse:nth-of-type(2), path');
+  const probe = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+  probe.style.fill = 'var(--illo-squishy-caramel)';
+  b.querySelector('svg').append(probe);
+  const want = getComputedStyle(probe).fill;
+  probe.remove();
+  return getComputedStyle(body).fill === want;
+}));
+const ghost = await sq('Not found yet: Bear');
+await ghost.click();
+ok('a ghost wobbles when tapped', (await ghost.evaluate(b => getComputedStyle(b.firstElementChild).animationName)) === 'luna-wobble');
+ok('a ghost has no face', await ghost.evaluate(b => [...b.querySelectorAll('circle')].some(c => getComputedStyle(c).display === 'none')));
+ok('a mystery squishy is a "?" slot', (await page.evaluate(() => document.querySelector('button[aria-label="Not found yet: a mystery squishy"]').textContent)) === '?');
+ok('rare and super-rare wear a sparkle, usual doesn\'t', await page.evaluate(() => {
+  const badge = l => !!document.querySelector(`button[aria-label="${l}"] [data-variant]`);
+  return badge('Bear, blush') && badge('Bear, honey') && !badge('Bear, toffee');
+}));
+ok('a shimmering tag sweeps with the shared shimmer', await page.evaluate(() => {
+  const t = document.querySelector('[data-shimmer]');
+  return getComputedStyle(t, '::after').animationName === 'luna-shimmer';
+}));
 
 await browser.close();
 console.log(results.every(Boolean) ? '\nALL PASS' : '\nSOME FAILED');
