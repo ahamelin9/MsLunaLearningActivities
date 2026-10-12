@@ -7,6 +7,7 @@ import { pronunciation, type SpeechPart } from '@/utils/pronunciation';
 import { StagePrompt } from '../shared/StagePrompt/StagePrompt';
 import { GameSurface } from '../shared/GameSurface/GameSurface';
 import { dataState } from '@/utils/cx';
+import { Icon } from '@/components/kit';
 import styles from './MemoryMatch.module.scss';
 
 interface Card {
@@ -161,7 +162,8 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
             >
               <span className={styles.cardInner}>
                 <span className={styles.cardBack} aria-hidden="true">
-                  <span className={styles.backMark}>🦉</span>
+                  {/* a book, not an owl: one Luna per screen (DES-12) */}
+                  <Icon name="book" size={32} />
                 </span>
                 <span className={styles.cardFace}>
                   {card.emoji ? (

@@ -191,3 +191,12 @@ only record of them. One line each: date, ID, title, and `Done` or
   |---|---|
   | a grown-up control (Settings) | a row of ChunkyButtons, the picked one `aria-pressed` |
   | a child's choice, with a picture (Grade Select) | kit Tiles, the picked one `aria-pressed`; its picture keeps its ink |
+- **2026-10-12** — DES-9c wrap-up: the contrast check now covers `--ink` on the five picture tints (a Tile's picture band carries text since Grade Select; 44 → 54 checks, all passing), and `review-sheet.mjs` in know-how builds the before/after sheets for Alex's review.
+- **2026-10-12** — DES-12 Luna on screen: one Luna, clear moods — Done, and with it Stage 5 (frame and shell). Every screen shows one Luna and no other owl. Feed Luna's own Luna is the only one on its round: the game sets `ownLuna`, and the shell's perch shows her line with no owl and no tail, tapping it says it again, and the hint still comes after two misses. Treasure Path lost its walker (the current stone's glow shows where you are) and keeps the perch Luna. The five Luna passages swapped their 🦉 picture for their own (🌙, 🛏️, 🌙, 🌅, 📚; not 🥞, whose syrup would argue with the "jam" blank, and not a full moon, which the teacher said looks like cheese), and Muddled Cards' card backs show the kit's book. `layout-audit.mjs` now fails a screen with more than one owl (the kit's Luna or an owl emoji) and audits Grade Select too: it failed on exactly those three screens before and passes at every grade and size after. `components.md` has a "Luna on screen" section with what each of her 8 moods is for and where it's used; `sleepy` and `idle` are kept but unused. Her beak follows the clips (`luna-talk-check`, 630 of 630). Only those three play screens changed, in light and dark; reduced motion stands still. Baseline 1,420 → 1,408. Moved on: the library's spoken greeting to DES-21, the moon's visit to DES-17, the owl-less perch's no-tail SpeechBubble to DES-22a. `treasure-check.cjs` can't run until OPS-9, so the new pictures were judged by hand against the existing passages. Alex OKed the shots. Kept as a rule (Alex, 2026-10-12):
+
+  | On a screen | Rule |
+  |---|---|
+  | Luna | one per screen; any owl (emoji, picture, card back) counts as her |
+  | a game with its own Luna on the stage | `ownLuna` on its definition; the perch shows her line, no owl, no tail; tapping the line says it again |
+  | the milestone moon (DES-17) | while she visits, Luna stays with `talking={false}`; only the moon talks |
+  | her mood | picked by what's happening, from the table in `components.md` |

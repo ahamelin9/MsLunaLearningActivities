@@ -276,6 +276,7 @@ export const feedLuna: GameDef<Round> = {
   mission: 'I am SO hungry. Feed me the right letter cookie!',
   roundsPerPlay: 5,
   shape: 'plate',
+  ownLuna: true,
   sticker: 'cookie',
   makeRounds: ({ grade, difficulty, count }) => {
     const tier = tierFor(grade, difficulty);

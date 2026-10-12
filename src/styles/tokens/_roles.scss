@@ -88,7 +88,8 @@ $colours: (
 // Each text role and the roles it sits on. scripts/design/contrast.mjs
 // (DES-19) checks every pair at 4.5:1 or more, in light and in dark.
 $text-pairs: (
-  ink: (ground, card, well, soil, edge, accent-soft, right-soft, try-again-soft),
+  // picture-*: a Tile's picture band carries text too (Grade Select's K, 1, 2; DES-9c)
+  ink: (ground, card, well, soil, edge, accent-soft, right-soft, try-again-soft, picture-1, picture-2, picture-3, picture-4, picture-5),
   ink-soft: (ground, card, well),
   accent-ink: (accent),
   accent-text: (accent-soft, card),

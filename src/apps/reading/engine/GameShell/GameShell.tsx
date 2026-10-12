@@ -406,6 +406,16 @@ export const GameShell: React.FC<GameShellProps> = ({
   // ---------- PLAY ----------
   const PlayComponent = game.Play;
   const round = rounds[roundIndex];
+  const perchLine = (
+    <>
+      {bubble}
+      {preparing && (
+        <span className={styles.thinkingDots} aria-label="Ms. Luna is getting ready to speak">
+          <i /><i /><i />
+        </span>
+      )}
+    </>
+  );
 
   return (
     <>
@@ -421,17 +431,18 @@ export const GameShell: React.FC<GameShellProps> = ({
           {round !== undefined && <PlayComponent key={roundIndex} round={round} api={api} />}
         </div>
 
-        <div className={styles.lunaPerch}>
-          <Luna mood={mood} size={82} onClick={() => speak(bubble, mood)} />
+        {/* one Luna per screen (DES-12): a game with its own Luna on the stage
+            gets her line here with no owl, and the line says itself again */}
+        <div className={styles.lunaPerch} data-own-luna={game.ownLuna || undefined}>
+          {!game.ownLuna && <Luna mood={mood} size={82} onClick={() => speak(bubble, mood)} />}
           <div className={styles.perchBubble}>
-            <p>
-              {bubble}
-              {preparing && (
-                <span className={styles.thinkingDots} aria-label="Ms. Luna is getting ready to speak">
-                  <i /><i /><i />
-                </span>
-              )}
-            </p>
+            {game.ownLuna ? (
+              <button className={styles.perchSay} onClick={() => speak(bubble, mood)} aria-label={`Hear Ms. Luna again: ${bubble}`}>
+                {perchLine}
+              </button>
+            ) : (
+              <p>{perchLine}</p>
+            )}
             {hint && (
               <button
                 className={styles.perchHint}

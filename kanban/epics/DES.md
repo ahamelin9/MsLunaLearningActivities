@@ -49,7 +49,7 @@ them in.
 | 2 | Structure (pure refactors, nothing looks different) | DES-18a–e (done 2026-10-11) | Screenshots you can compare; one folder per page, game and lesson; CSS modules; `games.scss` gone |
 | 3 | Foundations | DES-3 → DES-19 → DES-20 → DES-4 → DES-5 → DES-6 (done 2026-10-11) | Tokens in light and dark; lint enforces the rules after every edit; the Kit page; Andika and Fraunces offline; shared motion; reduced motion |
 | 4 | The kit | DES-7a, DES-7b, DES-7c (done 2026-10-11) | Every kit component on the Kit page in every state |
-| 5 | Frame and shell | DES-8, DES-10, DES-15 (done 2026-10-11), DES-9a, DES-9b, DES-9c (done 2026-10-12) → DES-12 | One header, the layout grid, the new Luna (moved here from Stage 4, Alex 2026-10-11), the restyled home, Settings, trophies and Grade Select; one Luna per screen |
+| 5 | Frame and shell | DES-8, DES-10, DES-15 (done 2026-10-11), DES-9a, DES-9b, DES-9c, DES-12 (done 2026-10-12) | One header, the layout grid, the new Luna (moved here from Stage 4, Alex 2026-10-11), the restyled home, Settings, trophies and Grade Select; one Luna per screen |
 | 6 | The library | DES-21 → **PRG-7 (pulled in)** → DES-13 | The library as on the board: lessons in order, one bar |
 | 7 | Play | DES-22a → DES-11 → DES-22b, DES-22c → DES-23 | GameShell, all 8 games and all 8 lesson types on the kit, with one right/wrong language |
 | 8 | The design system is done | DES-24 | Legacy styles deleted; the check runs strict with no baseline |
@@ -77,15 +77,6 @@ Story · P1 · S · needs: DES-22a
   - every solved round grows flowers and drops petals;
   - no confetti is left anywhere (`utils/confetti.ts` deleted);
   - it's checked in light and dark. (That every game and lesson looks the same is checked in DES-22b, DES-22c and DES-23.)
-
-### DES-12 · Luna on screen: one Luna, clear moods
-Story · P1 · S · needs: —
-- **Why:** Feed Luna shows two owls at once (the one on the stage and the one on the perch).
-- **How:** at most one Luna per screen; the perch Luna hides when the game's stage has its own. Document what each mood is for. Make sure the talking animation always follows the audio.
-  - **From DES-15 (2026-10-11):** the talking already follows the audio. The kit's Luna moves her beak only while a clip plays (`luna-talk-check.mjs` in know-how), so two Lunas on one screen talk together. Two screens show two today: Feed Luna (the stage and the perch) and Treasure Path (the walker on the stones and the perch).
-  - **Spoken, not shown (Alex, 2026-10-09):** where space is tight, as on the library, Luna's greeting is spoken with no always-on speech bubble. A small speaker mark shows she talks, and tapping her says it again.
-  - **The milestone moon is a visitor (DES-17):** while she visits, the owl stays and watches, and only the moon talks. One talker at a time.
-- **Complete when:** no screen shows two owls, and the moon appears only during a milestone visit.
 
 ### DES-13 · Lesson path on the hub: in order, one bar
 Story · P1 · S · needs: PRG-7
@@ -154,6 +145,7 @@ Story · P1 · M · needs: —
   - The owl stays and watches while she talks (DES-12).
   - Milestones are checked with the achievements in `utils/storage.ts`, so each one fires once per child.
 - **Complete when:**
+  - the moon appears only during a milestone visit, and while she's there only she talks: Luna stays and watches, beak still (moved here from DES-12);
   - each lesson milestone above brings the moon exactly once, with her line playing;
   - an ordinary lesson never does;
   - with reduced motion she appears without gliding;
@@ -165,7 +157,7 @@ Story · P1 · M · needs: —
 - **Why:** the round 2 Library board is approved, but no ticket covered the hub apart from its lesson path (DES-13).
 - **How:**
   - As on the Library board:
-    - the welcome row (Luna with her spoken greeting, DES-12);
+    - the welcome row (Luna with her spoken greeting). **Spoken, not shown (Alex, 2026-10-09; moved here from DES-12):** where space is tight, as on the library, Luna's greeting is spoken with no always-on speech bubble. A small speaker mark shows she talks, and tapping her says it again;
     - Luna's Pick;
     - the Play Shelf: 8 kit Tiles with drawn pictures in place of today's scenery and emoji lanterns.
   - The Squishy Shelf card and the "Today" panel come with PRG-5 and PRG-6, built from the same kit.
@@ -183,7 +175,7 @@ Story · P1 · M · needs: —
 - **Why:** every game's start screen is the same centred card with a green that belongs to neither palette, and the reward screen predates the round 2 Done board.
 - **How:**
   - **Start screen:** built from the kit. No board shows it, so Alex OKs it.
-  - **Stage and perch:** as on the Round board.
+  - **Stage and perch:** as on the Round board. **From DES-12:** a game with its own Luna on the stage (`ownLuna`, Feed Luna) has a perch with no owl: the bubble alone, with no tail, tappable to hear it again. The kit SpeechBubble has tails left and bottom only, so it needs a no-tail form here.
   - **Reward screen:** follows the Done board. The squishy and the times come with PRG-5 and PRG-6.
   - The per-game stage backgrounds (`data-shape`) use roles and `_illustration.scss`.
 - **Complete when:**

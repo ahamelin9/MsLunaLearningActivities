@@ -11,7 +11,8 @@
  *         onClick (she becomes a button) · label · className is layout only
  * States: the 8 moods re-pose one drawing (eyes, wings, beak, cheeks, a
  *         tilt); idle, happy, think and listen blink; cheer and surprise pop,
- *         oops wobbles; talking moves the beak
+ *         oops wobbles; talking moves the beak. What each mood is for, and
+ *         one Luna per screen: components.md, "Luna on screen" (DES-12)
  * Tokens: --luna-move, --luna-blink, --luna-talk
  * Reads:  --illo-luna-* (feather, feather-deep, belly, eye, pupil, cheek,
  *         beak), --illo-frames, --illo-shine, --illo-shadow, --ink-soft (the

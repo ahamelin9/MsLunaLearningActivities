@@ -43,7 +43,8 @@
       background:
         repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.14) 0 6px, transparent 6px 12px),
         linear-gradient(160deg, $plum, $plum-deep);
-      .back-mark { font-size: 1.6rem; opacity: 0.9; }
+      // the kit's book icon draws in this colour (DES-12; was an owl emoji)
+      color: var(--illo-shine);
     }
 
     .card-face {

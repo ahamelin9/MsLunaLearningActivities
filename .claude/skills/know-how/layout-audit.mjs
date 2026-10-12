@@ -1,7 +1,8 @@
 #!/usr/bin/env node
-// The layout audit (DES-10): at the four iPad sizes, visits the library, every
-// game's start screen and first round, and the first question of every lesson
-// of one grade, and reports:
+// The layout audit (DES-10): at the four iPad sizes, visits Grade Select
+// (DES-9c), the library, every game's start screen and first round, and the
+// first question of every lesson of one grade, and reports:
+//   - more than one owl on a screen: the kit's Luna and owl emoji (DES-12);
 //   - anything that scrolls on a game or lesson screen (nothing may, mid-round),
 //     or runs past the screen: the shell clips what overflows, so a stage too
 //     tall for the screen is cut off rather than scrolled;
@@ -91,6 +92,12 @@ function audit({ screen, midRound, scrolls = false }) {
       if (Math.min(a.right, c.right) - Math.max(a.left, c.left) > 2 && Math.min(a.bottom, c.bottom) - Math.max(a.top, c.top) > 2)
         add(taps[i], `overlapping: ${name(taps[i])} × ${name(taps[j])}`);
     }
+
+  // one Luna per screen (DES-12): the kit's Luna (her root carries data-mood),
+  // and any owl emoji, which a child reads as her too
+  const lunas = [...document.querySelectorAll('[data-mood]')].filter(visible).length;
+  const owls = (document.body.innerText.match(/🦉/gu) ?? []).length;
+  if (lunas + owls > 1) problems.push({ text: `two owls: ${lunas} Luna${lunas === 1 ? '' : 's'} and ${owls} owl emoji`, stage: false });
   return { screen, problems };
 }
 
@@ -136,11 +143,12 @@ for (const [width, height] of SIZES) {
   await page.click(at('open-reading'));
   await page.waitForSelector(at('grade-card'));
   await wait(500);
+  const results = [await page.evaluate(audit, { screen: 'Grade Select', midRound: false })];
   await (await page.$$(at('grade-card')))[grade].click();
   await page.waitForSelector(at('hub'));
   await wait(900);
 
-  const results = [await page.evaluate(audit, { screen: 'library', midRound: false, scrolls: true })];
+  results.push(await page.evaluate(audit, { screen: 'library', midRound: false, scrolls: true }));
   const lib = await page.evaluate(library);
 
   const open = async (shot, i) => {
@@ -198,6 +206,6 @@ await browser.close();
 console.log(
   failing
     ? `\n❌ ${failing} problem(s) outside the games' stages, or something scrolls mid-round.`
-    : '\n✅ Outside the stages: no scrolling mid-round, no overlaps, no small or edge-hugging targets. (stage) lines are for DES-22b/c, DES-23 and GAME-3.'
+    : '\n✅ Outside the stages: no scrolling mid-round, no overlaps, no small or edge-hugging targets, and one Luna per screen. (stage) lines are for DES-22b/c, DES-23 and GAME-3.'
 );
 process.exit(failing ? 1 : 0);

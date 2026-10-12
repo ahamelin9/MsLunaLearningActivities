@@ -15,7 +15,6 @@ import { pronunciation, type SpeechPart } from '@/utils/pronunciation';
 import { SpeakChip } from '../shared/SpeakChip/SpeakChip';
 import { GameSurface } from '../shared/GameSurface/GameSurface';
 import { cx, dataState } from '@/utils/cx';
-import { Luna } from '@/components/kit';
 import styles from './TreasureRead.module.scss';
 
 interface Round {
@@ -130,15 +129,12 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
 
   return (
     <GameSurface className={styles.treasure}>
+      {/* the current stone's glow says where you are; Luna stays on her perch,
+          one Luna per screen (DES-12) */}
       <div className={styles.treasurePath} aria-label={`Stone ${step + 1} of ${total}`}>
         {Array.from({ length: total }).map((_, i) => (
           <span key={i} className={styles.stone} data-state={dataState(i < step ? 'passed' : false, i === step ? 'current' : false)}>
             <span>{STONE_LABELS[i % STONE_LABELS.length]}</span>
-            {i === step && (
-              <span className={styles.walker} data-state={solved ? 'hopping' : undefined}>
-                <Luna mood={solved ? 'happy' : 'idle'} size={36} talking={false} />
-              </span>
-            )}
           </span>
         ))}
         <span className={styles.chest} data-state={solved && step === total - 1 ? 'open' : undefined}>

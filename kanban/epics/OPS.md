@@ -7,6 +7,7 @@ Task · P1 · S · needs: —
   - the walk from home to a game uses the `data-shot` names that exist since DES-18a (`open-reading`, `grade-card`, `hub`, `lesson-tile`, `game-tile`, `tile-title`, `play`, `shell-play`, `round-pips`);
   - the game pieces they read (Feed Luna's cookies; Treasure Path's passage, claim, options and gaps; the speak chip) get `data-shot` names, and their states are read from `data-state` once DES-18c/d have moved them there;
   - the "Selectors that work" list in the know-how skill names only those.
+  - **From DES-12 (2026-10-12):** `treasure-check.cjs` couldn't run to judge Treasure Path's new passage pictures (it still clicks `.ipad-reading-app-card`). The harness's clip labels also stick to the first line said (know-how, "Every clip carries the first line's label"); label each clip where it starts.
 - **Complete when:** the three checks pass against the moved tree, no class selector is left in them, and the know-how list names only `data-shot` and `data-state`.
 
 ### OPS-1 · Delete dead code

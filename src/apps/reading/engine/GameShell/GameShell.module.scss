@@ -1,4 +1,5 @@
 @use 'apps/reading/engine/world' as *;
+@use 'styles/mixins' as m;
 
 .game-shell {
   position: relative;
@@ -69,12 +70,29 @@
       max-width: 560px;
       box-shadow: 0 4px 0 rgba(58, 42, 31, 0.1);
 
-      p {
+      p,
+      .perch-say {
         font-family: var(--font-read);
         font-weight: 500;
         font-size: 1rem;
         line-height: 1.35;
         color: $ink;
+      }
+
+      // her line, when the game has its own Luna (DES-12): it says itself again
+      .perch-say {
+        display: flex;
+        align-items: center;
+        min-height: var(--target-chrome);
+        padding: 0;
+        border: none;
+        background: none;
+        text-align: left;
+        cursor: pointer;
+
+        &:focus-visible {
+          @include m.focus-ring;
+        }
       }
 
       .thinking-dots {
@@ -122,6 +140,11 @@
         border-bottom: 2.5px solid rgba(58, 42, 31, 0.16);
         transform: rotate(45deg);
       }
+    }
+
+    // no owl on the perch (DES-12), so the bubble has no tail pointing at her
+    &[data-own-luna] .perch-bubble::before {
+      content: none;
     }
   }
 

@@ -93,6 +93,12 @@ Follow "Adding a component" in `components.md`:
    `.claude/skills/know-how/kit-check.mjs`, and watch a check fail once.
 4. Add it to the table in `components.md`.
 
+A new state or variant on an existing component follows steps 3 and 4: a
+specimen on its Kit page, a `kit-check.mjs` line that fails with the style off,
+and its row in `components.md`. Check what a screen puts inside it (a slot, a
+picture) in the new state too: DES-9c's picked Tile first turned its picture's
+ink to the action ink, and the K on Grade Select all but vanished.
+
 ### Build or restyle a screen
 Follow `screens.md`:
 1. `npm run ui:shots -- --label before`.
@@ -103,7 +109,10 @@ Follow `screens.md`:
    baseline, so the area can't slip back.
 4. `npm run ui:shots -- --label after`. Compare it with the board (style sample,
    page "Round 2 · Teacher's picks") in light and dark.
-5. Get Alex's OK, and update the area's row on the map.
+5. Get Alex's OK on a review sheet (before, after light, after dark, plus any
+   state the shots don't reach), made with
+   `node .claude/skills/know-how/review-sheet.mjs <spec.json> screenshots/review/<ticket>-<screen>.png`.
+   Then update the area's row on the map.
 
 For a pure refactor, `npm run ui:shots -- --diff before after` must show 0
 changed screens.
@@ -140,7 +149,9 @@ changed screens.
 - Does a screen fit? `node .claude/skills/know-how/layout-audit.mjs 5199 <grade 0|1|2>`
   (Vite on 5199): nothing scrolls or is cut off mid-round, and no tap target
   outside a game's stage is small, overlapping or in the edge band (DES-10).
-  Its "(stage)" lines are the games' and lessons' own pieces.
+  It also fails a screen with more than one owl, the kit's Luna or an owl
+  emoji (DES-12), and covers Grade Select (DES-9c). Its "(stage)" lines are
+  the games' and lessons' own pieces.
 - `node .claude/skills/know-how/module-refs-check.mjs "$PWD" <folders>`: every
   `styles.x` points at a real class (a typo is silently `undefined`), and no
   `className="…"` string is left. For a refactor, the know-how entry "A move to

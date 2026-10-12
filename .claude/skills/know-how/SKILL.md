@@ -207,6 +207,15 @@ Pitfalls that cost time:
   stops the first before its clip loads, so only one clip plays. Count clips
   (`AudioBufferSourceNode.start`), not `say` calls; the production build
   says it once.
+- **Every clip carries the first line's label** (*2026-10-12, DES-12*): in
+  a copy of `speech-check.cjs`'s harness, the clips after the first few all
+  logged "Hi! Which grade are you in?", so a check matching a clip by its
+  label saw 0 plays of a line that had played. Likely cause: `say` resolves
+  before the clip is fetched and decoded, so its `finally` puts the real
+  `playBuffer` back before the clip starts, and `__label` keeps whatever it
+  last held. Count instead: the line in `pronunciation.say`'s log, plus one
+  more `AudioBufferSourceNode.start`. OPS-9 can fix the label when it moves
+  the harness onto `data-shot`.
 - **A puppeteer press does nothing** (*2026-10-11, DES-5*): `page.mouse.down()`
   at a `boundingBox()` below the fold lands outside the viewport, so `:active`
   never applies and the check reads the resting style. Scroll the element into

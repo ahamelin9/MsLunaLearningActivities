@@ -65,6 +65,11 @@ export interface GameDef<TRound = never> {
   mission: string;
   roundsPerPlay: number;
   shape: GameShape;
+  /**
+   * The game draws Luna on its own stage (Feed Luna), so the shell's perch
+   * shows her line without its owl: one Luna per screen (DES-12).
+   */
+  ownLuna?: boolean;
   /** signature sticker unlocked the first time this game is finished */
   sticker: string;
   /** built once per play so rounds never repeat within a session */

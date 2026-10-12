@@ -421,7 +421,7 @@ export const PASSAGES: PassageItem[] = [
   {
     id: 'k-big-moon',
     grade: 'kindergarten',
-    emoji: '🦉',
+    emoji: '🌙',
     lines: ['Luna sees the moon.', 'It is big and round.'],
     truth: [
       { claim: 'Luna looks at the moon.', isTrue: true },
@@ -458,7 +458,7 @@ export const PASSAGES: PassageItem[] = [
   {
     id: 'k-soft-bed',
     grade: 'kindergarten',
-    emoji: '🦉',
+    emoji: '🛏️',
     lines: ['It is night.', 'Luna gets into her soft bed.'],
     truth: [
       { claim: "Luna's bed is soft.", isTrue: true },
@@ -517,7 +517,7 @@ export const PASSAGES: PassageItem[] = [
   {
     id: 'g1-moon-pond',
     grade: 'grade1',
-    emoji: '🦉',
+    emoji: '🌙',
     lines: ['Luna flies to the pond at night.', 'She looks down at the water.', 'She sees the moon in the pond!'],
     truth: [
       { claim: 'The moon shines on the pond.', isTrue: true },
@@ -551,7 +551,7 @@ export const PASSAGES: PassageItem[] = [
   {
     id: 'g1-pancakes',
     grade: 'grade1',
-    emoji: '🦉',
+    emoji: '🌅',
     lines: ['Luna wakes up hungry.', 'She makes three pancakes for breakfast.', 'She eats them with sweet jam.'],
     truth: [
       { claim: 'Luna has pancakes in the morning.', isTrue: true },
@@ -586,7 +586,7 @@ export const PASSAGES: PassageItem[] = [
   {
     id: 'g2-windy-library',
     grade: 'grade2',
-    emoji: '🦉',
+    emoji: '📚',
     lines: [
       'It was a windy night, so Luna stayed in the library.',
       'She lit a small lamp and opened a book about the sea.',

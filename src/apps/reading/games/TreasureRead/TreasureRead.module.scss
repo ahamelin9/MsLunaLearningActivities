@@ -26,15 +26,6 @@
       &[data-state~="current"] { transform: scale(1.16); box-shadow: 0 0 0 4px rgba(240, 162, 46, 0.45); }
     }
 
-    .walker {
-      position: absolute;
-      top: -26px;
-      font-size: 1.5rem;
-      animation: walkerBob 1.6s ease-in-out infinite;
-
-      &[data-state="hopping"] { animation: walkerHop 0.7s ease-in-out 2; }
-    }
-
     .chest {
       font-size: 2rem;
       margin-left: 0.3rem;
@@ -131,17 +122,6 @@
     &[data-state~="wrong"] { animation: trackShake 0.4s ease; }
     &[data-state~="right"] { @include chunky($moss, $moss-deep); }
   }
-}
-
-@keyframes walkerBob {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-5px); }
-}
-
-@keyframes walkerHop {
-  0% { transform: translate(0, 0); }
-  50% { transform: translate(26px, -20px) rotate(12deg); }
-  100% { transform: translate(0, 0); }
 }
 
 @keyframes chestOpen {
