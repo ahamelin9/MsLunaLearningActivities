@@ -1,0 +1,64 @@
+// AppHeader (DES-8): the one header inside an app, as on the round 2
+// Library, Round and Done boards. Roles and the space scale only.
+
+@use 'styles/mixins' as *;
+
+.root {
+  // it stays put while the screen under it scrolls (AppWindow's content);
+  // AppWindow keeps a scrolled-to section clear of it with scroll-padding
+  position: sticky;
+  top: 0;
+  z-index: var(--z-header);
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  height: var(--space-16);
+  padding: 0 var(--space-6);
+  border-bottom: var(--border-regular) solid var(--edge);
+  background: var(--card);
+  color: var(--ink);
+}
+
+// a long game name gives way to the rounds and buttons on a narrow iPad
+.title {
+  min-width: 0;
+  margin: 0;
+  overflow: hidden;
+  font: var(--text-display-m);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.end {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-left: auto;
+}
+
+.rounds {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.roundsBar {
+  width: calc(var(--space-16) * 3);
+
+  @include bp(narrow) {
+    width: calc(var(--space-16) * 2);
+  }
+}
+
+// on a portrait iPad the bar alone shows the rounds, so the game's name fits
+.roundText {
+  font: var(--text-label-small);
+  color: var(--ink-soft);
+  white-space: nowrap;
+
+  @include bp(narrow) {
+    display: none;
+  }
+}

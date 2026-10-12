@@ -5,7 +5,8 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  min-height: 100%;
+  // it fills what's left under the app's header (AppHeader, DES-8)
+  min-height: 0;
   padding: 0.9rem 1.1rem 1.1rem;
   color: $ink;
   background:
@@ -32,95 +33,6 @@
     overflow-y: auto;
 
     > * { margin: auto; }
-  }
-
-  // ---------- top bar ----------
-  .shell-bar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 0.75rem;
-    margin-bottom: 0.7rem;
-    flex-wrap: wrap;
-  }
-
-  .shell-back {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.35rem;
-    padding: 0.4rem 0.85rem;
-    border-radius: 14px;
-    background: rgba(255, 255, 255, 0.8);
-    border: 2px solid rgba(58, 42, 31, 0.18);
-    color: $ink;
-    font-family: var(--font-read);
-    font-weight: 600;
-    font-size: 0.85rem;
-    cursor: pointer;
-
-    &:hover { background: #FFFFFF; }
-    &:active { transform: scale(0.96); }
-  }
-
-  .round-pips {
-    display: flex;
-    gap: 0.4rem;
-    align-items: center;
-
-    .pip {
-      width: 13px;
-      height: 13px;
-      border-radius: 50%;
-      background: rgba(58, 42, 31, 0.16);
-      border: 2px solid transparent;
-      transition: all 0.25s ease;
-
-      &[data-state~="done"] {
-        background: $amber;
-        box-shadow: 0 0 0 3px rgba(240, 162, 46, 0.25);
-      }
-
-      &[data-state~="current"] {
-        border-color: $ink;
-        transform: scale(1.25);
-      }
-    }
-  }
-
-  .shell-right {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-  }
-
-  .replay-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.3rem;
-    padding: 0.35rem 0.7rem;
-    border-radius: 999px;
-    background: #FFFFFF;
-    border: 2px solid rgba(58, 42, 31, 0.2);
-    font-family: var(--font-read);
-    font-weight: 600;
-    font-size: 0.82rem;
-    color: $ink;
-    cursor: pointer;
-
-    &:hover { background: #FFF3DC; }
-    &:active { transform: scale(0.95); }
-  }
-
-  .shell-title {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4rem;
-    font-family: var(--font-display);
-    font-weight: 600;
-    font-size: 0.95rem;
-    color: $ink-soft;
-
-    .shell-emoji { font-size: 1.15rem; }
   }
 
   // ---------- stage ----------
@@ -234,8 +146,6 @@
   &[data-phase="intro"] {
     align-items: center;
     justify-content: center;
-
-    .shell-back { position: absolute; top: 1rem; left: 1.1rem; }
 
     .intro-panel {
       @include paper-card;
@@ -449,7 +359,6 @@
       flex: 1 1 140px;
 
       &.primary { @include chunky($amber, $amber-deep, #46280A); }
-      &.ghost { box-shadow: none; background: transparent; border: 2px solid rgba(58, 42, 31, 0.2); }
     }
   }
 }
@@ -493,31 +402,6 @@
     padding: 0.7rem;
 
     .luna-perch .perch-bubble p { font-size: 0.92rem; }
-    .shell-right {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-  }
-
-  .replay-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.3rem;
-    padding: 0.35rem 0.7rem;
-    border-radius: 999px;
-    background: #FFFFFF;
-    border: 2px solid rgba(58, 42, 31, 0.2);
-    font-family: var(--font-read);
-    font-weight: 600;
-    font-size: 0.82rem;
-    color: $ink;
-    cursor: pointer;
-
-    &:hover { background: #FFF3DC; }
-    &:active { transform: scale(0.95); }
-  }
-
-  .shell-title { display: none; }
   }
 }
 

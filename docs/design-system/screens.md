@@ -26,6 +26,7 @@ Screens are where the kit, the roles and the content meet.
 ```
 src/
   components/os/<Name>/            the tablet shell: HomeScreen, StatusBar, AppWindow,
+                                   AppHeader (the one header inside an app, DES-8),
                                    SettingsModal, TrophyModal…
   apps/
     registry.ts                    the apps on the home screen

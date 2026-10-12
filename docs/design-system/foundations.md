@@ -47,8 +47,8 @@ Everything except colour ([colour.md](colour.md)). The values live in
 - Every screen works at 1180×820, 820×1180, 1024×768 and 744×1133, with no
   scrolling mid-round.
 - Media queries go only through the breakpoint mixin.
-- Inside an app there's one header: Home or Library, the title, stars, and the
-  gated gear.
+- Inside an app there's one header (`AppHeader`): Home or Library, the title,
+  then the stars and the gated gear, or a game's rounds and Again.
 
 ## Type
 
@@ -195,7 +195,9 @@ What the moments look like:
 - **Stacking:** the z roles, lowest first: `--z-ground`, `--z-raised`,
   `--z-float`, `--z-header`, `--z-celebrate` (petals and the win veil, which
   never take taps) and `--z-modal`.
-- **Chrome:** one 64px header inside an app. The status bar shrinks to the
-  clock (DES-8).
+- **Chrome:** one 64px header inside an app, `components/os/AppHeader`
+  (DES-8). It stays at the top while the screen under it scrolls. Inside an
+  app there's no status bar and no home-indicator strip; the home screen keeps
+  both.
 - **The library:** the next lesson and Luna's Pick show without scrolling, and
   the Play Shelf sits on one even grid (DES-10).

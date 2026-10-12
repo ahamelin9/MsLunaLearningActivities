@@ -11,8 +11,10 @@ import { pronunciation, type SpeechPart } from '@/utils/pronunciation';
 import { warmGameIntro } from '../warmup';
 import { storageService } from '@/utils/storage';
 import { launchConfetti } from '@/utils/confetti';
-import { ArrowLeftIcon, StarIcon } from '@/components/ui/Icons/Icons';
-import { cx, dataState } from '@/utils/cx';
+import { StarIcon } from '@/components/ui/Icons/Icons';
+import { ChunkyButton } from '@/components/kit';
+import { AppHeader } from '@/components/os/AppHeader/AppHeader';
+import { cx } from '@/utils/cx';
 import styles from './GameShell.module.scss';
 
 type Phase = 'intro' | 'play' | 'reward';
@@ -272,117 +274,139 @@ export const GameShell: React.FC<GameShellProps> = ({
     }, 700);
   }, [phase, award, game.id, game.lesson, later, speak]);
 
+  // the one header (DES-8): back to the library and the game's name; in play,
+  // the rounds and Again too, as on the round 2 Round and Done boards
+  const header = (inPlay = false) => (
+    <AppHeader
+      back="library"
+      onBack={onExit}
+      title={game.title}
+      rounds={inPlay ? { won: roundsWon, current: roundIndex + 1, total: game.roundsPerPlay } : undefined}
+    >
+      {inPlay && (
+        <ChunkyButton
+          icon="replay"
+          onClick={() => {
+            soundManager.playLetterTap();
+            pronunciation.replayLast();
+          }}
+        >
+          Again
+        </ChunkyButton>
+      )}
+    </AppHeader>
+  );
+
   // ---------- START ----------
   if (phase === 'intro') {
     return (
-      <div className={styles.gameShell} data-phase="intro" data-shape={game.shape} data-shot="shell-intro">
-        <button className={styles.shellBack} data-shot="shell-back" onClick={onExit}>
-          <ArrowLeftIcon size={14} />
-          <span>Library</span>
-        </button>
-
-        <div className={styles.introPanel}>
-          <div className={styles.introScene} aria-hidden="true">
-            <span className={styles.introEmoji}>{game.emoji}</span>
-          </div>
-
-          {surpriseBanner && <div className={styles.surpriseBanner}>{surpriseBanner}</div>}
-
-          <h2 className={styles.introTitle}>{game.title}</h2>
-          <p className={styles.introTagline}>{game.tagline}</p>
-
-          <div className={styles.introLuna}>
-            <LunaOwl mood="happy" size={78} onClick={() => speak(game.mission, 'happy')} />
-            <p className={styles.introMission}>“{game.mission}”</p>
-          </div>
-
-          {/* a lesson's questions are fixed, so there is nothing to choose */}
-          {!game.lesson && (
-            <div className={styles.difficultyRow} role="group" aria-label="Choose how tricky">
-              {DIFFICULTY_LABELS.map(level => (
-                <button
-                  key={level.value}
-                  className={styles.difficultyChip}
-                  data-state={difficulty === level.value ? 'active' : undefined}
-                  onClick={() => {
-                    soundManager.playLetterTap();
-                    setDifficulty(level.value);
-                  }}
-                >
-                  <span className={styles.chipDots} aria-hidden="true">
-                    {'●'.repeat(level.value)}
-                    <span className={styles.dim}>{'●'.repeat(3 - level.value)}</span>
-                  </span>
-                  <span className={styles.chipLabel}>{level.label}</span>
-                  <span className={styles.chipNote}>{level.note}</span>
-                </button>
-              ))}
+      <>
+        {header()}
+        <div className={styles.gameShell} data-phase="intro" data-shape={game.shape} data-shot="shell-intro">
+          <div className={styles.introPanel}>
+            <div className={styles.introScene} aria-hidden="true">
+              <span className={styles.introEmoji}>{game.emoji}</span>
             </div>
-          )}
 
-          <button className={styles.playButton} data-shot="play" onClick={() => startPlay(difficulty)}>
-            {game.lesson ? 'Let’s learn!' : 'Let’s play!'}
-          </button>
+            {surpriseBanner && <div className={styles.surpriseBanner}>{surpriseBanner}</div>}
 
-          <p className={styles.objectiveLine}>
-            <strong>Learning:</strong> {game.objective}
-          </p>
+            <h2 className={styles.introTitle}>{game.title}</h2>
+            <p className={styles.introTagline}>{game.tagline}</p>
+
+            <div className={styles.introLuna}>
+              <LunaOwl mood="happy" size={78} onClick={() => speak(game.mission, 'happy')} />
+              <p className={styles.introMission}>“{game.mission}”</p>
+            </div>
+
+            {/* a lesson's questions are fixed, so there is nothing to choose */}
+            {!game.lesson && (
+              <div className={styles.difficultyRow} role="group" aria-label="Choose how tricky">
+                {DIFFICULTY_LABELS.map(level => (
+                  <button
+                    key={level.value}
+                    className={styles.difficultyChip}
+                    data-state={difficulty === level.value ? 'active' : undefined}
+                    onClick={() => {
+                      soundManager.playLetterTap();
+                      setDifficulty(level.value);
+                    }}
+                  >
+                    <span className={styles.chipDots} aria-hidden="true">
+                      {'●'.repeat(level.value)}
+                      <span className={styles.dim}>{'●'.repeat(3 - level.value)}</span>
+                    </span>
+                    <span className={styles.chipLabel}>{level.label}</span>
+                    <span className={styles.chipNote}>{level.note}</span>
+                  </button>
+                ))}
+              </div>
+            )}
+
+            <button className={styles.playButton} data-shot="play" onClick={() => startPlay(difficulty)}>
+              {game.lesson ? 'Let’s learn!' : 'Let’s play!'}
+            </button>
+
+            <p className={styles.objectiveLine}>
+              <strong>Learning:</strong> {game.objective}
+            </p>
+          </div>
         </div>
-      </div>
+      </>
     );
   }
 
   // ---------- REWARD ----------
   if (phase === 'reward') {
     return (
-      <div className={styles.gameShell} data-phase="reward" data-shape={game.shape} data-shot="shell-reward">
-        <canvas ref={canvasRef} className={styles.rewardConfetti} />
+      <>
+        {header()}
+        <div className={styles.gameShell} data-phase="reward" data-shape={game.shape} data-shot="shell-reward">
+          <canvas ref={canvasRef} className={styles.rewardConfetti} />
 
-        <div className={styles.rewardPanel}>
-          <div className={styles.rewardLuna}>
-            <LunaOwl mood="cheer" size={110} talking={talking} />
-          </div>
-
-          <h2 className={styles.rewardTitle}>{game.title} — done!</h2>
-
-          <div className={styles.rewardStars}>
-            {Array.from({ length: award?.stars ?? 1 }).map((_, i) => (
-              <span key={i} className={styles.rewardStar} style={{ animationDelay: `${i * 140}ms` }}>
-                <StarIcon size={40} color="#FFD166" filled />
-              </span>
-            ))}
-          </div>
-
-          <p className={styles.rewardScore}>
-            {roundsWon} of {game.roundsPerPlay} solved
-            {cleanRounds === game.roundsPerPlay ? ' — no wobbles at all!' : ''}
-          </p>
-
-          {award?.sticker && (
-            <div className={styles.stickerAward}>
-              <span className={styles.stickerPeel}>{award.sticker.emoji}</span>
-              <div>
-                <span className={styles.stickerKicker}>New sticker for your tin</span>
-                <strong className={styles.stickerName}>{award.sticker.name}</strong>
-              </div>
+          <div className={styles.rewardPanel}>
+            <div className={styles.rewardLuna}>
+              <LunaOwl mood="cheer" size={110} talking={talking} />
             </div>
-          )}
 
-          <div className={styles.rewardActions}>
-            <button className={cx(styles.rewardBtn, styles.primary)} onClick={() => startPlay(difficulty)}>
-              Play again
-            </button>
-            {onPlayAnother && (
-              <button className={styles.rewardBtn} onClick={onPlayAnother}>
-                {playAnotherLabel}
-              </button>
+            <h2 className={styles.rewardTitle}>{game.title} — done!</h2>
+
+            <div className={styles.rewardStars}>
+              {Array.from({ length: award?.stars ?? 1 }).map((_, i) => (
+                <span key={i} className={styles.rewardStar} style={{ animationDelay: `${i * 140}ms` }}>
+                  <StarIcon size={40} color="#FFD166" filled />
+                </span>
+              ))}
+            </div>
+
+            <p className={styles.rewardScore}>
+              {roundsWon} of {game.roundsPerPlay} solved
+              {cleanRounds === game.roundsPerPlay ? ' — no wobbles at all!' : ''}
+            </p>
+
+            {award?.sticker && (
+              <div className={styles.stickerAward}>
+                <span className={styles.stickerPeel}>{award.sticker.emoji}</span>
+                <div>
+                  <span className={styles.stickerKicker}>New sticker for your tin</span>
+                  <strong className={styles.stickerName}>{award.sticker.name}</strong>
+                </div>
+              </div>
             )}
-            <button className={cx(styles.rewardBtn, styles.ghost)} onClick={onExit}>
-              Back to the library
-            </button>
+
+            <div className={styles.rewardActions}>
+              <button className={cx(styles.rewardBtn, styles.primary)} onClick={() => startPlay(difficulty)}>
+                Play again
+              </button>
+              {onPlayAnother && (
+                <button className={styles.rewardBtn} onClick={onPlayAnother}>
+                  {playAnotherLabel}
+                </button>
+              )}
+              {/* back to the library is the header's Library (DES-8) */}
+            </div>
           </div>
         </div>
-      </div>
+      </>
     );
   }
 
@@ -391,89 +415,55 @@ export const GameShell: React.FC<GameShellProps> = ({
   const round = rounds[roundIndex];
 
   return (
-    <div
-      className={styles.gameShell}
-      data-phase="play"
-      data-shape={game.shape}
-      data-flash={flash ?? undefined}
-      data-shot="shell-play"
-    >
-      <header className={styles.shellBar}>
-        <button className={styles.shellBack} data-shot="shell-back" onClick={onExit}>
-          <ArrowLeftIcon size={14} />
-          <span>Library</span>
-        </button>
-
-        <div className={styles.roundPips} data-shot="round-pips" aria-label={`Round ${roundIndex + 1} of ${game.roundsPerPlay}`}>
-          {Array.from({ length: game.roundsPerPlay }).map((_, i) => (
-            <span
-              key={i}
-              className={styles.pip}
-              // a pip can be both: the round just won, before the next one starts
-              data-state={dataState(i < roundsWon && 'done', i === roundIndex && 'current')}
-            />
-          ))}
+    <>
+      {header(true)}
+      <div
+        className={styles.gameShell}
+        data-phase="play"
+        data-shape={game.shape}
+        data-flash={flash ?? undefined}
+        data-shot="shell-play"
+      >
+        <div className={styles.shellStage}>
+          {round !== undefined && <PlayComponent key={roundIndex} round={round} api={api} />}
         </div>
 
-        <div className={styles.shellRight}>
-          <button
-            className={styles.replayBtn}
-            onClick={() => {
-              soundManager.playLetterTap();
-              pronunciation.replayLast();
-            }}
-            title="Hear that again"
-          >
-            <span aria-hidden="true">🔁</span>
-            <span>Again</span>
-          </button>
-
-          <div className={styles.shellTitle}>
-            <span className={styles.shellEmoji}>{game.emoji}</span>
-            <span>{game.title}</span>
+        <div className={styles.lunaPerch}>
+          <LunaOwl
+            mood={mood}
+            size={82}
+            talking={talking}
+            onClick={() => speak(bubble, mood)}
+          />
+          <div className={styles.perchBubble}>
+            <p>
+              {bubble}
+              {preparing && (
+                <span className={styles.thinkingDots} aria-label="Ms. Luna is getting ready to speak">
+                  <i /><i /><i />
+                </span>
+              )}
+            </p>
+            {hint && (
+              <button
+                className={styles.perchHint}
+                onClick={() => {
+                  soundManager.playLetterTap();
+                  pronunciation.speakSequence(hint);
+                }}
+              >
+                <span aria-hidden="true">🔦</span> Hear my hint again
+              </button>
+            )}
           </div>
         </div>
-      </header>
 
-      <div className={styles.shellStage}>
-        {round !== undefined && <PlayComponent key={roundIndex} round={round} api={api} />}
+        {flash === 'win' && (
+          <div className={styles.winVeil} data-shot="win-veil" aria-hidden="true">
+            <span className={styles.winBurst}>✦</span>
+          </div>
+        )}
       </div>
-
-      <div className={styles.lunaPerch}>
-        <LunaOwl
-          mood={mood}
-          size={82}
-          talking={talking}
-          onClick={() => speak(bubble, mood)}
-        />
-        <div className={styles.perchBubble}>
-          <p>
-            {bubble}
-            {preparing && (
-              <span className={styles.thinkingDots} aria-label="Ms. Luna is getting ready to speak">
-                <i /><i /><i />
-              </span>
-            )}
-          </p>
-          {hint && (
-            <button
-              className={styles.perchHint}
-              onClick={() => {
-                soundManager.playLetterTap();
-                pronunciation.speakSequence(hint);
-              }}
-            >
-              <span aria-hidden="true">🔦</span> Hear my hint again
-            </button>
-          )}
-        </div>
-      </div>
-
-      {flash === 'win' && (
-        <div className={styles.winVeil} data-shot="win-veil" aria-hidden="true">
-          <span className={styles.winBurst}>✦</span>
-        </div>
-      )}
-    </div>
+    </>
   );
 };

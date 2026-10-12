@@ -1,7 +1,6 @@
 import React from 'react';
 import type { AppDefinition } from '@/types/app';
 import { BookIcon, SparklesIcon } from '@/components/ui/Icons/Icons';
-import { soundManager } from '@/utils/audio';
 import { cx } from '@/utils/cx';
 import styles from './HomeScreen.module.scss';
 
@@ -16,10 +15,8 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
 }) => {
   const readingApp = apps.find(a => a.id === 'reading') || apps[0];
 
-  const handleLaunch = () => {
-    soundManager.playAppLaunch();
-    onLaunchApp(readingApp);
-  };
+  // App plays the launch sound (BUG-11)
+  const handleLaunch = () => onLaunchApp(readingApp);
 
   return (
     <div className={styles.homeScreenContainer} data-shot="home">

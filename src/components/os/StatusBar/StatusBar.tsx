@@ -5,22 +5,19 @@ import { storageService } from '@/utils/storage';
 import { soundManager } from '@/utils/audio';
 import type { UserProgress } from '@/types/user';
 import styles from './StatusBar.module.scss';
-import { VoiceIndicator } from '../VoiceIndicator/VoiceIndicator';
 
 interface StatusBarProps {
   progress: UserProgress;
   onOpenSettings: () => void;
   onOpenTrophies: () => void;
-  appName?: string;
-  onHomeClick?: () => void;
 }
+
+/** The home screen's status bar. Inside an app there is none: the app's own header takes its place (DES-8). */
 
 export const StatusBar: React.FC<StatusBarProps> = ({
   progress,
   onOpenSettings,
-  onOpenTrophies,
-  appName,
-  onHomeClick
+  onOpenTrophies
 }) => {
   const [currentTime, setCurrentTime] = useState<string>('');
 
@@ -56,23 +53,8 @@ export const StatusBar: React.FC<StatusBarProps> = ({
         </span>
       </div>
 
-      {/* Center: Active App Title (when inside an app) */}
-      <div className={styles.statusBarCenter}>
-        {appName ? (
-          <button
-            onClick={onHomeClick}
-            className={styles.appTitlePill}
-            title="Return to Home Screen"
-          >
-            <span>{appName}</span>
-          </button>
-        ) : null}
-      </div>
-
       {/* Right side: Star Points, Trophy Room, Audio Mute, Settings */}
       <div className={styles.statusBarRight}>
-        <VoiceIndicator />
-
         <StarBadge
           stars={progress.totalStars}
           points={progress.totalPoints}

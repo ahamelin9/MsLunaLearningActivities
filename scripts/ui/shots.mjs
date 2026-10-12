@@ -9,6 +9,9 @@
 //   npm run ui:shots -- --kit --label kit     -> screenshots/kit/kit/{light,dark}.png, the tokens (DES-20),
 //                                                and components-{light,dark}.png (DES-7a)
 //   npm run ui:shots -- --reduced-motion      -> the same run with Reduce Motion on; fails if anything still moves (DES-6)
+//   npm run ui:shots -- --theme dark --label after-dark
+//                                             -> the same run in the dark roles (DES-8): data-theme="dark" on <html>.
+//                                                Until DES-16 only what's on roles turns dark
 //
 // It starts its own Vite dev server and drives the Chrome already installed
 // on this machine (puppeteer-core downloads no browser of its own). Set
@@ -67,6 +70,7 @@ function parseArgs(argv) {
       'Usage: npm run ui:shots -- [--label <name>]\n' +
         '       npm run ui:shots -- --kit [--label <name>]\n' +
         '       npm run ui:shots -- --reduced-motion [--label <name>]\n' +
+        '       npm run ui:shots -- --theme light|dark [--label <name>]\n' +
         '       npm run ui:shots -- --diff <label-a> <label-b>\n' +
         'Labels use letters, digits, . _ - only.'
     );
@@ -80,10 +84,13 @@ function parseArgs(argv) {
   }
   const kit = argv.includes('--kit');
   const reduced = argv.includes('--reduced-motion');
+  const t = argv.indexOf('--theme');
+  const theme = t === -1 ? 'light' : argv[t + 1];
+  if (theme !== 'light' && theme !== 'dark') usage();
   const i = argv.indexOf('--label');
   const label = i === -1 ? (kit ? 'kit' : 'latest') : argv[i + 1];
   if (!label || !name.test(label)) usage();
-  return { mode: kit ? 'kit' : 'shoot', label, reduced };
+  return { mode: kit ? 'kit' : 'shoot', label, reduced, theme };
 }
 
 const slug = text =>
@@ -462,7 +469,7 @@ function driver(page) {
 }
 
 /** One run through the app at one size. */
-async function shootViewport(browser, url, viewport, outDir, reduced = false) {
+async function shootViewport(browser, url, viewport, outDir, reduced = false, theme = 'light') {
   const size = `${viewport.width}x${viewport.height}`;
   const dir = join(outDir, size);
   mkdirSync(dir, { recursive: true });
@@ -507,6 +514,8 @@ async function shootViewport(browser, url, viewport, outDir, reduced = false) {
     await page.goto(url, { waitUntil: 'networkidle0' });
     await page.evaluate(() => localStorage.clear());
     await page.reload({ waitUntil: 'networkidle0' });
+    // DES-8: index.html pins the app light, and nothing changes it until DES-16
+    await page.evaluate(theme => document.documentElement.setAttribute('data-theme', theme), theme);
     await until('home');
     await shot('home');
 
@@ -531,11 +540,22 @@ async function shootViewport(browser, url, viewport, outDir, reduced = false) {
     await click('modal-close');
     await gone('settings');
 
+    // since DES-8 the Trophy room opens from the home screen only, so the run
+    // goes home for it and back into Reading (the shot keeps its number)
+    const trophiesHere = await page.evaluate(shown, at('open-trophies'));
+    if (!trophiesHere) {
+      await click('app-home');
+      await until('home');
+    }
     await click('open-trophies');
     await until('trophies');
     await shot('trophies');
     await click('modal-close');
     await gone('trophies');
+    if (!trophiesHere) {
+      await click('open-reading');
+      await until('hub');
+    }
 
     // ---- every game: its start screen and its first round ----
     const titles = await page.$$eval(`${at('game-tile')} ${at('tile-title')}`, els =>
@@ -599,7 +619,7 @@ async function solveLesson(page, { click, waitFor }) {
   throw new Error('the lesson never reached its reward screen');
 }
 
-async function shoot(label, reduced = false) {
+async function shoot(label, reduced = false, theme = 'light') {
   const outDir = join(ROOT, 'screenshots', label);
   rmSync(outDir, { recursive: true, force: true });
 
@@ -611,7 +631,7 @@ async function shoot(label, reduced = false) {
   // the four sizes run side by side, each in its own fresh profile
   const started = Date.now();
   const results = await Promise.allSettled(
-    VIEWPORTS.map(viewport => shootViewport(browser, url, viewport, outDir, reduced))
+    VIEWPORTS.map(viewport => shootViewport(browser, url, viewport, outDir, reduced, theme))
   );
   await browser.close();
   await server.close();
@@ -620,7 +640,9 @@ async function shoot(label, reduced = false) {
   for (const f of failures) console.error(`\nui:shots failed — ${f.reason.message}`);
   if (failures.length) process.exit(1);
   const secs = Math.round((Date.now() - started) / 1000);
-  console.log(`\nDone in ${secs}s: screenshots/${label}/${reduced ? ' (reduced motion: nothing kept moving on any screen)' : ''}`);
+  console.log(
+    `\nDone in ${secs}s: screenshots/${label}/${theme === 'dark' ? ' (dark)' : ''}${reduced ? ' (reduced motion: nothing kept moving on any screen)' : ''}`
+  );
 }
 
 /**
@@ -739,7 +761,7 @@ async function main() {
   }
   if (args.mode === 'diff') await diff(args.a, args.b);
   else if (args.mode === 'kit') await shootKit(args.label);
-  else await shoot(args.label, args.reduced);
+  else await shoot(args.label, args.reduced, args.theme);
   // a puppeteer run can keep the process alive after it's done
   process.exit(0);
 }

@@ -43,6 +43,7 @@ export function App() {
     return () => unsubscribe();
   }, []);
 
+  // the one launch sound and the one close sound (BUG-11)
   const handleLaunchApp = (app: AppDefinition) => {
     soundManager.playAppLaunch();
     setActiveApp(app);
@@ -53,26 +54,28 @@ export function App() {
     setActiveApp(null);
   };
 
+  const handleOpenSettings = () => {
+    soundManager.playPop();
+    setIsSettingsOpen(true);
+  };
+
   const handleGradeChange = (grade: GradeLevel) => {
     storageService.setGrade(grade);
   };
 
   return (
     <div className={styles.tabletOsRoot}>
-      {/* Tablet Top Status Bar */}
-      <StatusBar
-        progress={progress}
-        onOpenSettings={() => {
-          soundManager.playPop();
-          setIsSettingsOpen(true);
-        }}
-        onOpenTrophies={() => {
-          soundManager.playPop();
-          setIsTrophyOpen(true);
-        }}
-        appName={activeApp ? activeApp.name : undefined}
-        onHomeClick={handleCloseApp}
-      />
+      {/* the home screen's status bar; inside an app, the app's own header takes its place (DES-8) */}
+      {!activeApp && (
+        <StatusBar
+          progress={progress}
+          onOpenSettings={handleOpenSettings}
+          onOpenTrophies={() => {
+            soundManager.playPop();
+            setIsTrophyOpen(true);
+          }}
+        />
+      )}
 
       {/* Main OS View: Either Home Screen or Active App Window */}
       <div className={styles.osViewport}>
@@ -82,15 +85,12 @@ export function App() {
             onLaunchApp={handleLaunchApp}
           />
         ) : (
-          <AppWindow
-            app={activeApp}
-            progress={progress}
-            onClose={handleCloseApp}
-          >
+          <AppWindow>
             {activeApp.id === 'reading' ? (
               <ReadingApp
                 progress={progress}
                 onReturnToHome={handleCloseApp}
+                onOpenSettings={handleOpenSettings}
                 onGradeChange={handleGradeChange}
               />
             ) : (

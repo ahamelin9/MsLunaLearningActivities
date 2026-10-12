@@ -156,7 +156,10 @@ and DES-18c): `[data-shot="open-reading"]` for the home icon;
 `[data-shot="lesson-tile"]` and games `[data-shot="game-tile"]`, a game
 named by its `[data-shot="tile-title"]`; `[data-shot="play"]`;
 `[data-shot="shell-play"]` / `[data-shot="shell-reward"]`; and
-`[data-shot="round-pips"][aria-label]`, which changes each round.
+`[data-shot="round-pips"][aria-label]`, which changes each round. Since DES-8
+the header (`AppHeader`) carries `shell-back` (Library), `round-pips` and
+`app-home` (Home, which leaves the app); the Trophy room opens from the home
+screen only.
 
 Prove the check can fail: switch the fix off for a moment (for example, set
 its constant to something huge), rerun, and watch it go ❌, then put the fix
@@ -197,7 +200,7 @@ Pitfalls that cost time:
   `hub-rug`, `hub-tin`, `lesson-tile`, `game-tile`, `tile-title`,
   `shell-intro`, `shell-play`, `shell-reward`, `play`, `shell-back`,
   `round-pips`, `win-veil`, `lesson-choice`, `open-settings`, `settings`,
-  `open-trophies`, `trophies`, `modal-close`. OPS-9 moves the checks in this
+  `open-trophies`, `trophies`, `modal-close`, `app-home` (DES-8). OPS-9 moves the checks in this
   folder onto them.
 - **"Does it still fit?"** for a screen whose content grows by grade (Treasure
   Path's 2nd-grade passages): `ui:shots` only plays Kindergarten. Play the game

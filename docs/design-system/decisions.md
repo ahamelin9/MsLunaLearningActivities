@@ -105,6 +105,7 @@ the code can enforce, staying as close to the prototype as the scales allow.
 | **Screens with no board** (Settings, Trophy room, Grade Select, game start screens, game scenery, Modal) are built from the kit, and Alex OKs the screenshots | The round 2 boards don't show them | DES-9b, DES-9c, DES-22a |
 | **Round counts come from lesson data,** never the design | The boards disagree (4 rounds on Round and Done, 5 on Progress) | DES-7c, DES-13 |
 | **Breakpoints:** as few as the four target sizes need, decided in DES-10; today's 640/700/720/860 retire | Two or three are enough for four iPad sizes | DES-10 |
+| **One header inside an app** (`components/os/AppHeader`, Alex 2026-10-11): Home, the title, the stars and the gear on the library and Grade Select; Library, the title, the rounds bar and Again in a round; Library and the title on a game's start and done screens. No status bar, mute, trophy button or home-indicator strip inside an app. It lives with the tablet shell, not in the kit | The round 2 Library, Round and Done boards show one bar and nothing else; mute stays off kid reach (SET-2). The Trophy room's way in from the app will be the library's squishy shelf (PRG-5) | DES-8 |
 | **Prototype glitches not to copy:** glow keyframes with the light action colour typed in; the "Up next" tag moving off-centre with reduced motion; the Look board's swatches for Right and Try again | Found in the 2026-10-10 audit of the prototype | DES-5, DES-7c, DES-19 |
 
 ## Permanent exceptions

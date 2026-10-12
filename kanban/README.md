@@ -98,7 +98,7 @@ In board order. A new epic gets its file in `epics/` first, then a link here
 |---|---|---|---|---|---|
 | **DES** | **Design system & layout** | Epic | **P0** | | |
 | DES-15 | Draw the chosen Ms. Luna | Story | P0 | M | Todo |
-| DES-8 | One set of chrome | Story | P0 | M | Todo |
+| DES-8 | One set of chrome | Story | P0 | M | In progress |
 | DES-10 | Layout grid and breakpoints | Story | P0 | M | Todo |
 | DES-9a | Shell restyle, part 1: home screen and status bar | Story | P0 | M | Todo |
 | DES-9b | Shell restyle, part 2: Settings and the Trophy room | Story | P0 | M | Todo |

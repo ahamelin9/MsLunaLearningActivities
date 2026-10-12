@@ -135,6 +135,10 @@ so changing a `## Rules` section changes what Claude is shown.
   and saves red overlays in `screenshots/diff-before-after/`. The run finds
   screens by their `data-shot="…"` attributes, so keep them when moving a screen,
   and give anything new it should click one.
+- **See the screens in dark:** `npm run ui:shots -- --theme dark --label after-dark`
+  (DES-8) sets `data-theme="dark"` on `<html>` for the run, so the dark roles
+  show. Until DES-16 only what's already on roles turns dark. Take a
+  `before-dark` too, and `--diff before-dark after-dark`.
 
 ## Reading a design check failure
 

@@ -87,6 +87,7 @@ Story · P0 · M · needs: DES-8, DES-15
   - As on the round 2 Home board: the iPad feel (status bar, the one Reading app icon, home indicator) in the sand and cocoa palette. Day shows the sun and dunes. The night scene comes with DES-16. No purple gradients or blurred blobs.
   - The scenery's colours come from `_illustration.scss`, and the app colours in `apps/registry.ts` go.
   - Room is left for later ESL companion apps (WRT-1 asks the teacher first).
+  - **Left by DES-8:** the status bar shows only on the home screen now (inside an app, `AppHeader` takes its place), and its voice pill is gone. It still has the stars, the trophy button and mute, which the Home board doesn't show: mute goes with SET-2, and the Trophy room's way in is DES-9b's. `AppWindow`'s opening zoom is its last 4 raw values; move it onto the shared motion here.
 - **Complete when:**
   - the home and status-bar shots match the Home board;
   - `components/os/HomeScreen` and `StatusBar` show zero in `design:status`;
@@ -100,6 +101,7 @@ Story · P0 · M · needs: DES-9a
   - No board shows them, so Alex OKs the shots.
   - The achievement badge colours (`data/achievements.ts`) and `TrophyModal`'s inline colours go; badges use roles or `_illustration.scss`.
   - `components/ui/Button` goes with its last users here. It plays a pop on every tap and the kit's ChunkyButton plays nothing, so a button that should keep its sound calls `soundManager` in its `onClick` (found in DES-7a).
+  - **The Trophy room's way in (Alex, 2026-10-11):** inside the app, a child reaches the collection by tapping the library's squishy shelf (the Squishy Shelf card, PRG-5); the app's header has no trophy button. Since DES-8 the Trophy room opens only from the home screen's trophy button, which the Home board doesn't show.
 - **Complete when:**
   - both screens use kit components and roles only, and their folders show zero;
   - `components/ui/Button` is deleted;
@@ -156,7 +158,7 @@ Story · P1 · S · needs: DES-10, PRG-7
   - **Done:** a green check badge and "took N min" (PRG-6). It can be played again.
   - **Up next:** a glowing border, an "Up next" tag and "about N min". Once started, a thin bar shows how many of its rounds are done.
   - **Locked:** dashed and quieter, with a lock badge and "about N min". Tapping it wobbles it, and Luna says to finish the open lesson first (PRG-7).
-  - **Inside a lesson:** the top bar shows the rounds as a bar, not seeds.
+  - **Inside a lesson:** the top bar shows the rounds as a bar, not seeds. Done in DES-8: the one header (`AppHeader`) shows every game's and lesson's rounds as the kit ProgressBar.
   - **Finishing a lesson:** the done screen shows a "Lesson done!" mark, the bar moving on, and "Lesson N is open now". Back on the hub, the next card unlocks with a short pop (DES-5; a plain swap with reduced motion).
   - No seeds, sprouts or flowers anywhere in progress. Wins keep theirs (DES-11).
 - **Complete when:**
@@ -241,6 +243,7 @@ Story · P1 · M · needs: DES-8, DES-10
     - Luna's Pick;
     - the Play Shelf: 8 kit Tiles with drawn pictures in place of today's scenery and emoji lanterns.
   - The Squishy Shelf card and the "Today" panel come with PRG-5 and PRG-6, built from the same kit.
+  - The board's grade chip beside the title in the header was left out by DES-8, since the desk's grade sign still shows the grade. Decide here whether the chip replaces the sign (SET-1 moves changing the grade behind the gate). The header is `components/os/AppHeader`; ReadingApp fills its end.
   - The hub's own keyframes (`pages/Hub`) move onto the shared motion set.
 - **Complete when:**
   - the hub matches the Library board (lesson path aside) at the four sizes, in light and dark;

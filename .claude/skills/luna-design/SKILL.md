@@ -138,8 +138,10 @@ changed screens.
   `styles.x` points at a real class (a typo is silently `undefined`), and no
   `className="…"` string is left. For a refactor, the know-how entry "A move to
   CSS modules" has the rule-by-rule comparison too.
-- Dark mode: force it on the Kit page or in the shots. Until DES-16 the app
-  itself stays light.
+- Dark mode: force it on the Kit page, or in the shots with
+  `npm run ui:shots -- --theme dark --label <name>-dark` (DES-8), and compare
+  each label with `--diff` as usual. Until DES-16 the app itself stays light,
+  and only what's on roles turns dark in those shots.
 
 ### When a hook speaks
 - **Before an edit** (`design-guide.mjs`, DES-25): the first edit in an area
