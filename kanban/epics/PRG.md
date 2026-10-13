@@ -58,7 +58,8 @@ Story · P1 · M · needs: DES-13
 - **How:**
   - **Before:** each lesson card on the hub shows an estimate, e.g. "about 5 min", with a small clock. It starts as rounds × a typical round time, then uses the real average once a few plays are saved.
   - **During:** time only counts while the app is open and on screen (paused when the tab is hidden or the iPad sleeps).
-  - **After:** the lesson-done screen shows the time taken next to the estimate, and the lessons bar moving on (DES-13).
+  - **After:** the lesson-done screen shows the time taken next to the estimate, and the lessons bar moving on (built by DES-22a, as on the Done board).
+  - **The cards (from DES-13, 2026-10-12):** the library's LessonCards ship with no time, since nothing measured one (the kit's `minutes` is optional). This ticket passes them: "took N min" on a done lesson, "about N min" on the rest.
   - **On the hub:** a "Today" line: minutes read today and lessons done (e.g. "12 min today · 3 of 6 done"). The Library board shows it as a "Today" panel in the welcome row, between the Squishy Shelf card and Luna's Pick; since DES-21 the Sticker Tin card stretches over that space until this panel comes.
   - Saved per lesson: last time, best time and number of plays, in `utils/storage.ts`.
 - **Complete when:**
@@ -67,14 +68,18 @@ Story · P1 · M · needs: DES-13
   - hiding the tab for a minute mid-lesson doesn't add that minute;
   - the times survive a reload, and older saves load without errors.
 
-### PRG-7 · Lessons open in order
-Story · P1 · M
-- **Why:** the teacher (2026-10-10): the lessons are linear, so a lesson opens only once the one before it is done. Games stay open to go in and out of as needed (Alex, 2026-10-10). Today every lesson is open; `completedLessons` is saved but nothing reads it to lock anything.
+### PRG-8 · Pick up a lesson where you left off
+Story · P1 · M · needs: —
+- **Why:** split from DES-13 (Alex, 2026-10-12). The Library and Progress boards show a thin rounds bar on the up-next lesson once it's started ("One bar"), but nothing saves a lesson part-way: leaving it restarts it from round 1, so the bar would show progress the child then loses.
 - **How:**
-  - In each grade, Lesson 1 is open. Each next lesson opens when the one before is in `completedLessons` (`utils/storage.ts`). Done lessons stay open to play again.
-  - Games on the Play Shelf are never locked.
-  - Tapping a locked lesson never opens it. It gives a small wobble, and Luna says (pre-rendered) "Let's finish Lesson N first!", where N is the open one.
-  - **Old saves:** lessons already done stay done and open, and the open one is the first lesson not done yet, so nobody loses anything.
-  - If Luna's Pick can choose a lesson, it only picks an open one.
-  - The look comes with DES-13. Until then, keep any screen change minimal, in today's style, and isolated so the restyle can replace it.
-- **Complete when:** a fresh save has only Lesson 1 open in each grade; finishing it opens Lesson 2; tapping a locked lesson doesn't open it and plays Luna's line; every game opens at any time; a save with lessons done out of order loads with those still done and the first not-done lesson open; `voice:audit` passes.
+  - Save the rounds done in the lesson up next as each round is won (per lesson, in `utils/storage.ts`), and clear them when it's finished.
+  - Opening that lesson again starts at the next round, not round 1. Lessons have fixed questions (`makeRounds` in `engine/lessons.ts`), so it starts that far into them. Games still start fresh.
+  - The up-next LessonCard passes those rounds to the kit's `rounds` (its thin bar, from DES-7c).
+  - "Play again" on a done lesson starts it from round 1.
+  - Old saves load with nothing part-way.
+- **Complete when:**
+  - leaving a lesson after winning 2 rounds shows "2 of N" on its card's bar, and opening it again starts on round 3;
+  - finishing it clears the bar and marks it done;
+  - games and done lessons always start at round 1;
+  - it survives a reload, and older saves load without errors.
+

@@ -210,3 +210,12 @@ only record of them. One line each: date, ID, title, and `Done` or
   | Luna's mute | a kit icon button beside her (speaker, or mute when off), the same `speechEnabled` as Settings' "Ms. Luna's voice"; it stops her mid-line. A child can reach it: SET-2 decides |
   | the Play Shelf | kit Tiles on one even grid, 4 across, every tile the same size; each game's picture from `ShelfPicture`, never a title on it |
 - **2026-10-12** — BUG-14 "Word of the day" changes on every visit — Won't do: DES-21 removed the word-of-the-day nook (the Library board has none), so there's no word left to pin to the day.
+- **2026-10-12** — PRG-7 Lessons open in order — Done (pulled into Stage 6 of the DES epic). In each grade only Lesson 1 opens on a fresh save, and each next lesson opens when the one before is done; games are never locked. One rule decides it, `lessonStates` in `engine/lessons.ts` (done, next or locked), which DES-13's cards read. A locked lesson doesn't open: it wobbles and Luna says "Let's finish Lesson N first!" for the lesson up next. The five lines (N 1–5; K has 6 lessons, 1st and 2nd 3) are written out whole in `FINISH_FIRST` and rendered, and `voice:audit` failed on them until they were. "Next lesson" on the done screen shows only when the next lesson is open. Its look is DES-13's, so the old cards in `LessonPath` got a stopgap: faded, a lock badge and the shared wobble, on roles (no raw values added). `lesson-order-check.mjs` (know-how) plays Lesson 1 through and checks every point (11 of 11), and fails 9 of them on the commit before. `layout-audit.mjs` now marks every lesson done before visiting them. Only the library and the screens over it changed, in light and dark; reduced motion stands still. Alex OKed the shots. Settled with Alex before building, and kept as a rule (2026-10-12):
+
+  | Lessons | Rule |
+  |---|---|
+  | which are open | every done lesson, plus the first one not done ("up next"); the rest are locked. One lesson is up next at a time |
+  | an old save done out of order | its done lessons stay done and open; only its first gap opens (Lessons 1 and 3 done: 2 opens, 4 stays locked) |
+  | a locked tap | doesn't open it; a wobble, and Luna says "Let's finish Lesson N first!", N being the lesson up next. A grade with more lessons needs its N added to `FINISH_FIRST` (the check fails until it is) |
+  | the done screen's "Next lesson" | shown only when the next lesson is open |
+  | games | never locked |

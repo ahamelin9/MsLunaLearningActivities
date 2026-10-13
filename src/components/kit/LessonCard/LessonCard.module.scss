@@ -116,6 +116,16 @@
   }
 }
 
+// the lesson that just opened pops in once (DES-13); the one up next then
+// glows on. Reduced motion turns both off, a plain swap
+.root[data-state~='opened'] {
+  --lesson-motion: var(--motion-pop);
+}
+
+.root[data-state~='next'][data-state~='opened'] {
+  --lesson-motion: var(--motion-pop), var(--motion-glow);
+}
+
 .root[data-state~='wobbling'] {
   --lesson-motion: var(--motion-wobble);
 }

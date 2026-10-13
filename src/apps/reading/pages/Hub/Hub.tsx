@@ -3,7 +3,7 @@ import type { GradeLevel } from '@/types/reading';
 import type { UserProgress } from '@/types/user';
 import type { AnyGameDef, GameShape } from '../../engine/types';
 import { GAMES } from '../../games';
-import { ChunkyButton, Luna, PaperCard, Tile } from '@/components/kit';
+import { ChunkyButton, LessonCard, Luna, PaperCard, ProgressBar, Tile } from '@/components/kit';
 import { greeting, lunaSay, type LunaLine, type LunaMood } from '../../engine/luna';
 import { STICKERS, stickerById } from '../../engine/stickers';
 import { soundManager } from '@/utils/audio';
@@ -11,16 +11,16 @@ import { pronunciation } from '@/utils/pronunciation';
 import { storageService } from '@/utils/storage';
 import { warmReadingVoice } from '../../engine/warmup';
 import { FINISH_FIRST, lessonStates } from '../../engine/lessons';
-import { LessonPath } from './LessonPath';
 import { ShelfPicture } from './ShelfPicture';
 import styles from './Hub.module.scss';
 
 interface HubProps {
   grade: GradeLevel;
-  gradeTitle: string;
   progress: UserProgress;
   /** this grade's guided lessons, in teaching order (engine/lessons.ts) */
   lessons: AnyGameDef[];
+  /** the lesson that just opened, back from finishing the one before: it pops in (DES-13) */
+  opened?: string | null;
   /** say her greeting as the library opens: only when it opens from home (DES-21) */
   greet: boolean;
   onPlayGame: (game: AnyGameDef) => void;
@@ -48,14 +48,15 @@ const SHELF_TINTS: Record<GameShape, 1 | 2 | 3 | 4 | 5> = {
 /**
  * Luna's library (DES-21), as on the round 2 Library board: the welcome row
  * (Luna, who says her greeting with no bubble; the Sticker Tin, standing in
- * for the Squishy Shelf until PRG-5; Luna's Pick), the lessons (LessonPath,
- * DES-13's) and the Play Shelf, all from the kit.
+ * for the Squishy Shelf until PRG-5; Luna's Pick), the lessons in order on one
+ * bar (DES-13: done, up next or locked, PRG-7) and the Play Shelf, all from
+ * the kit.
  */
 export const Hub: React.FC<HubProps> = ({
   grade,
-  gradeTitle,
   progress,
   lessons,
+  opened = null,
   greet,
   onPlayGame,
   onSurprise,
@@ -188,9 +189,27 @@ export const Hub: React.FC<HubProps> = ({
         </ChunkyButton>
       </div>
 
-      {/* ---- the lessons come first: the structured teaching, in order (DES-13) ---- */}
+      {/* ---- the lessons come first, in order on one bar (DES-13) ---- */}
       {lessons.length > 0 && (
-        <LessonPath lessons={lessons} states={states} gradeTitle={gradeTitle} onStart={startGame} onLocked={finishFirst} />
+        <section className={styles.lessons}>
+          <div className={styles.lessonsHead}>
+            <h2 className={styles.heading}>Luna’s Lessons</h2>
+            <ProgressBar done={states.filter(s => s === 'done').length} total={lessons.length} className={styles.lessonsBar} />
+          </div>
+          <div className={styles.lessonCards}>
+            {lessons.map((lesson, i) => (
+              <LessonCard
+                key={lesson.id}
+                number={i + 1}
+                title={lesson.title}
+                state={states[i]}
+                opened={lesson.id === opened}
+                data-shot="lesson-tile"
+                onClick={() => (states[i] === 'locked' ? finishFirst() : startGame(lesson))}
+              />
+            ))}
+          </div>
+        </section>
       )}
 
       {/* ---- the Play Shelf: every game the same size, each picture gently alive ---- */}

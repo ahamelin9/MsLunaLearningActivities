@@ -10,6 +10,8 @@
 // DES-9b: the Switch flips and slides its knob (at once under reduced motion),
 // and a selected ChunkyButton (aria-pressed) takes the action colour.
 // DES-9c: a picked Tile (aria-pressed) takes the action colour too.
+// DES-13: a LessonCard with no time shows none, and the one that just opened
+// pops then glows (no pop under reduced motion).
 // Start Vite on 5199 first, then from the repo root:
 //   node .claude/skills/know-how/kit-check.mjs
 // Exits 1 on any ❌.
@@ -203,6 +205,17 @@ await sleep(600);
 ok('the wobble clears', !(await locked.evaluate(e => e.dataset.state)).includes('wobbling'));
 await page.evaluate(() => document.documentElement.setAttribute('data-reduced-motion', ''));
 ok('reduced motion: the tag stays centred and nothing glows', (await centred()) < 1 && (await anim(next)) === 'none');
+await page.evaluate(() => document.documentElement.removeAttribute('data-reduced-motion'));
+
+// DES-13: a card with no time yet (until PRG-6), and the lesson that just opened
+ok('a card with no minutes shows no time', await page.evaluate(() => {
+  const b = [...document.querySelectorAll('button[aria-label^="Lesson"]')].find(x => x.getAttribute('aria-label').endsWith(', done'));
+  return !!b && !/min/.test(b.textContent);
+}));
+const opened = await page.evaluateHandle(() => document.querySelector('button[data-state~="opened"]'));
+ok('the lesson that just opened pops, then glows', (await anim(opened)) === 'luna-pop, luna-glow', await anim(opened));
+await page.evaluate(() => document.documentElement.setAttribute('data-reduced-motion', ''));
+ok('reduced motion: it opens with no pop', /^none(, none)?$/.test(await anim(opened)), await anim(opened));
 await page.evaluate(() => document.documentElement.removeAttribute('data-reduced-motion'));
 
 const sq = l => page.evaluateHandle(l => document.querySelector(`button[aria-label="${l}"]`), l);

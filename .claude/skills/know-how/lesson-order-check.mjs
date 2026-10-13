@@ -11,7 +11,8 @@
 //     line naming the lesson up next;
 //   - every game opens;
 //   - finishing Lesson 1 (played through for real) offers "Next lesson" and
-//     opens Lesson 2, and a locked tap then names Lesson 2;
+//     opens Lesson 2, whose card pops in back on the library (DES-13), and a
+//     locked tap then names Lesson 2;
 //   - an old save with Lessons 1 and 3 done keeps both done and open, opens
 //     only Lesson 2, and survives a reload; replaying Lesson 3 there offers no
 //     "Next lesson", since Lesson 4 is still locked;
@@ -191,8 +192,16 @@ check(`every game opens (${opened} of ${games})`, opened === games && games === 
 // ---- finishing Lesson 1 ----
 const finished = await playLesson(0);
 const nextOffered = await nextLessonOffered();
-await back();
+await page.click(at('shell-back'));
+await page.waitForSelector(at('hub'));
+// DES-13: the lesson that just opened pops in once, back on the library
+const pop = await page.$$eval(at('lesson-tile'), els => {
+  const el = els[1];
+  return { opened: /\bopened\b/.test(el.getAttribute('data-state') ?? ''), motion: getComputedStyle(el).animationName };
+});
+await wait(600);
 const afterOne = await states();
+check(`back on the library, Lesson 2 pops in once (${JSON.stringify(pop)})`, pop.opened && pop.motion.includes('luna-pop'));
 check(`finishing Lesson 1 offers "Next lesson" and opens Lesson 2 (${finished ? 'done screen' : 'never finished'}; ${afterOne.join(' ')})`,
   finished && nextOffered && afterOne[0] === 'done' && afterOne[1] === 'next' && afterOne.slice(2).every(s => s === 'locked'));
 await wait(1500);

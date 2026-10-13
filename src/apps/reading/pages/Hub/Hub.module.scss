@@ -1,6 +1,7 @@
 // Luna's library (DES-21), as on the round 2 Library board: kit pieces laid
-// out with roles and the space scale. The lessons have their own module
-// (LessonPath, DES-13's), and the Play Shelf's drawings theirs (ShelfPicture).
+// out with roles and the space scale: the welcome row, the lessons on one bar
+// (DES-13) and the Play Shelf, whose drawings have their own module
+// (ShelfPicture).
 
 @use 'styles/mixins' as *;
 
@@ -123,6 +124,41 @@
 
   @include bp(narrow) {
     display: none;
+  }
+}
+
+// ---- the lessons: the heading and one bar, then the cards in order (DES-13) ----
+.lessons {
+  display: flex;
+  flex-direction: column;
+  // room for the "Up next" tag and the badges, which overhang a card's top
+  gap: var(--space-6);
+}
+
+.lessons-head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-5);
+
+  .heading {
+    flex: none;
+  }
+}
+
+.lessons-bar {
+  flex: 1;
+  min-width: 0;
+}
+
+// six across, as on the board, so every card is one size at every grade;
+// three on a portrait iPad, where six would squeeze the titles
+.lesson-cards {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: var(--space-6) var(--space-4);
+
+  @include bp(narrow) {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 

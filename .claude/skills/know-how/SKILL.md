@@ -188,6 +188,16 @@ and serve your own response. `stale-index-check.cjs` is the example.
 
 Pitfalls that cost time:
 
+- **A check passes on old code for the wrong reason** (*2026-10-12,
+  PRG-7*): "no 'Next lesson' when the next is locked" passed against the
+  commit before, because it looked for a `data-shot` that commit didn't have,
+  so it never saw the button at all. When proving a check can fail, read
+  each ✅ the old code still gets and ask why. Find things by what a child
+  sees (a button's words) when the hook may not exist in the code compared.
+- **`pkill -f "vite --port 5199"` killed my own command** (*2026-10-12*):
+  `-f` matches whole command lines, so a status check whose own text held
+  that string (`pgrep -fl "vite --port 5199|…"`) was killed with it (exit
+  144). Keep the pattern out of other commands running at the same time.
 - **A puppeteer run prints its result but never exits** (*2026-10-10,
   GAME-1b*): copies of `speech-check.cjs` sometimes keep running after the ✅
   line. Their output is complete by then. Stop just that process by its script
@@ -267,6 +277,22 @@ Pitfalls that cost time:
 - **Pitfall, a fresh line each visit:** the library picks her greeting as it
   mounts, so after a game a tap says that visit's line, not the one said
   from home. Tap her straight after the greeting to test "says it again".
+
+## Do lessons open in order?
+
+*2026-10-12 · PRG-7*
+
+- **Symptom:** you need to know only the right lessons open (a fresh save, a
+  finished lesson, an old save done out of order), that a locked tap says the
+  right line, and that "Next lesson" never leads into a locked one.
+- **Fix:** with Vite on 5199, `node .claude/skills/know-how/lesson-order-check.mjs 5199`.
+  It reads each card's `data-state` (done, locked, or neither for the one up
+  next), plays lessons through by trying each `lesson-choice` in turn (as
+  `ui:shots` does), seeds old saves in `localStorage`, and checks that
+  `FINISH_FIRST` has a line for every lesson a grade can have up next. It
+  takes about two minutes, and fails 9 of 11 on the commit before PRG-7.
+- **Check:** 11 of 11. A grade given more lessons (CUR-4) fails its first
+  line until the new "Let's finish Lesson N first!" is added and rendered.
 
 ## Two screenshot runs of the same code don't match
 
@@ -389,6 +415,12 @@ Pitfalls that cost time:
   Its "(stage)" lines are the games' and lessons' own pieces inside
   `data-shot="stage"`; they're listed for DES-21, DES-22b/c, DES-23 and
   GAME-3 and don't fail the run.
+- **Pitfall, locked lessons** (*2026-10-12, PRG-7*): since lessons open in
+  order, a fresh save opens only Lesson 1, and a tap on the others never
+  reaches a start screen. The audit marks every lesson of the grade done in
+  `localStorage` (importing `lessonsFor` in the page) and comes back in from
+  home before its lesson pass; done lessons stay open. Any new check that
+  visits every lesson needs the same.
 - **Pitfall, scroll isn't the only way not to fit:** the first version only
   looked for scrolling, and a stage made 1,400px tall still passed. GameShell's
   root has `overflow: hidden`, so a stage too tall for the screen is cut off,

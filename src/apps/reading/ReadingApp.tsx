@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import type { GradeLevel } from '../../types/reading';
 import type { UserProgress } from '../../types/user';
 import type { AnyGameDef } from './engine/types';
@@ -10,7 +10,7 @@ import { GRADES } from '@/data/readingCurriculum';
 import { GradeSelect } from './pages/GradeSelect/GradeSelect';
 import { Hub } from './pages/Hub/Hub';
 import { GameShell } from './engine/GameShell/GameShell';
-import { lessonsFor, lessonStates } from './engine/lessons';
+import { lessonsFor, lessonStates, type LessonState } from './engine/lessons';
 import { surprisePick } from './games';
 
 interface ReadingAppProps {
@@ -37,6 +37,10 @@ export const ReadingApp: React.FC<ReadingAppProps> = ({ progress, onReturnToHome
   // (DES-21): after Grade Select she has just said "Let's start …!", and back
   // from a game she has been talking all along
   const [greet, setGreet] = useState(true);
+  // the lesson that just opened, so its card pops in back on the library
+  // (DES-13): the lesson states as a game starts, compared as it ends
+  const statesBefore = useRef<LessonState[]>([]);
+  const [opened, setOpened] = useState<string | null>(null);
 
   const currentGrade = progress.selectedGrade;
   const lessons = useMemo(() => (currentGrade ? lessonsFor(currentGrade) : []), [currentGrade]);
@@ -48,12 +52,18 @@ export const ReadingApp: React.FC<ReadingAppProps> = ({ progress, onReturnToHome
     setIsChangingGrade(false);
   };
 
+  const begin = (active: ActiveGame) => {
+    statesBefore.current = lessonStates(lessons, progress.completedLessons);
+    setOpened(null);
+    setActiveGame(active);
+  };
+
   const handleSurprise = (excludeId?: string) => {
     const game = surprisePick(progress.gamePlays || {}, excludeId);
     const roll = Math.random();
     const difficulty: Difficulty = roll < 0.25 ? 1 : roll > 0.85 ? 3 : 2;
 
-    setActiveGame({
+    begin({
       game,
       autoStart: true,
       difficulty,
@@ -61,7 +71,7 @@ export const ReadingApp: React.FC<ReadingAppProps> = ({ progress, onReturnToHome
     });
   };
 
-  const play = (game: AnyGameDef) => setActiveGame({ game, autoStart: false, difficulty: 2 });
+  const play = (game: AnyGameDef) => begin({ game, autoStart: false, difficulty: 2 });
 
   // View 1: a lesson or a mini-game, both run by the same shell, which has its own header
   if (activeGame && currentGrade) {
@@ -81,6 +91,9 @@ export const ReadingApp: React.FC<ReadingAppProps> = ({ progress, onReturnToHome
         startDifficulty={activeGame.difficulty}
         surpriseBanner={activeGame.banner}
         onExit={() => {
+          const now = lessonStates(lessons, progress.completedLessons);
+          const i = now.findIndex((state, n) => state !== 'locked' && statesBefore.current[n] === 'locked');
+          setOpened(i >= 0 ? lessons[i].id : null);
           setGreet(false);
           setActiveGame(null);
         }}
@@ -126,7 +139,7 @@ export const ReadingApp: React.FC<ReadingAppProps> = ({ progress, onReturnToHome
       {header(gradeTitle)}
       <Hub
         grade={currentGrade}
-        gradeTitle={gradeTitle}
+        opened={opened}
         progress={progress}
         lessons={lessons}
         greet={greet}

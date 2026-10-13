@@ -72,8 +72,8 @@ be pulled into Phase 1 for a break from styling.
 
 ### Now / Next
 
-- **Now:** PRG-7 (pulled in): lessons open in order, with Luna's pre-rendered "Let's finish Lesson N first!" on a locked one; its look waits for DES-13. The second of Stage 6. DES-21 (2026-10-12) put the library on the kit: Luna's spoken greeting with a mute beside her, the grade as a header button, the Sticker Tin, Luna's Pick and the Play Shelf
-- **Next:** DES-13, the lesson path on ProgressBar and LessonCard (it also rebuilds DES-21's `LessonPath`), which ends Stage 6. Then Stage 7, play: DES-22a → DES-11 → DES-22b, DES-22c → DES-23. SET-1 (the grown-up gate) no longer waits on anything. OPS-9 (know-how checks onto `data-shot`) can start any time: the checks lost their last class names with DES-18d. PRG-7 and SET-1 are pulled in where DES-13 and DES-16 need them. FB-1 (Phase 2) no longer waits on the layout; GAME-1c, Treasure Path's screen, waits on it
+- **Now:** DES-13: the lesson path on ProgressBar and LessonCard (one bar; done, up next, locked), which rebuilds DES-21's `LessonPath` on PRG-7's `lessonStates`. The last of Stage 6. DES-21 (the library on the kit) and PRG-7 (lessons open in order) are done (2026-10-12)
+- **Next:** Stage 7, play: DES-22a → DES-11 → DES-22b, DES-22c → DES-23. SET-1 (the grown-up gate) no longer waits on anything. OPS-9 (know-how checks onto `data-shot`) can start any time: the checks lost their last class names with DES-18d. SET-1 is pulled in where DES-16 needs it. FB-1 (Phase 2) no longer waits on the layout; GAME-1c, Treasure Path's screen, waits on it
 
 ## Epics
 
@@ -97,7 +97,7 @@ In board order. A new epic gets its file in `epics/` first, then a link here
 | ID | Title | Type | P | Size | Status |
 |---|---|---|---|---|---|
 | **DES** | **Design system & layout** | Epic | **P0** | | |
-| DES-13 | Lesson path on the hub: in order, one bar | Story | P1 | S | Todo |
+| DES-13 | Lesson path on the hub: in order, one bar | Story | P1 | S | In progress |
 | DES-22a | GameShell on the kit: start, stage, perch, reward | Story | P1 | M | Todo |
 | DES-11 | One right/wrong/reveal visual language | Story | P1 | S | Todo |
 | DES-22b | Games on the kit, part 1: Letter Jar, Bubble Sounds, Letter Cookies, Muddled Cards | Story | P1 | M | Todo |
@@ -151,7 +151,7 @@ In board order. A new epic gets its file in `epics/` first, then a link here
 | PRG-1 | Stars reflect performance | Story | P1 | M | Todo |
 | PRG-5 | Squishies instead of the sticker tin | Story | P1 | M | Todo |
 | PRG-6 | Time per lesson: know it before, see it after | Story | P1 | M | Todo |
-| PRG-7 | Lessons open in order | Story | P1 | M | In progress |
+| PRG-8 | Pick up a lesson where you left off | Story | P1 | M | Todo |
 | PRG-2 | Points: remove or give them a meaning | Story | P2 | S | Todo |
 | PRG-3 | Achievements worked out in one place | Task | P2 | S | Todo |
 | PRG-4 | Secret platinum trophy for a full squishy shelf | Story | P2 | S | Todo |

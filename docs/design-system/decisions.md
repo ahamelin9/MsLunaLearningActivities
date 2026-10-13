@@ -36,6 +36,7 @@ mentioned and what the prototype follows"). A future proposal is marked
 | 2026-10-10 | The milestone moon (a crescent face in black glasses) visits now and then to say "good job" for big milestones | Teacher | Keeps big moments special | DES-17 |
 | 2026-10-10 | No flowers for progress; of four simpler options she picked **One bar** | Teacher | Seeds to flowers was too confusing | DES-13 |
 | 2026-10-10 | Lessons go in order: the next opens when the one before is done. Games stay open | Teacher, Alex | The lessons are linear; games are for going in and out | PRG-7 |
+| 2026-10-12 | One lesson is up next at a time: done lessons stay open, plus the first one not done. An old save done out of order keeps its done lessons and opens only its first gap. A locked tap wobbles, and Luna names the lesson up next | Alex | Nobody loses a done lesson, and the path always has one clear next step (DES-13's "Up next") | PRG-7 |
 | 2026-10-10 | A win still grows flowers and drops petals, for now | Alex | The teacher dropped flowers for progress, not for wins | DES-11 |
 | 2026-10-10 | The cookie game is "Letter Cookies" | Alex | A clearer name | GAME-6 |
 | 2026-10-10 | The moon's milestones (proposal): first lesson ever, half a grade, a whole grade, a full shelf; never an ordinary lesson | Claude, for Alex | "Every once in a while" | DES-17 |

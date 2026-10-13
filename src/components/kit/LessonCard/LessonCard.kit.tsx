@@ -1,5 +1,6 @@
 // LessonCard on the Kit page (DES-7c): done, up next (before and after it's
-// started), locked, and pressed. Tap a locked card to see it wobble.
+// started), locked, with no time (DES-13), just opened, and pressed. Tap a
+// locked card to see it wobble.
 
 import type { ReactNode } from 'react';
 import { Specimen, Specimens } from '@/dev/KitPage/Specimen';
@@ -18,6 +19,14 @@ export default function LessonCardKit() {
         <Specimen label="up next"><Column><LessonCard number={2} title="Find A, M, S & B" state="next" minutes={5} /></Column></Specimen>
         <Specimen label="up next, started (2 of 4 rounds)"><Column><LessonCard number={2} title="Find A, M, S & B" state="next" minutes={5} rounds={{ done: 2, total: 4 }} /></Column></Specimen>
         <Specimen label="locked (tap it)"><Column><LessonCard number={3} title="Pet & Animal Words" state="locked" minutes={4} /></Column></Specimen>
+      </Specimens>
+      <Specimens title="No time yet: the library until PRG-6 measures them (DES-13)">
+        <Specimen label="done"><Column><LessonCard number={1} title="Sounds for M, S, B & T" state="done" /></Column></Specimen>
+        <Specimen label="up next"><Column><LessonCard number={2} title="Find A, M, S & B" state="next" /></Column></Specimen>
+        <Specimen label="locked"><Column><LessonCard number={3} title="Pet & Animal Words" state="locked" /></Column></Specimen>
+      </Specimens>
+      <Specimens title="Just opened: pops in once, then glows (reload to see it; none with reduced motion)">
+        <Specimen label="up next, just opened"><Column><LessonCard number={2} title="Find A, M, S & B" state="next" opened /></Column></Specimen>
       </Specimens>
       <Specimens title="Pressed">
         <Specimen label="done, pressed"><Column><LessonCard number={1} title="Sounds for M, S, B & T" state="done" minutes={4} data-state="pressed" /></Column></Specimen>
