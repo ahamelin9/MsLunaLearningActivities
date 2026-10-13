@@ -219,3 +219,11 @@ only record of them. One line each: date, ID, title, and `Done` or
   | a locked tap | doesn't open it; a wobble, and Luna says "Let's finish Lesson N first!", N being the lesson up next. A grade with more lessons needs its N added to `FINISH_FIRST` (the check fails until it is) |
   | the done screen's "Next lesson" | shown only when the next lesson is open |
   | games | never locked |
+- **2026-10-12** — DES-13 Lesson path on the hub: in order, one bar — Done, and with it Stage 6 (the library). The lessons follow the round 2 Library board: "Luna's Lessons", one kit ProgressBar ("N of 6 lessons done"), then kit LessonCards from PRG-7's `lessonStates`: done (green check), up next (glowing border, "Up next" tag) and locked (dashed, a lock, a wobble, and Luna naming the lesson up next). Back on the library after finishing a lesson, the card that just opened pops in once (none under reduced motion). DES-21's old `LessonPath` is deleted with its spine colours, emoji and taglines, and the path lives in the library's own files, so `pages/Hub` is at 0 (baseline 1,117 → 1,032). LessonCard gained an optional `minutes` (no time chip without one), the opened state and `data-shot`, all on the Kit page; `kit-check.mjs` checks them and fails with the pop off. `lesson-order-check.mjs` now checks the pop too (12 of 12). Only the library and the screens over it changed, in light and dark; the layout audit passes at every grade; reduced motion stands still. Settled with Alex before building: times wait for PRG-6 (no estimate from round counts), the part-way rounds bar became PRG-8 (nothing saved a lesson part-way), and the done screen's lesson pieces went to DES-22a. Alex OKed the shots. Kept as a rule (Alex, 2026-10-12):
+
+  | The lesson path | Rule |
+  |---|---|
+  | its parts | the heading, one ProgressBar of lessons done, then a LessonCard per lesson, its state from `lessonStates` |
+  | layout | six across on landscape, as on the board, so every card is one size at every grade (1st and 2nd's three fill half the row); three on portrait iPads |
+  | times | none on the cards until PRG-6 measures them: `minutes` is left out, never guessed |
+  | a lesson just opened | its card pops in once on the way back to the library; a plain swap with reduced motion |

@@ -53,7 +53,7 @@ Story · P1 · M · needs: —
   - every squishy's line has a clip, and `voice:audit` passes.
 
 ### PRG-6 · Time per lesson: know it before, see it after
-Story · P1 · M · needs: DES-13
+Story · P1 · M · needs: —
 - **Why:** the teacher wants to know how long a lesson takes before starting, and to see how much time and progress a child took (2026-10-09).
 - **How:**
   - **Before:** each lesson card on the hub shows an estimate, e.g. "about 5 min", with a small clock. It starts as rounds × a typical round time, then uses the real average once a few plays are saved.

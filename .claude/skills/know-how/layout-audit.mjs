@@ -7,7 +7,8 @@
 //     or runs past the screen: the shell clips what overflows, so a stage too
 //     tall for the screen is cut off rather than scrolled;
 //   - on the library, whether the next lesson and Luna's Pick show without
-//     scrolling, and Play Rug titles that sit on their scenery;
+//     scrolling, and Play Shelf titles that sit on their pictures (since
+//     DES-21 a failure: every game is a kit Tile, its name under its picture);
 //   - tap targets that overlap, are under their target role (48px chrome, 64px
 //     an answer, `data-shot="lesson-choice"`), or sit in the 16px band at the
 //     screen's sides and bottom. The header's buttons are left out: they sit
@@ -21,8 +22,8 @@
 // It needs Vite already running on the port (5199 is Claude's; 5173 is Alex's).
 // Exits 1 on any problem outside a game's stage, or anything that scrolls
 // mid-round. Problems inside the stage (`data-shot="stage"`: the games' and
-// lessons' own pieces) and on the Play Rug are listed but don't fail: they
-// belong to DES-21, DES-22b/c, DES-23 and GAME-3.
+// lessons' own pieces) are listed but don't fail: they belong to DES-22b/c,
+// DES-23 and GAME-3.
 
 import puppeteer from 'puppeteer-core';
 
@@ -103,7 +104,7 @@ function audit({ screen, midRound, scrolls = false }) {
   return { screen, problems };
 }
 
-/** In the page: the library's first screenful, and the Play Rug's titles. */
+/** In the page: the library's first screenful, and the Play Shelf's titles. */
 function library() {
   const H = innerHeight;
   const header = document.querySelector('header')?.getBoundingClientRect().bottom ?? 0;
@@ -204,10 +205,13 @@ for (const [width, height] of SIZES) {
   }
 
   console.log(`\n=== ${width}×${height}, grade ${['K', '1st', '2nd'][grade]}`);
-  const libraryProblems = [lib.nextLesson && `next lesson ${lib.nextLesson}`, lib.lunasPick && `Luna's Pick ${lib.lunasPick}`].filter(Boolean);
+  const libraryProblems = [
+    lib.nextLesson && `next lesson ${lib.nextLesson}`,
+    lib.lunasPick && `Luna's Pick ${lib.lunasPick}`,
+    lib.rug.length && `Play Shelf titles on their pictures: ${lib.rug.join(', ')}`
+  ].filter(Boolean);
   failing += libraryProblems.length;
   console.log(`${libraryProblems.length ? '❌' : '✅'} library: ${libraryProblems.join('; ') || "the next lesson and Luna's Pick show without scrolling"}`);
-  if (lib.rug.length) console.log(`   (Play Rug, DES-21) titles on their scenery: ${lib.rug.join(', ')}`);
   for (const r of results) {
     const hard = r.problems.filter(p => !p.stage);
     const soft = r.problems.filter(p => p.stage);

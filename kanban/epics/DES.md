@@ -50,7 +50,7 @@ them in.
 | 3 | Foundations | DES-3 → DES-19 → DES-20 → DES-4 → DES-5 → DES-6 (done 2026-10-11) | Tokens in light and dark; lint enforces the rules after every edit; the Kit page; Andika and Fraunces offline; shared motion; reduced motion |
 | 4 | The kit | DES-7a, DES-7b, DES-7c (done 2026-10-11) | Every kit component on the Kit page in every state |
 | 5 | Frame and shell | DES-8, DES-10, DES-15 (done 2026-10-11), DES-9a, DES-9b, DES-9c, DES-12 (done 2026-10-12) | One header, the layout grid, the new Luna (moved here from Stage 4, Alex 2026-10-11), the restyled home, Settings, trophies and Grade Select; one Luna per screen |
-| 6 | The library | DES-21, **PRG-7 (pulled in)** (done 2026-10-12) → DES-13 | The library as on the board: lessons in order, one bar |
+| 6 | The library | DES-21 → **PRG-7 (pulled in)** → DES-13 (done 2026-10-12) | The library as on the board: lessons in order, one bar |
 | 7 | Play | DES-22a → DES-11 → DES-22b, DES-22c → DES-23 | GameShell, all 8 games and all 8 lesson types on the kit, with one right/wrong language |
 | 8 | The design system is done | DES-24 | Legacy styles deleted; the check runs strict with no baseline |
 | 9 | What's left of the epic | **SET-1 (pulled in)** → DES-16, then DES-17, then DES-14 | Light/dark follows the iPad with a grown-up choice; the milestone moon; real cookies |
@@ -58,9 +58,8 @@ them in.
 **Notes on the order:**
 - **Why structure comes before tokens:** the design check's baseline (DES-19) is taken on the final tree, so moving files later doesn't upset it.
 - **The two pulled-in tickets:**
-  - PRG-7 (lessons open in order, Phase 7) has no needs of its own, and DES-13 can't finish without it.
-  - SET-1 (the grown-up gate, Phase 3) needs DES-9b, and DES-16's Settings choice lives behind it.
-  - If Alex would rather keep them in their phases, DES-13 and DES-16 wait for them, and the epic closes later.
+  - PRG-7 (lessons open in order, Phase 7) was pulled into Stage 6 for DES-13, and both are done (2026-10-12).
+  - SET-1 (the grown-up gate, Phase 3) needs DES-9b, and DES-16's Settings choice lives behind it. If Alex would rather keep it in its phase, DES-16 waits for it, and the epic closes later.
 - **DES-24 checks light and dark by forcing the theme** (on the Kit page and in the screenshots). DES-16 then lets the iPad and the grown-up switch it for real.
 - **DES-17's full-shelf milestone moved to PRG-4,** so the moon doesn't wait on squishies (PRG-5, Phase 7).
 - **DES-14** (P2) touches the same folder as DES-22b and can slot in straight after it.
@@ -77,32 +76,6 @@ Story · P1 · S · needs: DES-22a
   - every solved round grows flowers and drops petals;
   - no confetti is left anywhere (`utils/confetti.ts` deleted);
   - it's checked in light and dark. (That every game and lesson looks the same is checked in DES-22b, DES-22c and DES-23.)
-
-### DES-13 · Lesson path on the hub: in order, one bar
-Story · P1 · S · needs: —
-- **Why:** the teacher found seeds to flowers too confusing and picked "One bar" from the round 2 Progress board (2026-10-10). Lessons now go in order (PRG-7), so each one only needs to say done, up next or locked.
-- **How:** as on the round 2 Library, Round and Done boards:
-  - **The bar:** one bar above the lessons, one segment per lesson, with "N of 6 lessons done". It fills as each lesson is done.
-  - **Done:** a green check badge and "took N min" (PRG-6). It can be played again.
-  - **Up next:** a glowing border, an "Up next" tag and "about N min". Once started, a thin bar shows how many of its rounds are done.
-  - **Locked:** dashed and quieter, with a lock badge and "about N min". Tapping it wobbles it, and Luna says to finish the open lesson first (PRG-7).
-  - **Inside a lesson:** the top bar shows the rounds as a bar, not seeds. Done in DES-8: the one header (`AppHeader`) shows every game's and lesson's rounds as the kit ProgressBar.
-  - **Finishing a lesson:** the done screen shows a "Lesson done!" mark, the bar moving on, and "Lesson N is open now". Back on the hub, the next card unlocks with a short pop (DES-5; a plain swap with reduced motion).
-  - No seeds, sprouts or flowers anywhere in progress. Wins keep theirs (DES-11).
-  - **Settled before building (Alex, 2026-10-12):**
-    - **No times yet:** nothing measures them until PRG-6, so the kit's LessonCard takes an optional `minutes` and shows no time chip without one. No estimate from round counts, which could mislead the teacher. PRG-6 passes them.
-    - **The part-way rounds bar** is split out to PRG-8 (pick up a lesson where you left off): nothing saves a lesson part-way, and leaving restarts it.
-    - **The done screen's lesson pieces** ("Lesson done!", the bar moving on, "Lesson N is open now") move to DES-22a, which rebuilds that screen as the Done board. The round's top bar and the done screen already show no seeds or flowers (DES-8).
-    - **The unlock pop** is a kit LessonCard state: a one-time pop on the card that just opened (a plain swap under reduced motion), with its Kit page specimen, `kit-check.mjs` line and `components.md` row. The library finds the card by comparing lesson states before and after a lesson.
-    - **`data-shot`:** LessonCard passes `data-shot` through, so `lesson-tile` keeps working for `ui:shots`, the layout audit and `lesson-order-check.mjs`.
-    - **Layout:** six columns on landscape, as on the board (so 1st and 2nd grade's three lessons fill half the row and every card keeps one size); three on portrait iPads.
-    - The old cards' spine colours, emoji and taglines go (the board shows none), so `pages/Hub` reaches zero.
-- **Complete when:**
-  - a new child sees an empty bar, Lesson 1 up next and the rest locked;
-  - finishing Lesson 1 fills one segment, shows it done (its time comes with PRG-6), opens Lesson 2, and that card pops in once back on the library (no pop with reduced motion);
-  - the library shows no seeds or flowers;
-  - the path is built from ProgressBar, LessonCard and roles only, its code shows zero in `design:status` (`pages/Hub` at zero, the `LessonPath` DES-21 left included), and it's checked in light and dark;
-  - LessonCard's new states (no time, the unlock pop) are on the Kit page, and `kit-check.mjs` fails with the pop's style off.
 
 ### DES-14 · Feed Luna's cookies look like real, different cookies
 Story · P2 · S · needs: DES-22b

@@ -413,8 +413,9 @@ Pitfalls that cost time:
 - **Fix:** with Vite on 5199, run
   `node .claude/skills/know-how/layout-audit.mjs 5199 <0|1|2>` once per grade.
   Its "(stage)" lines are the games' and lessons' own pieces inside
-  `data-shot="stage"`; they're listed for DES-21, DES-22b/c, DES-23 and
-  GAME-3 and don't fail the run.
+  `data-shot="stage"`; they're listed for DES-22b/c, DES-23 and GAME-3 and
+  don't fail the run. Since DES-21 a Play Shelf title on its picture fails
+  it (proved against the commit before DES-21, which shows the five).
 - **Pitfall, locked lessons** (*2026-10-12, PRG-7*): since lessons open in
   order, a fresh save opens only Lesson 1, and a tap on the others never
   reaches a start screen. The audit marks every lesson of the grade done in
@@ -716,6 +717,22 @@ the old version either proves nothing.
   shell version or look for another way to set the bit.
 - **Check:** `sh .githooks/pre-commit` runs `npm run lint` and exits with its
   status, without needing the executable bit.
+
+## Lint says a click handler calls `Math.random` "during render"
+
+*2026-10-12 · DES-13*
+
+- **Symptom:** `npm run lint` fails with `react-hooks/purity` ("Cannot call
+  impure function during render") on `Math.random` inside a handler such as
+  ReadingApp's `handleSurprise`, which only runs on a tap, and which passed
+  lint the day before.
+- **Cause:** the handler had started calling a helper (`begin`) declared
+  further down the component. The React compiler's lint then reads the
+  handler as if it ran while rendering.
+- **Fix:** declare the helper above every handler that calls it. Don't
+  silence the rule.
+- **Check:** `npm run lint` is clean with the helper moved up, and fails
+  again with it moved back below.
 
 ## Lint suddenly fails with dozens of errors in `.d.ts` files nobody wrote
 
