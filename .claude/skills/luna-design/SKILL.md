@@ -110,9 +110,22 @@ Follow `screens.md`:
 4. `npm run ui:shots -- --label after`. Compare it with the board (style sample,
    page "Round 2 · Teacher's picks") in light and dark.
 5. Get Alex's OK on a review sheet (before, after light, after dark, plus any
-   state the shots don't reach), made with
+   state the shots don't reach, **plus the board's shot in light and dark
+   beside ours** when there is one), made with
    `node .claude/skills/know-how/review-sheet.mjs <spec.json> screenshots/review/<ticket>-<screen>.png`.
    Then update the area's row on the map.
+
+**Comparing with the board, at the start and the end** (Alex, 2026-10-12):
+plan from the board before building, and show it beside ours at the end. To
+shoot a board: open the canvas in the built-in browser (it's signed in; a
+headless puppeteer gets "Page not found", and the built boards in
+`prototype/project/` need the canvas runtime, so they don't render alone), set
+the tab to 1440×1000 with `resize_window`, wait about 8 s, then use the
+board's own nav bar (its buttons sit on the row at y≈466 of the 800-wide
+screenshot frame; "Dark" toggles the theme, and a board opens in light). A
+`zoom` of the region (120, 58)–(681, 446) is the board alone, saved as a PNG
+under the session's `tool-results/`: copy it to the scratchpad and list it in
+the sheet's spec. Reset the viewport (`preset: "desktop"`) when done.
 
 For a pure refactor, `npm run ui:shots -- --diff before after` must show 0
 changed screens.
@@ -147,6 +160,8 @@ changed screens.
   `node .claude/skills/know-how/luna-talk-check.mjs 5199` (Vite on 5199;
   DES-15). Her moods and blink are in `kit-check.mjs`. Her library greeting,
   the header's grade button and her mute: `greeting-check.mjs` (DES-21).
+  The game's perch (her line, a no-tail bubble, "Hear my clue") and the
+  stage's flash: `perch-check.mjs` (DES-22a).
 - Does a screen fit? `node .claude/skills/know-how/layout-audit.mjs 5199 <grade 0|1|2>`
   (Vite on 5199): nothing scrolls or is cut off mid-round, and no tap target
   outside a game's stage is small, overlapping or in the edge band (DES-10).

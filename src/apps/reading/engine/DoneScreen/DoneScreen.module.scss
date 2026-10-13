@@ -1,131 +1,179 @@
-// The done screen, moved unchanged out of GameShell's module (DES-22a) so the
-// shell could go onto the kit. Still the old look and the old styles: DES-22d
-// rebuilds it on the round 2 Done board and takes this folder to zero.
+// The done screen (DES-22d), as on the round 2 Done board: one lifted panel,
+// the lesson done on the left (on the soft accent, the mark in the arch's
+// round top, Luna in the corner) and what comes next on the right. Kit pieces
+// laid out with roles and the space scale; the motion is shared.
 
-@use 'apps/reading/engine/world' as *;
+@use 'styles/mixins' as *;
 
-// the shell's old frame, as it was under the reward
-.done-screen {
-  position: relative;
+.screen {
   flex: 1;
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
   // it fills what's left under the app's header (AppHeader, DES-8)
   min-height: 0;
-  padding: 0.9rem 1.1rem 1.1rem;
-  color: $ink;
-  background:
-    radial-gradient(ellipse at 50% -10%, rgba(240, 162, 46, 0.22), transparent 60%),
-    linear-gradient(180deg, #FFF6E6 0%, #FBEBD2 100%);
+  padding: var(--space-5) var(--space-6);
+  color: var(--ink);
+  font-family: var(--font-read);
   overflow: hidden;
 }
 
-.reward-confetti {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  z-index: 5;
-}
+.panel {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+  gap: var(--space-8);
 
-.reward-panel {
-  @include paper-card;
-  @include grain(0.06);
-  position: relative;
-  z-index: 6;
-  width: min(540px, 100%);
-  padding: 1.3rem 1.5rem 1.5rem;
-  text-align: center;
-  animation: panelRise 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.reward-luna { display: flex; justify-content: center; margin-top: -3.6rem; }
-
-.reward-title {
-  font-family: var(--font-display);
-  font-size: 1.6rem;
-  font-weight: 600;
-  margin-top: 0.3rem;
-}
-
-.reward-stars {
-  display: flex;
-  justify-content: center;
-  gap: 0.3rem;
-  margin: 0.7rem 0 0.4rem;
-
-  .reward-star {
-    animation: starDrop 0.55s cubic-bezier(0.2, 1.5, 0.4, 1) backwards;
-    filter: drop-shadow(0 4px 6px rgba(201, 123, 18, 0.45));
+  // portrait iPads: the lesson done above, what next below
+  @include bp(narrow) {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto minmax(0, 1fr);
   }
 }
 
-.reward-score { color: $ink-soft; font-weight: 700; font-size: 0.95rem; }
+// ---------- the lesson is done ----------
+// it runs to the panel's edges, as on the board, out through the card's padding
+.done {
+  position: relative;
+  // the arch and Luna sit behind and beside the rest, inside it
+  isolation: isolate;
+  margin: calc(var(--space-6) * -1) 0 calc(var(--space-6) * -1) calc(var(--space-6) * -1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-10) var(--space-6) var(--space-6);
+  border-radius: calc(var(--radius-stage) - var(--border-regular)) 0 0 calc(var(--radius-stage) - var(--border-regular));
+  background: var(--accent-soft);
+  overflow: hidden;
 
-.sticker-award {
+  @include bp(narrow) {
+    margin: calc(var(--space-6) * -1) calc(var(--space-6) * -1) 0;
+    padding-bottom: var(--space-16);
+    border-radius: calc(var(--radius-stage) - var(--border-regular)) calc(var(--radius-stage) - var(--border-regular)) 0 0;
+  }
+}
+
+// the arch behind the mark, as on the board: as tall as it's wide, a round
+// top over a square foot that ends by the title
+.arch {
+  position: absolute;
+  z-index: -1;
+  top: var(--space-10);
+  left: 50%;
+  width: calc(var(--space-16) * 4 + var(--space-8));
+  height: calc(var(--space-16) * 4 + var(--space-8));
+  transform: translateX(-50%);
+  border-radius: var(--radius-chip) var(--radius-chip) 0 0;
+  background: var(--edge);
+}
+
+// the mark is a picture that pops again when tapped, like a squishy
+.mark {
+  margin-top: calc(var(--space-12) + var(--space-3));
+  padding: 0;
+  border: none;
+  border-radius: var(--radius-chip);
+  background: none;
+  cursor: pointer;
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+.medal {
   display: flex;
   align-items: center;
-  gap: 0.8rem;
-  margin: 1rem 0;
-  padding: 0.7rem 0.9rem;
-  background: #FFFFFF;
-  border: 3px dashed $amber;
-  border-radius: 18px;
-  text-align: left;
-
-  .sticker-peel {
-    font-size: 2.7rem;
-    animation: stickerStick 0.7s cubic-bezier(0.2, 1.5, 0.4, 1);
-    filter: drop-shadow(0 3px 4px rgba(58, 42, 31, 0.3));
-  }
-
-  .sticker-kicker {
-    display: block;
-    font-size: 0.72rem;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: $amber-deep;
-    font-weight: 800;
-  }
-
-  .sticker-name {
-    font-family: var(--font-read);
-    font-size: 1.15rem;
-    font-weight: 600;
-  }
-}
-
-.reward-actions {
-  display: flex;
-  gap: 0.5rem;
-  flex-wrap: wrap;
   justify-content: center;
+  width: calc(var(--space-16) * 2 + var(--space-10));
+  height: calc(var(--space-16) * 2 + var(--space-10));
+  border-radius: var(--radius-chip);
+  background: var(--right);
+  color: var(--right-ink);
+  box-shadow: 0 var(--ledge-large) 0 var(--right-edge), 0 0 0 var(--space-3) var(--right-glow);
+  animation: var(--motion-pop);
+  animation-duration: var(--dur-celebrate);
 }
 
-.reward-btn {
-  @include chunky(#FFFFFF, rgba(58, 42, 31, 0.25), $ink);
-  padding: 0.6rem 1rem;
-  font-size: 1rem;
-  flex: 1 1 140px;
-
-  &.primary { @include chunky($amber, $amber-deep, #46280A); }
+.title {
+  margin-top: var(--space-6);
+  font: var(--text-display-xl);
+  text-align: center;
 }
 
-@keyframes panelRise {
-  from { transform: translateY(22px) scale(0.97); opacity: 0; }
-  to { transform: translateY(0) scale(1); opacity: 1; }
+.solved {
+  font: var(--text-label-small);
+  font-weight: 400;
+  color: var(--ink-soft);
 }
 
-@keyframes starDrop {
-  from { transform: translateY(-30px) scale(0.3) rotate(-40deg); opacity: 0; }
-  to { transform: translateY(0) scale(1) rotate(0); opacity: 1; }
+// Luna cheers from the corner
+.luna {
+  position: absolute;
+  left: var(--space-3);
+  bottom: var(--space-2);
 }
 
-@keyframes stickerStick {
-  0% { transform: translate(30px, -26px) rotate(28deg) scale(0.5); opacity: 0; }
-  60% { transform: translate(0, 0) rotate(-8deg) scale(1.2); opacity: 1; }
-  100% { transform: rotate(-4deg) scale(1); }
+// ---------- what comes next ----------
+.next {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  padding: var(--space-2) var(--space-2) 0 0;
+
+  @include bp(narrow) {
+    padding: 0;
+  }
+}
+
+.lessons {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.label {
+  font: var(--text-tag);
+  letter-spacing: var(--tracking-tag);
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+.opened {
+  align-self: flex-start;
+}
+
+.reward {
+  display: flex;
+  align-items: center;
+  gap: var(--space-5);
+}
+
+.sticker {
+  font: var(--text-display-l);
+}
+
+.reward-words {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.reward-label {
+  font: var(--text-tag);
+  letter-spacing: var(--tracking-tag);
+  text-transform: uppercase;
+  color: var(--accent-text);
+}
+
+.reward-name {
+  font: var(--text-read);
+  font-weight: 700;
+}
+
+.actions {
+  margin-top: auto;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-4);
 }

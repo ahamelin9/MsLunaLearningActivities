@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 // The layout audit (DES-10): at the four iPad sizes, visits Grade Select
-// (DES-9c), the library, every game's start screen and first round, and the
-// first question of every lesson of one grade, and reports:
+// (DES-9c), the library, every game's start screen and first round, the
+// first question of every lesson of one grade, and Lesson 1's done screen,
+// played through (DES-22d), and reports:
 //   - more than one owl on a screen: the kit's Luna and owl emoji (DES-12);
 //   - anything that scrolls on a game or lesson screen (nothing may, mid-round),
 //     or runs past the screen: the shell clips what overflows, so a stage too
@@ -66,7 +67,7 @@ function audit({ screen, midRound, scrolls = false }) {
     }
     if (document.scrollingElement.scrollHeight > H + 1)
       problems.push({ text: `scrolls: the page by ${document.scrollingElement.scrollHeight - H}px`, stage: false, scroll: true });
-    const shown = ['shell-play', 'stage'].map(n => document.querySelector(`[data-shot="${n}"]`)).filter(Boolean);
+    const shown = ['shell-play', 'stage', 'shell-reward'].map(n => document.querySelector(`[data-shot="${n}"]`)).filter(Boolean);
     const taps = [...document.querySelectorAll('button, [role="button"]')].filter(visible);
     for (const el of [...shown, ...taps]) {
       const b = el.getBoundingClientRect();
@@ -203,6 +204,34 @@ for (const [width, height] of SIZES) {
     results.push(await page.evaluate(audit, { screen: `Lesson ${i + 1}, question 1`, midRound: true }));
     await back();
   }
+
+  // the done screen (DES-22d): Lesson 1 played through, each choice tried in
+  // turn until the round moves on (as lesson-order-check.mjs does)
+  await open('lesson-tile', 0);
+  await play();
+  const shownNow = sel => page.evaluate(q => !!document.querySelector(q), sel);
+  const round = () => page.evaluate(() => document.querySelector('[data-shot="round-pips"]')?.getAttribute('aria-label') ?? null);
+  for (let guard = 0; guard < 40 && !(await shownNow(at('shell-reward'))); guard++) {
+    const now = await round();
+    const count = (await page.$$(at('lesson-choice'))).length;
+    let moved = false;
+    for (let c = 0; c < count && !moved; c++) {
+      const choice = (await page.$$(at('lesson-choice')))[c];
+      if (!choice) break;
+      await choice.click().catch(() => {});
+      for (let t = 0; t < 40 && !moved; t++) {
+        await wait(200);
+        moved = (await shownNow(`${at('win-veil')}, ${at('shell-reward')}`)) || (await round()) !== now;
+      }
+    }
+    for (let t = 0; t < 60 && !(await shownNow(at('shell-reward'))) && (await round()) === now; t++) await wait(200);
+  }
+  await wait(1500);
+  results.push(
+    (await shownNow(at('shell-reward')))
+      ? await page.evaluate(audit, { screen: 'Lesson 1, done screen', midRound: true })
+      : { screen: 'Lesson 1, done screen', problems: [{ text: 'never reached it', stage: false }] }
+  );
 
   console.log(`\n=== ${width}×${height}, grade ${['K', '1st', '2nd'][grade]}`);
   const libraryProblems = [

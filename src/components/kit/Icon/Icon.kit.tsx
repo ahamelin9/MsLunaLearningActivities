@@ -1,5 +1,6 @@
-// Icon on the Kit page (DES-7a): every drawing, the four sizes, a filled star,
-// and the colour following the text around it.
+// Icon on the Kit page (DES-7a): every drawing, the sizes (96 is the done
+// screen's mark, DES-22d), a filled star, and the colour following the text
+// around it.
 
 import { Specimen, Specimens } from '@/dev/KitPage/Specimen';
 import { Icon } from './Icon';
@@ -18,6 +19,7 @@ export default function IconKit() {
           <Specimen key={size} label={String(size)}><Icon name="clock" size={size} /></Specimen>
         ))}
         <Specimen label="star, filled"><Icon name="star" size={32} filled /></Specimen>
+        <Specimen label="96, the done mark"><Icon name="check" size={96} /></Specimen>
       </Specimens>
       <Specimens title="currentColor: it takes the text's colour">
         <Specimen label="in --ink"><span style={{ color: 'var(--ink)' }}><Icon name="speaker" size={32} /></span></Specimen>

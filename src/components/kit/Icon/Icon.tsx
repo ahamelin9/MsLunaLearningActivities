@@ -3,7 +3,8 @@
  * an icon takes the colour of the text around it and has none of its own.
  *
  * Props:  name: IconName (the drawings are in shapes.tsx)
- *         size: 16 | 20 | 24 | 32 | 40 (default 24)
+ *         size: 16 | 20 | 24 | 32 | 40 | 96 (default 24); 96 is the done
+ *         screen's mark (DES-22d)
  *         filled?: fills the shape too (a star in a count chip)
  *         label?: what it means, for an icon standing alone; without one it's
  *         hidden from screen readers, as its button or chip names it
@@ -11,7 +12,7 @@
  * States: none; it follows its parent's colour
  * Tokens: --icon-size, --icon-stroke; --icon-fill is inherited, so a kit parent
  *         can fill a shape in a second colour (currentColor if none is set)
- * Reads:  --space-4, --space-5, --space-6, --space-8, --space-10
+ * Reads:  --space-4, --space-5, --space-6, --space-8, --space-10, --space-16
  * Board:  every round 2 board: header buttons, chips, lesson badges
  */
 
@@ -23,7 +24,7 @@ export type { IconName };
 
 interface IconProps {
   name: IconName;
-  size?: 16 | 20 | 24 | 32 | 40;
+  size?: 16 | 20 | 24 | 32 | 40 | 96;
   filled?: boolean;
   label?: string;
   className?: string;

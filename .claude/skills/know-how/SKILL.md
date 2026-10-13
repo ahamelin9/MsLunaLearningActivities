@@ -278,6 +278,30 @@ Pitfalls that cost time:
   mounts, so after a game a tap says that visit's line, not the one said
   from home. Tap her straight after the greeting to test "says it again".
 
+## Does the perch work? (Luna's line, the clue, the flash)
+
+*2026-10-12 · DES-22a*
+
+- **Symptom:** you need to know the start screen's Luna perches with a tailed
+  bubble and says the mission; that a game with its own Luna (Feed Luna) gets
+  a perch with no owl and no tail whose line says itself again; that "Hear my
+  clue" shows from the second miss, plays the hint and goes on a win; and
+  that the stage's edge turns try-again or right. A miss's flash lasts 500ms,
+  too quick to catch by eye.
+- **Fix:** with Vite on 5199, `node .claude/skills/know-how/perch-check.mjs 5199`.
+  It plays Feed Luna at Kindergarten, logs what `pronunciation.say` was asked
+  and counts clips, and records every `data-flash` the stage takes with a
+  MutationObserver. 13 of 13; 6 of 11 fail on the commit before DES-22a.
+- **Pitfall, a colour read mid-change:** the stage's edge changes over
+  `--dur-quick`, so its colour read the moment `data-flash` appears is still
+  the old one. Read it 300ms later (the check's observer does).
+- **Pitfall, a borrowed label:** `kit-check.mjs` finds ListenCues by
+  `aria-label="Hear it again"`. SpeechBubble's new tappable line first used
+  the same default label, so three ListenCue checks failed on a component
+  nobody had touched. Give a new tappable thing its own label (the bubble's
+  is "Hear Ms. Luna again"), and when an untouched check fails, look for a
+  new element its selector now also matches.
+
 ## Do lessons open in order?
 
 *2026-10-12 · PRG-7*
@@ -431,6 +455,13 @@ Pitfalls that cost time:
   below.
 - **Pitfall, the library scrolls:** a card ending at the fold isn't hugging the
   edge, so the bottom band isn't judged there.
+- **Pitfall, decoration that hangs off a scroller** (*2026-10-12, DES-22a*):
+  the stage's soft blobs sit half outside it. On a lesson the stage scrolls
+  (`overflow-y: auto`, for long stories), so the low blob gave every lesson
+  128px of scroll ("scrolls: stage by 128px"); on games, `overflow: hidden`
+  had hidden it. Keep decoration on a parent that clips and never scrolls,
+  and put the content on an inner layer that does the scrolling (GameShell's
+  `.stage` and `.inside`).
 - **Check:** it passes at every grade today, and fails with GameShell's
   `.shell-stage { min-height }` set to 1400px for a moment.
 

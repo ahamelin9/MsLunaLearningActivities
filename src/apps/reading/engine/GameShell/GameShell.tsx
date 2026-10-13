@@ -4,6 +4,7 @@ import type { UserProgress } from '@/types/user';
 import type { AnyGameDef, GameApi, GameContext } from '../types';
 import type { Difficulty } from '../content';
 import { lunaSay, type LunaMood } from '../luna';
+import { lessonStates } from '../lessons';
 import { nextSticker, type Sticker } from '../stickers';
 import { soundManager } from '@/utils/audio';
 import { pronunciation, type SpeechPart } from '@/utils/pronunciation';
@@ -12,7 +13,7 @@ import { storageService } from '@/utils/storage';
 import { ChunkyButton, Icon, Luna, SpeechBubble } from '@/components/kit';
 import { AppHeader } from '@/components/os/AppHeader/AppHeader';
 import { GAME_TINTS, GamePicture } from '../../games/shared/GamePicture/GamePicture';
-import { DoneScreen } from '../DoneScreen/DoneScreen';
+import { DoneScreen, type LessonPath } from '../DoneScreen/DoneScreen';
 import { cx } from '@/utils/cx';
 import styles from './GameShell.module.scss';
 
@@ -32,6 +33,8 @@ interface GameShellProps {
   startDifficulty?: Difficulty;
   /** a lesson's place on the path: its start screen shows the number */
   lessonNumber?: number;
+  /** a lesson's grade's lessons, in order: its done screen shows the bar moving on */
+  lessons?: AnyGameDef[];
 }
 
 /** How tricky a game is, picked on its start screen: the words a child reads. */
@@ -58,7 +61,8 @@ export const GameShell: React.FC<GameShellProps> = ({
   playAnotherLabel = 'Another game',
   autoStart = false,
   startDifficulty = 2,
-  lessonNumber
+  lessonNumber,
+  lessons
 }) => {
   const [phase, setPhase] = useState<Phase>(autoStart ? 'play' : 'intro');
   const [difficulty, setDifficulty] = useState<Difficulty>(startDifficulty);
@@ -67,7 +71,8 @@ export const GameShell: React.FC<GameShellProps> = ({
   const [hintLevel, setHintLevel] = useState<0 | 1 | 2>(0);
   const [hint, setHint] = useState<SpeechPart[] | null>(null);
   const [roundsWon, setRoundsWon] = useState(0);
-  const [cleanRounds, setCleanRounds] = useState(0);
+  // the lessons done as this play began, to see what finishing it opened (DES-22d)
+  const [doneBefore, setDoneBefore] = useState<string[]>(() => progress.completedLessons);
   const [flash, setFlash] = useState<'win' | 'miss' | null>(null);
   const [bubble, setBubble] = useState<string>(game.mission);
   const [mood, setMood] = useState<LunaMood>('happy');
@@ -134,7 +139,7 @@ export const GameShell: React.FC<GameShellProps> = ({
     setHintLevel(0);
     setHint(null);
     setRoundsWon(0);
-    setCleanRounds(0);
+    setDoneBefore(progress.completedLessons);
     setWinStreak(0);
     wonRef.current = 0;
     cleanRef.current = 0;
@@ -172,7 +177,6 @@ export const GameShell: React.FC<GameShellProps> = ({
       wonRef.current += 1;
       setRoundsWon(wonRef.current);
       if (attempts === 0) cleanRef.current += 1;
-      setCleanRounds(cleanRef.current);
 
       const streakNow = winStreak + 1;
       setWinStreak(streakNow);
@@ -244,7 +248,7 @@ export const GameShell: React.FC<GameShellProps> = ({
   );
 
   // The done screen's side effects: save progress, the fanfare, Luna's
-  // closing line. Its confetti is the DoneScreen's own.
+  // closing line.
   useEffect(() => {
     if (phase !== 'reward' || !award || recorded.current) return;
     recorded.current = true;
@@ -274,11 +278,11 @@ export const GameShell: React.FC<GameShellProps> = ({
 
   // the one header (DES-8): back to the library and the game's name; in play,
   // the rounds and Again too, as on the round 2 Round and Done boards
-  const header = (inPlay = false) => (
+  const header = (inPlay = false, title = game.title) => (
     <AppHeader
       back="library"
       onBack={onExit}
-      title={game.title}
+      title={title}
       rounds={inPlay ? { won: roundsWon, current: roundIndex + 1, total: game.roundsPerPlay } : undefined}
     >
       {inPlay && (
@@ -297,17 +301,33 @@ export const GameShell: React.FC<GameShellProps> = ({
 
   // ---------- DONE ----------
   if (phase === 'reward') {
+    // a finished lesson's path (DES-22d): its result is saved just after this
+    // screen shows, so the bar moves on as it arrives, and the lesson that
+    // opened is the one locked as this play began and open now
+    let path: LessonPath | undefined;
+    if (game.lesson && lessons?.length) {
+      const before = lessonStates(lessons, doneBefore);
+      const now = lessonStates(lessons, progress.completedLessons);
+      const opened = now.findIndex((state, i) => state !== 'locked' && before[i] === 'locked');
+      path = {
+        done: now.filter(state => state === 'done').length,
+        total: lessons.length,
+        opened: opened >= 0 ? opened + 1 : undefined
+      };
+    }
     return (
       <>
-        {header()}
+        {/* as on the Done board: "Lesson 2 · Find A, M, S & B" */}
+        {header(false, game.lesson && lessonNumber ? `Lesson ${lessonNumber} · ${game.title}` : game.title)}
         <DoneScreen
           game={game}
           award={award}
           roundsWon={roundsWon}
-          cleanRounds={cleanRounds}
+          path={path}
           onPlayAgain={() => startPlay(difficulty)}
           onPlayAnother={onPlayAnother}
           playAnotherLabel={playAnotherLabel}
+          onLuna={() => speak(bubble, 'cheer')}
         />
       </>
     );

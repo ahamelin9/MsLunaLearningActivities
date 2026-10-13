@@ -16,6 +16,10 @@
 //   - an old save with Lessons 1 and 3 done keeps both done and open, opens
 //     only Lesson 2, and survives a reload; replaying Lesson 3 there offers no
 //     "Next lesson", since Lesson 4 is still locked;
+//   - the done screen's lesson pieces (DES-22d): after Lesson 1 the header
+//     reads "Lesson 1 · …", the bar moves on from 0 to 1 and "Lesson 2 is
+//     open now" shows; replaying Lesson 3 there, the bar stays and nothing
+//     says it opened;
 //   - nothing falls back to the browser voice.
 // Lines are matched by what pronunciation.say was asked (clip labels stick,
 // know-how). Lesson cards are read by data-state: "done", "locked", or
@@ -38,6 +42,12 @@ await page.setViewport({ width: 1180, height: 820 });
 await page.evaluateOnNewDocument(() => {
   window.__browserSpoke = [];
   window.speechSynthesis.speak = u => window.__browserSpoke.push(u.text);
+  // every count the done screen's lessons bar shows, in turn (DES-22d)
+  window.__barSeen = [];
+  new MutationObserver(() => {
+    const v = document.querySelector('[data-shot="shell-reward"] [role="progressbar"]')?.getAttribute('aria-valuenow');
+    if (v != null && window.__barSeen.at(-1) !== v) window.__barSeen.push(v);
+  }).observe(document, { subtree: true, childList: true, attributes: true, attributeFilter: ['aria-valuenow'] });
   window.__starts = 0;
   const start = AudioBufferSourceNode.prototype.start;
   AudioBufferSourceNode.prototype.start = function (...args) {
@@ -104,6 +114,7 @@ const tapLocked = async i => {
 
 /** Plays the open lesson card i through to its done screen, trying each choice in turn. */
 const playLesson = async i => {
+  await page.evaluate(() => { window.__barSeen = []; });
   await (await page.$$(at('lesson-tile')))[i].click();
   await page.waitForSelector(at('shell-intro'));
   await page.click(at('play'));
@@ -126,6 +137,18 @@ const playLesson = async i => {
     for (let t = 0; t < 60 && !(await shown(at('shell-reward'))) && (await round()) === now; t++) await wait(200);
   }
   return shown(at('shell-reward'));
+};
+/** The done screen's lesson pieces, once the result has been saved (DES-22d). */
+const doneScreen = async () => {
+  await wait(1200);
+  return page.evaluate(() => {
+    const r = document.querySelector('[data-shot="shell-reward"]');
+    return {
+      title: document.querySelector('header h1, header h2')?.textContent?.trim() ?? [...document.querySelectorAll('header *')].map(e => e.textContent.trim()).find(t => /^Lesson \d+ · /.test(t)) ?? null,
+      seen: window.__barSeen.slice(),
+      opened: [...(r?.querySelectorAll('span') ?? [])].map(s => s.textContent.trim()).find(t => /is open now$/.test(t)) ?? null
+    };
+  });
 };
 const back = async () => {
   await page.click(at('shell-back'));
@@ -191,6 +214,7 @@ check(`every game opens (${opened} of ${games})`, opened === games && games === 
 
 // ---- finishing Lesson 1 ----
 const finished = await playLesson(0);
+const doneOne = await doneScreen();
 const nextOffered = await nextLessonOffered();
 await page.click(at('shell-back'));
 await page.waitForSelector(at('hub'));
@@ -220,8 +244,13 @@ const reloaded = await states();
 const want = 'done next done locked locked locked';
 check(`Lessons 1 and 3 done: ${oldSave.join(' ')}, after a reload ${reloaded.join(' ')}`, oldSave.join(' ') === want && reloaded.join(' ') === want);
 const three = await playLesson(2);
+const doneThree = await doneScreen();
 const nextAfterThree = await nextLessonOffered();
 check(`replaying Lesson 3 there: ${three ? 'done screen' : 'never finished'}, no "Next lesson" while Lesson 4 is locked`, three && !nextAfterThree);
+check(`after Lesson 1 the done screen reads "${doneOne.title}", its bar moves on (${doneOne.seen.join(' → ')}) and says "${doneOne.opened}"`,
+  /^Lesson 1 · /.test(doneOne.title ?? '') && doneOne.seen.join(' ') === '0 1' && doneOne.opened === 'Lesson 2 is open now');
+check(`replaying Lesson 3, the bar stays (${doneThree.seen.join(' → ')}) and nothing opened (${doneThree.opened})`,
+  doneThree.seen.join(' ') === '2' && doneThree.opened === null);
 await back();
 
 const spoke = await page.evaluate(() => window.__browserSpoke);

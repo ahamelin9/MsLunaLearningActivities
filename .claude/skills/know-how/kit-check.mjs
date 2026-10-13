@@ -14,6 +14,7 @@
 // pops then glows (no pop under reduced motion).
 // DES-22a: a SpeechBubble with no tail draws none, and its line is a 48px
 // button that still reads as her words.
+// DES-22d: Icon's 96 size, and PaperCard's dashed reward panel.
 // Start Vite on 5199 first, then from the repo root:
 //   node .claude/skills/know-how/kit-check.mjs
 // Exits 1 on any ❌.
@@ -374,6 +375,23 @@ ok('… that reads as her words, not a grey button', await bare.evaluate(b => {
   const line = getComputedStyle(document.querySelector('[data-variant="left"] p'));
   return said.borderTopStyle === 'none' && said.backgroundColor === 'rgba(0, 0, 0, 0)' &&
     said.fontSize === line.fontSize && said.fontFamily === line.fontFamily && said.color === line.color;
+}));
+
+// ── the done screen's pieces (DES-22d): the 96px mark, the dashed reward panel ──
+const mark = await page.evaluate(() => {
+  const svg = document.querySelector('svg[data-size="96"]');
+  return svg ? svg.getBoundingClientRect().width : 0;
+});
+ok('Icon\'s 96 size is 96px (the done screen\'s mark)', mark === 96, `${mark}px`);
+ok('the reward PaperCard is flat, on a thick dashed accent border', await page.evaluate(() => {
+  const card = document.querySelector('[data-variant="reward"]');
+  const probe = document.createElement('span');
+  probe.style.color = 'var(--accent)';
+  card.parentElement.append(probe);
+  const accent = getComputedStyle(probe).color;
+  probe.remove();
+  const s = getComputedStyle(card);
+  return s.borderTopStyle === 'dashed' && s.borderTopWidth === '3px' && s.borderTopColor === accent && s.boxShadow === 'none';
 }));
 
 await browser.close();

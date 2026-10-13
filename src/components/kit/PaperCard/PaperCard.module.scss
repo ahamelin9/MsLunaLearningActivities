@@ -1,14 +1,15 @@
-// PaperCard (DES-7a): component tokens first; the three heights swap only these.
+// PaperCard (DES-7a): component tokens first; the variants swap only these.
 
 .root {
   --paper-bg: var(--card);
   --paper-edge: var(--edge);
+  --paper-border: var(--border-regular) solid;
   --paper-elevation: var(--elevation-card);
   --paper-radius: var(--radius-card);
   --paper-pad: var(--space-5);
 
   padding: var(--paper-pad);
-  border: var(--border-regular) solid var(--paper-edge);
+  border: var(--paper-border) var(--paper-edge);
   border-radius: var(--paper-radius);
   background: var(--paper-bg);
   box-shadow: var(--paper-elevation);
@@ -17,6 +18,14 @@
 
 .root[data-variant='flat'] {
   --paper-elevation: var(--elevation-flat);
+}
+
+// a new reward on the done screen (a sticker; PRG-5's squishy): flat, on a
+// thick dashed accent border, as on the Done board (DES-22d)
+.root[data-variant='reward'] {
+  --paper-elevation: var(--elevation-flat);
+  --paper-edge: var(--accent);
+  --paper-border: var(--border-thick) dashed;
 }
 
 // modals and the lesson-done panel only

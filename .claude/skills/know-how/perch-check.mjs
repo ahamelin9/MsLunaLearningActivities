@@ -13,6 +13,9 @@
 //     the second miss "Hear my clue" shows; a tap on it says the hint;
 //   - the right cookie turns the edge the right colour, pops the win
 //     sparkle (data-shot="win-veil") and takes "Hear my clue" away;
+//   - played to the end, a game's done screen (DES-22d) says "All done!",
+//     has no lessons bar, offers "Another game", and its header is the
+//     game's name alone;
 //   - nothing falls back to the browser voice.
 // Lines are matched by what was said (clip labels stick; know-how), and
 // clips are counted.
@@ -188,6 +191,27 @@ for (let tries = 0; tries < 12 && !won; tries++) {
 ok('a win turns the stage\'s edge the right colour', won?.edge === right, `${won?.edge} vs ${right}`);
 ok('… and pops the win sparkle', Boolean(won?.veil));
 ok('… and "Hear my clue" goes once the round is won, as on the board', won?.clue === false);
+// play on to the done screen: every cookie in turn, round after round
+for (let tries = 0; tries < 40 && !(await page.$(at('shell-reward'))); tries++) {
+  const cookies = await page.$$('[data-shot="stage"] button[aria-label^="letter"]');
+  for (const c of cookies) {
+    if (await page.$(at('shell-reward'))) break;
+    await c.click().catch(() => {});
+    await wait(2200);
+  }
+}
+await wait(1200);
+const done = await page.evaluate(() => {
+  const r = document.querySelector('[data-shot="shell-reward"]');
+  return r && {
+    title: r.querySelector('h2')?.textContent.trim(),
+    header: document.querySelector('header h1')?.textContent.trim(),
+    lessons: Boolean(r.querySelector('[role="progressbar"]')) || /your lessons/i.test(r.textContent),
+    another: [...r.querySelectorAll('button')].some(b => b.textContent.trim() === 'Another game')
+  };
+});
+ok('a game\'s done screen: "All done!", no lessons bar, "Another game", the game\'s name in the header',
+  done?.title === 'All done!' && !done.lessons && done.another && done.header === 'Feed Luna the Letter', JSON.stringify(done));
 ok('nothing fell back to the browser voice', (await page.evaluate(() => window.__browserSpoke.length)) === 0);
 
 await browser.close();

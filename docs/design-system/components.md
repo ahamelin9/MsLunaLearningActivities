@@ -32,9 +32,9 @@ list. Restyling the app means changing these, not every screen. The Kit page
 
 | Component | What it is | Variants and states | Ticket |
 |---|---|---|---|
-| `Icon` | The drawn icon set: round-capped strokes in `currentColor`, no colour of its own | check, clock, lock, unlock, chevron and arrow left/right, home, speaker, mute, ear, replay, gear, info, book, dice, play, star, sparkle, close, trophy, lightbulb; sizes 16, 20, 24, 32; filled | DES-7a (done) |
+| `Icon` | The drawn icon set: round-capped strokes in `currentColor`, no colour of its own | check, clock, lock, unlock, chevron and arrow left/right, home, speaker, mute, ear, replay, gear, info, book, dice, play, star, sparkle, close, trophy, lightbulb; sizes 16, 20, 24, 32, 40 (the ListenCue's ear) and 96 (the done screen's mark); filled | DES-7a (done), 96 DES-22d |
 | `ChunkyButton` | The pressable button with a hard ledge | action, accent (Luna's own: "Hear my clue", Luna's Pick), secondary, quiet (dashed), icon; sizes 48 and 64; an icon before or after the words; pressed, disabled, selected (`aria-pressed`: the picked one in a pick-one row takes the action look, DES-9b) | DES-7a (done), accent DES-7b |
-| `PaperCard` | The card surface | flat, card, lifted | DES-7a (done) |
+| `PaperCard` | The card surface | flat, card, lifted; reward (the done screen's panel for a new reward: flat, a thick dashed accent border, as on the Done board) | DES-7a (done), reward DES-22d |
 | `Chip` | A small pill: tag, count or time | time ("about 5 min"), took ("took 4 min"), accent ("Up next", "12 min today"), count (stars), rare and super-rare (a squishy's colour tag, with `shimmer`); `ground="well"` for a chip on a well. `TimeChip` is a preset: `minutes`, `took`, `highlight` | DES-7a (done), rarity tags DES-7c |
 | `Tile` | A card with a picture area and a name | the Play Shelf's games; picture tints 1–5; pressed; picked (`aria-pressed`: the picked one in a pick-one set takes the action look, its picture keeping its tint and ink; Grade Select, DES-9c) | DES-7a (done), picked DES-9c |
 | `Modal` | A lifted card over a dimmed screen, with a 48px close button | grown-up screens (Settings, trophies); open, closed. The one kit root with its own position (fixed); not in a portal, so it keeps its screen's mode | DES-7a (done) |
