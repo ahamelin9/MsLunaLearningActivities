@@ -1,6 +1,6 @@
 // Tile on the Kit page (DES-7a): the five tints, and pressed. The pictures are
 // stand-ins; the Play Shelf's drawings are the library's own
-// (pages/Hub/ShelfPicture, DES-21).
+// (games/shared/GamePicture, DES-21).
 
 import { Specimen, Specimens } from '@/dev/KitPage/Specimen';
 import { Icon } from '../Icon/Icon';

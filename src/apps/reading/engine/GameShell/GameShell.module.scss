@@ -1,426 +1,184 @@
-@use 'apps/reading/engine/world' as *;
-@use 'styles/mixins' as m;
+// GameShell (DES-22a), as on the round 2 Round board: the stage, a card with
+// two soft blobs (the board's accent one, and one in the game's picture tint),
+// and Luna's perch under it. The start screen sits on the same stage. Kit
+// pieces laid out with roles and the space scale only; the motion is shared.
 
-.game-shell {
+@use 'styles/mixins' as *;
+
+.shell {
   position: relative;
   flex: 1;
   display: flex;
   flex-direction: column;
+  gap: var(--space-4);
   // it fills what's left under the app's header (AppHeader, DES-8)
   min-height: 0;
-  padding: 0.9rem 1.1rem 1.1rem;
-  color: $ink;
-  background:
-    radial-gradient(ellipse at 50% -10%, rgba(240, 162, 46, 0.22), transparent 60%),
-    linear-gradient(180deg, #FFF6E6 0%, #FBEBD2 100%);
+  padding: var(--space-5) var(--space-6);
+  color: var(--ink);
+  font-family: var(--font-read);
   overflow: hidden;
+}
 
-  // Each game's stage takes on the material of its own world.
-  &[data-shape="jar"] .shell-stage { background: linear-gradient(180deg, #EAF6E6, #CFE9CC); }
-  &[data-shape="bubbles"] .shell-stage { background: linear-gradient(180deg, #DFF2FB, #A9DCF2); }
-  &[data-shape="plate"] .shell-stage { background: linear-gradient(180deg, #FDEFD6, #F6D9A8); }
-  &[data-shape="cards"] .shell-stage { background: linear-gradient(180deg, #F2E7FB, #DCC6F4); }
-  &[data-shape="book"] .shell-stage { background: linear-gradient(180deg, #FFFBF0, #F3E4C6); }
-  &[data-shape="page"] .shell-stage { background: linear-gradient(180deg, #FFFDF6, #EFE3CA); }
-  &[data-shape="desk"] .shell-stage { background: linear-gradient(180deg, #FBEEDD, #E7C99B); }
-  &[data-shape="map"] .shell-stage { background: linear-gradient(180deg, #FBEFD2, #EBD3A2); }
-  &[data-shape="lesson"] .shell-stage {
-    background: linear-gradient(180deg, #FFFDF5, #F4E7CD);
-    // A story can be taller than the stage, so a lesson scrolls inside it.
-    // Auto margins centre the lesson when it fits and start it at the top when
-    // it does not; align-items: center would push its first lines up out of
-    // reach (and the "safe" keyword that fixes that is missing on older iPads).
+// ---------- the stage ----------
+.stage {
+  position: relative;
+  // its blobs sit behind what's on it, inside its own stacking
+  isolation: isolate;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  border: var(--border-regular) solid var(--edge);
+  border-radius: var(--radius-stage);
+  background: var(--card);
+  box-shadow: var(--elevation-card);
+  overflow: hidden;
+  transition: box-shadow var(--dur-quick) var(--ease-standard), border-color var(--dur-quick) var(--ease-standard);
+
+  // the board's two soft blobs: low on the left, high on the right
+  &::before,
+  &::after {
+    content: '';
+    position: absolute;
+    z-index: -1;
+    border-radius: var(--radius-chip);
+    pointer-events: none;
+  }
+
+  &::before {
+    left: calc(var(--space-16) * -1);
+    bottom: calc(var(--space-16) * -2);
+    width: calc(var(--space-16) * 4);
+    height: calc(var(--space-16) * 4);
+    background: var(--accent-soft);
+  }
+
+  &::after {
+    right: calc(var(--space-10) * -1);
+    top: calc(var(--space-16) * -1);
+    width: calc(var(--space-16) * 3);
+    height: calc(var(--space-16) * 3);
+  }
+
+  // the game's own tint, as on its Play Shelf Tile
+  &[data-tint='1']::after { background: var(--picture-1); }
+  &[data-tint='2']::after { background: var(--picture-2); }
+  &[data-tint='3']::after { background: var(--picture-3); }
+  &[data-tint='4']::after { background: var(--picture-4); }
+  &[data-tint='5']::after { background: var(--picture-5); }
+
+  // the shell's flash: a miss turns the edge the try-again colour, a win the
+  // right colour with its glow (DES-11 makes it the one answer language)
+  &[data-flash='miss'] {
+    border-color: var(--try-again-edge);
+    box-shadow: 0 var(--ledge-small) 0 var(--try-again-edge);
+  }
+
+  &[data-flash='win'] {
+    border-color: var(--right);
+    box-shadow: 0 var(--ledge-small) 0 var(--right-edge), var(--glow-ring);
+  }
+}
+
+// what's on the stage: the game, or the start screen. The blobs stay on the
+// stage behind it and are clipped there, so they never give it room to scroll.
+.inside {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-5);
+
+  // A story can be taller than the stage, so a lesson scrolls inside it.
+  // Auto margins centre the lesson when it fits and start it at the top when
+  // it does not; align-items: center would push its first lines up out of
+  // reach (and the "safe" keyword that fixes that is missing on older iPads).
+  .stage[data-shape='lesson'] & {
     align-items: flex-start;
     overflow-y: auto;
 
     > * { margin: auto; }
   }
-
-  // ---------- stage ----------
-  .shell-stage {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 26px;
-    border: 3px solid rgba(58, 42, 31, 0.14);
-    box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.6), 0 10px 26px rgba(58, 42, 31, 0.16);
-    padding: 1.1rem;
-    position: relative;
-    overflow: hidden;
-    min-height: 320px;
-    transition: transform 0.18s ease;
-  }
-
-  &[data-flash="miss"] .shell-stage { animation: stageShake 0.42s ease; }
-  &[data-flash="win"] .shell-stage { box-shadow: inset 0 0 0 4px rgba(74, 160, 90, 0.55), 0 10px 26px rgba(58, 42, 31, 0.16); }
-
-  // ---------- Luna's perch ----------
-  .luna-perch {
-    display: flex;
-    align-items: flex-end;
-    gap: 0.7rem;
-    margin-top: 0.7rem;
-    min-height: 84px;
-
-    .perch-bubble {
-      @include paper-card(#FFFFFF);
-      position: relative;
-      padding: 0.65rem 0.95rem;
-      max-width: 560px;
-      box-shadow: 0 4px 0 rgba(58, 42, 31, 0.1);
-
-      p,
-      .perch-say {
-        font-family: var(--font-read);
-        font-weight: 500;
-        font-size: 1rem;
-        line-height: 1.35;
-        color: $ink;
-      }
-
-      // her line, when the game has its own Luna (DES-12): it says itself again
-      .perch-say {
-        display: flex;
-        align-items: center;
-        min-height: var(--target-chrome);
-        padding: 0;
-        border: none;
-        background: none;
-        text-align: left;
-        cursor: pointer;
-
-        &:focus-visible {
-          @include m.focus-ring;
-        }
-      }
-
-      .thinking-dots {
-        display: inline-flex;
-        gap: 3px;
-        margin-left: 6px;
-        vertical-align: middle;
-
-        i {
-          width: 5px;
-          height: 5px;
-          border-radius: 50%;
-          background: $plum;
-          animation: thinkingDot 1s ease-in-out infinite;
-        }
-        i:nth-child(2) { animation-delay: 0.15s; }
-        i:nth-child(3) { animation-delay: 0.3s; }
-      }
-
-      .perch-hint {
-        display: block;
-        width: 100%;
-        margin-top: 0.4rem;
-        padding: 0.4rem 0 0;
-        border: none;
-        border-top: 2px dashed rgba(58, 42, 31, 0.2);
-        background: none;
-        font: inherit;
-        font-size: 0.9rem;
-        color: $moss-deep;
-        font-weight: 600;
-        text-align: left;
-        cursor: pointer;
-      }
-
-      &::before {
-        content: '';
-        position: absolute;
-        left: -9px;
-        bottom: 18px;
-        width: 16px;
-        height: 16px;
-        background: #FFFFFF;
-        border-left: 2.5px solid rgba(58, 42, 31, 0.16);
-        border-bottom: 2.5px solid rgba(58, 42, 31, 0.16);
-        transform: rotate(45deg);
-      }
-    }
-
-    // no owl on the perch (DES-12), so the bubble has no tail pointing at her
-    &[data-own-luna] .perch-bubble::before {
-      content: none;
-    }
-  }
-
-  // ---------- win flourish ----------
-  .win-veil {
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    .win-burst {
-      font-size: 6rem;
-      color: #FFD166;
-      text-shadow: 0 0 30px rgba(255, 209, 102, 0.9);
-      animation: burstPop 0.85s cubic-bezier(0.2, 1.4, 0.4, 1) forwards;
-    }
-  }
-
-  // ---------- start screen ----------
-  &[data-phase="intro"] {
-    align-items: center;
-    justify-content: center;
-
-    .intro-panel {
-      @include paper-card;
-      @include grain(0.07);
-      width: min(560px, 100%);
-      padding: 1.4rem 1.6rem 1.5rem;
-      text-align: center;
-      animation: panelRise 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-
-    .intro-scene {
-      width: 104px;
-      height: 104px;
-      margin: -3.4rem auto 0.6rem;
-      border-radius: 50%;
-      display: grid;
-      place-items: center;
-      background: radial-gradient(circle at 35% 30%, #FFFFFF, $paper-deep);
-      border: 3px solid rgba(58, 42, 31, 0.18);
-      box-shadow: 0 8px 18px rgba(58, 42, 31, 0.22);
-
-      .intro-emoji { font-size: 3.1rem; animation: introFloat 3s ease-in-out infinite; }
-    }
-
-    .surprise-banner {
-      @include tape-label;
-      display: inline-block;
-      margin-bottom: 0.5rem;
-      font-size: 0.85rem;
-    }
-
-    .intro-title {
-      font-family: var(--font-display);
-      font-size: 1.9rem;
-      font-weight: 600;
-      color: $ink;
-      line-height: 1.1;
-    }
-
-    .intro-tagline {
-      font-size: 1.02rem;
-      color: $ink-soft;
-      margin-top: 0.25rem;
-      font-weight: 600;
-    }
-
-    .intro-luna {
-      display: flex;
-      align-items: center;
-      gap: 0.6rem;
-      margin: 0.9rem 0 1rem;
-      text-align: left;
-      background: rgba(255, 255, 255, 0.72);
-      border: 2px dashed rgba(58, 42, 31, 0.22);
-      border-radius: 18px;
-      padding: 0.5rem 0.8rem;
-
-      .intro-mission {
-        font-family: var(--font-read);
-        font-size: 1.05rem;
-        font-weight: 500;
-        color: $plum-deep;
-      }
-    }
-
-    .difficulty-row {
-      display: flex;
-      gap: 0.5rem;
-      justify-content: center;
-      flex-wrap: wrap;
-      margin-bottom: 1rem;
-    }
-
-    .difficulty-chip {
-      flex: 1 1 140px;
-      display: flex;
-      flex-direction: column;
-      gap: 0.1rem;
-      padding: 0.55rem 0.6rem;
-      border-radius: 14px;
-      background: rgba(255, 255, 255, 0.85);
-      border: 2.5px solid rgba(58, 42, 31, 0.16);
-      cursor: pointer;
-      text-align: center;
-      transition: transform 0.14s ease, border-color 0.14s ease, background 0.14s ease;
-
-      .chip-dots { font-size: 0.7rem; color: $amber-deep; letter-spacing: 2px; }
-      .chip-dots .dim { color: rgba(58, 42, 31, 0.2); }
-      .chip-label { font-family: var(--font-read); font-weight: 600; font-size: 0.98rem; }
-      .chip-note { font-size: 0.72rem; color: $ink-soft; }
-
-      &:hover { transform: translateY(-2px); }
-
-      &[data-state="active"] {
-        background: #FFF1D4;
-        border-color: $amber-deep;
-        box-shadow: 0 4px 0 rgba(201, 123, 18, 0.35);
-      }
-    }
-
-    .play-button {
-      @include chunky($moss, $moss-deep);
-      width: 100%;
-      padding: 0.85rem 1rem;
-      font-size: 1.35rem;
-      letter-spacing: 0.01em;
-    }
-
-    .objective-line {
-      margin-top: 0.9rem;
-      font-size: 0.78rem;
-      color: $ink-soft;
-      line-height: 1.4;
-
-      strong { color: $plum-deep; }
-    }
-  }
-
-  // ---------- reward screen ----------
-  &[data-phase="reward"] {
-    align-items: center;
-    justify-content: center;
-
-    .reward-confetti {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-      z-index: 5;
-    }
-
-    .reward-panel {
-      @include paper-card;
-      @include grain(0.06);
-      position: relative;
-      z-index: 6;
-      width: min(540px, 100%);
-      padding: 1.3rem 1.5rem 1.5rem;
-      text-align: center;
-      animation: panelRise 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-
-    .reward-luna { display: flex; justify-content: center; margin-top: -3.6rem; }
-
-    .reward-title {
-      font-family: var(--font-display);
-      font-size: 1.6rem;
-      font-weight: 600;
-      margin-top: 0.3rem;
-    }
-
-    .reward-stars {
-      display: flex;
-      justify-content: center;
-      gap: 0.3rem;
-      margin: 0.7rem 0 0.4rem;
-
-      .reward-star {
-        animation: starDrop 0.55s cubic-bezier(0.2, 1.5, 0.4, 1) backwards;
-        filter: drop-shadow(0 4px 6px rgba(201, 123, 18, 0.45));
-      }
-    }
-
-    .reward-score { color: $ink-soft; font-weight: 700; font-size: 0.95rem; }
-
-    .sticker-award {
-      display: flex;
-      align-items: center;
-      gap: 0.8rem;
-      margin: 1rem 0;
-      padding: 0.7rem 0.9rem;
-      background: #FFFFFF;
-      border: 3px dashed $amber;
-      border-radius: 18px;
-      text-align: left;
-
-      .sticker-peel {
-        font-size: 2.7rem;
-        animation: stickerStick 0.7s cubic-bezier(0.2, 1.5, 0.4, 1);
-        filter: drop-shadow(0 3px 4px rgba(58, 42, 31, 0.3));
-      }
-
-      .sticker-kicker {
-        display: block;
-        font-size: 0.72rem;
-        text-transform: uppercase;
-        letter-spacing: 0.08em;
-        color: $amber-deep;
-        font-weight: 800;
-      }
-
-      .sticker-name {
-        font-family: var(--font-read);
-        font-size: 1.15rem;
-        font-weight: 600;
-      }
-    }
-
-    .reward-actions {
-      display: flex;
-      gap: 0.5rem;
-      flex-wrap: wrap;
-      justify-content: center;
-    }
-
-    .reward-btn {
-      @include chunky(#FFFFFF, rgba(58, 42, 31, 0.25), $ink);
-      padding: 0.6rem 1rem;
-      font-size: 1rem;
-      flex: 1 1 140px;
-
-      &.primary { @include chunky($amber, $amber-deep, #46280A); }
-    }
-  }
 }
 
-@keyframes stageShake {
-  0%, 100% { transform: translateX(0); }
-  20% { transform: translateX(-9px) rotate(-0.4deg); }
-  45% { transform: translateX(8px) rotate(0.4deg); }
-  70% { transform: translateX(-5px); }
+// a won round: a sparkle pops over the top of the stage; it never takes a tap
+.win-veil {
+  position: absolute;
+  inset: 0;
+  z-index: var(--z-celebrate);
+  display: flex;
+  justify-content: center;
+  padding-top: var(--space-4);
+  pointer-events: none;
+  color: var(--accent);
 }
 
-@keyframes burstPop {
-  0% { transform: scale(0.2) rotate(-25deg); opacity: 0; }
-  40% { transform: scale(1.25) rotate(8deg); opacity: 1; }
-  100% { transform: scale(2.2) rotate(20deg); opacity: 0; }
+.win-spark {
+  display: flex;
+  animation: var(--motion-pop);
 }
 
-@keyframes panelRise {
-  from { transform: translateY(22px) scale(0.97); opacity: 0; }
-  to { transform: translateY(0) scale(1); opacity: 1; }
+// ---------- the start screen, on the stage ----------
+.start {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-6);
 }
 
-@keyframes introFloat {
-  0%, 100% { transform: translateY(0) rotate(-3deg); }
-  50% { transform: translateY(-7px) rotate(3deg); }
+// the game's picture in a round window of its tint; flat, so it reads as a
+// picture, not a button
+.picture {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: calc(var(--space-16) * 3);
+  height: calc(var(--space-16) * 3);
+  border-radius: var(--radius-chip);
+  background: var(--accent-soft);
+
+  .stage[data-tint='1'] & { background: var(--picture-1); }
+  .stage[data-tint='2'] & { background: var(--picture-2); }
+  .stage[data-tint='3'] & { background: var(--picture-3); }
+  .stage[data-tint='4'] & { background: var(--picture-4); }
+  .stage[data-tint='5'] & { background: var(--picture-5); }
 }
 
-@keyframes starDrop {
-  from { transform: translateY(-30px) scale(0.3) rotate(-40deg); opacity: 0; }
-  to { transform: translateY(0) scale(1) rotate(0); opacity: 1; }
+// a lesson has no drawing: its number, as on its card on the path
+.lesson-mark {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
-@keyframes stickerStick {
-  0% { transform: translate(30px, -26px) rotate(28deg) scale(0.5); opacity: 0; }
-  60% { transform: translate(0, 0) rotate(-8deg) scale(1.2); opacity: 1; }
-  100% { transform: rotate(-4deg) scale(1); }
+.lesson-word {
+  font: var(--text-tag);
+  letter-spacing: var(--tracking-tag);
+  text-transform: uppercase;
+  color: var(--ink-soft);
 }
 
-@keyframes thinkingDot {
-  0%, 100% { transform: translateY(0); opacity: 0.35; }
-  50% { transform: translateY(-3px); opacity: 1; }
+.lesson-number {
+  font: var(--text-cue);
+}
+
+.levels {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-3);
+}
+
+// ---------- Luna's perch ----------
+.perch {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  // Luna's height, so the stage doesn't jump when the owl-less perch shows
+  min-height: calc(var(--space-16) * 2 - var(--space-1));
+}
+
+.bubble {
+  min-width: 0;
 }

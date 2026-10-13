@@ -35,9 +35,12 @@ src/
       pages/Hub/                   the library (Luna's Lessons, the Play Shelf)
       pages/GradeSelect/
       engine/GameShell/            the frame every game and lesson plays in:
-                                   start, stage, perch, reward
+                                   the start screen, the stage and Luna's perch
+      engine/DoneScreen/           the screen at the end of a game or lesson
       games/<Game>/                one folder per game (BubbleSounds, FeedLuna, LetterHunt…)
-      games/shared/                pieces several games share (GameSurface, SpeakChip, StagePrompt)
+      games/shared/                pieces several games share (GameSurface, SpeakChip, StagePrompt),
+                                   and GamePicture, each game's drawing and tint (its Tile, its
+                                   start screen and its stage)
       lessons/<Type>/              one folder per lesson type (BlendAndRead, StoryReader…); a type
                                    with no styles of its own has only its .tsx
       lessons/shared/              LessonKit (+ the module every lesson type uses), LessonRound,

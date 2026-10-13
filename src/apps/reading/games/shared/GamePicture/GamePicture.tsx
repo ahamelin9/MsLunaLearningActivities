@@ -1,20 +1,39 @@
-import type { GameShape } from '../../engine/types';
+import type { GameShape } from '../../../engine/types';
 import { cx } from '@/utils/cx';
-import styles from './ShelfPicture.module.scss';
+import styles from './GamePicture.module.scss';
 
 /**
- * The drawn picture on each game's Play Shelf Tile (DES-21), as on the round 2
- * Library board. Colours come from the illustration palette (`--illo-tile-*`)
- * and roles, through classes in the module; each picture moves gently with
- * the shared sway or float, which reduced motion stills.
+ * Each game's drawn picture, as on the round 2 Library board: on its Play
+ * Shelf Tile (DES-21) and, larger, on its start screen (DES-22a), so a child
+ * sees the same picture they tapped. Colours come from the illustration
+ * palette (`--illo-tile-*`) and roles, through classes in the module; each
+ * picture moves gently with the shared sway or float, which reduced motion
+ * stills. A lesson has no picture (its start screen shows its number).
+ *
+ * Props:  shape: the game's · size: 'tile' (default) | 'large' (the start
+ *         screen: every picture the same height)
  */
 
-export function ShelfPicture({ shape }: { shape: GameShape }) {
+/** Each game's picture tint: its Tile on the shelf, and its stage's soft blobs. */
+export const GAME_TINTS: Record<GameShape, 1 | 2 | 3 | 4 | 5> = {
+  jar: 1,
+  bubbles: 2,
+  plate: 3,
+  cards: 4,
+  page: 5,
+  desk: 2,
+  map: 1,
+  book: 3,
+  // a lesson has no Tile; its stage takes the Round board's tint
+  lesson: 2
+};
+
+export function GamePicture({ shape, size = 'tile' }: { shape: GameShape; size?: 'tile' | 'large' }) {
   switch (shape) {
     case 'jar':
       // the Letter Jar: letters jiggling inside a glass jar
       return (
-        <svg className={styles.picture} width={96} height={68} viewBox="0 0 120 86" aria-hidden="true">
+        <svg className={styles.picture} data-size={size} width={96} height={68} viewBox="0 0 120 86" aria-hidden="true">
           <rect className={styles.olive} x={34} y={4} width={52} height={10} rx={4} />
           <path className={styles.glass} d="M38 14h44v58a10 10 0 0 1-10 10H48a10 10 0 0 1-10-10z" strokeWidth={3} />
           <text className={cx(styles.letter, styles.toffee, styles.sway)} x={45} y={48} fontSize={20}>B</text>
@@ -25,7 +44,7 @@ export function ShelfPicture({ shape }: { shape: GameShape }) {
     case 'bubbles':
       // Bubble Sounds: three bubbles bobbing
       return (
-        <svg className={styles.picture} width={120} height={68} viewBox="0 0 120 68" aria-hidden="true">
+        <svg className={styles.picture} data-size={size} width={120} height={68} viewBox="0 0 120 68" aria-hidden="true">
           <circle className={cx(styles.bubble, styles.float)} cx={38} cy={34} r={16} strokeWidth={3} />
           <circle className={cx(styles.bubble, styles.float, styles.later)} cx={68} cy={40} r={11} strokeWidth={3} />
           <circle className={cx(styles.bubble, styles.float, styles.latest)} cx={90} cy={46} r={7} strokeWidth={3} />
@@ -34,7 +53,7 @@ export function ShelfPicture({ shape }: { shape: GameShape }) {
     case 'plate':
       // Feed Luna (Letter Cookies, GAME-6): two letter cookies
       return (
-        <svg className={styles.picture} width={120} height={68} viewBox="0 0 140 80" aria-hidden="true">
+        <svg className={styles.picture} data-size={size} width={120} height={68} viewBox="0 0 140 80" aria-hidden="true">
           <g className={styles.sway}>
             <circle className={styles.cookie} cx={54} cy={42} r={28} strokeWidth={3} />
             <text className={cx(styles.letter, styles.line)} x={54} y={51} fontSize={26} textAnchor="middle">b</text>
@@ -51,7 +70,7 @@ export function ShelfPicture({ shape }: { shape: GameShape }) {
     case 'cards':
       // Muddled Cards: a face-up card between two shuffling backs
       return (
-        <svg className={styles.picture} width={120} height={68} viewBox="0 0 140 80" aria-hidden="true">
+        <svg className={styles.picture} data-size={size} width={120} height={68} viewBox="0 0 140 80" aria-hidden="true">
           <g transform="rotate(-10 49 39)">
             <rect className={cx(styles.toffee, styles.sway)} x={30} y={12} width={38} height={54} rx={8} />
           </g>
@@ -65,7 +84,7 @@ export function ShelfPicture({ shape }: { shape: GameShape }) {
     case 'page':
       // Words Off the Page: three words drifting
       return (
-        <svg className={styles.picture} width={150} height={60} viewBox="0 0 150 60" aria-hidden="true">
+        <svg className={styles.picture} data-size={size} width={150} height={60} viewBox="0 0 150 60" aria-hidden="true">
           {WORDS.map(({ word, x, width, tilt }, i) => (
             <g key={word} className={cx(styles.float, i === 1 && styles.later, i === 2 && styles.latest)}>
               <g transform={`rotate(${tilt} ${x + width / 2} 30)`}>
@@ -79,7 +98,7 @@ export function ShelfPicture({ shape }: { shape: GameShape }) {
     case 'desk':
       // What's Missing?: two things on the desk, and the space where one was
       return (
-        <svg className={styles.picture} width={130} height={60} viewBox="0 0 130 60" aria-hidden="true">
+        <svg className={styles.picture} data-size={size} width={130} height={60} viewBox="0 0 130 60" aria-hidden="true">
           <circle className={styles.cookie} cx={24} cy={34} r={14} strokeWidth={2.5} />
           <rect className={styles.leaf} x={48} y={20} width={28} height={28} rx={6} strokeWidth={2.5} />
           <rect className={cx(styles.gone, styles.sway)} x={92} y={20} width={28} height={28} rx={8} strokeWidth={2.5} strokeDasharray="5 5" />
@@ -88,7 +107,7 @@ export function ShelfPicture({ shape }: { shape: GameShape }) {
     case 'map':
       // Treasure Path: a dotted path to an X
       return (
-        <svg className={styles.picture} width={150} height={64} viewBox="0 0 160 70" aria-hidden="true">
+        <svg className={styles.picture} data-size={size} width={150} height={64} viewBox="0 0 160 70" aria-hidden="true">
           <path className={styles.path} d="M14 56C40 56 40 14 80 24s40 34 66 14" strokeWidth={4} strokeLinecap="round" strokeDasharray="2 10" />
           <path className={cx(styles.mark, styles.sway)} d="M138 28l12 12M150 28l-12 12" strokeWidth={4} strokeLinecap="round" />
         </svg>
@@ -96,7 +115,7 @@ export function ShelfPicture({ shape }: { shape: GameShape }) {
     case 'book':
       // Story Corner: an open book, its right page lifting
       return (
-        <svg className={styles.picture} width={104} height={64} viewBox="0 0 120 74" aria-hidden="true">
+        <svg className={styles.picture} data-size={size} width={104} height={64} viewBox="0 0 120 74" aria-hidden="true">
           <path className={styles.page} d="M60 18c-12-8-28-9-44-6v50c16-3 32-2 44 6z" strokeWidth={3} />
           <path className={cx(styles.page, styles.float)} d="M60 18c12-8 28-9 44-6v50c-16-3-32-2-44 6z" strokeWidth={3} />
         </svg>

@@ -51,7 +51,7 @@ them in.
 | 4 | The kit | DES-7a, DES-7b, DES-7c (done 2026-10-11) | Every kit component on the Kit page in every state |
 | 5 | Frame and shell | DES-8, DES-10, DES-15 (done 2026-10-11), DES-9a, DES-9b, DES-9c, DES-12 (done 2026-10-12) | One header, the layout grid, the new Luna (moved here from Stage 4, Alex 2026-10-11), the restyled home, Settings, trophies and Grade Select; one Luna per screen |
 | 6 | The library | DES-21 → **PRG-7 (pulled in)** → DES-13 (done 2026-10-12) | The library as on the board: lessons in order, one bar |
-| 7 | Play | DES-22a → DES-11 → DES-22b, DES-22c → DES-23 | GameShell, all 8 games and all 8 lesson types on the kit, with one right/wrong language |
+| 7 | Play | DES-22a → DES-22d → DES-11 → DES-22b, DES-22c → DES-23 | GameShell (start, stage, perch and the done screen), all 8 games and all 8 lesson types on the kit, with one right/wrong language |
 | 8 | The design system is done | DES-24 | Legacy styles deleted; the check runs strict with no baseline |
 | 9 | What's left of the epic | **SET-1 (pulled in)** → DES-16, then DES-17, then DES-14 | Light/dark follows the iPad with a grown-up choice; the milestone moon; real cookies |
 
@@ -62,19 +62,20 @@ them in.
   - SET-1 (the grown-up gate, Phase 3) needs DES-9b, and DES-16's Settings choice lives behind it. If Alex would rather keep it in its phase, DES-16 waits for it, and the epic closes later.
 - **DES-24 checks light and dark by forcing the theme** (on the Kit page and in the screenshots). DES-16 then lets the iPad and the grown-up switch it for real.
 - **DES-17's full-shelf milestone moved to PRG-4,** so the moon doesn't wait on squishies (PRG-5, Phase 7).
+- **DES-22d** (the done screen) was split from DES-22a before it started (Alex, 2026-10-12). DES-11 needs it, since its petals fall on the done screen.
 - **DES-14** (P2) touches the same folder as DES-22b and can slot in straight after it.
 - **P0 bugs** can still be pulled in between tickets for a break from styling.
 
 
 ### DES-11 · One right/wrong/reveal visual language
-Story · P1 · S · needs: DES-22a
+Story · P1 · S · needs: DES-22a, DES-22d
 - **How:** use the same right glow, wrong wobble, win veil and "revealed" style (for FB-2) in every game and lesson, through `Choice` and the shell's flash. Game pieces that aren't Choices (bubbles, cookies, bugs, memory cards, word tiles) use the same state roles, `data-state` and motion. The games and lessons adopt it in DES-22b, DES-22c and DES-23.
   - **A win grows flowers (Alex, 2026-10-09):** a solved round grows a few flowers up the sides of the stage, and petals fall instead of confetti, as on the round 2 Round board. The lesson-done screen uses the same petals. Flowers and petals never cover the answer choices or block the next tap. **Kept for now (Alex, 2026-10-10):** the teacher dropped flowers for progress (DES-13), not for wins; change this only if she asks.
 - **Complete when:**
   - the shell's flash, the win's flowers and petals, and Choice's states share one set of roles and motion;
   - the state roles for game pieces are documented in `components.md`;
   - every solved round grows flowers and drops petals;
-  - no confetti is left anywhere (`utils/confetti.ts` deleted);
+  - no confetti is left anywhere (`utils/confetti.ts`, deleted in DES-22d, stays gone);
   - it's checked in light and dark. (That every game and lesson looks the same is checked in DES-22b, DES-22c and DES-23.)
 
 ### DES-14 · Feed Luna's cookies look like real, different cookies
@@ -133,18 +134,45 @@ Story · P1 · M · needs: —
   - her clips are rendered and `voice:audit` passes;
   - the MilestoneMoon folder shows zero in `design:status`.
 
-### DES-22a · GameShell on the kit: start, stage, perch, reward
+### DES-22a · GameShell on the kit: start screen, stage and perch
 Story · P1 · M · needs: —
-- **Why:** every game's start screen is the same centred card with a green that belongs to neither palette, and the reward screen predates the round 2 Done board.
-- **How:**
-  - **Start screen:** built from the kit. No board shows it, so Alex OKs it.
-  - **Stage and perch:** as on the Round board. **From DES-12:** a game with its own Luna on the stage (`ownLuna`, Feed Luna) has a perch with no owl: the bubble alone, with no tail, tappable to hear it again. The kit SpeechBubble has tails left and bottom only, so it needs a no-tail form here.
-  - **Reward screen:** follows the Done board. The squishy and the times come with PRG-5 and PRG-6.
-    - **From DES-13 (Alex, 2026-10-12):** a finished lesson's done screen shows the Done board's lesson pieces: the "Lesson done!" mark, the kit ProgressBar moving on ("2 of 6 lessons done"), and "Lesson N is open now" when one opened (`lessonStates` in `engine/lessons.ts`).
-  - The per-game stage backgrounds (`data-shape`) use roles and `_illustration.scss`.
+- **Why:** every game's start screen is the same centred card with a green that belongs to neither palette, and the stage and perch predate the round 2 Round board.
+- **How** (settled with Alex, 2026-10-12, when the done screen split off as DES-22d):
+  - **Start screen:** no board shows it, so it's built from the kit and Alex OKs it. It uses the round's own frame:
+    - the stage shows the game's picture (its Play Shelf drawing: `ShelfPicture` moves to `games/shared/GamePicture` with the tints, so both screens draw from one place; a lesson shows its number), the difficulty row (three ChunkyButtons, the picked one `aria-pressed`) and a 64px "Let's play!" / "Let's learn!";
+    - Luna sits on her perch saying the mission in her SpeechBubble, where she talks all game.
+    - The header already names the game (DES-8), so the stage doesn't repeat it.
+    - Gone: the "Learning:" objective (grown-up text, screens.md rule 8; SET-5 shows it behind the gate), the tagline (Luna says the mission), the difficulty dots and notes, and the "Luna picked this one" banner, which never showed (Luna's Pick skips the start screen).
+  - **Stage and perch:** as on the Round board.
+    - The stage is a card with two soft blobs in the game's Play Shelf tint; the old gradients go.
+    - Luna sits on the perch at the board's 124px, beside the kit SpeechBubble; the hint button is the bubble's "Hear my clue". The loading dots go (the board has none). Not built: the board's "Try again" and "See the end" after a win, since the app moves on by itself.
+    - **From DES-12:** a game with its own Luna on the stage (`ownLuna`, Feed Luna) has a perch with no owl: the bubble alone, with no tail, tappable to hear it again. The kit SpeechBubble gains `tail="none"` and `onLine` for it (a Kit page specimen, `kit-check.mjs` lines, a `components.md` row).
+  - **The shell's flash** moves onto roles and the shared motion, so its own keyframes go: a miss turns the stage's edge the try-again colour, a win the right colour with the glow ring, and the burst is the kit's sparkle with the shared pop. DES-11 adds the flowers and petals.
+  - **`games/shared`:** GameSurface and StagePrompt move onto roles and type roles with the stage. SpeakChip is DES-22b's.
+  - The done screen moves unchanged into `engine/DoneScreen/` for DES-22d.
 - **Complete when:**
-  - the start, stage, perch and reward screens use kit components and roles only;
-  - `engine/GameShell` shows zero in `design:status`;
+  - the start screen, stage and perch use kit components and roles only;
+  - `engine/GameShell`, GameSurface and StagePrompt show zero in `design:status`;
+  - Feed Luna's perch shows her line with no owl and no tail, and tapping it says it again; the Kit page shows the no-tail bubble, and `kit-check.mjs` fails with its style off;
+  - the done screen's shots don't change;
+  - `layout-audit.mjs` passes at every grade, with the start screen judged outside the stage, and Luna's beak follows the clips;
+  - it's checked in light and dark, and Alex OKs it.
+
+### DES-22d · The done screen on the Done board
+Story · P1 · M · needs: DES-22a
+- **Why:** the reward screen predates the round 2 Done board. Split from DES-22a (Alex, 2026-10-12).
+- **How:**
+  - As on the Done board: a lifted panel. On the left, the "Lesson done!" mark (tapping it pops it again), StarRow, "N of M solved" and Luna cheering in the corner (tapping her says her line again). On the right, the lesson pieces, the reward and the actions. The header reads "Lesson N · title".
+  - **From DES-13 (Alex, 2026-10-12):** a finished lesson shows the kit ProgressBar moving on ("2 of 6 lessons done") and "Lesson N is open now" when one opened (`lessonStates` in `engine/lessons.ts`).
+  - Today's sticker award fills the squishy panel's place (a dashed PaperCard; the sticker says its line when tapped) until PRG-5. Left out until their tickets: the time (PRG-6), "12 min today" and "See my shelf" (PRG-5). Also left out: "You learned …" (no lesson has that line) and "— no wobbles at all!".
+  - A game's done screen is the same panel with "All done!", no lessons block, and "Another game".
+  - "Next lesson" shows only when the next lesson is open (PRG-7); `lesson-order-check.mjs` finds it by those words.
+  - The confetti canvas goes and `utils/confetti.ts` is deleted; DES-11 brings the petals.
+- **Complete when:**
+  - the done screen uses kit components and roles only (StarRow, not the legacy StarIcon), and `engine/DoneScreen` shows zero in `design:status`;
+  - after a lesson that opens the next, the bar moves on and "Lesson N is open now" shows; after a replay, neither; after a game, no lessons block;
+  - `lesson-order-check.mjs` passes;
+  - no confetti is left (`utils/confetti.ts` deleted);
   - it's checked in light and dark, and Alex OKs it.
 
 ### DES-22b · Games on the kit, part 1: Letter Jar, Bubble Sounds, Letter Cookies, Muddled Cards
@@ -154,11 +182,12 @@ Story · P1 · M · needs: DES-11, DES-22a
   - Its game pieces (bugs, bubbles, cookies, memory cards) stay in its folder but use the state roles, `data-state` and the shared motion (DES-11).
   - Its scenery uses roles and `_illustration.scss`, and Icon replaces emoji in the interface.
   - `engine/content.ts`'s colours go with these games.
+  - **`games/shared`'s SpeakChip** (from DES-22a, Alex 2026-10-12) becomes the Round board's prompt pill (a speaker icon, 48px, on the soft accent) as a kit piece, which DES-22c and DES-23 reuse. Every SpeakChip (Letter Jar, Words Off the Page, Treasure Path, Story Corner) swaps to it, and SpeakChip is deleted.
   - **Touch targets (from DES-10):** every piece a child taps meets the target roles. On 2026-10-11, `layout-audit.mjs` found Letter Jar's smallest letters at 43–47px and its "Say it again" pill 39px tall; Bubble Sounds' overlapping bubbles are GAME-3's.
 - **Complete when:**
   - in each of the 4 games, a right and a wrong answer look like they do everywhere else;
   - `.claude/skills/know-how/layout-audit.mjs` lists no "(stage)" line for these games at the four sizes and three grades, except Bubble Sounds' overlaps if GAME-3 isn't done;
-  - the 4 game folders show zero in `design:status`;
+  - the 4 game folders and `games/shared` show zero in `design:status`;
   - they're checked in light and dark at the four sizes.
 
 ### DES-22c · Games on the kit, part 2: Words Off the Page, What's Missing?, Treasure Path, Story Corner

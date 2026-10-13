@@ -30,3 +30,9 @@ Task · P2 · S
 - **Fix:** read it from `data/readingCurriculum.ts`.
 
 - **Complete when:** the Settings grade buttons come from `GRADES`, so a grade added there appears in Settings with no other change.
+
+### SET-5 · Grown-ups can see what each game and lesson teaches
+Story · P2 · S · needs: SET-1
+- **Why:** each game and lesson has a learning objective written for grown-ups (`objective` on its definition). It was the start screen's "Learning:" line until DES-22a took it off the child's screen (screens.md rule 8: grown-up text sits behind the gate). Alex, 2026-10-12.
+- **How:** show every game's and lesson's objective in plain words behind the grown-up gate, for example a list in Settings.
+- **Complete when:** a grown-up past the gate can read the objective of every game and lesson, and no child screen shows one.

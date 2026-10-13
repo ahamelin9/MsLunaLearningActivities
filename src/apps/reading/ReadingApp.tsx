@@ -27,7 +27,6 @@ interface ActiveGame {
   game: AnyGameDef;
   autoStart: boolean;
   difficulty: Difficulty;
-  banner?: string;
 }
 
 export const ReadingApp: React.FC<ReadingAppProps> = ({ progress, onReturnToHome, onOpenSettings, onOpenTrophies, onGradeChange }) => {
@@ -63,12 +62,7 @@ export const ReadingApp: React.FC<ReadingAppProps> = ({ progress, onReturnToHome
     const roll = Math.random();
     const difficulty: Difficulty = roll < 0.25 ? 1 : roll > 0.85 ? 3 : 2;
 
-    begin({
-      game,
-      autoStart: true,
-      difficulty,
-      banner: '✨ Luna picked this one'
-    });
+    begin({ game, autoStart: true, difficulty });
   };
 
   const play = (game: AnyGameDef) => begin({ game, autoStart: false, difficulty: 2 });
@@ -89,7 +83,8 @@ export const ReadingApp: React.FC<ReadingAppProps> = ({ progress, onReturnToHome
         progress={progress}
         autoStart={activeGame.autoStart}
         startDifficulty={activeGame.difficulty}
-        surpriseBanner={activeGame.banner}
+        // the next one's index is this lesson's number on the path
+        lessonNumber={game.lesson ? next : undefined}
         onExit={() => {
           const now = lessonStates(lessons, progress.completedLessons);
           const i = now.findIndex((state, n) => state !== 'locked' && statesBefore.current[n] === 'locked');

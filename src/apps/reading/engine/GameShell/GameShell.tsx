@@ -9,10 +9,10 @@ import { soundManager } from '@/utils/audio';
 import { pronunciation, type SpeechPart } from '@/utils/pronunciation';
 import { warmGameIntro } from '../warmup';
 import { storageService } from '@/utils/storage';
-import { launchConfetti } from '@/utils/confetti';
-import { StarIcon } from '@/components/ui/Icons/Icons';
-import { ChunkyButton, Luna } from '@/components/kit';
+import { ChunkyButton, Icon, Luna, SpeechBubble } from '@/components/kit';
 import { AppHeader } from '@/components/os/AppHeader/AppHeader';
+import { GAME_TINTS, GamePicture } from '../../games/shared/GamePicture/GamePicture';
+import { DoneScreen } from '../DoneScreen/DoneScreen';
 import { cx } from '@/utils/cx';
 import styles from './GameShell.module.scss';
 
@@ -23,23 +23,32 @@ interface GameShellProps {
   grade: GradeLevel;
   progress: UserProgress;
   onExit: () => void;
-  /** the reward screen's second button; left out, the button is not shown */
+  /** the done screen's second button; left out, the button is not shown */
   onPlayAnother?: () => void;
   /** what that button says: "Another game", or "Next lesson" */
   playAnotherLabel?: string;
-  /** Surprise picks skip the start screen and drop straight into play. */
+  /** Luna's Pick skips the start screen and drops straight into play. */
   autoStart?: boolean;
   startDifficulty?: Difficulty;
-  /** Shown above the title when Luna chose the game herself. */
-  surpriseBanner?: string;
+  /** a lesson's place on the path: its start screen shows the number */
+  lessonNumber?: number;
 }
 
-const DIFFICULTY_LABELS: { value: Difficulty; label: string; note: string }[] = [
-  { value: 1, label: 'Warm up', note: 'Short words, fewer choices' },
-  { value: 2, label: 'Just right', note: 'A good challenge' },
-  { value: 3, label: 'Tricky', note: 'Longer words, sneakier' }
+/** How tricky a game is, picked on its start screen: the words a child reads. */
+const DIFFICULTY_LABELS: { value: Difficulty; label: string }[] = [
+  { value: 1, label: 'Warm up' },
+  { value: 2, label: 'Just right' },
+  { value: 3, label: 'Tricky' }
 ];
 
+/**
+ * The frame every game and lesson plays in (DES-22a), as on the round 2 Round
+ * board: the stage, a card with two soft blobs in the game's picture tint, and
+ * Luna's perch under it, where she says her line in a SpeechBubble. The start
+ * screen uses the same frame: the game's picture, how tricky, and the big
+ * button on the stage, while Luna says the mission from her perch. The done
+ * screen is its own (DoneScreen).
+ */
 export const GameShell: React.FC<GameShellProps> = ({
   game,
   grade,
@@ -49,7 +58,7 @@ export const GameShell: React.FC<GameShellProps> = ({
   playAnotherLabel = 'Another game',
   autoStart = false,
   startDifficulty = 2,
-  surpriseBanner
+  lessonNumber
 }) => {
   const [phase, setPhase] = useState<Phase>(autoStart ? 'play' : 'intro');
   const [difficulty, setDifficulty] = useState<Difficulty>(startDifficulty);
@@ -62,17 +71,13 @@ export const GameShell: React.FC<GameShellProps> = ({
   const [flash, setFlash] = useState<'win' | 'miss' | null>(null);
   const [bubble, setBubble] = useState<string>(game.mission);
   const [mood, setMood] = useState<LunaMood>('happy');
-  const [preparing, setPreparing] = useState(false);
   const [winStreak, setWinStreak] = useState(0);
 
   const [rounds, setRounds] = useState<unknown[]>(() =>
     game.makeRounds({ grade, difficulty: startDifficulty, count: game.roundsPerPlay })
   );
 
-  useEffect(() => pronunciation.onBusy(setPreparing), []);
-
   const timers = useRef<number[]>([]);
-  const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [award, setAward] = useState<{ sticker: Sticker | null; stars: number; points: number } | null>(null);
   const wonRef = useRef(0);
   const cleanRef = useRef(0);
@@ -238,7 +243,8 @@ export const GameShell: React.FC<GameShellProps> = ({
     [ctx, attempts, hintLevel, flash, handleWin, handleMiss, handleTick, speak]
   );
 
-  // Reward side effects: save progress, fanfare, confetti, closing line.
+  // The done screen's side effects: save progress, the fanfare, Luna's
+  // closing line. Its confetti is the DoneScreen's own.
   useEffect(() => {
     if (phase !== 'reward' || !award || recorded.current) return;
     recorded.current = true;
@@ -261,7 +267,6 @@ export const GameShell: React.FC<GameShellProps> = ({
     }
 
     soundManager.playFanfare();
-    launchConfetti(canvasRef.current, 2800);
     later(() => {
       speak(lunaSay('finish', game.id).text, 'cheer', award.sticker ? [{ text: award.sticker.line }] : []);
     }, 700);
@@ -290,178 +295,121 @@ export const GameShell: React.FC<GameShellProps> = ({
     </AppHeader>
   );
 
-  // ---------- START ----------
-  if (phase === 'intro') {
-    return (
-      <>
-        {header()}
-        <div className={styles.gameShell} data-phase="intro" data-shape={game.shape} data-shot="shell-intro">
-          <div className={styles.introPanel}>
-            <div className={styles.introScene} aria-hidden="true">
-              <span className={styles.introEmoji}>{game.emoji}</span>
-            </div>
-
-            {surpriseBanner && <div className={styles.surpriseBanner}>{surpriseBanner}</div>}
-
-            <h2 className={styles.introTitle}>{game.title}</h2>
-            <p className={styles.introTagline}>{game.tagline}</p>
-
-            <div className={styles.introLuna}>
-              <Luna mood="happy" size={78} float onClick={() => speak(game.mission, 'happy')} />
-              <p className={styles.introMission}>“{game.mission}”</p>
-            </div>
-
-            {/* a lesson's questions are fixed, so there is nothing to choose */}
-            {!game.lesson && (
-              <div className={styles.difficultyRow} role="group" aria-label="Choose how tricky">
-                {DIFFICULTY_LABELS.map(level => (
-                  <button
-                    key={level.value}
-                    className={styles.difficultyChip}
-                    data-state={difficulty === level.value ? 'active' : undefined}
-                    onClick={() => {
-                      soundManager.playLetterTap();
-                      setDifficulty(level.value);
-                    }}
-                  >
-                    <span className={styles.chipDots} aria-hidden="true">
-                      {'●'.repeat(level.value)}
-                      <span className={styles.dim}>{'●'.repeat(3 - level.value)}</span>
-                    </span>
-                    <span className={styles.chipLabel}>{level.label}</span>
-                    <span className={styles.chipNote}>{level.note}</span>
-                  </button>
-                ))}
-              </div>
-            )}
-
-            <button className={styles.playButton} data-shot="play" onClick={() => startPlay(difficulty)}>
-              {game.lesson ? 'Let’s learn!' : 'Let’s play!'}
-            </button>
-
-            <p className={styles.objectiveLine}>
-              <strong>Learning:</strong> {game.objective}
-            </p>
-          </div>
-        </div>
-      </>
-    );
-  }
-
-  // ---------- REWARD ----------
+  // ---------- DONE ----------
   if (phase === 'reward') {
     return (
       <>
         {header()}
-        <div className={styles.gameShell} data-phase="reward" data-shape={game.shape} data-shot="shell-reward">
-          <canvas ref={canvasRef} className={styles.rewardConfetti} />
-
-          <div className={styles.rewardPanel}>
-            <div className={styles.rewardLuna}>
-              <Luna mood="cheer" size={110} />
-            </div>
-
-            <h2 className={styles.rewardTitle}>{game.title} — done!</h2>
-
-            <div className={styles.rewardStars}>
-              {Array.from({ length: award?.stars ?? 1 }).map((_, i) => (
-                <span key={i} className={styles.rewardStar} style={{ animationDelay: `${i * 140}ms` }}>
-                  <StarIcon size={40} color="#FFD166" filled />
-                </span>
-              ))}
-            </div>
-
-            <p className={styles.rewardScore}>
-              {roundsWon} of {game.roundsPerPlay} solved
-              {cleanRounds === game.roundsPerPlay ? ' — no wobbles at all!' : ''}
-            </p>
-
-            {award?.sticker && (
-              <div className={styles.stickerAward}>
-                <span className={styles.stickerPeel}>{award.sticker.emoji}</span>
-                <div>
-                  <span className={styles.stickerKicker}>New sticker for your tin</span>
-                  <strong className={styles.stickerName}>{award.sticker.name}</strong>
-                </div>
-              </div>
-            )}
-
-            <div className={styles.rewardActions}>
-              <button className={cx(styles.rewardBtn, styles.primary)} onClick={() => startPlay(difficulty)}>
-                Play again
-              </button>
-              {onPlayAnother && (
-                <button className={styles.rewardBtn} onClick={onPlayAnother}>
-                  {playAnotherLabel}
-                </button>
-              )}
-              {/* back to the library is the header's Library (DES-8) */}
-            </div>
-          </div>
-        </div>
+        <DoneScreen
+          game={game}
+          award={award}
+          roundsWon={roundsWon}
+          cleanRounds={cleanRounds}
+          onPlayAgain={() => startPlay(difficulty)}
+          onPlayAnother={onPlayAnother}
+          playAnotherLabel={playAnotherLabel}
+        />
       </>
     );
   }
 
-  // ---------- PLAY ----------
+  const inPlay = phase === 'play';
+  // one Luna per screen (DES-12): a game with its own Luna on the stage gets
+  // her line on the perch with no owl and no tail, and the line says itself
+  // again. On the start screen she isn't on the stage yet, so she perches.
+  const owlOnStage = inPlay && Boolean(game.ownLuna);
   const PlayComponent = game.Play;
   const round = rounds[roundIndex];
-  const perchLine = (
-    <>
-      {bubble}
-      {preparing && (
-        <span className={styles.thinkingDots} aria-label="Ms. Luna is getting ready to speak">
-          <i /><i /><i />
-        </span>
-      )}
-    </>
-  );
 
   return (
     <>
-      {header(true)}
-      <div
-        className={styles.gameShell}
-        data-phase="play"
-        data-shape={game.shape}
-        data-flash={flash ?? undefined}
-        data-shot="shell-play"
-      >
-        <div className={styles.shellStage} data-shot="stage">
-          {round !== undefined && <PlayComponent key={roundIndex} round={round} api={api} />}
-        </div>
+      {header(inPlay)}
+      <div className={styles.shell} data-phase={phase} data-shot={inPlay ? 'shell-play' : 'shell-intro'}>
+        {inPlay ? (
+          <div
+            className={styles.stage}
+            data-tint={GAME_TINTS[game.shape]}
+            data-shape={game.shape}
+            data-flash={flash ?? undefined}
+            data-shot="stage"
+          >
+            <div className={styles.inside}>
+              {round !== undefined && <PlayComponent key={roundIndex} round={round} api={api} />}
+            </div>
 
-        {/* one Luna per screen (DES-12): a game with its own Luna on the stage
-            gets her line here with no owl, and the line says itself again */}
-        <div className={styles.lunaPerch} data-own-luna={game.ownLuna || undefined}>
-          {!game.ownLuna && <Luna mood={mood} size={82} onClick={() => speak(bubble, mood)} />}
-          <div className={styles.perchBubble}>
-            {game.ownLuna ? (
-              <button className={styles.perchSay} onClick={() => speak(bubble, mood)} aria-label={`Hear Ms. Luna again: ${bubble}`}>
-                {perchLine}
-              </button>
-            ) : (
-              <p>{perchLine}</p>
-            )}
-            {hint && (
-              <button
-                className={styles.perchHint}
-                onClick={() => {
-                  soundManager.playLetterTap();
-                  pronunciation.speakSequence(hint);
-                }}
-              >
-                <span aria-hidden="true">🔦</span> Hear my hint again
-              </button>
+            {flash === 'win' && (
+              // the round is won: a sparkle pops (DES-11 brings the flowers and petals)
+              <span className={styles.winVeil} data-shot="win-veil" aria-hidden="true">
+                <span className={styles.winSpark}>
+                  <Icon name="sparkle" size={40} filled />
+                </span>
+              </span>
             )}
           </div>
-        </div>
+        ) : (
+          // the start screen: no board, built from the kit (DES-22a)
+          <div className={styles.stage} data-tint={GAME_TINTS[game.shape]}>
+            <div className={cx(styles.inside, styles.start)}>
+              <span className={styles.picture} aria-hidden="true">
+                {game.lesson ? (
+                  <span className={styles.lessonMark}>
+                    <span className={styles.lessonWord}>Lesson</span>
+                    <span className={styles.lessonNumber}>{lessonNumber}</span>
+                  </span>
+                ) : (
+                  <GamePicture shape={game.shape} size="large" />
+                )}
+              </span>
 
-        {flash === 'win' && (
-          <div className={styles.winVeil} data-shot="win-veil" aria-hidden="true">
-            <span className={styles.winBurst}>✦</span>
+              {/* a lesson's questions are fixed, so there is nothing to choose */}
+              {!game.lesson && (
+                <div className={styles.levels} role="group" aria-label="Choose how tricky">
+                  {DIFFICULTY_LABELS.map(level => (
+                    <ChunkyButton
+                      key={level.value}
+                      aria-pressed={difficulty === level.value}
+                      onClick={() => {
+                        soundManager.playLetterTap();
+                        setDifficulty(level.value);
+                      }}
+                    >
+                      {level.label}
+                    </ChunkyButton>
+                  ))}
+                </div>
+              )}
+
+              <ChunkyButton variant="action" size={64} icon="play" data-shot="play" onClick={() => startPlay(difficulty)}>
+                {game.lesson ? 'Let’s learn!' : 'Let’s play!'}
+              </ChunkyButton>
+            </div>
           </div>
         )}
+
+        {/* Luna's perch, as on the Round board: what she says; a clue is
+            spoken, never written */}
+        <div className={styles.perch}>
+          {!owlOnStage && (
+            <Luna mood={inPlay ? mood : 'happy'} size={124} float={!inPlay} onClick={() => speak(bubble, mood)} />
+          )}
+          <SpeechBubble
+            className={styles.bubble}
+            tail={owlOnStage ? 'none' : 'left'}
+            onLine={owlOnStage ? () => speak(bubble, mood) : undefined}
+            lineLabel={`Hear Ms. Luna again: ${bubble}`}
+            // from the second miss until the round is won, as on the board
+            onClue={
+              inPlay && hint && flash !== 'win'
+                ? () => {
+                    soundManager.playLetterTap();
+                    pronunciation.speakSequence(hint);
+                  }
+                : undefined
+            }
+          >
+            {bubble}
+          </SpeechBubble>
+        </div>
       </div>
     </>
   );

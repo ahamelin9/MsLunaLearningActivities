@@ -1,0 +1,131 @@
+// The done screen, moved unchanged out of GameShell's module (DES-22a) so the
+// shell could go onto the kit. Still the old look and the old styles: DES-22d
+// rebuilds it on the round 2 Done board and takes this folder to zero.
+
+@use 'apps/reading/engine/world' as *;
+
+// the shell's old frame, as it was under the reward
+.done-screen {
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  // it fills what's left under the app's header (AppHeader, DES-8)
+  min-height: 0;
+  padding: 0.9rem 1.1rem 1.1rem;
+  color: $ink;
+  background:
+    radial-gradient(ellipse at 50% -10%, rgba(240, 162, 46, 0.22), transparent 60%),
+    linear-gradient(180deg, #FFF6E6 0%, #FBEBD2 100%);
+  overflow: hidden;
+}
+
+.reward-confetti {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.reward-panel {
+  @include paper-card;
+  @include grain(0.06);
+  position: relative;
+  z-index: 6;
+  width: min(540px, 100%);
+  padding: 1.3rem 1.5rem 1.5rem;
+  text-align: center;
+  animation: panelRise 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.reward-luna { display: flex; justify-content: center; margin-top: -3.6rem; }
+
+.reward-title {
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  font-weight: 600;
+  margin-top: 0.3rem;
+}
+
+.reward-stars {
+  display: flex;
+  justify-content: center;
+  gap: 0.3rem;
+  margin: 0.7rem 0 0.4rem;
+
+  .reward-star {
+    animation: starDrop 0.55s cubic-bezier(0.2, 1.5, 0.4, 1) backwards;
+    filter: drop-shadow(0 4px 6px rgba(201, 123, 18, 0.45));
+  }
+}
+
+.reward-score { color: $ink-soft; font-weight: 700; font-size: 0.95rem; }
+
+.sticker-award {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  margin: 1rem 0;
+  padding: 0.7rem 0.9rem;
+  background: #FFFFFF;
+  border: 3px dashed $amber;
+  border-radius: 18px;
+  text-align: left;
+
+  .sticker-peel {
+    font-size: 2.7rem;
+    animation: stickerStick 0.7s cubic-bezier(0.2, 1.5, 0.4, 1);
+    filter: drop-shadow(0 3px 4px rgba(58, 42, 31, 0.3));
+  }
+
+  .sticker-kicker {
+    display: block;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: $amber-deep;
+    font-weight: 800;
+  }
+
+  .sticker-name {
+    font-family: var(--font-read);
+    font-size: 1.15rem;
+    font-weight: 600;
+  }
+}
+
+.reward-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.reward-btn {
+  @include chunky(#FFFFFF, rgba(58, 42, 31, 0.25), $ink);
+  padding: 0.6rem 1rem;
+  font-size: 1rem;
+  flex: 1 1 140px;
+
+  &.primary { @include chunky($amber, $amber-deep, #46280A); }
+}
+
+@keyframes panelRise {
+  from { transform: translateY(22px) scale(0.97); opacity: 0; }
+  to { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+@keyframes starDrop {
+  from { transform: translateY(-30px) scale(0.3) rotate(-40deg); opacity: 0; }
+  to { transform: translateY(0) scale(1) rotate(0); opacity: 1; }
+}
+
+@keyframes stickerStick {
+  0% { transform: translate(30px, -26px) rotate(28deg) scale(0.5); opacity: 0; }
+  60% { transform: translate(0, 0) rotate(-8deg) scale(1.2); opacity: 1; }
+  100% { transform: rotate(-4deg) scale(1); }
+}

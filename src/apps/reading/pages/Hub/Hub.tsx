@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import type { GradeLevel } from '@/types/reading';
 import type { UserProgress } from '@/types/user';
-import type { AnyGameDef, GameShape } from '../../engine/types';
+import type { AnyGameDef } from '../../engine/types';
 import { GAMES } from '../../games';
 import { ChunkyButton, LessonCard, Luna, PaperCard, ProgressBar, Tile } from '@/components/kit';
 import { greeting, lunaSay, type LunaLine, type LunaMood } from '../../engine/luna';
@@ -11,7 +11,7 @@ import { pronunciation } from '@/utils/pronunciation';
 import { storageService } from '@/utils/storage';
 import { warmReadingVoice } from '../../engine/warmup';
 import { FINISH_FIRST, lessonStates } from '../../engine/lessons';
-import { ShelfPicture } from './ShelfPicture';
+import { GAME_TINTS, GamePicture } from '../../games/shared/GamePicture/GamePicture';
 import styles from './Hub.module.scss';
 
 interface HubProps {
@@ -31,19 +31,6 @@ interface HubProps {
 
 /** How many of the latest stickers stand on the Sticker Tin's plank. */
 const ON_THE_PLANK = 3;
-
-/** Each game's picture tint on its Play Shelf Tile, as on the board. */
-const SHELF_TINTS: Record<GameShape, 1 | 2 | 3 | 4 | 5> = {
-  jar: 1,
-  bubbles: 2,
-  plate: 3,
-  cards: 4,
-  page: 5,
-  desk: 2,
-  map: 1,
-  book: 3,
-  lesson: 1
-};
 
 /**
  * Luna's library (DES-21), as on the round 2 Library board: the welcome row
@@ -222,8 +209,8 @@ export const Hub: React.FC<HubProps> = ({
             <Tile
               key={game.id}
               name={game.title}
-              tint={SHELF_TINTS[game.shape]}
-              picture={<ShelfPicture shape={game.shape} />}
+              tint={GAME_TINTS[game.shape]}
+              picture={<GamePicture shape={game.shape} />}
               data-shot="game-tile"
               onClick={() => startGame(game)}
             />

@@ -1,11 +1,19 @@
-// The Play Shelf's drawn pictures (DES-21): illustration colours and roles
-// through classes, never fill="#…" in the markup (colour.md, Illustrations).
-// They move with the shared sway and float, which reduced motion turns off.
+// Each game's drawn picture (DES-21; shared with the start screen, DES-22a):
+// illustration colours and roles through classes, never fill="#…" in the
+// markup (colour.md, Illustrations). They move with the shared sway and float,
+// which reduced motion turns off.
 
 // a drawing keeps its shape and shrinks to fit a narrow tile (portrait iPads)
 .picture {
   max-width: calc(100% - var(--space-4));
   height: auto;
+}
+
+// the start screen: every picture the same height, its width from its shape
+.picture[data-size='large'] {
+  width: auto;
+  max-width: none;
+  height: calc(var(--space-16) * 2);
 }
 
 // ---- fills ----

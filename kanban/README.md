@@ -72,8 +72,8 @@ be pulled into Phase 1 for a break from styling.
 
 ### Now / Next
 
-- **Now:** DES-22a: GameShell on the kit (start screen, stage and perch, the done screen as on the Done board, with DES-13's lesson pieces). The first of Stage 7, play. Stage 6 (the library) is done (2026-10-12): DES-21 (the library on the kit), PRG-7 (lessons open in order) and DES-13 (the lesson path, one bar)
-- **Next:** the rest of Stage 7: DES-11 → DES-22b, DES-22c → DES-23. PRG-8 (pick up a lesson where you left off) was split from DES-13 and needs nothing. SET-1 (the grown-up gate) no longer waits on anything. OPS-9 (know-how checks onto `data-shot`) can start any time: the checks lost their last class names with DES-18d. SET-1 is pulled in where DES-16 needs it. FB-1 (Phase 2) no longer waits on the layout; GAME-1c, Treasure Path's screen, waits on it
+- **Now:** DES-22a: GameShell on the kit (start screen, stage and perch). The first of Stage 7, play; the done screen split off as DES-22d (Alex, 2026-10-12). Stage 6 (the library) is done (2026-10-12): DES-21 (the library on the kit), PRG-7 (lessons open in order) and DES-13 (the lesson path, one bar)
+- **Next:** the rest of Stage 7: DES-22d (the done screen) → DES-11 → DES-22b, DES-22c → DES-23. PRG-8 (pick up a lesson where you left off) was split from DES-13 and needs nothing. SET-1 (the grown-up gate) no longer waits on anything. OPS-9 (know-how checks onto `data-shot`) can start any time: the checks lost their last class names with DES-18d. SET-1 is pulled in where DES-16 needs it. FB-1 (Phase 2) no longer waits on the layout; GAME-1c, Treasure Path's screen, waits on it
 
 ## Epics
 
@@ -97,7 +97,8 @@ In board order. A new epic gets its file in `epics/` first, then a link here
 | ID | Title | Type | P | Size | Status |
 |---|---|---|---|---|---|
 | **DES** | **Design system & layout** | Epic | **P0** | | |
-| DES-22a | GameShell on the kit: start, stage, perch, reward | Story | P1 | M | Todo |
+| DES-22a | GameShell on the kit: start screen, stage and perch | Story | P1 | M | In progress |
+| DES-22d | The done screen on the Done board | Story | P1 | M | Todo |
 | DES-11 | One right/wrong/reveal visual language | Story | P1 | S | Todo |
 | DES-22b | Games on the kit, part 1: Letter Jar, Bubble Sounds, Letter Cookies, Muddled Cards | Story | P1 | M | Todo |
 | DES-22c | Games on the kit, part 2: Words Off the Page, What's Missing?, Treasure Path, Story Corner | Story | P1 | M | Todo |
@@ -125,6 +126,7 @@ In board order. A new epic gets its file in `epics/` first, then a link here
 | SET-2 | A child can't silence Luna by accident | Story | P0 | S | Todo |
 | SET-3 | Simplify the voice section | Story | P2 | S | Todo |
 | SET-4 | Settings grade list uses `GRADES` | Task | P2 | S | Todo |
+| SET-5 | Grown-ups can see what each game and lesson teaches | Story | P2 | S | Todo |
 | **LVL** | **Difficulty** | Epic | **P0** | | |
 | LVL-1 | Explicit grade × dial difficulty table | Story | P0 | S | Todo |
 | LVL-2 | Remember the chosen difficulty per game | Story | P2 | S | Todo |

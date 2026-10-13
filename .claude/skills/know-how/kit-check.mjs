@@ -12,6 +12,8 @@
 // DES-9c: a picked Tile (aria-pressed) takes the action colour too.
 // DES-13: a LessonCard with no time shows none, and the one that just opened
 // pops then glows (no pop under reduced motion).
+// DES-22a: a SpeechBubble with no tail draws none, and its line is a 48px
+// button that still reads as her words.
 // Start Vite on 5199 first, then from the repo root:
 //   node .claude/skills/know-how/kit-check.mjs
 // Exits 1 on any ❌.
@@ -357,6 +359,21 @@ ok('… and its picture keeps the ink, not the action ink', await page.evaluate(
   const ink = b => getComputedStyle(b.firstElementChild).color;
   const picked = set.find(b => b.getAttribute('aria-pressed') === 'true');
   return ink(picked) === ink(set.find(b => b !== picked)) && ink(picked) !== getComputedStyle(picked).color;
+}));
+
+// ── a SpeechBubble with no tail (DES-22a, the perch of a game with its own Luna) ──
+const bare = await page.evaluateHandle(() => document.querySelector('button[aria-label="Hear Ms. Luna again"]'));
+await bare.evaluate(e => e.scrollIntoView({ block: 'center' }));
+ok('a no-tail bubble draws no tail', await bare.evaluate(b => {
+  const root = b.closest('[data-variant]');
+  return root.dataset.variant === 'none' && root.children.length === 1;
+}));
+ok('… its line is a button at least 48px tall', await bare.evaluate(b => b.getBoundingClientRect().height >= 48), `${await bare.evaluate(b => b.getBoundingClientRect().height)}px`);
+ok('… that reads as her words, not a grey button', await bare.evaluate(b => {
+  const said = getComputedStyle(b);
+  const line = getComputedStyle(document.querySelector('[data-variant="left"] p'));
+  return said.borderTopStyle === 'none' && said.backgroundColor === 'rgba(0, 0, 0, 0)' &&
+    said.fontSize === line.fontSize && said.fontFamily === line.fontFamily && said.color === line.color;
 }));
 
 await browser.close();

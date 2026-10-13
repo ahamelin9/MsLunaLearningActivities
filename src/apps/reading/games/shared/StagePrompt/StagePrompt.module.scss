@@ -1,9 +1,9 @@
-@use 'apps/reading/engine/world' as *;
+// A game's line of instruction on the stage (DES-22a): the reading type, at
+// least the 20px a child reads to play, in bold.
 
 .stage-prompt {
-  font-family: var(--font-read);
-  font-weight: 600;
-  font-size: 1.2rem;
-  color: $ink;
+  font: var(--text-read);
+  font-weight: 700;
+  color: var(--ink);
   text-align: center;
 }

@@ -2,6 +2,8 @@
 // 45°, with the card's border on its two outer sides, overlapping the card's
 // edge by half and painted over it.
 
+@use 'styles/mixins' as *;
+
 .root {
   --bubble-bg: var(--card);
   --bubble-edge: var(--edge);
@@ -25,6 +27,24 @@
 
 .line {
   font: var(--text-read);
+}
+
+// the line as a button that says it again (DES-22a): it reads as the same
+// words, at least a header button tall, so a child can tap it
+.say {
+  display: flex;
+  align-items: center;
+  min-height: var(--target-chrome);
+  padding: 0;
+  border: none;
+  background: none;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+
+  &:focus-visible {
+    @include focus-ring;
+  }
 }
 
 .tail {
