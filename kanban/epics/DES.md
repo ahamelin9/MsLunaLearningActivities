@@ -52,7 +52,7 @@ them in.
 | 5 | Frame and shell | DES-8, DES-10, DES-15 (done 2026-10-11), DES-9a, DES-9b, DES-9c, DES-12 (done 2026-10-12) | One header, the layout grid, the new Luna (moved here from Stage 4, Alex 2026-10-11), the restyled home, Settings, trophies and Grade Select; one Luna per screen |
 | 6 | The library | DES-21 → **PRG-7 (pulled in)** → DES-13 (done 2026-10-12) | The library as on the board: lessons in order, one bar |
 | 7 | Play | DES-22a (done 2026-10-12) → DES-22d (done 2026-10-13) → DES-11 (done 2026-10-17) → DES-22b, DES-22c → DES-23 (done 2026-10-18) | GameShell (start, stage, perch and the done screen), all 8 games and all 8 lesson types on the kit, with one right/wrong language |
-| 8 | The design system is done | DES-24 | Legacy styles deleted; the check runs strict with no baseline |
+| 8 | The design system is done | DES-24 (done 2026-10-18) | Legacy styles deleted; the check runs strict with no baseline |
 | 9 | What's left of the epic | **SET-1 (pulled in)** → DES-16, then DES-17, then DES-14 | Light/dark follows the iPad with a grown-up choice; the milestone moon; real cookies |
 
 **Notes on the order:**
@@ -122,18 +122,3 @@ Story · P1 · M · needs: —
   - with reduced motion she appears without gliding;
   - her clips are rendered and `voice:audit` passes;
   - the MilestoneMoon folder shows zero in `design:status`.
-
-### DES-24 · Retire the legacy styles
-Task · P1 · S · needs: —
-- **Why:** this is the finish line of the design-system effort (Alex's plan, 2026-10-10).
-- **How:**
-  - Delete `src/styles/_variables.scss`, `src/apps/reading/engine/_world.scss`, `src/index.css` (replaced by `styles/base/`), the legacy mixins (`glassmorphism`, `squircle-icon` and the like) and `scripts/design/baseline.json`.
-  - Delete `components/ui/Icons`, once the restyles have moved every screen onto the kit's Icon (DES-7a). No ticket owns it before this one.
-  - The design check then runs strict, with no baseline.
-- **Complete when:**
-  - `npm run lint` passes with no baseline: every colour, size, radius, border, shadow, duration and breakpoint in `src` comes from the token files;
-  - every screen works in light and dark from roles alone, and the contrast check passes;
-  - every button, card and answer choice is a kit component, and the Kit page shows them all in every state;
-  - each page, game and lesson type has its own folder and styles;
-  - someone new can open `docs/design-system/README.md`, find any token or component in under a minute, and follow written steps to add one or to handle something that doesn't fit (Alex tries it);
-  - the `luna-design` skill tells Claude the same.

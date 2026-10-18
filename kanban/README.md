@@ -72,8 +72,8 @@ be pulled into Phase 1 for a break from styling.
 
 ### Now / Next
 
-- **Now:** DES-24: retire the legacy styles (Stage 8), so the design check runs strict with no baseline. Stage 7 (play) is done (2026-10-18): GameShell, the done screen, a won round's garden and petals, all eight games and all eight lesson types are on the kit. About 180 raw values are left in 6 files.
-- **Next:** Stage 9, what's left of the epic: SET-1 (pulled in) → DES-16 (light and dark), then DES-17 (the milestone moon), then DES-14 (real cookies, which can slot in any time). OPS-11 (a first cloud session) waits until Alex wants to work away from the Mac. PRG-8 (pick up a lesson where you left off) was split from DES-13 and needs nothing. SET-1 (the grown-up gate) no longer waits on anything. OPS-9 (know-how checks onto `data-shot`) can start any time: the checks lost their last class names with DES-18d. SET-1 is pulled in where DES-16 needs it. FB-1 (Phase 2) no longer waits on the layout; GAME-1c, Treasure Path's screen, waits on it
+- **Now:** SET-1: the grown-up gate for Settings (pulled into Stage 9, because DES-16's light/dark choice lives behind it). Stage 8 is done (2026-10-18): the legacy styles are gone, and the design check is strict with no baseline.
+- **Next:** the rest of Stage 9: DES-16 (light and dark), then DES-17 (the milestone moon), then DES-14 (real cookies, which can slot in any time). OPS-11 (a first cloud session) waits until Alex wants to work away from the Mac. PRG-8 (pick up a lesson where you left off) was split from DES-13 and needs nothing. OPS-9 (know-how checks onto `data-shot`) can start any time: the checks lost their last class names with DES-18d. FB-1 (Phase 2) no longer waits on the layout; GAME-1c, Treasure Path's screen, waits on it
 
 ## Epics
 
@@ -97,7 +97,6 @@ In board order. A new epic gets its file in `epics/` first, then a link here
 | ID | Title | Type | P | Size | Status |
 |---|---|---|---|---|---|
 | **DES** | **Design system & layout** | Epic | **P0** | | |
-| DES-24 | Retire the legacy styles | Task | P1 | S | In progress |
 | DES-16 | Light and dark mode | Story | P1 | M | Todo |
 | DES-17 | The moon visits for big milestones | Story | P1 | M | Todo |
 | DES-14 | Feed Luna's cookies look like real, different cookies | Story | P2 | S | Todo |
