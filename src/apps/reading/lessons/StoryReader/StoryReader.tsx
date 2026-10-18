@@ -4,9 +4,9 @@ import type { GameApi } from '../../engine/types';
 import { shuffle } from '../../engine/content';
 import { soundManager } from '@/utils/audio';
 import { pronunciation } from '@/utils/pronunciation';
-import { PromptChip } from '../shared/LessonKit';
-import { useAnswer, usePrompt } from '../shared/lessonHooks';
-import { cx, dataState } from '@/utils/cx';
+import { ChunkyButton, Choice, PaperCard } from '@/components/kit';
+import { choiceState, useAnswer, usePrompt } from '../shared/lessonHooks';
+import { cx } from '@/utils/cx';
 import kit from '../shared/LessonKit.module.scss';
 import styles from './StoryReader.module.scss';
 
@@ -46,12 +46,13 @@ export const StoryReader: React.FC<{ question: StoryReadQuestion; api: GameApi }
 
   return (
     <div className={kit.lesson}>
-      <div className={styles.lessonStory}>
-        <div className={styles.storyHead}>
-          <span className={styles.storyEmoji}>{question.imageEmoji}</span>
-          <span className={styles.storyTitle}>{question.title}</span>
-          <button
-            className={kit.lessonAction}
+      <PaperCard className={styles.story}>
+        <div className={styles.head}>
+          <span className={styles.picture}>{question.imageEmoji}</span>
+          <span className={styles.title}>{question.title}</span>
+          <ChunkyButton
+            variant="prompt"
+            icon="speaker"
             disabled={!tried}
             onClick={() => {
               soundManager.playPop();
@@ -60,28 +61,27 @@ export const StoryReader: React.FC<{ question: StoryReadQuestion; api: GameApi }
             }}
             title={tried ? undefined : 'Try it first!'}
           >
-            🔊 Read me the whole story
-          </button>
+            Read me the whole story
+          </ChunkyButton>
         </div>
 
         {question.sentences.map((sentence, s) => (
-          <div key={sentence.id} className={styles.storyLine} data-state={activeLine === s ? 'active' : undefined}>
-            <button
-              className={styles.linePlay}
+          <div key={sentence.id} className={styles.line} data-state={activeLine === s ? 'active' : undefined}>
+            <ChunkyButton
+              variant="icon"
+              icon="speaker"
               disabled={!tried}
               onClick={() => readLine(s)}
               title="Read this line"
               aria-label="Read this line"
-            >
-              🔊
-            </button>
-            <span className={cx(kit.lessonSentence, styles.lessonSentence)}>
+            />
+            <span className={cx(kit.sentence, styles.sentence)}>
               {sentence.text.split(' ').map((word, w) => {
                 const key = `${s}-${w}`;
                 return (
                   <button
                     key={key}
-                    className={kit.lessonWordChip}
+                    className={kit.word}
                     data-state={activeWord === key ? 'active' : undefined}
                     onClick={() => readWord(word, key)}
                   >
@@ -92,18 +92,19 @@ export const StoryReader: React.FC<{ question: StoryReadQuestion; api: GameApi }
             </span>
           </div>
         ))}
-      </div>
+      </PaperCard>
 
-      <PromptChip text={quiz.question} onClick={sayQuestion} />
+      <ChunkyButton variant="prompt" icon="speaker" onClick={sayQuestion}>
+        {quiz.question}
+      </ChunkyButton>
 
-      <div className={styles.lessonAnswers}>
+      <div className={kit.choices}>
         {answers.map(answer => (
-          <button
+          <Choice
             key={answer.id}
+            kind="phrase"
             data-shot="lesson-choice"
-            className={styles.lessonAnswer}
-            data-state={dataState(wrongId === answer.id ? 'wrong' : false, solved && answer.isCorrect ? 'right' : false)}
-            disabled={solved}
+            state={choiceState(answer.id, answer.isCorrect, wrongId, solved)}
             onClick={() =>
               choose(answer.id, answer.isCorrect, onEnd =>
                 // a right answer is followed by why it is right
@@ -114,7 +115,7 @@ export const StoryReader: React.FC<{ question: StoryReadQuestion; api: GameApi }
             }
           >
             {answer.text}
-          </button>
+          </Choice>
         ))}
       </div>
     </div>

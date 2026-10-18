@@ -222,7 +222,7 @@ for (const [width, height] of SIZES) {
       await choice.click().catch(() => {});
       for (let t = 0; t < 40 && !moved; t++) {
         await wait(200);
-        moved = (await shownNow(`${at('win-veil')}, ${at('shell-reward')}`)) || (await round()) !== now;
+        moved = (await shownNow(`${at('win-garden')}, ${at('shell-reward')}`)) || (await round()) !== now;
       }
     }
     for (let t = 0; t < 60 && !(await shownNow(at('shell-reward'))) && (await round()) === now; t++) await wait(200);

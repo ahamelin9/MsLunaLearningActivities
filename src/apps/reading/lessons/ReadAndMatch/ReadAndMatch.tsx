@@ -4,9 +4,8 @@ import type { GameApi } from '../../engine/types';
 import { shuffle } from '../../engine/content';
 import { soundManager } from '@/utils/audio';
 import { pronunciation } from '@/utils/pronunciation';
-import { PromptChip } from '../shared/LessonKit';
-import { useAnswer, usePrompt } from '../shared/lessonHooks';
-import { dataState } from '@/utils/cx';
+import { ChunkyButton, Choice, PaperCard } from '@/components/kit';
+import { choiceState, useAnswer, usePrompt } from '../shared/lessonHooks';
 import kit from '../shared/LessonKit.module.scss';
 
 /** Read a word, find its picture. */
@@ -20,38 +19,40 @@ export const ReadAndMatch: React.FC<{ question: ReadAndMatchQuestion; api: GameA
 
   return (
     <div className={kit.lesson}>
-      <button
-        className={kit.lessonCard}
-        data-state={solved ? 'button' : undefined}
-        onClick={() => {
-          if (!solved) return;
-          soundManager.playPop();
-          pronunciation.speakWord(question.word);
-        }}
-        title={solved ? 'Hear the word' : undefined}
-      >
-        <span className={kit.cardWord}>{question.word.toUpperCase()}</span>
-        {solved && <span className={kit.cardTap}>tap to hear it</span>}
-      </button>
-      <PromptChip text={question.prompt} onClick={sayPrompt} />
+      <PaperCard>
+        <button
+          className={kit.card}
+          onClick={() => {
+            if (!solved) return;
+            soundManager.playPop();
+            pronunciation.speakWord(question.word);
+          }}
+          title={solved ? 'Hear the word' : undefined}
+        >
+          <span className={kit.cardWord}>{question.word.toUpperCase()}</span>
+          {solved && <span className={kit.cardTap}>tap to hear it</span>}
+        </button>
+      </PaperCard>
+      <ChunkyButton variant="prompt" icon="speaker" onClick={sayPrompt}>
+        {question.prompt}
+      </ChunkyButton>
 
-      <div className={kit.lessonChoices}>
+      <div className={kit.choices}>
         {options.map(option => (
-          <button
+          <Choice
             key={option.id}
+            kind="picture"
             data-shot="lesson-choice"
-            className={kit.lessonChoice}
-            data-state={dataState(wrongId === option.id ? 'wrong' : false, solved && option.isCorrect ? 'right' : false)}
-            disabled={solved}
+            state={choiceState(option.id, option.isCorrect, wrongId, solved)}
             onClick={() =>
               choose(option.id, option.isCorrect, onEnd => pronunciation.speakText(option.text, { onEnd }))
             }
             aria-label={option.text}
+            // named once found: written, it would be matched to the word letter for letter
+            caption={solved ? option.text : undefined}
           >
-            <span className={kit.choiceEmoji}>{option.imageEmoji}</span>
-            {/* named once found: written, it would be matched to the word letter for letter */}
-            {solved && <span className={kit.choiceLabel}>{option.text}</span>}
-          </button>
+            {option.imageEmoji}
+          </Choice>
         ))}
       </div>
     </div>

@@ -226,6 +226,11 @@ Pitfalls that cost time:
   `-f` matches whole command lines, so a status check whose own text held
   that string (`pgrep -fl "vite --port 5199|…"`) was killed with it (exit
   144). Keep the pattern out of other commands running at the same time.
+  The same trap waits forever (*2026-10-18, DES-23*): `until ! pgrep -f
+  "layout-audit.mjs 5199"; do sleep 20; done` finds its own shell, whose
+  command line holds the pattern, so it never ends, and a pile of such
+  loops sat in the background for hours. Run the long check itself in the
+  background and let its own end notify you, or wait on a file it writes.
 - **A puppeteer run prints its result but never exits** (*2026-10-10,
   GAME-1b*): copies of `speech-check.cjs` sometimes keep running after the ✅
   line. Their output is complete by then. Stop just that process by its script
@@ -263,7 +268,7 @@ Pitfalls that cost time:
   names (DES-18a): `home`, `open-reading`, `grade-select`, `grade-card`, `hub`,
   `hub-rug`, `hub-tin`, `lesson-tile`, `game-tile`, `tile-title`,
   `shell-intro`, `shell-play`, `shell-reward`, `play`, `shell-back`,
-  `round-pips`, `win-veil`, `lesson-choice`, `open-settings`, `settings`,
+  `round-pips`, `win-garden` (a won round, DES-11), `petals`, `lesson-choice`, `open-settings`, `settings`,
   `open-trophies`, `trophies`, `modal-close`, `app-home` (DES-8), `stage`
   (GameShell's stage, DES-10), and on the library `change-grade` (the
   header's grade) and `luna-mute` (the button beside her) (DES-21). OPS-9
@@ -513,6 +518,13 @@ Pitfalls that cost time:
   `transform`, so the two don't cancel). Pieces placed on a grid fixed by the
   round fit one screen and not another: shape the grid from the measured
   field instead (`gridFor` in `LetterHunt.tsx`, with a ResizeObserver).
+- **Pitfall, a fit check that can't fail** (*2026-10-18, DES-22c*): measuring
+  "everything inside the stage" said every Treasure Path stone fitted
+  exactly, because the stage's own layers (`.inside`, the garden, the
+  blobs) fill it edge to edge. Measure the game's own pieces instead: its
+  first and last things (the path of stones, the answers). The layout audit
+  plays only round 1, so a game whose content grows by round needs its own
+  check: `treasure-fit.mjs` next to this file plays all 5 stones.
 - **Check:** it passes at every grade today, and fails with GameShell's
   `.shell-stage { min-height }` set to 1400px for a moment.
 

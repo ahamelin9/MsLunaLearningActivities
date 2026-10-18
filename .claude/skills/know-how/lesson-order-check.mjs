@@ -132,7 +132,7 @@ const playLesson = async i => {
       await choice.click().catch(() => {});
       for (let t = 0; t < 40 && !moved; t++) {
         await wait(200);
-        moved = (await shown(`${at('win-veil')}, ${at('shell-reward')}`)) || (await round()) !== now;
+        moved = (await shown(`${at('win-garden')}, ${at('shell-reward')}`)) || (await round()) !== now;
       }
     }
     for (let t = 0; t < 60 && !(await shown(at('shell-reward'))) && (await round()) === now; t++) await wait(200);

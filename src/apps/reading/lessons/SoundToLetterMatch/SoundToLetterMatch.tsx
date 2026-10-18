@@ -4,9 +4,8 @@ import type { GameApi } from '../../engine/types';
 import { shuffle } from '../../engine/content';
 import { soundManager } from '@/utils/audio';
 import { pronunciation } from '@/utils/pronunciation';
-import { ListenCue, PromptChip } from '../shared/LessonKit';
-import { useAnswer, usePrompt } from '../shared/lessonHooks';
-import { dataState } from '@/utils/cx';
+import { ChunkyButton, Choice, ListenCue } from '@/components/kit';
+import { choiceState, useAnswer, usePrompt } from '../shared/lessonHooks';
 import kit from '../shared/LessonKit.module.scss';
 
 /** Hear a sound, find the letter that makes it. The sound is never written. */
@@ -27,22 +26,23 @@ export const SoundToLetterMatch: React.FC<{ question: SoundToLetterQuestion; api
   return (
     <div className={kit.lesson}>
       <ListenCue
-        answer={solved ? question.targetLetter : null}
+        state={solved ? 'found' : 'waiting'}
+        answer={question.targetLetter}
         onClick={() => {
           soundManager.playLetterTap();
           pronunciation.speakLetterSound(question.targetLetter);
         }}
       />
-      <PromptChip text={question.prompt} onClick={sayPrompt} />
+      <ChunkyButton variant="prompt" icon="speaker" onClick={sayPrompt}>
+        {question.prompt}
+      </ChunkyButton>
 
-      <div className={kit.lessonChoices}>
+      <div className={kit.choices}>
         {options.map(option => (
-          <button
+          <Choice
             key={option.id}
             data-shot="lesson-choice"
-            className={kit.lessonChoice}
-            data-state={dataState(wrongId === option.id ? 'wrong' : false, solved && option.isCorrect ? 'right' : false)}
-            disabled={solved}
+            state={choiceState(option.id, option.isCorrect, wrongId, solved)}
             onClick={() =>
               choose(option.id, option.isCorrect, onEnd =>
                 pronunciation.speakSequence([{ text: 'Letter' }, { name: option.letter }], { onEnd })
@@ -50,8 +50,8 @@ export const SoundToLetterMatch: React.FC<{ question: SoundToLetterQuestion; api
             }
             aria-label={`letter ${option.letter}`}
           >
-            <span className={kit.choiceLetter}>{option.letter}</span>
-          </button>
+            {option.letter}
+          </Choice>
         ))}
       </div>
     </div>

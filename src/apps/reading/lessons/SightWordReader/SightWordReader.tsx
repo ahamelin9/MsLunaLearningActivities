@@ -4,9 +4,8 @@ import type { GameApi } from '../../engine/types';
 import { shuffle } from '../../engine/content';
 import { soundManager } from '@/utils/audio';
 import { pronunciation } from '@/utils/pronunciation';
-import { ListenCue, PromptChip } from '../shared/LessonKit';
-import { useAnswer, usePrompt } from '../shared/lessonHooks';
-import { dataState } from '@/utils/cx';
+import { ChunkyButton, Choice, ListenCue, PaperCard } from '@/components/kit';
+import { choiceState, useAnswer, usePrompt } from '../shared/lessonHooks';
 import kit from '../shared/LessonKit.module.scss';
 
 /**
@@ -37,48 +36,53 @@ export const SightWordReader: React.FC<{ question: SightWordReaderQuestion; api:
   return (
     <div className={kit.lesson}>
       <ListenCue
-        answer={solved ? question.word : null}
+        state={solved ? 'found' : 'waiting'}
+        kind="word"
+        answer={question.word}
         onClick={() => {
           soundManager.playLetterTap();
           pronunciation.speakWord(question.word);
         }}
       />
-      <PromptChip text={question.prompt} onClick={sayPrompt} />
+      <ChunkyButton variant="prompt" icon="speaker" onClick={sayPrompt}>
+        {question.prompt}
+      </ChunkyButton>
 
-      <div className={kit.lessonChoices}>
+      <div className={kit.choices}>
         {options.map(option => (
-          <button
+          <Choice
             key={option.id}
+            kind="word"
             data-shot="lesson-choice"
-            className={kit.lessonChoice}
-            data-state={dataState(wrongId === option.id ? 'wrong' : false, solved && option.isCorrect ? 'right' : false)}
-            disabled={solved}
+            state={choiceState(option.id, option.isCorrect, wrongId, solved)}
             onClick={() =>
               choose(option.id, option.isCorrect, onEnd => pronunciation.speakWord(option.word, { onEnd }))
             }
           >
-            <span className={kit.choiceWord}>{option.word}</span>
-          </button>
+            {option.word}
+          </Choice>
         ))}
       </div>
 
       {solved && question.exampleSentence && (
-        <button
-          className={kit.lessonCard} data-state="button"
-          onClick={() => {
-            soundManager.playPop();
-            pronunciation.speakSentence(question.exampleSentence);
-          }}
-        >
-          <span className={kit.lessonSentence}>
-            {sentence.map(({ token, isKey, i }) => (
-              <span key={i} className={kit.lessonWordChip} data-state={isKey ? 'key' : undefined}>
-                {token}
-              </span>
-            ))}
-          </span>
-          <span className={kit.cardTap}>tap to hear it</span>
-        </button>
+        <PaperCard>
+          <button
+            className={kit.card}
+            onClick={() => {
+              soundManager.playPop();
+              pronunciation.speakSentence(question.exampleSentence);
+            }}
+          >
+            <span className={kit.sentence}>
+              {sentence.map(({ token, isKey, i }) => (
+                <span key={i} className={kit.word} data-state={isKey ? 'key' : undefined}>
+                  {token}
+                </span>
+              ))}
+            </span>
+            <span className={kit.cardTap}>tap to hear it</span>
+          </button>
+        </PaperCard>
       )}
     </div>
   );

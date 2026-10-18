@@ -4,6 +4,8 @@
 // shell's.
 
 import { useEffect, useRef, useState } from 'react';
+import type { ChoiceState } from '@/components/kit';
+import { afterMotion } from '@/utils/motion';
 import type { GameApi } from '../../engine/types';
 
 /** Says the question's prompt once, a moment after it appears. */
@@ -35,8 +37,9 @@ export function useAnswer(api: GameApi, hint?: string) {
     busy.current = true;
     if (correct) setSolved(true);
     else {
+      // a wrong answer wobbles, and clears when its wobble ends (components.md)
       setWrongId(id);
-      window.setTimeout(() => setWrongId(null), 600);
+      afterMotion('emphasis', () => setWrongId(null));
     }
 
     let settled = false;
@@ -67,4 +70,14 @@ export function useAnswer(api: GameApi, hint?: string) {
   const tried = solved || api.attempts > 0;
 
   return { solved, tried, wrongId, choose };
+}
+
+/**
+ * A choice's state in the one answer language (DES-23): wobbling while
+ * wrong; once solved, the right one right and the others faded.
+ */
+export function choiceState(id: string, correct: boolean, wrongId: string | null, solved: boolean): ChoiceState {
+  if (wrongId === id) return 'wrong';
+  if (solved) return correct ? 'right' : 'faded';
+  return 'idle';
 }

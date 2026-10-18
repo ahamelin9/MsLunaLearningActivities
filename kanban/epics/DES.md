@@ -51,7 +51,7 @@ them in.
 | 4 | The kit | DES-7a, DES-7b, DES-7c (done 2026-10-11) | Every kit component on the Kit page in every state |
 | 5 | Frame and shell | DES-8, DES-10, DES-15 (done 2026-10-11), DES-9a, DES-9b, DES-9c, DES-12 (done 2026-10-12) | One header, the layout grid, the new Luna (moved here from Stage 4, Alex 2026-10-11), the restyled home, Settings, trophies and Grade Select; one Luna per screen |
 | 6 | The library | DES-21 → **PRG-7 (pulled in)** → DES-13 (done 2026-10-12) | The library as on the board: lessons in order, one bar |
-| 7 | Play | DES-22a (done 2026-10-12) → DES-22d (done 2026-10-13) → DES-11 (done 2026-10-17) → DES-22b (done 2026-10-18) → DES-22c → DES-23 | GameShell (start, stage, perch and the done screen), all 8 games and all 8 lesson types on the kit, with one right/wrong language |
+| 7 | Play | DES-22a (done 2026-10-12) → DES-22d (done 2026-10-13) → DES-11 (done 2026-10-17) → DES-22b, DES-22c (done 2026-10-18) → DES-23 | GameShell (start, stage, perch and the done screen), all 8 games and all 8 lesson types on the kit, with one right/wrong language |
 | 8 | The design system is done | DES-24 | Legacy styles deleted; the check runs strict with no baseline |
 | 9 | What's left of the epic | **SET-1 (pulled in)** → DES-16, then DES-17, then DES-14 | Light/dark follows the iPad with a grown-up choice; the milestone moon; real cookies |
 
@@ -123,20 +123,6 @@ Story · P1 · M · needs: —
   - her clips are rendered and `voice:audit` passes;
   - the MilestoneMoon folder shows zero in `design:status`.
 
-### DES-22c · Games on the kit, part 2: Words Off the Page, What's Missing?, Treasure Path, Story Corner
-Story · P1 · M · needs: —
-- **How:** as DES-22b did for the first four (its changelog line has the rules):
-  - Each game's answer buttons become `Choice`.
-  - Its game pieces (word tiles, memory objects, stones) stay in its folder but use the state roles, `data-state` and the shared motion (the table in `components.md`).
-  - Its scenery uses roles and its own Play Shelf picture's colours, and Icon replaces emoji in the interface; none of these has a board, so each look is Alex's call from its shots.
-  - Treasure Path's stopgap passage view stays until GAME-1c designs its real screen. Its walker is the kit's Luna since DES-15 (36px, `talking={false}`); its hop is still the game's own keyframes.
-  - **Touch targets (from DES-10):** on 2026-10-11, `layout-audit.mjs` found Words Off the Page's word tiles and empty slots 46px tall and Story Corner's "Next line" 38px. The prompt pills are the kit's 48px ChunkyButton `prompt` since DES-22b.
-- **Complete when:**
-  - in each of the 4 games, a right and a wrong answer look like they do everywhere else;
-  - `.claude/skills/know-how/layout-audit.mjs` lists no "(stage)" line for these games at the four sizes and three grades;
-  - the 4 game folders show zero in `design:status`;
-  - they're checked in light and dark at the four sizes.
-
 ### DES-23 · Lessons on the kit
 Story · P1 · M · needs: —
 - **How:**
@@ -152,7 +138,7 @@ Story · P1 · M · needs: —
   - it's checked in light and dark.
 
 ### DES-24 · Retire the legacy styles
-Task · P1 · S · needs: DES-22c, DES-23
+Task · P1 · S · needs: DES-23
 - **Why:** this is the finish line of the design-system effort (Alex's plan, 2026-10-10).
 - **How:**
   - Delete `src/styles/_variables.scss`, `src/apps/reading/engine/_world.scss`, `src/index.css` (replaced by `styles/base/`), the legacy mixins (`glassmorphism`, `squircle-icon` and the like) and `scripts/design/baseline.json`.

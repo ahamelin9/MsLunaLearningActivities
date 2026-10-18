@@ -1,151 +1,105 @@
-// The guided lessons, drawn in the same paper, wood and ink as the games they
-// sit beside. Every question type builds from these few pieces.
-@use 'apps/reading/engine/world' as *;
+// What every guided lesson lays out with (DES-23). The pieces are the kit's
+// (ListenCue, ChunkyButton's prompt pill, PaperCard, Choice); this is only how
+// they sit, and the words of a sentence a child can tap one by one.
 
+@use 'styles/mixins' as *;
+
+// a question: one column, centred on the stage
 .lesson {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
   width: 100%;
-  max-width: 860px;
+  max-width: calc(var(--space-16) * 13 + var(--space-10));
   margin: 0 auto;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.9rem;
+  color: var(--ink);
   font-family: var(--font-read);
-  color: $ink;
 }
 
-// ---------- the thing to listen for ----------
-.lesson-listen {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  min-width: 150px;
-  padding: 0.7rem 1.6rem 0.6rem;
-  border-radius: 28px;
-  background: linear-gradient(160deg, #EDE9FE, #C4B5FD);
-  border: 4px solid $plum;
-  box-shadow: 0 6px 0 $plum-deep, 0 10px 20px rgba(91, 33, 182, 0.3);
-  cursor: pointer;
-  font-family: inherit;
-  transition: transform 0.12s ease;
-
-  .listen-icon { font-size: 1.8rem; line-height: 1; }
-  .listen-answer { font-size: 3rem; font-weight: 600; line-height: 1.05; color: $plum-deep; }
-  .listen-label { font-size: 0.8rem; font-weight: 600; color: $plum-deep; text-transform: uppercase; letter-spacing: 0.06em; }
-
-  &[data-state="found"] {
-    background: linear-gradient(160deg, #EAF8E6, #BFE5B8);
-    border-color: $moss;
-    box-shadow: 0 6px 0 $moss-deep, 0 10px 20px rgba(47, 122, 62, 0.25);
-    .listen-answer, .listen-label { color: $moss-deep; }
-    .listen-answer { animation: lessonPop 0.45s ease; }
-  }
-
-  &:active { transform: translateY(4px); }
-}
-
-// ---------- the question, in writing ----------
-.lesson-prompt {
-  @include tape-label;
-  border: none;
-  border-radius: 6px;
-  font-size: 1rem;
-  cursor: pointer;
-}
-
-// ---------- paper cards: a word, a sentence, the rhyme to match ----------
-.lesson-card {
-  @include paper-card(#FFFDF6);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.35rem;
-  padding: 0.8rem 1.6rem;
-  font-family: inherit;
-  color: inherit;
-
-  &[data-state="button"] { cursor: pointer; }
-
-  .card-emoji { font-size: 3rem; line-height: 1.1; }
-  .card-word { font-size: 2.6rem; font-weight: 600; letter-spacing: 0.04em; line-height: 1.1; }
-  .card-tap { font-size: 0.72rem; color: $ink-soft; text-transform: uppercase; letter-spacing: 0.08em; }
-}
-
-.lesson-action {
-  @include chunky($amber, $amber-deep, #46280A);
-  padding: 0.5rem 1.1rem;
-  font-size: 1rem;
-}
-
-// ---------- a sentence, word by word ----------
-.lesson-sentence {
+// the answers, in a row that wraps
+.choices {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 0.25rem 0.4rem;
-  font-size: 1.6rem;
-  line-height: 1.4;
+  gap: var(--target-gap);
 }
 
-.lesson-word-chip {
+// a PaperCard's inside: a word or a picture to read, sometimes a button
+// that says it
+.card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-3) var(--space-6);
   border: none;
   background: none;
-  font: inherit;
   color: inherit;
-  padding: 0 0.2rem;
-  border-radius: 8px;
-  cursor: pointer;
-
-  &:hover { background: rgba(240, 162, 46, 0.2); }
-  &[data-state~="key"] { box-shadow: inset 0 -4px 0 rgba(240, 162, 46, 0.7); }
-  &[data-state~="active"] { background: $amber; color: #46280A; }
+  font: inherit;
 }
 
-// ---------- the choices ----------
-.lesson-choices {
+button.card {
+  cursor: pointer;
+
+  &:focus-visible {
+    @include focus-ring;
+    border-radius: var(--radius-card);
+  }
+}
+
+.card-picture {
+  font: var(--text-answer-word);
+}
+
+.card-word {
+  font: var(--text-answer-word);
+  letter-spacing: var(--tracking-tag);
+}
+
+// "tap to hear it" under a card
+.card-tap {
+  color: var(--ink-soft);
+  font: var(--text-tag);
+  letter-spacing: var(--tracking-tag);
+  text-transform: uppercase;
+}
+
+// a sentence, word by word: each word says itself when tapped
+.sentence {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 0.8rem;
+  // each word's own padding spaces them, about as far apart as in a book
+  gap: 0;
+  font: var(--text-read);
 }
 
-.lesson-choice {
-  min-width: 108px;
-  min-height: 108px;
-  padding: 0.5rem 0.9rem;
-  border-radius: 22px;
-  background: #FFFDF6;
-  border: 4px solid rgba(58, 42, 31, 0.2);
-  box-shadow: 0 5px 0 rgba(58, 42, 31, 0.2);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 0.1rem;
-  font-family: inherit;
-  color: $ink;
+// a 48px target however short the word ("a", "of"), so a small finger finds it
+.word {
+  min-width: var(--target-chrome);
+  min-height: var(--target-chrome);
+  padding: 0 var(--space-1);
+  border: none;
+  border-radius: var(--radius-tile);
+  background: none;
+  color: inherit;
+  font: inherit;
   cursor: pointer;
-  transition: transform 0.15s ease;
+  transition: background-color var(--dur-quick) var(--ease-standard);
 
-  .choice-letter { font-size: 3.2rem; font-weight: 600; line-height: 1; }
-  .choice-emoji { font-size: 3rem; line-height: 1.1; }
-  .choice-word { font-size: 1.6rem; font-weight: 600; }
-  .choice-label { font-size: 0.9rem; color: $moss-deep; font-weight: 600; animation: lessonPop 0.35s ease; }
+  &:focus-visible {
+    @include focus-ring;
+  }
 
-  &:hover:not(:disabled) { transform: translateY(-4px); }
-  &:disabled { cursor: default; }
-  &[data-state~="wrong"] { animation: lessonShake 0.4s ease; border-color: $berry; }
-  &[data-state~="right"] { border-color: $moss; background: #F1FBEF; box-shadow: 0 5px 0 $moss-deep; }
-}
+  // a word the question is about: underlined in the accent
+  &[data-state~='key'] {
+    box-shadow: inset 0 calc(var(--border-thick) * -1) 0 var(--accent);
+  }
 
-@keyframes lessonShake {
-  0%, 100% { transform: translateX(0); }
-  25% { transform: translateX(-6px); }
-  75% { transform: translateX(6px); }
-}
-
-@keyframes lessonPop {
-  0% { transform: scale(0.6); opacity: 0; }
-  70% { transform: scale(1.12); opacity: 1; }
-  100% { transform: scale(1); }
+  // the word being said
+  &[data-state~='active'] {
+    background: var(--action);
+    color: var(--action-ink);
+  }
 }

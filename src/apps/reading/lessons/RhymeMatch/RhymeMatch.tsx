@@ -4,9 +4,8 @@ import type { GameApi } from '../../engine/types';
 import { shuffle } from '../../engine/content';
 import { soundManager } from '@/utils/audio';
 import { pronunciation } from '@/utils/pronunciation';
-import { PromptChip } from '../shared/LessonKit';
-import { useAnswer, usePrompt } from '../shared/lessonHooks';
-import { dataState } from '@/utils/cx';
+import { ChunkyButton, Choice, PaperCard } from '@/components/kit';
+import { choiceState, useAnswer, usePrompt } from '../shared/lessonHooks';
 import kit from '../shared/LessonKit.module.scss';
 
 /**
@@ -22,36 +21,39 @@ export const RhymeMatch: React.FC<{ question: RhymeMatchQuestion; api: GameApi }
 
   return (
     <div className={kit.lesson}>
-      <button
-        className={kit.lessonCard} data-state="button"
-        onClick={() => {
-          soundManager.playPop();
-          pronunciation.speakWord(question.targetWord);
-        }}
-        title="Hear the word"
-      >
-        <span className={kit.cardEmoji}>{question.targetEmoji}</span>
-        <span className={kit.cardWord}>{question.targetWord}</span>
-        <span className={kit.cardTap}>tap to listen</span>
-      </button>
-      <PromptChip text={question.prompt} onClick={sayPrompt} />
+      <PaperCard>
+        <button
+          className={kit.card}
+          onClick={() => {
+            soundManager.playPop();
+            pronunciation.speakWord(question.targetWord);
+          }}
+          title="Hear the word"
+        >
+          <span className={kit.cardPicture}>{question.targetEmoji}</span>
+          <span className={kit.cardWord}>{question.targetWord}</span>
+          <span className={kit.cardTap}>tap to listen</span>
+        </button>
+      </PaperCard>
+      <ChunkyButton variant="prompt" icon="speaker" onClick={sayPrompt}>
+        {question.prompt}
+      </ChunkyButton>
 
-      <div className={kit.lessonChoices}>
+      <div className={kit.choices}>
         {options.map(option => (
-          <button
+          <Choice
             key={option.word}
+            kind="picture"
             data-shot="lesson-choice"
-            className={kit.lessonChoice}
-            data-state={dataState(wrongId === option.word ? 'wrong' : false, solved && option.isRhyme ? 'right' : false)}
-            disabled={solved}
+            state={choiceState(option.word, option.isRhyme, wrongId, solved)}
             onClick={() =>
               choose(option.word, option.isRhyme, onEnd => pronunciation.speakWord(option.word, { onEnd }))
             }
             aria-label={option.word}
+            caption={solved ? option.word : undefined}
           >
-            <span className={kit.choiceEmoji}>{option.emoji}</span>
-            {solved && <span className={kit.choiceLabel}>{option.word}</span>}
-          </button>
+            {option.emoji}
+          </Choice>
         ))}
       </div>
     </div>

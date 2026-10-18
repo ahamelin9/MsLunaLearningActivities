@@ -4,8 +4,8 @@ import type { GameApi } from '../../engine/types';
 import { shuffle } from '../../engine/content';
 import { soundManager } from '@/utils/audio';
 import { pronunciation } from '@/utils/pronunciation';
-import { PromptChip } from '../shared/LessonKit';
-import { useAnswer, usePrompt } from '../shared/lessonHooks';
+import { ChunkyButton, Choice, PaperCard } from '@/components/kit';
+import { choiceState, useAnswer, usePrompt } from '../shared/lessonHooks';
 import { dataState } from '@/utils/cx';
 import kit from '../shared/LessonKit.module.scss';
 
@@ -26,17 +26,19 @@ export const SentenceReader: React.FC<{ question: SentenceComprehensionQuestion;
 
   return (
     <div className={kit.lesson}>
-      <PromptChip text={question.prompt} onClick={sayPrompt} />
+      <ChunkyButton variant="prompt" icon="speaker" onClick={sayPrompt}>
+        {question.prompt}
+      </ChunkyButton>
 
-      <div className={kit.lessonCard}>
-        <div className={kit.lessonSentence}>
+      <PaperCard className={kit.card}>
+        <div className={kit.sentence}>
           {words.map((word, i) => {
             // the reader keeps apostrophes; the inventory renders both spellings
             const clean = word.replace(/[.,/#!$%^&*;:{}=\-_`~()?"']/g, '');
             return (
               <button
                 key={`${word}-${i}`}
-                className={kit.lessonWordChip}
+                className={kit.word}
                 data-state={dataState(keys.has(clean.toLowerCase()) ? 'key' : false, active === i ? 'active' : false)}
                 onClick={() => {
                   soundManager.playPop();
@@ -49,8 +51,9 @@ export const SentenceReader: React.FC<{ question: SentenceComprehensionQuestion;
             );
           })}
         </div>
-        <button
-          className={kit.lessonAction}
+        <ChunkyButton
+          variant="prompt"
+          icon="speaker"
           disabled={!tried}
           onClick={() => {
             soundManager.playPop();
@@ -58,27 +61,27 @@ export const SentenceReader: React.FC<{ question: SentenceComprehensionQuestion;
           }}
           title={tried ? undefined : 'Try it first!'}
         >
-          🔊 Hear the sentence
-        </button>
-      </div>
+          Hear the sentence
+        </ChunkyButton>
+      </PaperCard>
 
-      <div className={kit.lessonChoices}>
+      <div className={kit.choices}>
         {options.map(option => (
-          <button
+          <Choice
             key={option.id}
+            // a picture to pick; with no picture, the words themselves
+            kind={option.imageEmoji ? 'picture' : 'phrase'}
             data-shot="lesson-choice"
-            className={kit.lessonChoice}
-            data-state={dataState(wrongId === option.id ? 'wrong' : false, solved && option.isCorrect ? 'right' : false)}
-            disabled={solved}
+            state={choiceState(option.id, option.isCorrect, wrongId, solved)}
             onClick={() =>
               choose(option.id, option.isCorrect, onEnd => pronunciation.speakText(option.text, { onEnd }))
             }
             aria-label={option.text}
+            // a written label repeats the sentence's words, so it waits for the answer
+            caption={option.imageEmoji && solved ? option.text : undefined}
           >
-            {option.imageEmoji ? <span className={kit.choiceEmoji}>{option.imageEmoji}</span> : null}
-            {/* a written label repeats the sentence's words, so it waits for the answer */}
-            {(solved || !option.imageEmoji) && <span className={kit.choiceLabel}>{option.text}</span>}
-          </button>
+            {option.imageEmoji || option.text}
+          </Choice>
         ))}
       </div>
     </div>

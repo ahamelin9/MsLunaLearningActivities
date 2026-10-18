@@ -1,20 +1,41 @@
-@use 'apps/reading/engine/world' as *;
+// Blend and Read on the kit (DES-23): one block per sound, each saying its
+// sound when tapped. A game piece, answer-sized, lit in the action colour
+// while its sound plays.
 
-// ---------- sounding out: one block per sound ----------
-.lesson-blocks {
+@use 'styles/mixins' as *;
+
+.blocks {
   display: flex;
-  gap: 0.6rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--target-gap);
 }
 
-.lesson-block {
-  @include chunky(#FFFFFF, rgba(58, 42, 31, 0.28), $ink);
-  width: 76px;
-  padding: 0.5rem 0 0.4rem;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+.block {
+  @include press(var(--ledge-small), var(--edge));
+  display: grid;
+  place-items: center;
+  min-width: calc(var(--space-16) + var(--space-4));
+  min-height: calc(var(--space-16) + var(--space-4));
+  padding: 0 var(--space-3);
+  border: var(--border-thick) solid var(--edge);
+  border-radius: var(--radius-card);
+  background: var(--card);
+  color: var(--ink);
+  font: var(--text-answer-word);
+  transition:
+    transform var(--dur-tap) var(--ease-standard),
+    box-shadow var(--dur-tap) var(--ease-standard),
+    background-color var(--dur-quick) var(--ease-standard);
 
-  .block-letters { font-size: 2.3rem; line-height: 1.1; }
+  &:focus-visible {
+    @include focus-ring;
+  }
 
-  &[data-state="active"] { @include chunky($amber, $amber-deep, #46280A); }
+  // its sound is playing
+  &[data-state='active'] {
+    border-color: var(--action-edge);
+    background: var(--action);
+    color: var(--action-ink);
+  }
 }

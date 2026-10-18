@@ -369,7 +369,7 @@ function roundMoved(round) {
 /** True once a choice was right: the win veil, the next round, or the reward. */
 function answerWon(round) {
   const label = document.querySelector('[data-shot="round-pips"]')?.getAttribute('aria-label') ?? null;
-  return Boolean(document.querySelector('[data-shot="win-veil"], [data-shot="shell-reward"]')) || label !== round;
+  return Boolean(document.querySelector('[data-shot="win-garden"], [data-shot="shell-reward"]')) || label !== round;
 }
 
 /**
