@@ -10,11 +10,13 @@ Read this before touching anything visual. The standards live in
 is how Claude works with them. Never copy values or rules from the docs into
 here; link to them.
 
-> **Status, 2026-10-10:** the teacher approved the round 2 look. The standards
-> are written (DES-2), and the code is being built ticket by ticket in the DES
-> epic. Check the status table in `docs/design-system/README.md` for what
-> exists yet. If a piece isn't built yet (the tokens before DES-3, the kit before
-> DES-7a), follow the ticket that builds it, and don't invent a stand-in.
+> **Status, 2026-10-18:** the teacher approved the round 2 look (2026-10-10),
+> and every screen is now on the kit and the tokens. The legacy styles are
+> gone (DES-24), so the design check is strict: one raw value anywhere in
+> `src` fails lint. What's left of the DES epic (light/dark switching, the
+> milestone moon, real cookies) is in the status table in
+> `docs/design-system/README.md`. If a piece isn't built yet, follow the
+> ticket that builds it, and don't invent a stand-in.
 
 ## Start here
 
@@ -53,8 +55,8 @@ job is bigger than one edit.
    `src/styles/motion/`.
 5. **Doesn't fit? Use the ladder** in `fitting-in.md`: reuse, then a component
    token, then a role (Alex's OK), then a primitive (Alex's OK, and the
-   teacher's if the look changes), then a marked exception. Never raise the
-   baseline, and never leave a silent exception.
+   teacher's if the look changes), then a marked exception. Never leave a
+   silent exception.
 
 Plus the backlog's guardrails: heard, never shown; voice stays pre-rendered;
 build only what the ticket asks.
@@ -104,9 +106,8 @@ Follow `screens.md`:
 1. `npm run ui:shots -- --label before`.
 2. Build from the kit, with roles and the space scale only, in the screen's own
    folder.
-3. `npm run design:status` should show the area at zero, and `npm run lint`
-   should pass. Then `node scripts/design/check.mjs --update` writes the lower
-   baseline, so the area can't slip back.
+3. `npm run lint` should pass. The design check is strict (no baseline since
+   DES-24), so any raw value left in the screen fails it.
 4. `npm run ui:shots -- --label after`. Compare it with the board (style sample,
    page "Round 2 · Teacher's picks") in light and dark.
 5. Get Alex's OK on a review sheet (before, after light, after dark, plus any
@@ -151,7 +152,8 @@ changed screens.
   The backlog guard runs it before any ticket closes. To read a failure, see
   "Reading a design check failure" in `docs/design-system/README.md`;
   `node scripts/design/check.mjs <file>` lists one file's raw values with hints.
-- `npm run design:status`: what's left per area and folder.
+- `npm run design:status`: raw values and exception markers per area and
+  folder (all 0 since DES-24).
 - The Kit page, light and dark side by side: `npm run dev`, open `/?kit`
   (DES-20). `npm run ui:shots -- --kit --label <name>` saves both tabs in both
   modes. With Vite on 5199, `node .claude/skills/know-how/kit-sections.mjs
@@ -185,7 +187,7 @@ changed screens.
 - Dark mode: force it on the Kit page, or in the shots with
   `npm run ui:shots -- --theme dark --label <name>-dark` (DES-8), and compare
   each label with `--diff` as usual. Until DES-16 the app itself stays light,
-  and only what's on roles turns dark in those shots.
+  and every screen is on roles (DES-24), so those shots show it all in dark.
 
 ### When a hook speaks
 - **Before an edit** (`design-guide.mjs`, DES-25): the first edit in an area
@@ -193,15 +195,15 @@ changed screens.
   the ladder for tokens, the Illustrations section for drawn things). Read
   them, then make the edit again, following them; it goes through. Later edits
   in the area get one reminder line. Areas: tokens (all of `src/styles/`
-  except motion), motion, kit (and the legacy `components/ui/`), screens
+  except motion), motion, kit, screens
   (everything else in `src`), and illustrations on top (`_illustration.scss`,
   `LunaOwl`, kit `Luna`, `MilestoneMoon`, `Squishy`). After changing the hook,
   a doc's headings or the folders, run
   `node .claude/skills/luna-design/guide-check.mjs "$PWD"`.
-- **After an edit** (`design-check-file.mjs`, DES-19): it lists new violations
-  with a fix hint. Fix them in the same turn. Don't raise the baseline or add an
-  exception to get past them. It compares with the file's committed version,
-  so a value only moved within the file doesn't count.
+- **After an edit** (`design-check-file.mjs`, DES-19): it lists every raw
+  value or broken rule left in the file, with a fix hint. Fix them in the same
+  turn; lint fails until they're gone. Don't add an exception to get past
+  them.
 
 ## Who decides, and where learnings go
 

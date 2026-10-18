@@ -11,7 +11,7 @@
 //   npm run ui:shots -- --reduced-motion      -> the same run with Reduce Motion on; fails if anything still moves (DES-6)
 //   npm run ui:shots -- --theme dark --label after-dark
 //                                             -> the same run in the dark roles (DES-8): data-theme="dark" on <html>.
-//                                                Until DES-16 only what's on roles turns dark
+//                                                Until DES-16 the app itself stays light
 //
 // It starts its own Vite dev server and drives the Chrome already installed
 // on this machine (puppeteer-core downloads no browser of its own), found by

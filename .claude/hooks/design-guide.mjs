@@ -54,8 +54,8 @@ function areasFor(rel) {
   if (!inScope) return [];
   let own;
   if (rel.startsWith('src/styles/motion/')) own = 'motion';
-  else if (rel.startsWith('src/styles/')) own = 'tokens'; // token files, plus the legacy and global styles
-  else if (/^src\/components\/(kit|ui)\//.test(rel)) own = 'kit'; // ui/ is the legacy kit
+  else if (rel.startsWith('src/styles/')) own = 'tokens'; // token files, plus the global styles
+  else if (rel.startsWith('src/components/kit/')) own = 'kit';
   else own = 'screens'; // components/os, apps/, App, main, dev/
   const drawn =
     rel === 'src/styles/tokens/_illustration.scss' ||

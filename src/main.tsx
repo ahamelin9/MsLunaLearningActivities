@@ -1,7 +1,6 @@
 import { StrictMode, Suspense, lazy } from 'react'
 import { createRoot } from 'react-dom/client'
 import './styles/global.scss'
-import './index.css'
 import App from './App.tsx'
 
 // The Kit page, `/?kit` (DES-20): dev only, so the production build drops it

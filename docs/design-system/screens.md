@@ -77,10 +77,10 @@ This is how the DES tickets move each area onto the system.
 1. **Before:** `npm run ui:shots -- --label before`.
 2. **Move it onto the kit:** buttons, cards, chips, answers. Swap each raw value
    for a role or token, and each local animation for a shared one.
-3. **Drop what the kit now does,** along with the legacy partials
-   (`_world.scss`, `_variables.scss`) for this area.
-4. **Check the count:** `npm run design:status` shows the area at zero, and
-   `npm run lint` passes.
+3. **Drop what the kit now does:** the screen's own buttons, cards and
+   animations that a kit component or a shared animation replaces.
+4. **Check it:** `npm run lint` passes (the design check is strict since
+   DES-24, so the screen has no raw value left).
 5. **After:** `npm run ui:shots -- --label after`. Compare it with the board in
    light and dark, and get Alex's OK.
 6. **Record it:** update the area's row on the map.

@@ -5,7 +5,7 @@
 //
 // Reduced motion (DES-6): `data-reduced-motion` on <html>, set from the
 // Settings switch or the iPad's own setting. Under it the motion roles are off
-// (src/styles/tokens/_roles.scss) and every legacy animation ends at once
+// (src/styles/tokens/_roles.scss) and any other animation ends at once
 // (src/styles/base/_reduced-motion.scss).
 
 import { useEffect } from 'react';

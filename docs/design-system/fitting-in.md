@@ -14,8 +14,9 @@ seem to have, and what happens when something truly doesn't fit.
 4. **Exceptions are visible.** A `design-exception(ID): why` marker sits on the
    line or just above it, naming the ticket. A permanent one also gets a line in
    `decisions.md`.
-5. **Never raise the baseline.** While the legacy styles go away, the design
-   check's baseline may only shrink.
+5. **The check is strict.** There's no baseline (DES-24): one raw value
+   anywhere in `src` fails `npm run lint`, so a value that doesn't fit goes
+   down the ladder, never around it.
 
 ## The ladder
 
@@ -69,20 +70,13 @@ In TSX:
   says so" isn't a reason.
 - **To see them all:** `npm run design:status` counts the markers.
 
-## The baseline, while the legacy styles go away
+## The baseline, gone since DES-24
 
-- **What it is:** today's code has hundreds of raw values. The design check
-  (DES-19) records how many each file has in `scripts/design/baseline.json`.
-- **How lint uses it:** `npm run lint` fails if any file goes **up**, or if a
-  new file has any violation at all.
-- **When a ticket moves an area onto the system:** that area's count drops.
-  `node scripts/design/check.mjs --update` writes the new, lower baseline. It
-  refuses to write a higher one. A file that was only moved or renamed counts
-  as new; `--update` accepts it as long as the total doesn't rise.
-- **To see what's left:** `npm run design:status` shows the count per area.
-  The map's status table follows it.
-- **The end:** DES-24 deletes the baseline. From then on the check is strict:
-  zero violations, no allowances.
+While the legacy styles went away, the design check (DES-19) let each file
+keep the raw values it had, in `scripts/design/baseline.json`, and a count
+could only shrink. DES-24 deleted the legacy styles and the baseline with them
+(2026-10-18). The check is strict now: zero raw values, no allowances, and
+`npm run design:status` shows every area at 0.
 
 ## When the check complains
 

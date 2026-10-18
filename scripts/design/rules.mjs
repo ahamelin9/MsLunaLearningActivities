@@ -4,19 +4,21 @@
 // values live only in src/styles/tokens/ (colour.md, foundations.md,
 // fitting-in.md).
 //
-// Counted against the baseline (it may only shrink):
+// Raw values, counted per area by `npm run design:status`:
 //   colour     a hex, rgb()/hsl() or colour name outside _primitives.scss and
 //              _illustration.scss (in .ts/.tsx, colours are the only check)
 //   size       a px or rem value outside src/styles/tokens/
 //   motion     a duration (ms, s) or an easing outside src/styles/tokens/
 //   keyframes  an @keyframes outside src/styles/motion/
-// Always fail, whatever the baseline:
+// Broken rules:
 //   primitives an @use/@forward/@import of the primitives outside src/styles/tokens/
 //   kit-page   a kit folder with no <Name>.kit.tsx
 //   media      an @media outside src/styles/tokens/_breakpoints.scss: breakpoints
 //              go through bp(), and reduced motion through data-reduced-motion (DES-10)
 //   marker     a design-exception(ID) whose ID is neither on the board nor in
 //              the changelog, or that gives no reason
+//
+// Since DES-24 there is no baseline: any one of them fails `npm run lint`.
 //
 // Skipped: comments and url(data:…); 0, %, fr, viewport units, deg, em and
 // unitless numbers. A `design-exception(ID): why` marker covers its own line
@@ -39,7 +41,7 @@ export const HINTS = {
   marker: 'design-exception(ID): why — the ID must be on the board or in kanban/CHANGELOG.md, and the reason must be there. See docs/design-system/fitting-in.md'
 };
 
-/** Rules a baseline can carry; the rest always fail. */
+/** The raw-value rules, which design:status counts per area; the rest are broken rules. */
 export const COUNTED = new Set(['colour', 'size', 'motion', 'keyframes']);
 
 // CSS colour names (CSS Color 4), so `color: white` counts like a hex
@@ -132,9 +134,8 @@ const idKnown = (root, id) => {
 
 /**
  * Checks one file's text. `rel` is its path from the repo root.
- * Returns { violations, markers, legacy }: each violation is
- * { line, rule, text, hint, counted }; markers counts valid exception markers;
- * legacy is true when the file still uses an old partial.
+ * Returns { violations, markers }: each violation is
+ * { line, rule, text, hint, counted }; markers counts valid exception markers.
  */
 export function checkText(root, rel, text) {
   const css = /\.(scss|css)$/.test(rel);
@@ -189,11 +190,8 @@ export function checkText(root, rel, text) {
     if (!isBreakpoints) for (const m of line.matchAll(MEDIA)) add(n, 'media', m[0]);
   });
 
-  return { violations: found, markers, legacy: LEGACY_USE.test(text) };
+  return { violations: found, markers };
 }
-
-// a stylesheet still on the old partials (_variables.scss, _world.scss), which DES-24 deletes
-const LEGACY_USE = /@(?:use|import)\s+['"][^'"]*\b_?(?:variables|world)['"]/;
 
 /** Every stylesheet and TypeScript file under src/, as repo-relative paths. */
 export function sourceFiles(root) {
@@ -222,15 +220,4 @@ export function kitFoldersWithoutPage(root) {
 /** Checks a file on disk. */
 export function checkFile(root, rel) {
   return checkText(root, rel, readFileSync(join(root, rel), 'utf8'));
-}
-
-export const BASELINE = 'scripts/design/baseline.json';
-
-/** The baseline's per-file counts ({} when there's none yet). */
-export function readBaseline(root) {
-  try {
-    return JSON.parse(readFileSync(join(root, BASELINE), 'utf8')).files ?? {};
-  } catch {
-    return {};
-  }
 }

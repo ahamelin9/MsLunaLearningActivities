@@ -72,8 +72,8 @@ be pulled into Phase 1 for a break from styling.
 
 ### Now / Next
 
-- **Now:** DES-23: lessons on the kit, the last of Stage 7 (play). Done in the stage: DES-22a (the start screen, stage and perch, 2026-10-12), DES-22d (the done screen, 2026-10-13), DES-11 (a won round's garden and petals, one answer language, 2026-10-17), and DES-22b and DES-22c (all eight games on the kit, 2026-10-18). OPS-10 closed in part (2026-10-17): the Chrome helper, the board pictures and the cloud groundwork landed, and the rest is parked as OPS-11
-- **Next:** Stage 8: DES-24 retires the legacy styles once DES-23 is done. DES-14 (real cookies) can slot in any time since DES-22b. OPS-11 (a first cloud session) waits until Alex wants to work away from the Mac. PRG-8 (pick up a lesson where you left off) was split from DES-13 and needs nothing. SET-1 (the grown-up gate) no longer waits on anything. OPS-9 (know-how checks onto `data-shot`) can start any time: the checks lost their last class names with DES-18d. SET-1 is pulled in where DES-16 needs it. FB-1 (Phase 2) no longer waits on the layout; GAME-1c, Treasure Path's screen, waits on it
+- **Now:** DES-24: retire the legacy styles (Stage 8), so the design check runs strict with no baseline. Stage 7 (play) is done (2026-10-18): GameShell, the done screen, a won round's garden and petals, all eight games and all eight lesson types are on the kit. About 180 raw values are left in 6 files.
+- **Next:** Stage 9, what's left of the epic: SET-1 (pulled in) → DES-16 (light and dark), then DES-17 (the milestone moon), then DES-14 (real cookies, which can slot in any time). OPS-11 (a first cloud session) waits until Alex wants to work away from the Mac. PRG-8 (pick up a lesson where you left off) was split from DES-13 and needs nothing. SET-1 (the grown-up gate) no longer waits on anything. OPS-9 (know-how checks onto `data-shot`) can start any time: the checks lost their last class names with DES-18d. SET-1 is pulled in where DES-16 needs it. FB-1 (Phase 2) no longer waits on the layout; GAME-1c, Treasure Path's screen, waits on it
 
 ## Epics
 
@@ -97,8 +97,7 @@ In board order. A new epic gets its file in `epics/` first, then a link here
 | ID | Title | Type | P | Size | Status |
 |---|---|---|---|---|---|
 | **DES** | **Design system & layout** | Epic | **P0** | | |
-| DES-23 | Lessons on the kit | Story | P1 | M | In progress |
-| DES-24 | Retire the legacy styles | Task | P1 | S | Todo |
+| DES-24 | Retire the legacy styles | Task | P1 | S | In progress |
 | DES-16 | Light and dark mode | Story | P1 | M | Todo |
 | DES-17 | The moon visits for big milestones | Story | P1 | M | Todo |
 | DES-14 | Feed Luna's cookies look like real, different cookies | Story | P2 | S | Todo |

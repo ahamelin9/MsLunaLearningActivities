@@ -1,4 +1,23 @@
 // The reset every screen starts from (DES-3; moved here from index.css).
+@use '../mixins' as *;
+
+// the text a screen starts from, before its own type roles (DES-24)
+:root {
+  font-family: var(--font-read);
+  line-height: 1.5;
+  font-weight: 600;
+  color: var(--ink);
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+  letter-spacing: -0.01em;
+}
 
 *,
 *::before,
@@ -32,4 +51,9 @@ button {
   background: none;
   cursor: pointer;
   outline: none;
+}
+
+// a button that sets no ring of its own still shows the kit's
+button:focus-visible {
+  @include focus-ring;
 }

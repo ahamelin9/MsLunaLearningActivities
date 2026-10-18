@@ -1,5 +1,5 @@
-// The shared animations (DES-5): the only @keyframes outside an area's
-// legacy styles. Loaded once by global.scss, so the names stay global and a
+// The shared animations (DES-5): the only @keyframes in the app. Loaded once
+// by global.scss, so the names stay global and a
 // CSS module reaches them through the roles: `animation: var(--motion-pop)`.
 //
 // Distances come from the space scale and the viewport, colours from roles,

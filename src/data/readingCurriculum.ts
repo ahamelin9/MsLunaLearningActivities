@@ -12,7 +12,6 @@ export const READING_CURRICULUM: Record<GradeLevel, ReadingSkill[]> = {
       id: 'k-match-sounds',
       name: 'Match the Sound',
       icon: '👂',
-      color: '#A855F7',
       description: 'Hear a letter sound, then find the letter that makes it.',
       lessons: [
         {
@@ -97,7 +96,6 @@ export const READING_CURRICULUM: Record<GradeLevel, ReadingSkill[]> = {
       id: 'k-letter-hunter',
       name: 'Letter Hunter',
       icon: '🔍',
-      color: '#3B82F6',
       description: 'Look for the letter! Practice spotting uppercase and lowercase letters.',
       lessons: [
         {
@@ -160,7 +158,6 @@ export const READING_CURRICULUM: Record<GradeLevel, ReadingSkill[]> = {
       id: 'k-blend-words',
       name: 'Blend & Read CVC Words',
       icon: '🧩',
-      color: '#FF70A6',
       description: 'Tap each letter sound, blend them together, and find the matching picture!',
       lessons: [
         {
@@ -301,7 +298,6 @@ export const READING_CURRICULUM: Record<GradeLevel, ReadingSkill[]> = {
       id: 'k-sight-words',
       name: 'Sight Word Power',
       icon: '⚡',
-      color: '#FFD166',
       description: 'Recognize common words instantly by sight.',
       lessons: [
         {
@@ -364,7 +360,6 @@ export const READING_CURRICULUM: Record<GradeLevel, ReadingSkill[]> = {
       id: 'k-rhyming',
       name: 'Rhyme Matcher',
       icon: '🎵',
-      color: '#06D6A0',
       description: 'Match words that sound the same at the end!',
       lessons: [
         {
@@ -430,7 +425,6 @@ export const READING_CURRICULUM: Record<GradeLevel, ReadingSkill[]> = {
       id: 'g1-digraphs',
       name: 'Digraphs & Blends Decoder',
       icon: '🔤',
-      color: '#4D96FF',
       description: 'Decode 2-letter teams like SH, CH, TH, and blends like FR and ST!',
       lessons: [
         {
@@ -504,7 +498,6 @@ export const READING_CURRICULUM: Record<GradeLevel, ReadingSkill[]> = {
       id: 'g1-magic-e',
       name: 'Magic Silent E Readers',
       icon: '🪄',
-      color: '#9D4EDD',
       description: 'The magic E jumps over the consonant to make the vowel say its long name!',
       lessons: [
         {
@@ -564,7 +557,6 @@ export const READING_CURRICULUM: Record<GradeLevel, ReadingSkill[]> = {
       id: 'g1-sentences',
       name: 'Read Sentences & Match',
       icon: '📖',
-      color: '#06D6A0',
       description: 'Read full sentences and pick the picture that matches what you read!',
       lessons: [
         {
@@ -614,7 +606,6 @@ export const READING_CURRICULUM: Record<GradeLevel, ReadingSkill[]> = {
       id: 'g2-vowel-teams',
       name: 'Vowel Team Readers',
       icon: '✨',
-      color: '#FF70A6',
       description: 'When two vowels go walking, the first one does the talking! (ai, ea, oa)',
       lessons: [
         {
@@ -674,7 +665,6 @@ export const READING_CURRICULUM: Record<GradeLevel, ReadingSkill[]> = {
       id: 'g2-compounds',
       name: 'Compound Word Readers',
       icon: '🧩',
-      color: '#118AB2',
       description: 'Read two smaller words joined together into one big exciting word!',
       lessons: [
         {
@@ -721,7 +711,6 @@ export const READING_CURRICULUM: Record<GradeLevel, ReadingSkill[]> = {
       id: 'g2-storybooks',
       name: 'Decodable Storybooks',
       icon: '📖',
-      color: '#9D4EDD',
       description: 'Read short stories on your own, then answer questions about them.',
       lessons: [
         {

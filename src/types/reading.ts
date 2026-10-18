@@ -139,7 +139,6 @@ export interface ReadingSkill {
   id: string;
   name: string;
   icon: string;
-  color: string;
   description: string;
   lessons: Lesson[];
 }

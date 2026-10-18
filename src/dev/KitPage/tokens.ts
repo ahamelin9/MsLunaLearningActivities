@@ -5,7 +5,7 @@
 /**
  * Every custom property the token files declare on :root, in their order.
  * Only global.scss counts (Vite marks each dev stylesheet with its file), so
- * the legacy ones in index.css stay out.
+ * a module's own component tokens stay out.
  */
 export function tokenNames(): string[] {
   const names: string[] = [];

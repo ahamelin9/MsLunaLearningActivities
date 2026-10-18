@@ -5,11 +5,12 @@ value lives, and how to add or change something. It's written for people and
 for Claude alike. The `luna-design` skill points Claude here before any UI
 work, and a hook brings in the right section whenever a UI file is edited.
 
-**Status (2026-10-10):** the teacher approved the look (the round 2 style
-sample), and Alex approved these standards. The code is being built ticket by
-ticket in the DES epic. The order to finish it is at the top of
-`kanban/epics/DES.md`, and the table at the bottom of this page shows where each
-area stands. Until an area is built, its old styles still run.
+**Status (2026-10-18):** the teacher approved the look (the round 2 style
+sample), and Alex approved these standards (2026-10-10). Every screen is now
+built from the kit and the tokens, and the legacy styles are gone (DES-24), so
+the design check is strict: any raw value fails `npm run lint`. What's left of
+the DES epic is at the top of `kanban/epics/DES.md`, and the table at the
+bottom of this page shows where each area stands.
 
 ## In one minute
 
@@ -83,7 +84,7 @@ Raw colours may appear in two files only: `_primitives.scss` and
 | Pre-commit check for people | `.githooks/pre-commit`; turn it on once per clone (see "How to…") | DES-25 |
 | Screenshots and the pixel diff | `scripts/ui/shots.mjs`, run by `npm run ui:shots` | DES-1, DES-18a |
 | The approved design (frozen) | the [style sample](https://claude.ai/artifact/Gr1ngbrVdGS6xE4pALyWsm), page "Round 2 · Teacher's picks"; source in `.claude/skills/luna-design/prototype/` | frozen 2026-10-10 |
-| Legacy styles (going away) | `src/styles/_variables.scss`, `src/apps/reading/engine/_world.scss`, `src/index.css` | DES-24 deletes them |
+| What every screen starts from: the reset, the paper ground, the base text (Andika in `--ink`, headings in Fraunces) and the focus ring for a plain button | `src/styles/base/` | DES-3, DES-24 |
 
 ## The docs
 
@@ -123,8 +124,9 @@ so changing a `## Rules` section changes what Claude is shown.
   the tokens, `components-light.png` and `components-dark.png`), which `--diff`
   compares like a screen size.
 - **Check your work:** `npm run lint` runs eslint, the design check and the
-  contrast check. `npm run design:status` shows what's left per area (DES-19).
-  A failure? See "Reading a design check failure" below.
+  contrast check. `npm run design:status` counts raw values and exception
+  markers per area (every area is at 0 since DES-24). A failure? See "Reading a
+  design check failure" below.
 - **Turn on the pre-commit check** (people; once per clone): run
   `chmod +x .githooks/pre-commit`, then `git config core.hooksPath .githooks`.
   Every commit then runs `npm run lint` first, and a failure stops the commit.
@@ -137,16 +139,18 @@ so changing a `## Rules` section changes what Claude is shown.
   and give anything new it should click one.
 - **See the screens in dark:** `npm run ui:shots -- --theme dark --label after-dark`
   (DES-8) sets `data-theme="dark"` on `<html>` for the run, so the dark roles
-  show. Until DES-16 only what's already on roles turns dark. Take a
-  `before-dark` too, and `--diff before-dark after-dark`.
+  show. Every screen is on roles (DES-24), but until DES-16 the app itself
+  stays light, so this is how to see dark. Take a `before-dark` too, and
+  `--diff before-dark after-dark`.
 
 ## Reading a design check failure
 
 `npm run lint` runs eslint, then the design check, then the contrast check, and
 stops at the first that fails.
 
-**The design check** (`scripts/design/check.mjs`) counts raw values outside
-their homes:
+**The design check** (`scripts/design/check.mjs`) finds raw values outside
+their homes. It's strict: there's no baseline (DES-24 deleted it), so one raw
+value anywhere in `src` fails it.
 
 | Kind | What counts | Its home |
 |---|---|---|
@@ -160,22 +164,15 @@ and plain numbers. A `design-exception(ID): why` marker covers its own line and
 the next ([fitting-in.md](fitting-in.md)).
 
 What a failure says, and what to do:
-- **`src/x.module.scss: 41 raw value(s), the baseline allows 40 (+1)`**: the
-  file gained one. `node scripts/design/check.mjs src/x.module.scss` lists every
-  raw value with its line and a hint (↳) naming the token to use. Replace the
-  new one. `--update` won't help: it refuses a higher count.
-- **`…, the baseline allows 0`** and a list: a new file has raw values. Move
-  them onto tokens. If it's an old file that was only moved or renamed, run
-  `node scripts/design/check.mjs --update`: it accepts the move when the total
-  doesn't rise.
-- **A line with no count**, which fails whatever the baseline: `@use` of the
-  primitives outside `src/styles/tokens/`, a kit folder with no `.kit.tsx`, an
-  `@media` outside the breakpoint mixin (use `@include bp(narrow)` or
-  `bp(short)`; DES-10), or a `design-exception` marker whose ticket ID is on
-  neither the board nor the changelog, or that gives no reason.
-- **On a pass, "N file(s) now below their baseline"**: raw values were moved
-  onto tokens. Run `--update` to lock the lower count in, so it can't creep
-  back.
+- **`src/x.module.scss: 2 raw value(s)`** and a list: each raw value with its
+  line and a hint (↳) naming the token to use. Replace each with its role or
+  token. `node scripts/design/check.mjs src/x.module.scss` lists them again.
+  Nothing fits? Go down the ladder in [fitting-in.md](fitting-in.md).
+- **A line with no count**: a broken rule. `@use` of the primitives outside
+  `src/styles/tokens/`, a kit folder with no `.kit.tsx`, an `@media` outside
+  the breakpoint mixin (use `@include bp(narrow)` or `bp(short)`; DES-10), or a
+  `design-exception` marker whose ticket ID is on neither the board nor the
+  changelog, or that gives no reason.
 
 **The contrast check** (`scripts/design/contrast.mjs`) prints every text pair
 from `_roles.scss` with its ratio in light and dark. A ❌ names the text role,
@@ -196,9 +193,9 @@ Each ticket updates its row when it closes (Completion criteria B7 in
 | Standards (these docs, the skill) | `docs/design-system/`, `luna-design` | Done (Alex approved, 2026-10-10) | DES-2 |
 | Hooks at the moment of editing | `.claude/hooks/`, `.githooks/` | Done: the before-edit hook and pre-commit check (DES-25, 2026-10-10), and the after-edit design check (DES-19, 2026-10-11) | DES-25, DES-19 |
 | Screenshots you can compare | `scripts/ui/shots.mjs` | Done (DES-18a, 2026-10-11): same pixels every run on a page clock, `--diff` with red overlays, found by `data-shot` | DES-18a |
-| Source tree and CSS modules | `src/` | Done (2026-10-11): every page, game and lesson type has its own folder and CSS module, and no global class is left in `src/` (`module-refs-check.mjs`). Only the legacy partials and `index.css` stay global until DES-24 | DES-18b–e |
+| Source tree and CSS modules | `src/` | Done (2026-10-11): every page, game and lesson type has its own folder and CSS module, and no global class is left in `src/` (`module-refs-check.mjs`). The only global styles are `global.scss`'s tokens, keyframes and `base/` (DES-24 deleted the legacy partials and `index.css`) | DES-18b–e, DES-24 |
 | Tokens | `src/styles/tokens/` | Done (DES-3, 2026-10-11): primitives, roles in light and dark (the build fails if one is missing), the illustration palette, `bp()`, `global.scss` and `base/`. Every colour on the round 2 boards has a token (`tokens-check.mjs`). The app is pinned light on `<html>`; nothing reads the tokens yet | DES-3 |
-| Design check and contrast check | `scripts/design/` | Done (DES-19, 2026-10-11): both run in `npm run lint`. Baseline 2,365 raw values in 50 files, which may only shrink; 22 text pairs pass 4.5:1 in both modes. `npm run design:status` shows what's left | DES-19 |
+| Design check and contrast check | `scripts/design/` | Done (DES-19, 2026-10-11): both run in `npm run lint`. It started with a baseline of 2,365 raw values in 50 files, which could only shrink; 22 text pairs pass 4.5:1 in both modes. Strict since DES-24 (2026-10-18): no baseline, and one raw value anywhere in `src` fails lint; the after-edit hook lists every one left in the file | DES-19, DES-24 |
 | Kit page | `src/dev/KitPage/` | Done (DES-20, 2026-10-11): `/?kit` in dev only (the production build has none of it). The Tokens tab reads the tokens from `global.scss` itself, with each text role's contrast; the Components tab collects every `.kit.tsx` (none until DES-7a). `ui:shots --kit` shoots light and dark | DES-20 |
 | Type and fonts | tokens, `public/fonts/` | Done (DES-4, 2026-10-11): Andika and Fraunces served from `public/fonts/` (no Google Fonts), 11 type roles, and every old Fredoka/Nunito use points at the font roles (titles Fraunces, the rest Andika). Screens move onto the type roles when restyled | DES-4 |
 | Motion and reduced motion | `src/styles/motion/` | Done (DES-5, DES-6, 2026-10-11): duration, easing and 11 `--motion-*` roles, the shared keyframes, `motionMs()`/`afterMotion()` and the press mixin, all on the Kit page. Reduced motion (the Settings switch or the iPad's) stops every screen's motion, proven by `ui:shots --reduced-motion`; Bubble Sounds slows down | DES-5, DES-6 |
@@ -209,4 +206,4 @@ Each ticket updates its row when it closes (Completion criteria B7 in
 | GameShell and games | `engine/GameShell/`, `engine/DoneScreen/`, `games/` | Start screen, stage and perch done (DES-22a, 2026-10-12): as on the Round board, the stage is a card with the accent blob and one in the game's Play Shelf tint, and Luna's perch is the kit's Luna with a SpeechBubble (no tail where the game draws its own Luna) and "Hear my clue". The start screen uses the same frame: the game's picture (`games/shared/GamePicture`; a lesson its number), how tricky and the big button. The shell's flash is the stage's edge, on roles. `engine/GameShell`, GameSurface and StagePrompt are at 0; `perch-check.mjs` (know-how) checks the perch, the flash and the clue. The done screen done (DES-22d, 2026-10-13): as on the Done board, the mark in the arch, "Lesson done!" (a game: "All done!"), StarRow, Luna in the corner, a lesson's bar moving on and "Lesson N is open now", today's sticker in PaperCard's dashed `reward` panel, Play again and Next lesson; the confetti is deleted and `engine/DoneScreen` is at 0. The layout audit now covers it. The win done (DES-11, 2026-10-17): a won round grows the Round board's garden behind the pieces (kit `Flower`) and drops kit `Petals` that fall on into the next round; the done screen drops them once it has arrived; the stand-in sparkle is gone. The game pieces' state roles are a table in `components.md`. The first four games done (DES-22b, 2026-10-17): Letter Cookies, Letter Jar, Bubble Sounds and Muddled Cards on the kit and their Play Shelf pictures' colours, every tapped piece at least the answer size, right and wrong as everywhere else; SpeakChip gave way to ChunkyButton's prompt pill in every game; the done screen's arch now ends just under its title. Their folders, `games/shared` and `content.ts` are at 0. The other four games done (DES-22c, 2026-10-18): Words Off the Page, What's Missing?, Treasure Path (its GAME-1b stopgap layout, on roles) and Story Corner on the kit, with kit Choices (and Choice's new `phrase` kind) and the reading size for what a child reads; their folders are at 0, so every game is on the kit. Still to come: Treasure Path's real screen with GAME-1c, the times and the squishy with PRG-6 and PRG-5 | DES-22a, DES-22d, DES-11, DES-22b, DES-22c |
 | Lessons | `apps/reading/lessons/` | Done (DES-23, 2026-10-18): all 8 lesson types on the kit, as on the Round board. The thing to listen for is the kit ListenCue (with its burst), the question is ChunkyButton's prompt pill, word cards are PaperCards, the answers are Choices (letter, word, picture with its word once found, phrase), and every word in a sentence or story is a 48px target that says itself. `lessons/shared` is layout only (its own cue and prompt chip are deleted) and a wrong answer clears on the shared timer. `lessons/` is at 0 | DES-23 |
 | Light and dark switching | `index.html`, Settings | Planned | DES-16 |
-| Legacy styles retired | everything above at zero | Planned | DES-24 |
+| Legacy styles retired | everything above at zero | Done (DES-24, 2026-10-18): `_variables.scss`, `_world.scss`, `index.css`, the old mixins, `components/ui/Icons` and the baseline are deleted. `index.css`'s base text and focus ring moved onto roles in `base/_reset.scss`, and the curriculum's unused skill colours went. Every area is at 0 in `design:status`, and every screen's shots, light and dark, are pixel for pixel what they were | DES-24 |
