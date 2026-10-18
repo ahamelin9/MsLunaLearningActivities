@@ -95,6 +95,59 @@
   --button-pad: 0;
 }
 
+// the grown-up gate (SET-1): the wrapper is what a screen places, and anchors
+// the note; relative positions place nothing, they only anchor the ring and note
+.hold {
+  position: relative;
+  display: inline-flex;
+}
+
+.root[data-hold] {
+  --hold-progress: 0;
+  position: relative;
+  touch-action: none;
+  -webkit-touch-callout: none;
+
+  // the ring just outside the border, filling clockwise from the top while
+  // held; drawn from --hold-progress, so reduced motion still shows it fill
+  &::after {
+    content: '';
+    position: absolute;
+    inset: calc(-1 * (var(--border-regular) + var(--border-thick)));
+    padding: var(--border-thick);
+    border-radius: calc(var(--button-radius) + var(--border-thick));
+    background: conic-gradient(var(--action) calc(var(--hold-progress) * 1turn), transparent 0);
+    -webkit-mask:
+      linear-gradient(var(--action) 0 0) content-box,
+      linear-gradient(var(--action) 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+  }
+}
+
+// "Grown-ups: press and hold", under the button after a quick tap
+.note {
+  position: absolute;
+  top: calc(100% + var(--space-2));
+  right: 0;
+  z-index: var(--z-float);
+  display: none;
+  padding: var(--space-1) var(--space-3);
+  border: var(--border-regular) solid var(--edge);
+  border-radius: var(--radius-chip);
+  background: var(--card);
+  box-shadow: var(--elevation-card);
+  color: var(--ink);
+  font: var(--text-label-small);
+  white-space: nowrap;
+  pointer-events: none;
+
+  &[data-state='shown'] {
+    display: block;
+  }
+}
+
 // the Round board's prompt pill (DES-22b): what the game asks, said again on
 // a tap. The soft accent with round ends, flat like the board's (it still
 // sinks when pressed), in the reading type as a game's line of instruction

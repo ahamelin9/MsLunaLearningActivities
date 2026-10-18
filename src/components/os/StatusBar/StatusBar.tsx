@@ -11,8 +11,9 @@ const clock = (now: Date) => `${now.getHours() % 12 || 12}:${String(now.getMinut
 
 /**
  * The home screen's status bar, as on the round 2 Home board: the time, and
- * the gear for grown-ups (DES-9a; SET-1 gates it). Inside an app there is
- * none: the app's own header takes its place (DES-8).
+ * the gear for grown-ups (DES-9a), behind the grown-up gate: a 2s press and
+ * hold (SET-1). Inside an app there is none: the app's own header takes its
+ * place (DES-8).
  */
 export const StatusBar: React.FC<StatusBarProps> = ({ onOpenSettings }) => {
   const [time, setTime] = useState(() => clock(new Date()));
@@ -30,7 +31,7 @@ export const StatusBar: React.FC<StatusBarProps> = ({ onOpenSettings }) => {
         icon="gear"
         aria-label="Grown-ups: settings"
         data-shot="open-settings"
-        onClick={onOpenSettings}
+        onHold={onOpenSettings}
       />
     </header>
   );

@@ -23,6 +23,9 @@
 // faded while it waits); a found ListenCue's burst of five sparks (none
 // under reduced motion).
 // DES-22c: Choice's phrase kind (22px, bold, at least 64px tall).
+// SET-1: ChunkyButton's hold mode: the ring drawn from --hold-progress, the
+// note only after a quick tap, and a press held 2s (not 1s) opening, with
+// the same wait and a filling ring under reduced motion.
 // Start Vite on 5199 first, then from the repo root:
 //   node .claude/skills/know-how/kit-check.mjs
 // Exits 1 on any ❌.
@@ -557,6 +560,44 @@ const phrase = await page.evaluate(() => {
   return { size: s.fontSize, weight: s.fontWeight, tall: c.offsetHeight };
 });
 ok('a phrase Choice is the reading type, bold, and an answer tall', phrase.size === '22px' && phrase.weight === '700' && phrase.tall >= 64 && phrase.tall < 88, JSON.stringify(phrase));
+await page.evaluate(() => document.documentElement.removeAttribute('data-reduced-motion'));
+
+// ── ChunkyButton's hold mode (SET-1): the grown-up gate ──
+const heldRing = await page.evaluate(() => {
+  const b = [...document.querySelectorAll('button[data-hold]')].find(el => el.style.getPropertyValue('--hold-progress') === '0.6');
+  const after = getComputedStyle(b, '::after');
+  return { bg: after.backgroundImage, wider: parseFloat(after.width) > b.offsetWidth };
+});
+ok('a held-part-way gate draws its ring round the button, in the action colour', heldRing.bg.startsWith('conic-gradient') && heldRing.wider, JSON.stringify(heldRing));
+const notes = await page.$$eval('button[data-hold] + [role="status"]', els => els.map(el => `${el.dataset.state ?? '-'}:${getComputedStyle(el).display}`));
+ok('the note shows only where it was asked for', notes.filter(n => n === 'shown:block').length === 1 && notes.every(n => n === 'shown:block' || n.endsWith(':none')), notes.join(' '));
+const tryHold = await page.$('[data-shot="kit-hold"]');
+const tryLabel = () => tryHold.evaluate(b => b.closest('figure').querySelector('figcaption').textContent.trim());
+const holdFor = async (ms, mid) => {
+  await tryHold.evaluate(b => b.scrollIntoView({ block: 'center', behavior: 'instant' }));
+  const box = await tryHold.boundingBox();
+  await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+  await page.mouse.down();
+  await sleep(mid);
+  const ring = await tryHold.evaluate(b => Number(getComputedStyle(b).getPropertyValue('--hold-progress')) || 0);
+  await sleep(ms - mid);
+  await page.mouse.up();
+  await sleep(300);
+  return ring;
+};
+for (const rm of [false, true]) {
+  if (rm) await page.evaluate(() => document.documentElement.setAttribute('data-reduced-motion', ''));
+  const before = await tryLabel();
+  await holdFor(80, 40);
+  const tapNote = await tryHold.evaluate(b => getComputedStyle(b.nextElementSibling).display);
+  const ring = await holdFor(1000, 500);
+  const afterShort = await tryLabel();
+  await holdFor(2300, 1000);
+  const afterLong = await tryLabel();
+  ok(`${rm ? 'reduced motion: ' : ''}a tap or a 1s hold doesn't open, a 2s hold does; the ring fills meanwhile`,
+    afterShort === before && afterLong !== before && tapNote === 'block' && ring > 0.1 && ring < 0.5,
+    `${before} → ${afterShort} → ${afterLong}, note ${tapNote}, ring ${ring.toFixed(2)} at 0.5s`);
+}
 await page.evaluate(() => document.documentElement.removeAttribute('data-reduced-motion'));
 
 await browser.close();

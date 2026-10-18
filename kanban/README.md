@@ -115,7 +115,7 @@ In board order. A new epic gets its file in `epics/` first, then a link here
 | BUG-12 | Day streak rolls over at 7 pm (UTC date) | Bug | P2 | S | Todo |
 | BUG-13 | Trophy dot never clears | Bug | P2 | S | Todo |
 | **SET** | **Settings & grown-up area** | Epic | **P0** | | |
-| SET-1 | Grown-up gate for settings | Story | P0 | M | Todo |
+| SET-1 | Grown-up gate for settings | Story | P0 | M | In progress |
 | SET-2 | A child can't silence Luna by accident | Story | P0 | S | Todo |
 | SET-3 | Simplify the voice section | Story | P2 | S | Todo |
 | SET-4 | Settings grade list uses `GRADES` | Task | P2 | S | Todo |

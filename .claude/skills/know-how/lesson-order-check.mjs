@@ -31,6 +31,14 @@ import { chromePath } from '../../../scripts/chrome-path.cjs';
 const port = process.argv[2] ?? '5199';
 const at = n => `[data-shot="${n}"]`;
 const wait = ms => new Promise(r => setTimeout(r, ms));
+// the grown-up gate (SET-1): press and hold for --dur-hold (2s), then let go
+const hold = async selector => {
+  const box = await (await page.$(selector)).boundingBox();
+  await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+  await page.mouse.down();
+  await wait(2300);
+  await page.mouse.up();
+};
 const KEY = 'ms_luna_learning_progress_v1';
 
 const browser = await puppeteer.launch({
@@ -182,7 +190,7 @@ await wait(600);
 const kFresh = await states();
 check(`fresh save, K: only Lesson 1 open (${kFresh.join(' ')})`, kFresh[0] === 'next' && kFresh.slice(1).every(s => s === 'locked'));
 for (const [i, name] of [[1, '1st'], [2, '2nd']]) {
-  await page.click(at('change-grade'));
+  await hold(at('change-grade'));
   await page.waitForSelector(at('grade-card'));
   await (await page.$$(at('grade-card')))[i].click();
   await page.waitForSelector(at('hub'));
@@ -190,7 +198,7 @@ for (const [i, name] of [[1, '1st'], [2, '2nd']]) {
   const s = await states();
   check(`fresh save, ${name}: only Lesson 1 open (${s.join(' ')})`, s[0] === 'next' && s.slice(1).every(x => x === 'locked'));
 }
-await page.click(at('change-grade'));
+await hold(at('change-grade'));
 await page.waitForSelector(at('grade-card'));
 await (await page.$$(at('grade-card')))[0].click();
 await page.waitForSelector(at('hub'));

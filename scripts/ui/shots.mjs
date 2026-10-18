@@ -466,8 +466,18 @@ function driver(page) {
   };
   const scrollTo = name =>
     page.$eval(at(name), el => el.scrollIntoView({ block: 'start', behavior: 'instant' }));
+  // the grown-up gate (SET-1): press and hold `name` until `opens` appears,
+  // the clock moving on meanwhile, then let go
+  const hold = async (name, opens) => {
+    await until(name);
+    const box = await (await page.$(at(name))).boundingBox();
+    await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+    await page.mouse.down();
+    await until(opens);
+    await page.mouse.up();
+  };
 
-  return { advance, quiet, waitFor, until, gone, click, scrollTo };
+  return { advance, quiet, waitFor, until, gone, click, scrollTo, hold };
 }
 
 /** One run through the app at one size. */
@@ -490,7 +500,7 @@ async function shootViewport(browser, url, viewport, outDir, reduced = false, th
   await devtools.send('Animation.enable');
   await devtools.send('Animation.setPlaybackRate', { playbackRate: 0 });
   const drive = driver(page);
-  const { advance, quiet, until, gone, click, scrollTo } = drive;
+  const { advance, quiet, until, gone, click, scrollTo, hold } = drive;
 
   let n = 0;
   let step = 'start';
@@ -536,8 +546,7 @@ async function shootViewport(browser, url, viewport, outDir, reduced = false, th
     await scrollTo('hub');
 
     // ---- the grown-up screens ----
-    await click('open-settings');
-    await until('settings');
+    await hold('open-settings', 'settings');
     await shot('settings');
     await click('modal-close');
     await gone('settings');

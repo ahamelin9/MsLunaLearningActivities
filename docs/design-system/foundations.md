@@ -150,8 +150,9 @@ In code: `--target-answer`, `--target-chrome`, `--target-gap` and
 | `celebrate` | Big pops, stars landing |
 | `petals` | Falling petals after a win |
 | `loop` | The shortest ambient loop |
+| `hold` | A grown-up's press and hold on a gated button (2s; SET-1). A wait, not motion, so reduced motion keeps it |
 
-- **In code:** durations are `--dur-tap` … `--dur-loop`, easings `--ease-standard`,
+- **In code:** durations are `--dur-tap` … `--dur-loop` and `--dur-hold`, easings `--ease-standard`,
   `--ease-springy`, `--ease-soft-spring`, `--ease-exit` and `--ease-in-out`, and
   each shared animation is a whole `--motion-*` shorthand. The keyframes live in
   `src/styles/motion/_keyframes.scss` (named `luna-*`). A JS timer uses

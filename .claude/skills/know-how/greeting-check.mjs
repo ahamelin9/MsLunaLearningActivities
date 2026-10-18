@@ -24,6 +24,14 @@ import { chromePath } from '../../../scripts/chrome-path.cjs';
 const port = process.argv[2] ?? '5199';
 const at = n => `[data-shot="${n}"]`;
 const wait = ms => new Promise(r => setTimeout(r, ms));
+// the grown-up gate (SET-1): press and hold for --dur-hold (2s), then let go
+const hold = async selector => {
+  const box = await (await page.$(selector)).boundingBox();
+  await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+  await page.mouse.down();
+  await wait(2300);
+  await page.mouse.up();
+};
 
 const browser = await puppeteer.launch({
   executablePath: chromePath(),
@@ -99,7 +107,7 @@ const game = await step('back from a game', async () => {
 // the header's grade: Grade Select with the current grade picked, then 1st
 let picked = null;
 const change = await step('changing grade from the header', async () => {
-  await page.click(at('change-grade'));
+  await hold(at('change-grade'));
   await page.waitForSelector(at('grade-select'));
   await wait(2500);
   picked = await page.$$eval(at('grade-card'), els => els.map(el => el.getAttribute('aria-pressed')));
@@ -123,7 +131,7 @@ await wait(150);
 const talkingAfter = await talking();
 const mutedLabel = await page.$eval(at('luna-mute'), el => el.getAttribute('aria-label'));
 const mutedTap = await step('tap Luna while muted', () => page.click('[data-shot="hub"] [data-mood]'), 2500);
-await page.click(at('open-settings'));
+await hold(at('open-settings'));
 await page.waitForSelector(at('settings'));
 const settingsSwitch = await page.$eval('[role="switch"][aria-label="Ms. Luna’s voice"]', el => el.getAttribute('aria-checked'));
 await page.click(at('modal-close'));

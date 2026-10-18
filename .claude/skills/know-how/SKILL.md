@@ -271,7 +271,9 @@ Pitfalls that cost time:
   `round-pips`, `win-garden` (a won round, DES-11), `petals`, `lesson-choice`, `open-settings`, `settings`,
   `open-trophies`, `trophies`, `modal-close`, `app-home` (DES-8), `stage`
   (GameShell's stage, DES-10), and on the library `change-grade` (the
-  header's grade) and `luna-mute` (the button beside her) (DES-21). OPS-9
+  header's grade) and `luna-mute` (the button beside her) (DES-21). Since
+  SET-1, `open-settings` and `change-grade` open only on a 2s hold, and the
+  Kit page's hold to try is `kit-hold`. OPS-9
   moves the checks in this folder onto them.
 - **"Does it still fit?"** for a screen whose content grows by grade (Treasure
   Path's 2nd-grade passages): `ui:shots` only plays Kindergarten. Play the game
@@ -310,6 +312,30 @@ Pitfalls that cost time:
 - **Pitfall, a fresh line each visit:** the library picks her greeting as it
   mounts, so after a game a tap says that visit's line, not the one said
   from home. Tap her straight after the greeting to test "says it again".
+
+## Does the grown-up gate hold? (SET-1)
+
+*2026-10-18 · SET-1*
+
+- **Symptom:** you need to know a child tapping around can't open Settings
+  or change the grade: the home gear, the library gear and the grade button
+  open only after a 2s press and hold, a quick tap shows "Grown-ups: press
+  and hold", and the ring fills, under reduced motion too.
+- **Fix:** with Vite on 5199, `node .claude/skills/know-how/gate-check.mjs 5199`
+  (add `--reduced-motion` for the second pass). It taps, holds 1s and holds
+  2.3s on each, reading `--hold-progress` halfway. `kit-check.mjs` checks the
+  kit's hold mode on the Kit page.
+- **A check that has to get past the gate:** hold, don't click. With a real
+  clock, mouse down, wait 2.3s, mouse up (`greeting-check.mjs`'s and
+  `lesson-order-check.mjs`'s `hold()`). On `ui:shots`' page clock, mouse down,
+  then `until()` the thing it opens, which moves the clock on (its `hold()`).
+- **Pitfall, off the screen:** a mouse press at a button's box only lands
+  when the button is in view. The Kit page's "try it" gate sits below the
+  fold, so scroll it into view first, or the press reaches nothing and the
+  check reads "opened" as never.
+- **Pitfall, two browsers at once:** `greeting-check.mjs` failed its "from
+  home" step once while `kit-check.mjs` ran beside it, and passed alone. Run
+  the timing-sensitive checks one at a time.
 
 ## Does the perch work? (Luna's line, the clue, the flash, the win)
 

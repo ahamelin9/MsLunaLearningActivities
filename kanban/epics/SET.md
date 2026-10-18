@@ -5,7 +5,16 @@ Story · P0 · M · needs: —
 - **Why:** a child can open Settings, change the grade, turn off narration, or reset all progress.
 - **How:** add a press-and-hold gate (about 2s) or a simple grown-up question before Settings opens. Grade, narration, speed, reduced motion and reset all go behind it.
   - **From DES-21 (Alex, 2026-10-12):** the library's header shows the grade as a button that opens Grade Select, because the teacher takes different groups and swaps grades as the schedule needs. A child can change the grade with it too. Decide here whether it goes behind the gate (and how quick that gate is for her), or stays one tap.
-- **Complete when:** a child tapping around can't change any setting.
+  - **Decided (Alex, 2026-10-18):**
+    - the gate is a press and hold of about 2s, with a ring filling round the button; a quick tap only shows a small "Grown-ups: press and hold" note;
+    - it's a `hold` mode on the kit's ChunkyButton (on the Kit page), timed by a new motion role, `--dur-hold` (2s), which keeps its length under reduced motion;
+    - it guards the home screen's gear, the library's gear and the library's grade button;
+    - Luna's mute beside her in the library stays one tap for SET-2 to settle.
+- **Complete when:**
+  - a tap, or a hold shorter than 2s, on either gear or the grade button opens nothing; a 2s hold opens Settings or Grade Select (checked in a browser);
+  - a quick tap shows the "press and hold" note, and the ring fills while held, with and without reduced motion;
+  - so a child tapping around can't change any setting, Luna's mute aside (SET-2);
+  - the kit's ChunkyButton shows its hold mode on the Kit page, and `kit-check.mjs` checks it.
 
 ### SET-2 · A child can't silence Luna by accident
 Story · P0 · S · needs: SET-1

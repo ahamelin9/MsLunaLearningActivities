@@ -163,6 +163,9 @@ $duration: (
   petals: 2200ms,    // petals falling after a win
   loop: 4s,          // the shortest ambient loop
 );
+// how long a grown-up holds a gated button (SET-1). A wait, not motion, so
+// reduced motion keeps it: outside $duration, which reduced motion zeroes
+$hold: 2s;
 $easing: (
   standard: cubic-bezier(0.2, 0, 0, 1),
   springy: cubic-bezier(0.34, 1.56, 0.64, 1),     // a pop with a little overshoot

@@ -29,8 +29,12 @@ export function useReducedMotion(setting: boolean) {
   }, [setting]);
 }
 
-/** The duration roles in src/styles/tokens/ (`--dur-*`). */
-export type MotionDuration = 'tap' | 'quick' | 'emphasis' | 'enter' | 'celebrate' | 'petals' | 'loop';
+/**
+ * The duration roles in src/styles/tokens/ (`--dur-*`). All but `hold` are 0
+ * under reduced motion; `hold` is a grown-up's press and hold (SET-1), a wait
+ * rather than motion, so it keeps its length.
+ */
+export type MotionDuration = 'tap' | 'quick' | 'emphasis' | 'enter' | 'celebrate' | 'petals' | 'loop' | 'hold';
 
 /** A duration role in milliseconds, as `el` resolves it now (0 if it isn't there). */
 export function motionMs(name: MotionDuration, el: Element = document.documentElement): number {

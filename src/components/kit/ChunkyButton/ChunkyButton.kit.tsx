@@ -1,8 +1,22 @@
 // ChunkyButton on the Kit page (DES-7a): each variant at 48 and 64, idle,
-// pressed (held with data-state) and disabled.
+// pressed (held with data-state) and disabled; the hold mode (SET-1) idle,
+// held part-way, with its note, and one to try.
 
+import { useState, type CSSProperties } from 'react';
 import { Specimen, Specimens } from '@/dev/KitPage/Specimen';
 import { ChunkyButton } from './ChunkyButton';
+
+/** A hold to try: it counts the times it opened. */
+function TryHold() {
+  const [opened, setOpened] = useState(0);
+  return (
+    <Specimen label={opened ? `opened ${opened}×` : 'try it: hold'}>
+      <ChunkyButton variant="icon" icon="gear" aria-label="Hold to try" data-shot="kit-hold" onHold={() => setOpened(n => n + 1)} />
+    </Specimen>
+  );
+}
+
+const noop = () => {};
 
 const STATES = [
   { label: 'idle', props: {} },
@@ -69,6 +83,26 @@ export default function ChunkyButtonKit() {
             <ChunkyButton aria-pressed={label === 'Normal'}>{label}</ChunkyButton>
           </Specimen>
         ))}
+      </Specimens>
+      <Specimens title="hold: the grown-up gate, a 2s press and hold (SET-1)">
+        <Specimen label="idle">
+          <ChunkyButton variant="icon" icon="gear" aria-label="Grown-ups: settings" onHold={noop} />
+        </Specimen>
+        <Specimen label="held part-way">
+          <ChunkyButton variant="icon" icon="gear" aria-label="Grown-ups: settings" onHold={noop} style={{ '--hold-progress': 0.6 } as CSSProperties} />
+        </Specimen>
+        <Specimen label="a grade, held part-way">
+          <ChunkyButton onHold={noop} style={{ '--hold-progress': 0.35 } as CSSProperties}>Kindergarten</ChunkyButton>
+        </Specimen>
+        <TryHold />
+      </Specimens>
+      <Specimens title="hold: after a quick tap, the note (SET-1)">
+        <Specimen label="after a quick tap">
+          {/* room for the note, which hangs left from the button's right edge, as under the header's gear */}
+          <div style={{ paddingLeft: 'calc(var(--space-16) * 3)', paddingBottom: 'var(--space-10)' }}>
+            <ChunkyButton variant="icon" icon="gear" aria-label="Grown-ups: settings" onHold={noop} holdNote />
+          </div>
+        </Specimen>
       </Specimens>
     </>
   );

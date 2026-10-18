@@ -178,6 +178,8 @@ $text-pairs: (
   @each $name, $ms in p.$duration {
     --dur-#{$name}: #{$ms};
   }
+  // a grown-up's press and hold on a gated button (SET-1); reduced motion keeps it
+  --dur-hold: #{p.$hold};
   @each $name, $curve in p.$easing {
     --ease-#{$name}: #{$curve};
   }
