@@ -9,6 +9,7 @@
 // Landscape shots are drawn 300px tall and portrait ones 420px, so an iPad
 // mini sits beside a landscape shot at a readable size. No server needed.
 import puppeteer from 'puppeteer-core';
+import { chromePath } from '../../../scripts/chrome-path.cjs';
 import { readFileSync } from 'node:fs';
 
 const [specPath, out] = process.argv.slice(2);
@@ -30,7 +31,7 @@ const html = `<body style="margin:0;padding:8px;background:#ccc;font:600 15px sy
     .join('')}</div>`)
   .join('')}</body>`;
 
-const browser = await puppeteer.launch({ executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome', headless: true });
+const browser = await puppeteer.launch({ executablePath: chromePath(), headless: true });
 const page = await browser.newPage();
 await page.setViewport({ width: 2400, height: 900 });
 await page.setContent(html, { waitUntil: 'load' });

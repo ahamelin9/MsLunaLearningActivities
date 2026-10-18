@@ -194,6 +194,22 @@ Pitfalls that cost time:
   so it never saw the button at all. When proving a check can fail, read
   each ✅ the old code still gets and ask why. Find things by what a child
   sees (a button's words) when the hook may not exist in the code compared.
+- **Two checks on one Vite, or a Vite left running for hours** (*2026-10-13,
+  DES-22d*): the grade 2 layout audit crashed with "Attempted to use detached
+  Frame" while other browser checks used the same server on 5199, and a
+  rerun then timed out on its very first page load ("Navigation timeout of
+  30000 ms"), on a Vite that had been up and hot-reloading all session. Run
+  one browser check at a time, and if a first load times out, restart Vite
+  (`pkill -f "vite --port 5199"`, then start it again). Grade 2's audit takes
+  over 10 minutes since it plays Lesson 1 to its done screen, so run it in
+  the background.
+- **A check run with `node -e` can't import a file next to it** (*2026-10-17,
+  OPS-10*): `offline-check.mjs` runs as `node --input-type=module -e "$(cat …)"`,
+  so `import … from '../../../scripts/chrome-path.cjs'` resolved from the
+  current folder and failed with `ERR_MODULE_NOT_FOUND` for
+  `/Users/scripts/chrome-path.cjs`. Under `-e` find repo files from the repo
+  root instead: `createRequire(join(process.cwd(), 'package.json'))('./scripts/chrome-path.cjs')`.
+  Packages (`puppeteer-core`, `vite`) still import by name.
 - **`pkill -f "vite --port 5199"` killed my own command** (*2026-10-12*):
   `-f` matches whole command lines, so a status check whose own text held
   that string (`pgrep -fl "vite --port 5199|…"`) was killed with it (exit

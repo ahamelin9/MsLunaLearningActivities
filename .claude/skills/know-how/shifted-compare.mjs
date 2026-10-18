@@ -13,6 +13,7 @@
 
 import { readFileSync, writeFileSync } from 'node:fs';
 import puppeteer from 'puppeteer-core';
+import { chromePath } from '../../../scripts/chrome-path.cjs';
 
 const [before, after, topA, topB, rowsArg, out] = process.argv.slice(2);
 if (!before || !after || topA === undefined || topB === undefined) {
@@ -21,7 +22,7 @@ if (!before || !after || topA === undefined || topB === undefined) {
 }
 
 const browser = await puppeteer.launch({
-  executablePath: process.env.CHROME_PATH ?? '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+  executablePath: chromePath(),
   headless: true
 });
 const page = await browser.newPage();

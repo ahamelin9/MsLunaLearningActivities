@@ -10,7 +10,7 @@ tickets.
 - **`epics/<EPIC>.md`**: one file per epic, with its goal and every ticket's full section (Why / How / Complete when). A ticket never moves files when its status changes.
 - **`CHANGELOG.md`**: finished and dropped tickets. Once a ticket is deleted, its changelog line is its only record.
 
-**Last updated:** 2026-10-12
+**Last updated:** 2026-10-17
 
 ## How to read this
 
@@ -72,8 +72,8 @@ be pulled into Phase 1 for a break from styling.
 
 ### Now / Next
 
-- **Now:** DES-22d: the done screen on the Done board, with DES-13's lesson pieces (the bar moving on, "Lesson N is open now"). Stage 7 (play) is under way: DES-22a (GameShell's start screen, stage and perch on the kit) is done (2026-10-12)
-- **Next:** the rest of Stage 7: DES-11 → DES-22b, DES-22c → DES-23. PRG-8 (pick up a lesson where you left off) was split from DES-13 and needs nothing. SET-1 (the grown-up gate) no longer waits on anything. OPS-9 (know-how checks onto `data-shot`) can start any time: the checks lost their last class names with DES-18d. SET-1 is pulled in where DES-16 needs it. FB-1 (Phase 2) no longer waits on the layout; GAME-1c, Treasure Path's screen, waits on it
+- **Now:** DES-11: one right/wrong/reveal language; a win grows flowers and drops petals (on the round and the done screen), and the stand-in sparkle goes. Stage 7 (play) is under way: DES-22a (the start screen, stage and perch) is done (2026-10-12), and DES-22d (the done screen on the Done board) is done (2026-10-13). OPS-10 closed in part (2026-10-17): the Chrome helper, the board pictures and the cloud groundwork landed, and the rest is parked as OPS-11
+- **Next:** the rest of Stage 7: DES-22b, DES-22c → DES-23. OPS-11 (a first cloud session) waits until Alex wants to work away from the Mac. PRG-8 (pick up a lesson where you left off) was split from DES-13 and needs nothing. SET-1 (the grown-up gate) no longer waits on anything. OPS-9 (know-how checks onto `data-shot`) can start any time: the checks lost their last class names with DES-18d. SET-1 is pulled in where DES-16 needs it. FB-1 (Phase 2) no longer waits on the layout; GAME-1c, Treasure Path's screen, waits on it
 
 ## Epics
 
@@ -97,8 +97,7 @@ In board order. A new epic gets its file in `epics/` first, then a link here
 | ID | Title | Type | P | Size | Status |
 |---|---|---|---|---|---|
 | **DES** | **Design system & layout** | Epic | **P0** | | |
-| DES-22d | The done screen on the Done board | Story | P1 | M | In progress |
-| DES-11 | One right/wrong/reveal visual language | Story | P1 | S | Todo |
+| DES-11 | One right/wrong/reveal visual language | Story | P1 | S | In progress |
 | DES-22b | Games on the kit, part 1: Letter Jar, Bubble Sounds, Letter Cookies, Muddled Cards | Story | P1 | M | Todo |
 | DES-22c | Games on the kit, part 2: Words Off the Page, What's Missing?, Treasure Path, Story Corner | Story | P1 | M | Todo |
 | DES-23 | Lessons on the kit | Story | P1 | M | Todo |
@@ -164,3 +163,4 @@ In board order. A new epic gets its file in `epics/` first, then a link here
 | OPS-2 | README and stale copy | Task | P2 | S | Todo |
 | OPS-7 | Drop Treasure Path's leftovers from the sentence bank | Task | P2 | S | Todo |
 | OPS-8 | Retarget the backlog guard check's two stale cases | Task | P2 | S | Todo |
+| OPS-11 | A first cloud session (parked) | Task | P2 | M | Todo |

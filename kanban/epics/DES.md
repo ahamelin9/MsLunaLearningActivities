@@ -51,7 +51,7 @@ them in.
 | 4 | The kit | DES-7a, DES-7b, DES-7c (done 2026-10-11) | Every kit component on the Kit page in every state |
 | 5 | Frame and shell | DES-8, DES-10, DES-15 (done 2026-10-11), DES-9a, DES-9b, DES-9c, DES-12 (done 2026-10-12) | One header, the layout grid, the new Luna (moved here from Stage 4, Alex 2026-10-11), the restyled home, Settings, trophies and Grade Select; one Luna per screen |
 | 6 | The library | DES-21 → **PRG-7 (pulled in)** → DES-13 (done 2026-10-12) | The library as on the board: lessons in order, one bar |
-| 7 | Play | DES-22a (done 2026-10-12) → DES-22d → DES-11 → DES-22b, DES-22c → DES-23 | GameShell (start, stage, perch and the done screen), all 8 games and all 8 lesson types on the kit, with one right/wrong language |
+| 7 | Play | DES-22a (done 2026-10-12) → DES-22d (done 2026-10-13) → DES-11 → DES-22b, DES-22c → DES-23 | GameShell (start, stage, perch and the done screen), all 8 games and all 8 lesson types on the kit, with one right/wrong language |
 | 8 | The design system is done | DES-24 | Legacy styles deleted; the check runs strict with no baseline |
 | 9 | What's left of the epic | **SET-1 (pulled in)** → DES-16, then DES-17, then DES-14 | Light/dark follows the iPad with a grown-up choice; the milestone moon; real cookies |
 
@@ -68,7 +68,7 @@ them in.
 
 
 ### DES-11 · One right/wrong/reveal visual language
-Story · P1 · S · needs: DES-22d
+Story · P1 · S · needs: —
 - **How:** use the same right glow, wrong wobble, win veil and "revealed" style (for FB-2) in every game and lesson, through `Choice` and the shell's flash. Game pieces that aren't Choices (bubbles, cookies, bugs, memory cards, word tiles) use the same state roles, `data-state` and motion. The games and lessons adopt it in DES-22b, DES-22c and DES-23.
   - **A win grows flowers (Alex, 2026-10-09):** a solved round grows a few flowers up the sides of the stage, and petals fall instead of confetti, as on the round 2 Round board. The lesson-done screen uses the same petals. Flowers and petals never cover the answer choices or block the next tap. **Kept for now (Alex, 2026-10-10):** the teacher dropped flowers for progress (DES-13), not for wins; change this only if she asks.
 - **Complete when:**
@@ -133,23 +133,6 @@ Story · P1 · M · needs: —
   - with reduced motion she appears without gliding;
   - her clips are rendered and `voice:audit` passes;
   - the MilestoneMoon folder shows zero in `design:status`.
-
-### DES-22d · The done screen on the Done board
-Story · P1 · M · needs: —
-- **Why:** the reward screen predates the round 2 Done board. Split from DES-22a (Alex, 2026-10-12).
-- **How:**
-  - As on the Done board: a lifted panel. On the left, the "Lesson done!" mark (tapping it pops it again), StarRow, "N of M solved" and Luna cheering in the corner (tapping her says her line again). On the right, the lesson pieces, the reward and the actions. The header reads "Lesson N · title".
-  - **From DES-13 (Alex, 2026-10-12):** a finished lesson shows the kit ProgressBar moving on ("2 of 6 lessons done") and "Lesson N is open now" when one opened (`lessonStates` in `engine/lessons.ts`).
-  - Today's sticker award fills the squishy panel's place (a dashed PaperCard; the sticker says its line when tapped) until PRG-5. Left out until their tickets: the time (PRG-6), "12 min today" and "See my shelf" (PRG-5). Also left out: "You learned …" (no lesson has that line) and "— no wobbles at all!".
-  - A game's done screen is the same panel with "All done!", no lessons block, and "Another game".
-  - "Next lesson" shows only when the next lesson is open (PRG-7); `lesson-order-check.mjs` finds it by those words.
-  - The confetti canvas goes and `utils/confetti.ts` is deleted; DES-11 brings the petals.
-- **Complete when:**
-  - the done screen uses kit components and roles only (StarRow, not the legacy StarIcon), and `engine/DoneScreen` shows zero in `design:status`;
-  - after a lesson that opens the next, the bar moves on and "Lesson N is open now" shows; after a replay, neither; after a game, no lessons block;
-  - `lesson-order-check.mjs` passes;
-  - no confetti is left (`utils/confetti.ts` deleted);
-  - it's checked in light and dark, and Alex OKs it.
 
 ### DES-22b · Games on the kit, part 1: Letter Jar, Bubble Sounds, Letter Cookies, Muddled Cards
 Story · P1 · M · needs: DES-11

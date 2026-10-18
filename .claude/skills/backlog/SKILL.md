@@ -81,9 +81,7 @@ files when its status changes; the status changes in the board row only. The
    (`.claude/skills/know-how/`); a hook reminds you when the Done line lands.
 7. **Commit message:** suggest one commit per ticket, its message starting
    with the ID (`DES-1: screenshot harness`), so git history lines up with
-   the changelog. Alex does all git himself (add, commit, push) on the one
-   branch, `main`. Never run those or create branches; just hand over the
-   message.
+   the changelog. See **Git** below for who runs it.
 8. **Finishing an epic:** when an epic's last ticket goes, remove the epic's
    board header row, then its link in the README's epic list, then its file
    (`rm kanban/epics/<EPIC>.md` is the one shell change the guard allows, and
@@ -91,6 +89,33 @@ files when its status changes; the status changes in the board row only. The
 9. **Finishing a phase:** when a phase has nothing left, move `— now` in the
    Roadmap table to the next phase (the hook reads that marker).
 10. Refresh **Now / Next** and **Last updated** in the README.
+
+## Git
+
+Each ticket is two commits, split by path: its code first, then its
+close-out (changelog, board, section, map, decisions, know-how). Messages
+start with the ticket ID and end with the co-author line. One branch, `main`.
+Who runs git depends on where the session runs; the backlog hook's
+"Session:" line says which (OPS-10, 2026-10-13).
+
+- **On Alex's Mac (the desktop app):** Alex runs all git himself. Never run
+  `git add`, `commit`, `push`, `rm` or `branch`; hand over the exact
+  `git add <paths>` and the message for each commit. His "pushed! next!" is
+  his OK on the shots and his go for the next ticket; check `git log` and
+  `git status` before starting it, and say once if a close-out is still
+  uncommitted.
+- **In a cloud session:** Alex can't run git there, so Claude does, with the
+  same gates:
+  1. after the build, send the review and stop for Alex's OK, as on the Mac;
+  2. on his OK ("pushed! next!", "OK", "go"), make the code commit, then the
+     close-out commit, exactly as they'd be handed over on the Mac;
+  3. push them to `main`. If the session can't push to `main` (it works on
+     its own branch), push that branch, open a pull request with `gh`, and
+     merge it into `main` once Alex has OKed; if merging is refused too, give
+     Alex the pull request's link to merge;
+  4. never force-push, rewrite history, or commit before his OK. A ticket
+     whose lines wait in the voice queue goes in as `Blocked` (the
+     `voice-queue` skill).
 
 ## Two chats at once
 

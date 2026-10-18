@@ -26,6 +26,7 @@
 // neither for the one up next.
 
 import puppeteer from 'puppeteer-core';
+import { chromePath } from '../../../scripts/chrome-path.cjs';
 
 const port = process.argv[2] ?? '5199';
 const at = n => `[data-shot="${n}"]`;
@@ -33,7 +34,7 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
 const KEY = 'ms_luna_learning_progress_v1';
 
 const browser = await puppeteer.launch({
-  executablePath: process.env.CHROME_PATH ?? '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+  executablePath: chromePath(),
   headless: true,
   args: ['--mute-audio', '--autoplay-policy=no-user-gesture-required']
 });

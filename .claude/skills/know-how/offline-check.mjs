@@ -8,13 +8,17 @@
 // Run from the repo root (it starts its own Vite). Under -e the first argument
 // is process.argv[1].
 
+import { createRequire } from 'node:module';
+import { join } from 'node:path';
 import puppeteer from 'puppeteer-core';
 import { createServer } from 'vite';
+// Under -e there's no file to be relative to, so the helper is found from the repo root
+const { chromePath } = createRequire(join(process.cwd(), 'package.json'))('./scripts/chrome-path.cjs');
 const out = process.argv[1];
 const server = await createServer({ root: process.cwd(), logLevel: 'error', server: { open: false } });
 await server.listen();
 const url = server.resolvedUrls.local[0];
-const browser = await puppeteer.launch({ executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome', headless: true, args: ['--mute-audio'] });
+const browser = await puppeteer.launch({ executablePath: chromePath(), headless: true, args: ['--mute-audio'] });
 const page = await browser.newPage();
 await page.setViewport({ width: 1180, height: 820 });
 await page.setRequestInterception(true);

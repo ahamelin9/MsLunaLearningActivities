@@ -34,7 +34,19 @@ Task · P2 · S
 
 ### OPS-8 · Retarget the backlog guard check's two stale cases
 Task · P2 · S
-- **Why:** found while closing DES-25 (2026-10-10): `node .claude/skills/backlog/guard-check.mjs "$PWD"` shows 2 cases wrong. "A second In progress" edits a DES-3 row followed by DES-4, but the board now runs DES-3, DES-19; "a ticket losing its Complete when" looks for DES-4's old one-line Complete when, which is now a list. Their edits miss, so the guard never sees them and they show as allowed. The guard itself is fine. (DES-3 closed on 2026-10-11, so its row is gone too; still the same 2 cases.)
+- **Why:** found while closing DES-25 (2026-10-10): `node .claude/skills/backlog/guard-check.mjs "$PWD"` shows 2 cases wrong. "A second In progress" edits a DES-3 row followed by DES-4, but the board now runs DES-3, DES-19; "a ticket losing its Complete when" looks for DES-4's old one-line Complete when, which is now a list. Their edits miss, so the guard never sees them and they show as allowed. The guard itself is fine. (DES-3 closed on 2026-10-11, so its row is gone too; still the same 2 cases.) Since DES-4 closed, a third shows the same way (found in OPS-10, 2026-10-13): "a status that is not allowed" edits DES-4's board row, which is gone.
 - **How:** point both cases at text that's on the board and in `epics/DES.md` today (two rows next to each other; a one-line `- **Complete when:**`), ideally rows less likely to move, and keep the script's note on what to do when a target goes.
 - **Complete when:** the guard check shows all 14 cases as expected.
+
+### OPS-11 · A first cloud session (parked)
+Task · P2 · M
+- **Why:** the rest of OPS-10, parked by Alex on 2026-10-17: the cloud set-up was taking time away from building the app, and he hasn't needed to work away from the Mac yet. OPS-10 left the groundwork in the repo (one Chrome helper, the boards as pictures, `CLAUDE.md`, the backlog's **Git** section, the `voice-queue` skill, `docs/cloud-sessions.md`). Pick this up only if Alex wants to work from claude.ai/code.
+- **How:**
+  - **Claude's notes into the repo:** the notes in the Mac's memory (git rules, follow the board, the teacher's tastes, the stage table…) move into `.claude/memory/`, indexed from `CLAUDE.md`; the Mac's memory keeps only a pointer, and the `wrap-up` skill sends new notes there. Leave out anything personal: the repo is public. On 2026-10-17 the auto-mode safety check refused copying them (private memory into a public repo), so Alex allows those writes first.
+  - **The cloud environment:** Alex sets up the setup script and the network access in `docs/cloud-sessions.md`.
+  - **The first run:** that page's "The first cloud session" steps, noting in its table how review sheets reach Alex and whether `voice:render` reaches the model.
+- **Complete when:**
+  - `.claude/memory/` holds every note, `CLAUDE.md` indexes them, and the Mac's memory only points at them;
+  - a cloud session passes `npm run lint` and `kit-check.mjs`, runs `ui:shots` with the emoji drawn, and a review sheet reaches Alex;
+  - `docs/cloud-sessions.md` says which way the review sheet came and whether the voice model was reachable.
 

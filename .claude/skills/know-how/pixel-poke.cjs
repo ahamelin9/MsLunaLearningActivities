@@ -9,11 +9,13 @@ const fs = require('node:fs');
 const path = require('node:path');
 const [root, from, to, file, x, y, delta] = process.argv.slice(2);
 const puppeteer = createRequire(path.join(root, 'package.json'))('puppeteer-core');
+// the one place every check finds Chrome: the Mac's, or a cloud session's Chromium (OPS-10)
+const { chromePath } = require(path.join(root, 'scripts', 'chrome-path.cjs'));
 (async () => {
   fs.rmSync(path.join(root, 'screenshots', to), { recursive: true, force: true });
   fs.cpSync(path.join(root, 'screenshots', from), path.join(root, 'screenshots', to), { recursive: true });
   const target = path.join(root, 'screenshots', to, file);
-  const browser = await puppeteer.launch({ executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome', headless: true });
+  const browser = await puppeteer.launch({ executablePath: chromePath(), headless: true });
   const page = await browser.newPage();
   const out = await page.evaluate(async (b64, x, y, d) => {
     const blob = await (await fetch(`data:image/png;base64,${b64}`)).blob();

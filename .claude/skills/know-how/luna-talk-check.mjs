@@ -13,6 +13,7 @@
 // data-state="talking", so a run against older code shows it can fail.
 
 import puppeteer from 'puppeteer-core';
+import { chromePath } from '../../../scripts/chrome-path.cjs';
 
 const port = process.argv[2] ?? '5199';
 const GRACE_MS = 60;
@@ -20,7 +21,7 @@ const at = n => `[data-shot="${n}"]`;
 const wait = ms => new Promise(r => setTimeout(r, ms));
 
 const browser = await puppeteer.launch({
-  executablePath: process.env.CHROME_PATH ?? '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+  executablePath: chromePath(),
   headless: true,
   args: ['--mute-audio', '--autoplay-policy=no-user-gesture-required']
 });

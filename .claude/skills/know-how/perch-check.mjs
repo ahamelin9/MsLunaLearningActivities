@@ -21,6 +21,7 @@
 // clips are counted.
 
 import puppeteer from 'puppeteer-core';
+import { chromePath } from '../../../scripts/chrome-path.cjs';
 
 const port = process.argv[2] ?? '5199';
 const at = n => `[data-shot="${n}"]`;
@@ -32,7 +33,7 @@ const ok = (name, pass, detail = '') => {
 };
 
 const browser = await puppeteer.launch({
-  executablePath: process.env.CHROME_PATH ?? '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+  executablePath: chromePath(),
   headless: true,
   args: ['--mute-audio', '--autoplay-policy=no-user-gesture-required']
 });

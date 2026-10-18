@@ -113,11 +113,19 @@ Follow `screens.md`:
    state the shots don't reach, **plus the board's shot in light and dark
    beside ours** when there is one), made with
    `node .claude/skills/know-how/review-sheet.mjs <spec.json> screenshots/review/<ticket>-<screen>.png`.
+   Send it with SendUserFile. In a cloud session without it, publish the
+   sheet as a private Artifact and give Alex the link (`docs/cloud-sessions.md`).
    Then update the area's row on the map.
 
 **Comparing with the board, at the start and the end** (Alex, 2026-10-12):
-plan from the board before building, and show it beside ours at the end. To
-shoot a board: open the canvas in the built-in browser (it's signed in; a
+plan from the board before building, and show it beside ours at the end.
+**The boards are in the repo as pictures** (OPS-10, 2026-10-13):
+`prototype/shots/<Board>-light.png` and `-dark.png` for all eight (R2Look,
+R2Home, R2Library, R2Progress, R2Round, R2Done, R2Squishies, R2Luna), so any
+session, a cloud one included, can read them and list them in a review sheet.
+The prototype is frozen, so they don't go stale. The Ms. Luna board's lower
+row is cut off by its own nav bar; its picks are in the top part. To shoot a
+board afresh (desktop app only): open the canvas in the built-in browser (it's signed in; a
 headless puppeteer gets "Page not found", and the built boards in
 `prototype/project/` need the canvas runtime, so they don't render alone), set
 the tab to 1440×1000 with `resize_window`, wait about 8 s, then use the

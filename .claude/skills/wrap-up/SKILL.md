@@ -45,6 +45,7 @@ Convert relative dates ("tomorrow") to real ones.
    - anything that took more than one try to get right (that's a `know-how` entry);
    - scripts still in the scratchpad.
 3. **Stale notes:** fix or delete memory or skill text that today proved wrong, such as "X is next" when it no longer is.
-4. **Commit message:** suggest one, starting with the ticket ID. Alex does all git himself on `main`; never run add, commit, push or branch.
-5. **Teacher note (optional):** offer `/app-updates` if something changed that she'd notice.
-6. **Report:** a short list of what went where, so Alex can check it.
+4. **Commit message:** one, starting with the ticket ID. On Alex's Mac he runs git himself (never run add, commit, push or branch); in a cloud session Claude commits and pushes on his OK. The backlog skill's **Git** section has both.
+5. **Voice queue:** say whether any lines wait in the `voice-queue` skill for the next session on the Mac.
+6. **Teacher note (optional):** offer `/app-updates` if something changed that she'd notice.
+7. **Report:** a short list of what went where, so Alex can check it.

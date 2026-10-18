@@ -14,8 +14,11 @@
 //                                                Until DES-16 only what's on roles turns dark
 //
 // It starts its own Vite dev server and drives the Chrome already installed
-// on this machine (puppeteer-core downloads no browser of its own). Set
-// CHROME_PATH to use a different one. Each size runs from a fresh start:
+// on this machine (puppeteer-core downloads no browser of its own), found by
+// scripts/chrome-path.cjs: CHROME_PATH, the Mac's Chrome, or a cloud session's
+// Chromium (OPS-10). Shots from the Mac and from a cloud session never match
+// pixel for pixel, so take a --diff's two sets on the same machine. Each size
+// runs from a fresh start:
 // its own browser profile with localStorage cleared, the way a new child
 // first meets the app.
 //
@@ -37,6 +40,7 @@ import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import puppeteer from 'puppeteer-core';
 import { createServer } from 'vite';
+import { chromePath } from '../chrome-path.cjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 
@@ -48,8 +52,8 @@ const VIEWPORTS = [
   { width: 744, height: 1133 } // iPad mini, portrait
 ];
 
-const CHROME_PATH =
-  process.env.CHROME_PATH ?? '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
+// CHROME_PATH, the Mac's Chrome, or a cloud session's Chromium (OPS-10)
+const CHROME_PATH = chromePath();
 
 /** App time a screen gets before its shot: its entrance and its first line. */
 const SETTLE_MS = 900;

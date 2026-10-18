@@ -4,11 +4,12 @@
 //   node .claude/skills/know-how/kit-sections.mjs <outDir> <Name> [<Name>…]
 // e.g. screenshots/des7b/sections Choice ListenCue → Choice-light.png, …
 import puppeteer from 'puppeteer-core';
+import { chromePath } from '../../../scripts/chrome-path.cjs';
 import { mkdirSync } from 'node:fs';
 
 const [outDir, ...names] = process.argv.slice(2);
 mkdirSync(outDir, { recursive: true });
-const browser = await puppeteer.launch({ executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome', headless: true });
+const browser = await puppeteer.launch({ executablePath: chromePath(), headless: true });
 const page = await browser.newPage();
 await page.setViewport({ width: 1180, height: 900 });
 for (const mode of ['light', 'dark']) {

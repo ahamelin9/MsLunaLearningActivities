@@ -10,9 +10,11 @@ const { createRequire } = require('node:module');
 const { join } = require('node:path');
 const fs = require('node:fs');
 const puppeteer = createRequire(join(process.cwd(), 'package.json'))('puppeteer-core');
+// the one place every check finds Chrome: the Mac's, or a cloud session's Chromium (OPS-10)
+const { chromePath } = require(join(process.cwd(), 'scripts', 'chrome-path.cjs'));
 
 const URL_ = 'http://localhost:5198/';
-const CHROME = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
+const CHROME = chromePath();
 const LINE = 'Which letter did Ms. Luna say?';
 const NEVER = 'Zorblax quibbles the purple teapot.'; // in neither index
 const sleep = ms => new Promise(r => setTimeout(r, ms));

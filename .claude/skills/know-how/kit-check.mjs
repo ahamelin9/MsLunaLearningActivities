@@ -19,12 +19,13 @@
 //   node .claude/skills/know-how/kit-check.mjs
 // Exits 1 on any ❌.
 import puppeteer from 'puppeteer-core';
+import { chromePath } from '../../../scripts/chrome-path.cjs';
 
 const URL = 'http://localhost:5199/?kit&tab=components&mode=light';
 const results = [];
 const ok = (name, pass, detail = '') => { results.push(pass); console.log(`${pass ? '✅' : '❌'} ${name}${detail ? `  (${detail})` : ''}`); };
 
-const browser = await puppeteer.launch({ executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome', headless: true, args: ['--mute-audio'] });
+const browser = await puppeteer.launch({ executablePath: chromePath(), headless: true, args: ['--mute-audio'] });
 const page = await browser.newPage();
 await page.setViewport({ width: 1180, height: 820 });
 await page.goto(URL, { waitUntil: 'networkidle0' });

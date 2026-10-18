@@ -14,10 +14,12 @@
 const { createRequire } = require('node:module');
 const { join } = require('node:path');
 const puppeteer = createRequire(join(process.cwd(), 'package.json'))('puppeteer-core');
+// the one place every check finds Chrome: the Mac's, or a cloud session's Chromium (OPS-10)
+const { chromePath } = require(join(process.cwd(), 'scripts', 'chrome-path.cjs'));
 
 const CONFIG = {
   url: 'http://localhost:5199/',
-  chrome: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+  chrome: chromePath(),
   grade: 0, // 0 Kindergarten, 1 1st grade, 2 2nd grade
   kind: 'game', // 'game' (the play rug) or 'lesson'
   title: 'Feed Luna the Letter' // exactly as on its hub card

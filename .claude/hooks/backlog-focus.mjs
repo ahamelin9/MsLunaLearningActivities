@@ -4,11 +4,25 @@
 // priority check (rules in .claude/skills/focus/SKILL.md), plus anything in the
 // backlog that breaks its rules, so a half-finished deletion gets tidied. It
 // never blocks a prompt, and it stays silent if the backlog is missing or
-// unreadable.
+// unreadable. Since OPS-10 it also says where the session runs (Alex's Mac, or
+// a cloud session: the git rule differs) and how much waits in the voice queue.
 
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { checkBacklog, loadBacklog, parseBacklog } from './backlog-lib.mjs';
 
 const root = process.env.CLAUDE_PROJECT_DIR || process.cwd();
+
+// Alex works on a Mac; a Claude Code cloud session runs on Linux (OPS-10)
+const onMac = process.platform === 'darwin';
+let queued = 0;
+try {
+  queued = readFileSync(join(root, '.claude/skills/voice-queue/queue.md'), 'utf8')
+    .split('\n')
+    .filter(line => line.startsWith('- ')).length;
+} catch {
+  // no queue file: nothing waiting
+}
 
 let backlog;
 try {
@@ -39,6 +53,12 @@ const context = [
   `- In progress: ${list(inProgress)}${blocked.length ? ` | Blocked: ${list(blocked)}` : ''}`,
   `- Open P0: ${openP0.map(t => t.id).join(', ') || 'none'}`,
   ...(problems.length ? [`- Backlog needs tidying: ${problems.join(' ')}`] : []),
+  onMac
+    ? '- Session: on Alex\'s Mac. Alex runs git himself (suggest commits, never run them).'
+    : '- Session: a cloud session. Claude commits (code, then close-out) and pushes only on Alex\'s OK (backlog skill, "Git").',
+  ...(queued
+    ? [`- Voice queue: ${queued} waiting (voice-queue skill)${onMac ? ': render them before other work.' : ', for the next session on the Mac.'}`]
+    : []),
   'Focus check (focus skill): if this message starts new work that is not the in-progress or Now ticket, open your reply with one line naming what is next on the agenda and how this request ranks against it, then do what was asked: the user decides. Offer to log untracked work as a ticket. Skip this for questions, chat, and work on the current ticket.'
 ].join('\n');
 

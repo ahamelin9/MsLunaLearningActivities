@@ -27,6 +27,7 @@
 // DES-23 and GAME-3.
 
 import puppeteer from 'puppeteer-core';
+import { chromePath } from '../../../scripts/chrome-path.cjs';
 
 const port = process.argv[2] ?? '5199';
 const grade = Number(process.argv[3] ?? 0);
@@ -128,7 +129,7 @@ function library() {
 }
 
 const browser = await puppeteer.launch({
-  executablePath: process.env.CHROME_PATH ?? '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+  executablePath: chromePath(),
   headless: true,
   args: ['--mute-audio', '--autoplay-policy=no-user-gesture-required']
 });
