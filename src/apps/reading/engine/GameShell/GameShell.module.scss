@@ -66,8 +66,9 @@
   &[data-tint='4']::after { background: var(--picture-4); }
   &[data-tint='5']::after { background: var(--picture-5); }
 
-  // the shell's flash: a miss turns the edge the try-again colour, a win the
-  // right colour with its glow (DES-11 makes it the one answer language)
+  // the shell's flash, in the one answer language (components.md): a miss
+  // turns the edge the try-again colour, a win the right colour with its glow,
+  // as a wrong and a right Choice do
   &[data-flash='miss'] {
     border-color: var(--try-again-edge);
     box-shadow: 0 var(--ledge-small) 0 var(--try-again-edge);
@@ -101,21 +102,25 @@
   }
 }
 
-// a won round: a sparkle pops over the top of the stage; it never takes a tap
-.win-veil {
+// a won round's garden (DES-11), as on the Round board: three flowers in each
+// bottom corner. It sits behind what's on the stage (in front of the accent
+// blob), so it never covers an answer, and it never takes a tap.
+.garden {
   position: absolute;
   inset: 0;
-  z-index: var(--z-celebrate);
+  z-index: -1;
   display: flex;
-  justify-content: center;
-  padding-top: var(--space-4);
+  justify-content: space-between;
+  align-items: flex-end;
+  padding-inline: var(--space-5);
   pointer-events: none;
-  color: var(--accent);
 }
 
-.win-spark {
+.bed {
   display: flex;
-  animation: var(--motion-pop);
+  align-items: flex-end;
+  // their soil sinks a little into the stage's bottom edge
+  margin-bottom: calc(var(--space-1) * -1);
 }
 
 // ---------- the start screen, on the stage ----------

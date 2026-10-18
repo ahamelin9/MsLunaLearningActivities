@@ -15,6 +15,10 @@
 // DES-22a: a SpeechBubble with no tail draws none, and its line is a 48px
 // button that still reads as her words.
 // DES-22d: Icon's 96 size, and PaperCard's dashed reward panel.
+// DES-11: Flower's kinds in the illustration palette, growing a step apart
+// then swaying (still under reduced motion); Petals falling (30, in 7
+// colours, never taking a tap), the delayed ones waiting, none under reduced
+// motion.
 // Start Vite on 5199 first, then from the repo root:
 //   node .claude/skills/know-how/kit-check.mjs
 // Exits 1 on any ❌.
@@ -394,6 +398,79 @@ ok('the reward PaperCard is flat, on a thick dashed accent border', await page.e
   const s = getComputedStyle(card);
   return s.borderTopStyle === 'dashed' && s.borderTopWidth === '3px' && s.borderTopColor === accent && s.boxShadow === 'none';
 }));
+
+// ── a won round's garden and petals (DES-11): Flower and Petals ──
+const clickText = async text => {
+  const b = await page.evaluateHandle(t => [...document.querySelectorAll('button')].find(x => x.textContent.trim() === t), text);
+  await b.evaluate(e => e.scrollIntoView({ block: 'center' }));
+  await b.click();
+};
+ok('a red rose, a blush rose and a daisy, in the illustration palette', await page.evaluate(() => {
+  const probe = (near, v) => {
+    const p = document.createElement('span');
+    p.style.color = `var(${v})`;
+    near.append(p);
+    const c = getComputedStyle(p).color;
+    p.remove();
+    return c;
+  };
+  const fill = el => getComputedStyle(el).fill;
+  // the drawing's children: soil, stem, leaf, then the head
+  const head = kind => document.querySelector(`[data-kind="${kind}"] svg`).children;
+  const near = document.querySelector('[data-kind="daisy"]').parentElement;
+  return fill(head('rose-red')[4]) === probe(near, '--illo-rose-red') &&
+    fill(head('rose-blush')[4]) === probe(near, '--illo-rose-blush') &&
+    fill(head('daisy')[3]) === probe(near, '--illo-daisy-petal') &&
+    fill(head('daisy')[9]) === probe(near, '--illo-daisy-heart') &&
+    fill(head('daisy')[1]) === 'none' && fill(head('daisy')[0]) === probe(near, '--soil');
+}));
+ok('a still flower doesn\'t move', await page.evaluate(() => {
+  const f = document.querySelector('[data-kind="rose-red"]');
+  return getComputedStyle(f).animationName === 'none' && getComputedStyle(f.querySelector('svg')).animationName === 'none';
+}));
+await clickText('Grow again');
+await new Promise(r => setTimeout(r, 50));
+const growing = await page.evaluate(() => [...document.querySelector('[data-shot="kit-flower-row"]').children].map(f => ({
+  grow: getComputedStyle(f).animationName,
+  wait: parseFloat(getComputedStyle(f).animationDelay),
+  sway: getComputedStyle(f.querySelector('svg')).animationName
+})));
+ok('a growing row grows in one step after another, then sways',
+  growing.every(g => g.grow === 'luna-grow-in' && g.sway === 'luna-sway') && growing[0].wait < growing[1].wait && growing[1].wait < growing[2].wait,
+  growing.map(g => `${g.grow} ${g.wait}s ${g.sway}`).join(' | '));
+await page.evaluate(() => document.documentElement.setAttribute('data-reduced-motion', ''));
+await clickText('Grow again');
+await new Promise(r => setTimeout(r, 50));
+ok('reduced motion: the flowers are simply there, and don\'t sway', await page.evaluate(() => [...document.querySelector('[data-shot="kit-flower-row"]').children].every(f => {
+  const s = getComputedStyle(f);
+  return s.animationName === 'none' && getComputedStyle(f.querySelector('svg')).animationName === 'none' && s.opacity === '1' && s.transform === 'none';
+})));
+await page.evaluate(() => document.documentElement.removeAttribute('data-reduced-motion'));
+
+// the petals fall once, so drop them again and look while they're falling
+const petalsNow = () => page.evaluate(() => [...document.querySelectorAll('[data-shot="petals"]')].slice(0, 2).map(root => ({
+  count: root.children.length,
+  taps: getComputedStyle(root).pointerEvents,
+  z: getComputedStyle(root).zIndex,
+  fall: getComputedStyle(root.firstElementChild).animationName,
+  shown: [...root.children].filter(p => parseFloat(getComputedStyle(p).opacity) > 0.05).length,
+  colours: new Set([...root.children].map(p => getComputedStyle(p).backgroundColor)).size
+})));
+await clickText('Drop again');
+await new Promise(r => setTimeout(r, 600));
+const [now, late] = await petalsNow();
+ok('30 petals fall with the shared petal fall, in 7 colours', now.count === 30 && now.fall === 'luna-petal-fall' && now.colours === 7, JSON.stringify(now));
+ok('… they never take a tap, over the screen on --z-celebrate', now.taps === 'none' && now.z === '60');
+ok('… a won round\'s start at once; the done screen\'s wait for it to arrive', now.shown > 5 && late.shown === 0, `at once ${now.shown} shown, delayed ${late.shown}`);
+await new Promise(r => setTimeout(r, 1400));
+const [, lateNow] = await petalsNow();
+ok('… then the done screen\'s fall too', lateNow.shown > 5, `${lateNow.shown} shown`);
+await page.evaluate(() => document.documentElement.setAttribute('data-reduced-motion', ''));
+await clickText('Drop again');
+await new Promise(r => setTimeout(r, 600));
+const rmPetals = await petalsNow();
+ok('reduced motion: no petals at all', rmPetals.every(p => p.shown === 0 && p.fall === 'none'), JSON.stringify(rmPetals.map(p => p.shown)));
+await page.evaluate(() => document.documentElement.removeAttribute('data-reduced-motion'));
 
 await browser.close();
 console.log(results.every(Boolean) ? '\nALL PASS' : '\nSOME FAILED');

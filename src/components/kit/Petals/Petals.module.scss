@@ -1,0 +1,48 @@
+// Petals (DES-11): component tokens first; the colours swap only these. Every
+// colour is from the illustration palette (_illustration.scss). Under reduced
+// motion the fall is off (the roles), and a petal that doesn't fall never
+// shows: it starts see-through.
+
+.root {
+  position: absolute;
+  inset: 0;
+  z-index: var(--z-celebrate);
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.petal {
+  --petal-colour: var(--illo-petal-cream);
+  --petal-edge: transparent;
+  --petal-size: calc(var(--space-2) + var(--space-1) * var(--petal-step, 0));
+
+  position: absolute;
+  top: 0;
+  left: var(--petal-x, 50%);
+  width: var(--petal-size);
+  height: calc(var(--petal-size) * 1.35);
+  // the board's petal: two round corners, two points
+  border-radius: 80% 0;
+  background: var(--petal-colour);
+  box-shadow: inset 0 0 0 var(--border-hair) var(--petal-edge);
+  opacity: 0;
+  animation: var(--motion-petal-fall);
+  animation-duration: calc(var(--dur-petals) * var(--petal-pace, 1));
+  animation-delay: calc(var(--dur-celebrate) * var(--petal-wait, 0));
+}
+
+// the mirror way: the same drift, flipped left for right
+.petal[data-turn='b'] { scale: -1 1; }
+
+.root[data-state~='delayed'] .petal {
+  animation-delay: calc(var(--dur-enter) * 2 + var(--dur-celebrate) * var(--petal-wait, 0));
+}
+
+// the pale two get a thin edge, so they show on a cream card
+.petal[data-colour='cream'] { --petal-edge: var(--illo-petal-edge); }
+.petal[data-colour='blush'] { --petal-colour: var(--illo-petal-blush); }
+.petal[data-colour='red'] { --petal-colour: var(--illo-petal-red); }
+.petal[data-colour='latte'] { --petal-colour: var(--illo-petal-latte); }
+.petal[data-colour='ivory'] { --petal-colour: var(--illo-petal-ivory); --petal-edge: var(--illo-petal-edge); }
+.petal[data-colour='pink'] { --petal-colour: var(--illo-petal-pink); }
+.petal[data-colour='caramel'] { --petal-colour: var(--illo-petal-caramel); }

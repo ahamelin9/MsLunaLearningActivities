@@ -71,6 +71,13 @@ them in.
 Story · P1 · S · needs: —
 - **How:** use the same right glow, wrong wobble, win veil and "revealed" style (for FB-2) in every game and lesson, through `Choice` and the shell's flash. Game pieces that aren't Choices (bubbles, cookies, bugs, memory cards, word tiles) use the same state roles, `data-state` and motion. The games and lessons adopt it in DES-22b, DES-22c and DES-23.
   - **A win grows flowers (Alex, 2026-10-09):** a solved round grows a few flowers up the sides of the stage, and petals fall instead of confetti, as on the round 2 Round board. The lesson-done screen uses the same petals. Flowers and petals never cover the answer choices or block the next tap. **Kept for now (Alex, 2026-10-10):** the teacher dropped flowers for progress (DES-13), not for wins; change this only if she asks.
+  - **Settled with Alex before building (2026-10-17):**
+    - **Timing:** the next round starts 1.75s after a win, but the board's petals take about 3s to fall. The petals keep falling into the start of the next round, never taking a tap; the flowers leave with the solved round. The win pause stays as it is.
+    - **The sparkle goes:** the shell's stand-in sparkle is removed. The board's star burst from the "?" cue moves to DES-22b.
+    - **Behind the pieces:** the flowers grow from the stage's bottom corners (a daisy, a rose and a daisy on each side, as on the board) behind the round's pieces, so they can never cover an answer.
+    - **Two kit pieces:** `Flower` (daisy, red rose, blush rose; grows in, then sways) and `Petals` (the fall), on the Kit page, in the colours already in `_illustration.scss`.
+    - **The done screen:** the same petals, starting 1.2s after it opens, as on the Done board.
+    - **Game pieces:** their states (wrong, right, revealed, faded) as a table of roles and motion in `components.md`; the games adopt it in DES-22b, DES-22c and DES-23.
 - **Complete when:**
   - the shell's flash, the win's flowers and petals, and Choice's states share one set of roles and motion;
   - the state roles for game pieces are documented in `components.md`;
@@ -143,6 +150,7 @@ Story · P1 · M · needs: DES-11
   - `engine/content.ts`'s colours go with these games.
   - **`games/shared`'s SpeakChip** (from DES-22a, Alex 2026-10-12) becomes the Round board's prompt pill (a speaker icon, 48px, on the soft accent) as a kit piece, which DES-22c and DES-23 reuse. Every SpeakChip (Letter Jar, Words Off the Page, Treasure Path, Story Corner) swaps to it, and SpeakChip is deleted.
   - **Touch targets (from DES-10):** every piece a child taps meets the target roles. On 2026-10-11, `layout-audit.mjs` found Letter Jar's smallest letters at 43–47px and its "Say it again" pill 39px tall; Bubble Sounds' overlapping bubbles are GAME-3's.
+  - **The star burst from the cue (moved from DES-11, Alex 2026-10-17):** on the Round board, five sparks fly out of the "?" cue as it's found (`--illo-spark-win-1`…`4`). It becomes the kit ListenCue's found moment, so every game and lesson with a "?" cue gets it; none under reduced motion.
 - **Complete when:**
   - in each of the 4 games, a right and a wrong answer look like they do everywhere else;
   - `.claude/skills/know-how/layout-audit.mjs` lists no "(stage)" line for these games at the four sizes and three grades, except Bubble Sounds' overlaps if GAME-3 isn't done;

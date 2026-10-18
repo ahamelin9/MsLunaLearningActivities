@@ -11,11 +11,13 @@
 //     tap on its line says the line again (a clip plays);
 //   - a wrong cookie turns the stage's edge the try-again colour, and from
 //     the second miss "Hear my clue" shows; a tap on it says the hint;
-//   - the right cookie turns the edge the right colour, pops the win
-//     sparkle (data-shot="win-veil") and takes "Hear my clue" away;
+//   - the right cookie turns the edge the right colour, grows the garden
+//     (six flowers, behind the pieces) and drops 30 petals, none taking a
+//     tap and no sparkle left (DES-11), and takes "Hear my clue" away; in
+//     the next round the garden has gone and the petals are still falling;
 //   - played to the end, a game's done screen (DES-22d) says "All done!",
 //     has no lessons bar, offers "Another game", and its header is the
-//     game's name alone;
+//     game's name alone; once it has arrived, petals fall over it (DES-11);
 //   - nothing falls back to the browser voice.
 // Lines are matched by what was said (clip labels stick; know-how), and
 // clips are counted.
@@ -179,19 +181,42 @@ for (let tries = 0; tries < 12 && !won; tries++) {
     await wait(400);
     const f = await page.evaluate(() => window.__flashes.at(-1));
     if (f?.v === 'win') {
-      won = {
-        edge: f.edge,
-        veil: await page.$(at('win-veil')).then(Boolean),
-        clue: await page.evaluate(() => [...document.querySelectorAll('button')].some(b => b.textContent.trim() === 'Hear my clue'))
-      };
+      won = await page.evaluate(() => {
+        const stage = document.querySelector('[data-shot="stage"]');
+        const garden = stage.querySelector('[data-shot="win-garden"]');
+        const petals = document.querySelector('[data-shot="shell-play"] [data-shot="petals"]');
+        return {
+          garden: garden ? garden.querySelectorAll('svg').length : 0,
+          behind: garden ? getComputedStyle(garden).zIndex === '-1' && getComputedStyle(garden).pointerEvents === 'none' : false,
+          petals: petals ? petals.children.length : 0,
+          petalTaps: petals ? getComputedStyle(petals).pointerEvents : null,
+          sparkle: Boolean(document.querySelector('[data-shot="win-veil"]')),
+          clue: [...document.querySelectorAll('button')].some(b => b.textContent.trim() === 'Hear my clue')
+        };
+      });
+      won.edge = f.edge;
+      // the next round starts 1.75s after the win; the petals fall on into it
+      await wait(1600);
+      Object.assign(won, await page.evaluate(() => {
+        const petals = document.querySelector('[data-shot="shell-play"] [data-shot="petals"]');
+        // still on screen and showing (a finished petal rests below the bottom edge)
+        const bottom = petals?.getBoundingClientRect().bottom ?? 0;
+        return {
+          next: document.querySelector('[data-shot="stage"]').getAttribute('data-flash') !== 'win',
+          gardenAfter: Boolean(document.querySelector('[data-shot="win-garden"]')),
+          fallingAfter: petals ? [...petals.children].filter(p => parseFloat(getComputedStyle(p).opacity) > 0.05 && p.getBoundingClientRect().top < bottom).length : 0
+        };
+      }));
       break;
     }
     await wait(1500);
   }
 }
 ok('a win turns the stage\'s edge the right colour', won?.edge === right, `${won?.edge} vs ${right}`);
-ok('… and pops the win sparkle', Boolean(won?.veil));
+ok('… grows six flowers behind the pieces, never taking a tap (DES-11)', won?.garden === 6 && won.behind, `${won?.garden} flowers, behind: ${won?.behind}`);
+ok('… drops 30 petals that never take a tap, and no sparkle', won?.petals === 30 && won.petalTaps === 'none' && !won.sparkle, JSON.stringify({ petals: won?.petals, taps: won?.petalTaps, sparkle: won?.sparkle }));
 ok('… and "Hear my clue" goes once the round is won, as on the board', won?.clue === false);
+ok('in the next round the garden has gone, and the petals are still falling', won?.next && !won.gardenAfter && won.fallingAfter > 0, `next round: ${won?.next}, garden: ${won?.gardenAfter}, ${won?.fallingAfter} petals falling`);
 // play on to the done screen: every cookie in turn, round after round
 for (let tries = 0; tries < 40 && !(await page.$(at('shell-reward'))); tries++) {
   const cookies = await page.$$('[data-shot="stage"] button[aria-label^="letter"]');
@@ -213,6 +238,13 @@ const done = await page.evaluate(() => {
 });
 ok('a game\'s done screen: "All done!", no lessons bar, "Another game", the game\'s name in the header',
   done?.title === 'All done!' && !done.lessons && done.another && done.header === 'Feed Luna the Letter', JSON.stringify(done));
+await wait(800);
+const donePetals = await page.evaluate(() => {
+  const p = document.querySelector('[data-shot="shell-reward"] [data-shot="petals"]');
+  const bottom = p?.getBoundingClientRect().bottom ?? 0;
+  return p ? [...p.children].filter(x => parseFloat(getComputedStyle(x).opacity) > 0.05 && x.getBoundingClientRect().top < bottom).length : -1;
+});
+ok('… and once it has arrived, petals drift down over it (DES-11)', donePetals > 0, `${donePetals} falling`);
 ok('nothing fell back to the browser voice', (await page.evaluate(() => window.__browserSpoke.length)) === 0);
 
 await browser.close();

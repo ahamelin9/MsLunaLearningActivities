@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import type { AnyGameDef } from '../types';
 import type { Sticker } from '../stickers';
 import { soundManager } from '@/utils/audio';
-import { Chip, ChunkyButton, Icon, Luna, PaperCard, ProgressBar, StarRow } from '@/components/kit';
+import { Chip, ChunkyButton, Icon, Luna, PaperCard, Petals, ProgressBar, StarRow } from '@/components/kit';
 import styles from './DoneScreen.module.scss';
 
 /** A finished lesson's place on the path, as the result is saved. */
@@ -34,8 +34,9 @@ interface DoneScreenProps {
  * board, from the kit. On the left, the "Lesson done!" mark (tap it to see it
  * pop again), the stars and Luna cheering in the corner; on the right, a
  * lesson's bar moving on and the lesson it opened, the reward (today's
- * sticker, until PRG-5's squishies) and what next. The times (PRG-6) and
- * "See my shelf" (PRG-5) come with their tickets; the petals with DES-11.
+ * sticker, until PRG-5's squishies) and what next. Petals drift down once it
+ * has arrived, as after a won round (DES-11). The times (PRG-6) and "See my
+ * shelf" (PRG-5) come with their tickets.
  * GameShell saves the result and has Luna say her line; the header is the
  * shell's.
  */
@@ -135,6 +136,10 @@ export const DoneScreen: React.FC<DoneScreenProps> = ({
           </div>
         </div>
       </PaperCard>
+
+      {/* as on the Done board: the same petals as a won round, once the
+          screen has arrived; they never take a tap */}
+      <Petals delayed />
     </div>
   );
 };

@@ -10,7 +10,7 @@ import { soundManager } from '@/utils/audio';
 import { pronunciation, type SpeechPart } from '@/utils/pronunciation';
 import { warmGameIntro } from '../warmup';
 import { storageService } from '@/utils/storage';
-import { ChunkyButton, Icon, Luna, SpeechBubble } from '@/components/kit';
+import { ChunkyButton, Flower, Luna, Petals, SpeechBubble } from '@/components/kit';
 import { AppHeader } from '@/components/os/AppHeader/AppHeader';
 import { GAME_TINTS, GamePicture } from '../../games/shared/GamePicture/GamePicture';
 import { DoneScreen, type LessonPath } from '../DoneScreen/DoneScreen';
@@ -77,6 +77,9 @@ export const GameShell: React.FC<GameShellProps> = ({
   const [bubble, setBubble] = useState<string>(game.mission);
   const [mood, setMood] = useState<LunaMood>('happy');
   const [winStreak, setWinStreak] = useState(0);
+  // counts this play's wins, so each one drops a fresh fall of petals that
+  // keeps falling into the next round (DES-11)
+  const [petalFalls, setPetalFalls] = useState(0);
 
   const [rounds, setRounds] = useState<unknown[]>(() =>
     game.makeRounds({ grade, difficulty: startDifficulty, count: game.roundsPerPlay })
@@ -141,6 +144,7 @@ export const GameShell: React.FC<GameShellProps> = ({
     setRoundsWon(0);
     setDoneBefore(progress.completedLessons);
     setWinStreak(0);
+    setPetalFalls(0);
     wonRef.current = 0;
     cleanRef.current = 0;
     recorded.current = false;
@@ -173,6 +177,7 @@ export const GameShell: React.FC<GameShellProps> = ({
   const handleWin = useCallback(
     (opts?: { lunaLine?: string; delay?: number }) => {
       setFlash('win');
+      setPetalFalls(n => n + 1);
       soundManager.playCorrect();
       wonRef.current += 1;
       setRoundsWon(wonRef.current);
@@ -353,18 +358,27 @@ export const GameShell: React.FC<GameShellProps> = ({
             data-flash={flash ?? undefined}
             data-shot="stage"
           >
-            <div className={styles.inside}>
-              {round !== undefined && <PlayComponent key={roundIndex} round={round} api={api} />}
-            </div>
-
             {flash === 'win' && (
-              // the round is won: a sparkle pops (DES-11 brings the flowers and petals)
-              <span className={styles.winVeil} data-shot="win-veil" aria-hidden="true">
-                <span className={styles.winSpark}>
-                  <Icon name="sparkle" size={40} filled />
+              // the round is won: a little garden grows up both sides of the
+              // stage, as on the Round board, behind the round's pieces so it
+              // never covers an answer (DES-11). It leaves with the round.
+              <span className={styles.garden} data-shot="win-garden" aria-hidden="true">
+                <span className={styles.bed}>
+                  <Flower kind="daisy" grow step={0} />
+                  <Flower kind="rose-red" size="large" grow step={2} />
+                  <Flower kind="daisy" size="small" grow step={4} />
+                </span>
+                <span className={styles.bed}>
+                  <Flower kind="daisy" size="small" grow step={3} />
+                  <Flower kind="rose-blush" size="large" grow step={1} />
+                  <Flower kind="daisy" grow step={5} />
                 </span>
               </span>
             )}
+
+            <div className={styles.inside}>
+              {round !== undefined && <PlayComponent key={roundIndex} round={round} api={api} />}
+            </div>
           </div>
         ) : (
           // the start screen: no board, built from the kit (DES-22a)
@@ -430,6 +444,10 @@ export const GameShell: React.FC<GameShellProps> = ({
             {bubble}
           </SpeechBubble>
         </div>
+
+        {/* each win's petals drift down over the stage and the perch, and
+            keep falling into the next round; they never take a tap (DES-11) */}
+        {inPlay && petalFalls > 0 && <Petals key={petalFalls} />}
       </div>
     </>
   );

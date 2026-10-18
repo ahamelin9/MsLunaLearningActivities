@@ -6,6 +6,8 @@
 @use 'styles/mixins' as *;
 
 .screen {
+  // the petals fill it (DES-11)
+  position: relative;
   flex: 1;
   display: flex;
   // it fills what's left under the app's header (AppHeader, DES-8)

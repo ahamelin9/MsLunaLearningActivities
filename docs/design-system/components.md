@@ -37,7 +37,7 @@ list. Restyling the app means changing these, not every screen. The Kit page
 | `PaperCard` | The card surface | flat, card, lifted; reward (the done screen's panel for a new reward: flat, a thick dashed accent border, as on the Done board) | DES-7a (done), reward DES-22d |
 | `Chip` | A small pill: tag, count or time | time ("about 5 min"), took ("took 4 min"), accent ("Up next", "12 min today"), count (stars), rare and super-rare (a squishy's colour tag, with `shimmer`); `ground="well"` for a chip on a well. `TimeChip` is a preset: `minutes`, `took`, `highlight` | DES-7a (done), rarity tags DES-7c |
 | `Tile` | A card with a picture area and a name | the Play Shelf's games; picture tints 1–5; pressed; picked (`aria-pressed`: the picked one in a pick-one set takes the action look, its picture keeping its tint and ink; Grade Select, DES-9c) | DES-7a (done), picked DES-9c |
-| `Modal` | A lifted card over a dimmed screen, with a 48px close button | grown-up screens (Settings, trophies); open, closed. The one kit root with its own position (fixed); not in a portal, so it keeps its screen's mode | DES-7a (done) |
+| `Modal` | A lifted card over a dimmed screen, with a 48px close button | grown-up screens (Settings, trophies); open, closed. A kit root with its own position (fixed), like `Petals`; not in a portal, so it keeps its screen's mode | DES-7a (done) |
 | `Choice` | **The only answer button** | letter, word, picture × idle, pressed, wrong, right, revealed, faded/disabled. Controlled: the screen sets `state` and clears `wrong` with `afterMotion('emphasis', …)`. A picture's `caption` is passed only once solved | DES-7b (done) |
 | `ListenCue` | The "?" arch that holds the target's place | waiting (a slow glow), tapped (the glow once, as a ripple), found; a letter or a word. It renders its `answer` only when found | DES-7b (done) |
 | `SpeechBubble` | Luna's line in a card with a tail | tail left or bottom; optional "Hear my clue" button (`onClue`); no tail, for a perch with no owl (a game with its own Luna), its line then a 48px button that says it again (`onLine`) | DES-7b (done), no tail DES-22a |
@@ -47,6 +47,8 @@ list. Restyling the app means changing these, not every screen. The Kit page
 | `Squishy` | A collectible squishy | ball, cat, bunny, bear, butter block, peach, cloud, little moon; oat, caramel, toffee, cream (usual), blush, butter (rare, a sparkle), honey (super rare, a gold sparkle); sizes 64, 96, 128; squishes on tap; ghost (its shape, greyed) and "?" slot wobble; `SquishyDots` for the colours found and still to find. Its colours come only from `_illustration.scss` | DES-7c (done) |
 | `Switch` | An on/off setting for grown-ups: a 48px target with a sliding knob | off, on (the action colour), disabled; `role="switch"`, named by `label`. Settings' sound effects, Ms. Luna's voice and Less Motion | DES-9b (done) |
 | `Luna` | Ms. Luna, the owl the teacher picked (round 2, owl 1) | 8 moods (idle, happy, cheer, think, oops, surprise, listen, sleepy), each a pose of one drawing; blinks in idle, happy, think and listen; talking follows the voice by itself (her beak moves only while a clip plays; `talking={false}` keeps her quiet while someone else speaks); `float` for screens where nothing is being played; any `size`; tappable with `onClick`. Her colours come only from `--illo-luna-*` | DES-15 (done) |
+| `Flower` | A flower in its mound of soil: the garden a won round grows (never progress) | daisy, red rose, blush rose; small, medium, large (56, 64, 84px wide); still, or `grow` (the shared grow-in on its `step`, a little after the step before, then the shared sway). Its colours come only from `_illustration.scss`; the soil is `--soil` | DES-11 |
+| `Petals` | Petals drifting down instead of confetti | at once (a won round) or `delayed` (the done screen, once it has arrived); `count` (30). Each falls once; mount it again with a new `key` to drop them again. It fills its nearest positioned parent on `--z-celebrate` and places itself, as the Modal does; it never takes a tap. None under reduced motion | DES-11 |
 | `MilestoneMoon` | The crescent moon with glasses who visits for big milestones | happy, cheer, talking | DES-17 |
 
 ## One answer language
@@ -66,7 +68,31 @@ in every game and lesson (DES-11).
 **Game pieces aren't Choices** (bubbles, cookies, bugs, memory cards, word
 tiles): their shape is the game. They live in their game's folder but use the
 same `data-state` values, the same state roles and the same motion, so right
-and wrong still look alike everywhere.
+and wrong still look alike everywhere (DES-11; the games take them on in
+DES-22b, DES-22c and DES-23):
+
+| `data-state` | Roles | Motion |
+|---|---|---|
+| `wrong` | fill `--try-again-soft`, edge `--try-again-edge` | `--motion-wobble`; the screen clears the state with `afterMotion('emphasis', …)` |
+| `right` | fill `--right`, ink `--right-ink`, edge `--right`, ledge `--right-edge`, plus `--glow-ring` | `--motion-pop` |
+| `revealed` | fill `--accent-soft`, a dashed `--accent-edge` edge; still tappable | none |
+| `faded` | the piece at 0.4 opacity; it can't be tapped | none |
+
+A piece with no fill of its own (a bubble, a cookie) takes the edge, ledge,
+glow and motion, and keeps its drawn colours.
+
+**The stage speaks the same language** (GameShell, `data-flash`): a miss turns
+its edge `--try-again-edge`, a win `--right` with the `--right-edge` ledge and
+`--glow-ring`, as a wrong and a right Choice do.
+
+**A won round** (DES-11): the answer pops, the stage's edge turns right, and a
+little garden grows from the stage's bottom corners, as on the Round board: a
+daisy, a rose and a daisy on each side (`Flower`, one `step` apart, then
+swaying). It grows behind the round's pieces, so it never covers an answer,
+and it leaves with the round. `Petals` drift down over the stage and the
+perch and keep falling into the next round's first second. The done screen
+drops the same petals once it has arrived. None of it takes a tap; under
+reduced motion the flowers are simply there and no petals fall.
 
 ## Luna on screen
 

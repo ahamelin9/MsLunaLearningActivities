@@ -30,7 +30,8 @@
 //    sound. Network speed and machine load can't change a frame.
 //  - CSS animations stand still on the browser's clock. Before each shot,
 //    endless ones are held at their start and the rest are finished, then two
-//    real frames are painted. The confetti canvas never draws.
+//    real frames are painted. The done screen's petals (DES-11) fall once,
+//    so every shot has them finished, below the screen's edge.
 //  - --diff exits 1 when any screen differs, so it can gate a refactor.
 //  - everything is found by `data-shot="…"` attributes, never by a class
 //    name, so moving styles into CSS modules can't break the run.
@@ -309,9 +310,6 @@ function installPageClock({ start, seed }) {
       realSetTimeout(done, 1000); // in case a frame never comes
       realFrame(() => realFrame(done));
     });
-
-  // the confetti canvas never draws: its 120 pieces would differ frame to frame
-  HTMLCanvasElement.prototype.getContext = () => null;
 
   window.__pageClock = { advance, quiet, painted };
 }

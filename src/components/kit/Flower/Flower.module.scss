@@ -1,0 +1,94 @@
+// Flower (DES-11): component tokens first; the kinds and sizes swap only
+// these. Every colour is from the illustration palette (_illustration.scss),
+// except the soil, which is the interface's ground.
+
+.root {
+  --flower-size: var(--space-16);
+  --flower-motion: none;
+  // a row grows one after another, a step apart (the Round board's stagger)
+  --flower-wait: calc(var(--dur-quick) + var(--dur-tap) * 0.5 * var(--flower-step, 0));
+  --flower-bloom: var(--illo-rose-red);
+  --flower-bloom-deep: var(--illo-rose-red-deep);
+  --flower-bloom-front: var(--illo-rose-red-front);
+
+  display: inline-block;
+  flex: none;
+  width: var(--flower-size);
+  transform-origin: 50% 100%;
+  animation: var(--flower-motion);
+  animation-delay: var(--flower-wait);
+  pointer-events: none;
+}
+
+.root[data-size='small'] { --flower-size: calc(var(--space-16) - var(--space-2)); }
+.root[data-size='large'] { --flower-size: calc(var(--space-16) + var(--space-5)); }
+
+.root[data-kind='rose-blush'] {
+  --flower-bloom: var(--illo-rose-blush);
+  --flower-bloom-deep: var(--illo-rose-blush-deep);
+  --flower-bloom-front: var(--illo-rose-blush-front);
+}
+
+// ── the drawing (60 × 70) ──────────────────────────────────────────────────
+.drawing {
+  display: block;
+  width: var(--flower-size);
+  height: calc(var(--flower-size) * 7 / 6);
+  overflow: visible;
+  transform-origin: 50% 100%;
+}
+
+.soil { fill: var(--soil); }
+
+.stem {
+  fill: none;
+  stroke: var(--illo-stem);
+  stroke-width: 3;
+  stroke-linecap: round;
+}
+
+.leaf { fill: var(--illo-leaf); }
+
+.daisyPetal {
+  fill: var(--illo-daisy-petal);
+  stroke: var(--illo-daisy-petal-edge);
+  stroke-width: 1.5;
+}
+
+.daisyHeart {
+  fill: var(--illo-daisy-heart);
+  stroke: var(--illo-daisy-heart-edge);
+  stroke-width: 1.5;
+}
+
+.bloom {
+  fill: var(--flower-bloom);
+  stroke: var(--flower-bloom-deep);
+  stroke-width: 1.5;
+  stroke-linejoin: round;
+}
+
+.swirl {
+  fill: none;
+  stroke: var(--flower-bloom-deep);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+}
+
+.front {
+  fill: var(--flower-bloom-front);
+  stroke: var(--flower-bloom-deep);
+  stroke-width: 1.2;
+  stroke-linejoin: round;
+}
+
+// ── growing: it grows in on its step, then sways in the breeze ─────────────
+.root[data-state~='growing'] {
+  --flower-motion: var(--motion-grow-in);
+
+  .drawing {
+    animation: var(--motion-sway);
+    // as on the board: the breeze starts once the whole row has grown
+    animation-delay: calc(var(--dur-enter) * 2);
+  }
+}

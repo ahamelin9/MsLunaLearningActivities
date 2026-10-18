@@ -172,7 +172,8 @@ In code: `--target-answer`, `--target-chrome`, `--target-gap` and
 
 What the moments look like:
 - **A win:** the answer pops, Luna hops, flowers grow up the sides of the stage
-  and petals drift down. It never blocks the next tap.
+  and petals drift down, falling on into the next round's first second
+  (DES-11; `components.md`, "A won round"). It never blocks the next tap.
 - **Wrong:** a small wobble and the soft try-again tint, which clears when the
   wobble ends. Never red.
 - **Rare things shimmer:** a light sweep and sparkles on rare tags and Pearl
@@ -207,8 +208,9 @@ What the moments look like:
   game's stage. It also lists those inside a stage, for the games' and
   lessons' own tickets.
 - **Stacking:** the z roles, lowest first: `--z-ground`, `--z-raised`,
-  `--z-float`, `--z-header`, `--z-celebrate` (petals and the win veil, which
-  never take taps) and `--z-modal`.
+  `--z-float`, `--z-header`, `--z-celebrate` (the petals, which never take
+  taps) and `--z-modal`. A won round's garden sits behind the stage's pieces
+  instead, so it never covers an answer.
 - **Chrome:** one 64px header inside an app, `components/os/AppHeader`
   (DES-8). It stays at the top while the screen under it scrolls. Inside an
   app there's no status bar and no home-indicator strip; the home screen keeps
