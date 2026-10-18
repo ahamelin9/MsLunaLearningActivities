@@ -12,7 +12,7 @@ import {
 } from '../../engine/content';
 import { pickWrong, textChoice } from '../../engine/distractors';
 import { pronunciation, type SpeechPart } from '@/utils/pronunciation';
-import { SpeakChip } from '../shared/SpeakChip/SpeakChip';
+import { ChunkyButton } from '@/components/kit';
 import { GameSurface } from '../shared/GameSurface/GameSurface';
 import { cx, dataState } from '@/utils/cx';
 import styles from './TreasureRead.module.scss';
@@ -161,13 +161,15 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
           </p>
         )}
 
-        <SpeakChip
+        <ChunkyButton
+          variant="prompt"
+          icon="speaker"
           onClick={readToMe}
           disabled={!readAlong && !tried}
           title={readAlong || tried ? 'Hear the story' : 'Try it first!'}
         >
-          🔊 Read it to me
-        </SpeakChip>
+          Read it to me
+        </ChunkyButton>
       </div>
 
       <div className={styles.treasureOptions} data-state={round.kind === 'truefalse' ? 'binary' : undefined}>

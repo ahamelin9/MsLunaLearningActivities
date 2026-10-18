@@ -1,6 +1,6 @@
 // ListenCue on the Kit page (DES-7b): waiting, tapped (held) and found, for a
 // letter and a word, and one to tap: each tap ripples, and "Found it" shows
-// the answer.
+// the answer with its burst of sparks (DES-22b).
 
 import { useState } from 'react';
 import { Specimen, Specimens } from '@/dev/KitPage/Specimen';
@@ -29,6 +29,7 @@ export default function ListenCueKit() {
         <Specimen label="tapped"><ListenCue answer="M" data-state="tapped" /></Specimen>
         <Specimen label="found, a letter"><ListenCue state="found" answer="M" /></Specimen>
         <Specimen label="found, a word"><ListenCue state="found" kind="word" answer="ship" /></Specimen>
+        <Specimen label="waiting, a picture (DES-22b)"><ListenCue answer="c" picture="🐱" listenText="first letter?" /></Specimen>
       </Specimens>
       <TryIt />
     </>

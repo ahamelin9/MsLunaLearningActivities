@@ -30,6 +30,9 @@
   gap: var(--space-1);
   width: var(--cue-width);
   height: var(--cue-height);
+  // a longer line under the "?" wraps inside the arch (DES-22b)
+  padding-inline: var(--space-4);
+  text-align: center;
   border: var(--border-thick) var(--cue-border-style) var(--cue-border);
   border-radius: var(--cue-radius);
   background: var(--cue-bg);
@@ -46,6 +49,11 @@
 
 .mark {
   font: var(--text-cue);
+}
+
+// a word's picture in the "?"'s place, about as big (DES-22b)
+.picture {
+  font: var(--text-answer-letter);
 }
 
 .small {
@@ -69,6 +77,67 @@
   animation-duration: var(--dur-celebrate);
   animation-iteration-count: 1;
   animation-fill-mode: both;
+}
+
+// found: five sparks fly out from the arch, each its own way, as on the Round
+// board (DES-22b). Under reduced motion the burst is off, and a spark that
+// doesn't fly never shows: it starts see-through.
+.burst {
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+
+.spark {
+  --spark: var(--illo-spark-win-1);
+  --icon-fill: var(--spark);
+
+  grid-area: 1 / 1;
+  display: flex;
+  color: var(--spark);
+  opacity: 0;
+  animation: var(--motion-burst);
+}
+
+// the board's five ways out, its little stagger, and its colours
+.spark[data-n='1'] {
+  --burst-x: calc((var(--space-16) * 2 + var(--space-10)) * -1);
+  --burst-y: calc((var(--space-16) + var(--space-4)) * -1);
+  --burst-turn: 80deg;
+}
+
+.spark[data-n='2'] {
+  --spark: var(--illo-spark-win-2);
+  --burst-x: calc(var(--space-16) * 2 + var(--space-10));
+  --burst-y: calc((var(--space-16) + var(--space-8) + var(--space-1)) * -1);
+  --burst-turn: -80deg;
+
+  animation-delay: calc(var(--dur-tap) * 0.5);
+}
+
+.spark[data-n='3'] {
+  --spark: var(--illo-spark-win-3);
+  --burst-x: calc((var(--space-16) * 2 + var(--space-6)) * -1);
+  --burst-y: calc(var(--space-16) + var(--space-6));
+  --burst-turn: 60deg;
+
+  animation-delay: var(--dur-tap);
+}
+
+.spark[data-n='4'] {
+  --spark: var(--illo-spark-win-4);
+  --burst-x: calc(var(--space-16) * 2 + var(--space-8));
+  --burst-y: calc(var(--space-16) + var(--space-4));
+  --burst-turn: -60deg;
+
+  animation-delay: calc(var(--dur-tap) * 0.75);
+}
+
+.spark[data-n='5'] {
+  --burst-y: calc((var(--space-16) * 2 + var(--space-10)) * -1);
+  --burst-turn: 90deg;
+
+  animation-delay: calc(var(--dur-tap) * 0.25);
 }
 
 // found: the answer in the right colours, with the shared pop

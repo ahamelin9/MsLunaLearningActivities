@@ -294,7 +294,7 @@ Pitfalls that cost time:
   mounts, so after a game a tap says that visit's line, not the one said
   from home. Tap her straight after the greeting to test "says it again".
 
-## Does the perch work? (Luna's line, the clue, the flash)
+## Does the perch work? (Luna's line, the clue, the flash, the win)
 
 *2026-10-12 · DES-22a*
 
@@ -317,6 +317,20 @@ Pitfalls that cost time:
   nobody had touched. Give a new tappable thing its own label (the bubble's
   is "Hear Ms. Luna again"), and when an untouched check fails, look for a
   new element its selector now also matches.
+- **A won round (DES-11, 2026-10-17):** the same check also wins a round and
+  looks for the garden (six flowers, `data-shot="win-garden"`, behind the
+  pieces on z-index -1), 30 petals (`data-shot="petals"`) that never take a
+  tap, no sparkle, the garden gone and petals still falling once the next
+  round starts, and petals over the done screen. ui:shots never wins a round,
+  so for review shots of the win use `win-shot.mjs` next to this file: it
+  plays Feed Luna to a win and shoots 350, 900, 1500 and 2300ms after it
+  (`DONE=1` adds the done screen); the flowers have all grown by about 1.2s.
+- **Pitfall, a finished petal still "shows":** a petal's fall ends at 0.6
+  opacity just below the bottom edge (`forwards`), so "opacity > 0" counted
+  all 30 as still falling 2s after the win. Count only petals whose top is
+  still above the layer's bottom. For the same reason ui:shots, which finishes
+  every one-shot animation before a shot, never shows the done screen's
+  petals.
 
 ## Do lessons open in order?
 

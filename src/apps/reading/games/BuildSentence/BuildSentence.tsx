@@ -4,7 +4,7 @@ import { pick, sentencesFor, shuffle, tierFor, type SentenceItem } from '../../e
 import { pickWrong, textChoice } from '../../engine/distractors';
 import { soundManager } from '@/utils/audio';
 import { pronunciation } from '@/utils/pronunciation';
-import { SpeakChip } from '../shared/SpeakChip/SpeakChip';
+import { ChunkyButton } from '@/components/kit';
 import { GameSurface } from '../shared/GameSurface/GameSurface';
 import { dataState } from '@/utils/cx';
 import styles from './BuildSentence.module.scss';
@@ -132,13 +132,15 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
     <GameSurface className={styles.sentence}>
       <div className={styles.sentenceScene}>
         <span className={styles.sceneEmoji}>{round.sentence.emoji}</span>
-        <SpeakChip
+        <ChunkyButton
+          variant="prompt"
+          icon="speaker"
           onClick={() => pronunciation.speakSentence(round.sentence.text)}
           disabled={!solved && api.hintLevel < 1}
           title={api.hintLevel < 1 ? 'Try it first!' : 'Hear the sentence'}
         >
-          🔊 Hear the whole sentence
-        </SpeakChip>
+          Hear the whole sentence
+        </ChunkyButton>
       </div>
 
       <div className={styles.sentenceTrack} data-state={dataState(shakeSlot ? 'shaking' : false, solved ? 'solved' : false)}>

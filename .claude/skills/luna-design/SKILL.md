@@ -169,7 +169,9 @@ changed screens.
   DES-15). Her moods and blink are in `kit-check.mjs`. Her library greeting,
   the header's grade button and her mute: `greeting-check.mjs` (DES-21).
   The game's perch (her line, a no-tail bubble, "Hear my clue") and the
-  stage's flash: `perch-check.mjs` (DES-22a).
+  stage's flash: `perch-check.mjs` (DES-22a), which also checks a won
+  round's garden and petals (DES-11). Review shots of a win:
+  `win-shot.mjs` next to it.
 - Does a screen fit? `node .claude/skills/know-how/layout-audit.mjs 5199 <grade 0|1|2>`
   (Vite on 5199): nothing scrolls or is cut off mid-round, and no tap target
   outside a game's stage is small, overlapping or in the edge band (DES-10).

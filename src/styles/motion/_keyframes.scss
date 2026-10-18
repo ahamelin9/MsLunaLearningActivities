@@ -71,6 +71,14 @@
   100% { transform: translate(var(--space-1), 107vh) rotate(340deg); opacity: 0.6; }
 }
 
+// sparks flying out of a found "?" (DES-22b, as on the Round board); each spark
+// sets its own way and turn with --burst-x, --burst-y and --burst-turn
+@keyframes luna-burst {
+  0% { transform: translate(0, 0) scale(0.2); opacity: 0; }
+  30% { opacity: 1; }
+  100% { transform: translate(var(--burst-x, 0), var(--burst-y, 0)) scale(1.1) rotate(var(--burst-turn, 0deg)); opacity: 0; }
+}
+
 // a flower or card growing in
 @keyframes luna-grow-in {
   0% { transform: scale(0.3, 0); opacity: 0; }

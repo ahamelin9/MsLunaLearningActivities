@@ -72,8 +72,8 @@ be pulled into Phase 1 for a break from styling.
 
 ### Now / Next
 
-- **Now:** DES-11: one right/wrong/reveal language; a win grows flowers and drops petals (on the round and the done screen), and the stand-in sparkle goes. Stage 7 (play) is under way: DES-22a (the start screen, stage and perch) is done (2026-10-12), and DES-22d (the done screen on the Done board) is done (2026-10-13). OPS-10 closed in part (2026-10-17): the Chrome helper, the board pictures and the cloud groundwork landed, and the rest is parked as OPS-11
-- **Next:** the rest of Stage 7: DES-22b, DES-22c → DES-23. OPS-11 (a first cloud session) waits until Alex wants to work away from the Mac. PRG-8 (pick up a lesson where you left off) was split from DES-13 and needs nothing. SET-1 (the grown-up gate) no longer waits on anything. OPS-9 (know-how checks onto `data-shot`) can start any time: the checks lost their last class names with DES-18d. SET-1 is pulled in where DES-16 needs it. FB-1 (Phase 2) no longer waits on the layout; GAME-1c, Treasure Path's screen, waits on it
+- **Now:** DES-22b: games on the kit, part 1 (Letter Jar, Bubble Sounds, Letter Cookies, Muddled Cards), with the cue's star burst moved from DES-11. Stage 7 (play) is under way: DES-22a (the start screen, stage and perch, 2026-10-12), DES-22d (the done screen, 2026-10-13) and DES-11 (a won round's garden and petals, one answer language, 2026-10-17) are done. OPS-10 closed in part (2026-10-17): the Chrome helper, the board pictures and the cloud groundwork landed, and the rest is parked as OPS-11
+- **Next:** the rest of Stage 7: DES-22c → DES-23. OPS-11 (a first cloud session) waits until Alex wants to work away from the Mac. PRG-8 (pick up a lesson where you left off) was split from DES-13 and needs nothing. SET-1 (the grown-up gate) no longer waits on anything. OPS-9 (know-how checks onto `data-shot`) can start any time: the checks lost their last class names with DES-18d. SET-1 is pulled in where DES-16 needs it. FB-1 (Phase 2) no longer waits on the layout; GAME-1c, Treasure Path's screen, waits on it
 
 ## Epics
 
@@ -97,8 +97,7 @@ In board order. A new epic gets its file in `epics/` first, then a link here
 | ID | Title | Type | P | Size | Status |
 |---|---|---|---|---|---|
 | **DES** | **Design system & layout** | Epic | **P0** | | |
-| DES-11 | One right/wrong/reveal visual language | Story | P1 | S | In progress |
-| DES-22b | Games on the kit, part 1: Letter Jar, Bubble Sounds, Letter Cookies, Muddled Cards | Story | P1 | M | Todo |
+| DES-22b | Games on the kit, part 1: Letter Jar, Bubble Sounds, Letter Cookies, Muddled Cards | Story | P1 | M | In progress |
 | DES-22c | Games on the kit, part 2: Words Off the Page, What's Missing?, Treasure Path, Story Corner | Story | P1 | M | Todo |
 | DES-23 | Lessons on the kit | Story | P1 | M | Todo |
 | DES-24 | Retire the legacy styles | Task | P1 | S | Todo |

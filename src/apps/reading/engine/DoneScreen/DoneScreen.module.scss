@@ -55,18 +55,28 @@
   }
 }
 
-// the arch behind the mark, as on the board: as tall as it's wide, a round
-// top over a square foot that ends by the title
-.arch {
-  position: absolute;
-  z-index: -1;
-  top: var(--space-10);
-  left: 50%;
-  width: calc(var(--space-16) * 4 + var(--space-8));
-  height: calc(var(--space-16) * 4 + var(--space-8));
-  transform: translateX(-50%);
-  border-radius: var(--radius-chip) var(--radius-chip) 0 0;
-  background: var(--edge);
+// the mark and the title on the arch, as on the board: a round top over a
+// square foot that ends just under the title. The arch is drawn from the pair,
+// not a fixed height, so the foot never cuts through the title (a fixed one
+// ended 8px short of it)
+.crest {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-bottom: var(--space-2);
+
+  &::before {
+    content: '';
+    position: absolute;
+    z-index: -1;
+    inset: 0 auto;
+    left: 50%;
+    width: calc(var(--space-16) * 4 + var(--space-8));
+    transform: translateX(-50%);
+    border-radius: var(--radius-chip) var(--radius-chip) 0 0;
+    background: var(--edge);
+  }
 }
 
 // the mark is a picture that pops again when tapped, like a squishy

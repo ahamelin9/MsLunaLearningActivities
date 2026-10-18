@@ -1,151 +1,93 @@
-@use 'apps/reading/engine/world' as *;
+// Bubble Sounds on the kit (DES-22b): the prompt pill and the rounds bar, and
+// the water in the game's own tint with bubbles rising through it, as on its
+// Play Shelf picture. A bubble is a game piece in the one answer language
+// (components.md), at least the answer size. Its rising is the game, so it's
+// the one place reading moves (foundations.md); under reduced motion it slows.
 
-.sound-horn {
-  display: inline-flex;
+@use 'styles/mixins' as *;
+
+.header {
+  display: flex;
   align-items: center;
-  gap: 0.55rem;
-  padding: 0.5rem 1.1rem 0.5rem 0.7rem;
-  border-radius: 999px;
-  background: linear-gradient(135deg, #FFE2A8, #F0A22E);
-  border: 3px solid $amber-deep;
-  box-shadow: 0 4px 0 rgba(201, 123, 18, 0.5);
-  cursor: pointer;
-
-  .horn-icon { font-size: 1.6rem; animation: hornWiggle 2.6s ease-in-out infinite; }
-  .horn-sound { font-family: var(--font-read); font-size: 1.5rem; font-weight: 600; color: #4A2E10; }
-
-  &.small { padding: 0.35rem 0.9rem 0.35rem 0.55rem; .horn-icon { font-size: 1.2rem; } .horn-sound { font-size: 1.2rem; } }
-
-  &:active { transform: translateY(3px); box-shadow: 0 1px 0 rgba(201, 123, 18, 0.5); }
+  gap: var(--space-4);
 }
 
-@keyframes hornWiggle {
-  0%, 100% { transform: rotate(-6deg); }
-  50% { transform: rotate(8deg); }
+.tally {
+  width: calc(var(--space-16) * 2);
 }
 
-.bubbles {
-  .bubble-header {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-  }
+.tank {
+  position: relative;
+  flex: 1;
+  width: 100%;
+  min-height: calc(var(--space-16) * 4 + var(--space-6));
+  border: var(--border-regular) solid var(--edge);
+  border-radius: var(--radius-card);
+  background: var(--picture-2);
+  overflow: hidden;
+}
 
-  .bubble-tally {
-    display: flex;
-    gap: 0.3rem;
+// placed by the round as it rises; a bubble is round, never smaller than an answer
+.bubble {
+  position: absolute;
+  z-index: var(--z-raised);
+  display: grid;
+  place-items: center;
+  width: calc(var(--target-answer) * var(--size, 1));
+  height: calc(var(--target-answer) * var(--size, 1));
+  border: var(--border-thick) solid var(--action);
+  border-radius: var(--radius-chip);
+  background: var(--card);
+  transform: translate(-50%, -50%);
+  transition: opacity var(--dur-quick) var(--ease-exit);
 
-    .tally-dot {
-      width: 16px;
-      height: 16px;
-      border-radius: 50%;
-      border: 3px solid rgba(42, 126, 174, 0.6);
-      background: rgba(255, 255, 255, 0.5);
-      transition: all 0.3s ease;
-
-      &[data-state="lit"] {
-        background: #FFFFFF;
-        box-shadow: 0 0 10px rgba(255, 255, 255, 0.9);
-        transform: scale(1.15);
-      }
-    }
-  }
-
-  .bubble-tank {
-    position: relative;
-    flex: 1;
-    width: 100%;
-    min-height: 280px;
-    border-radius: 20px;
-    overflow: hidden;
-    background: linear-gradient(180deg, #CFEDFB 0%, #7FC6E8 70%, #4FA8D8 100%);
-    box-shadow: inset 0 0 0 3px rgba(42, 126, 174, 0.3);
-  }
-
-  .bubble {
-    position: absolute;
-    width: calc(66px * var(--size, 1));
-    height: calc(66px * var(--size, 1));
-    transform: translate(-50%, -50%);
-    border-radius: 50%;
-    border: 3px solid rgba(255, 255, 255, 0.85);
-    background: radial-gradient(circle at 32% 28%, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.35) 40%, rgba(127, 198, 232, 0.5));
-    display: grid;
-    place-items: center;
-    cursor: pointer;
-    box-shadow: 0 4px 10px rgba(42, 126, 174, 0.3);
-    animation: bubbleWobble 2.4s ease-in-out infinite;
-
-    .bubble-char {
-      font-family: var(--font-read);
-      font-size: calc(1.6rem * var(--size, 1));
-      font-weight: 600;
-      color: #10496B;
-      text-shadow: 0 1px 0 rgba(255, 255, 255, 0.8);
-    }
-
-    .bubble-shine {
-      position: absolute;
-      top: 14%;
-      left: 20%;
-      width: 26%;
-      height: 20%;
-      border-radius: 50%;
-      background: rgba(255, 255, 255, 0.9);
-    }
-
-    &:hover { filter: brightness(1.08); }
-    &[data-state="popped"] { animation: bubblePop 0.4s ease-out forwards; pointer-events: none; }
-  }
-
-  .bubble-splash {
-    position: absolute;
-    left: 50%;
-    top: 40%;
-    transform: translate(-50%, -50%);
-    font-size: 3rem;
-    animation: splashFade 0.45s ease-out forwards;
+  // a wrong one: the try-again edge and the shared wobble, and it's gone
+  &[data-state~='wrong'] {
+    border-color: var(--try-again-edge);
+    background: var(--try-again-soft);
+    opacity: 0;
+    animation: var(--motion-wobble);
     pointer-events: none;
-
-    &[data-state="ok"] { color: #FFE66D; }
   }
 
-  .tank-floor {
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    height: 54px;
-    display: flex;
-    align-items: flex-end;
-    justify-content: space-around;
-    font-size: 1.8rem;
-    background: linear-gradient(180deg, transparent, rgba(201, 160, 94, 0.7));
-    padding-bottom: 0.3rem;
+  // a right one: the right edge, the glow and the pop, and it's gone
+  &[data-state~='right'] {
+    border-color: var(--right);
+    box-shadow: var(--glow-ring);
+    opacity: 0;
+    animation: var(--motion-pop);
     pointer-events: none;
+  }
 
-    span:nth-child(1) { animation: swim 6s ease-in-out infinite; }
-    span:nth-child(3) { animation: swim 7.5s ease-in-out infinite reverse; }
+  &:focus-visible {
+    @include focus-ring;
   }
 }
 
-@keyframes bubbleWobble {
-  0%, 100% { margin-left: 0; }
-  50% { margin-left: 7px; }
+// the light catching it
+.shine {
+  position: absolute;
+  top: 14%;
+  left: 20%;
+  width: 26%;
+  height: 20%;
+  border-radius: var(--radius-chip);
+  background: var(--illo-shine);
+  opacity: 0.7;
 }
 
-@keyframes bubblePop {
-  0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
-  45% { transform: translate(-50%, -50%) scale(1.45); opacity: 0.8; }
-  100% { transform: translate(-50%, -50%) scale(0.2); opacity: 0; }
+.char {
+  position: relative;
+  color: var(--ink);
+  font: var(--text-answer-word);
 }
 
-@keyframes splashFade {
-  0% { transform: translate(-50%, -50%) scale(0.4); opacity: 1; }
-  100% { transform: translate(-50%, -140%) scale(1.6); opacity: 0; }
-}
-
-@keyframes swim {
-  0%, 100% { transform: translateX(0); }
-  50% { transform: translateX(28px) scaleX(-1); }
+// the sandy bottom, behind the bubbles
+.floor {
+  position: absolute;
+  inset: auto 0 0;
+  height: var(--space-8);
+  border-top: var(--border-regular) solid var(--edge);
+  background: var(--soil);
+  pointer-events: none;
 }

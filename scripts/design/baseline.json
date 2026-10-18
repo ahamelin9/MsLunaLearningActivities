@@ -1,15 +1,9 @@
 {
   "about": "Raw values each file may still have while the legacy styles go away (DES-19). It may only shrink: node scripts/design/check.mjs --update. DES-24 deletes it.",
-  "total": 818,
+  "total": 542,
   "files": {
     "src/apps/reading/engine/_world.scss": 74,
-    "src/apps/reading/engine/content.ts": 7,
-    "src/apps/reading/games/BubbleSounds/BubbleSounds.module.scss": 82,
     "src/apps/reading/games/BuildSentence/BuildSentence.module.scss": 66,
-    "src/apps/reading/games/FeedLuna/FeedLuna.module.scss": 69,
-    "src/apps/reading/games/LetterHunt/LetterHunt.module.scss": 75,
-    "src/apps/reading/games/MemoryMatch/MemoryMatch.module.scss": 35,
-    "src/apps/reading/games/shared/SpeakChip/SpeakChip.module.scss": 8,
     "src/apps/reading/games/StoryTime/StoryTime.module.scss": 53,
     "src/apps/reading/games/TreasureRead/TreasureRead.module.scss": 68,
     "src/apps/reading/games/WhatsMissing/WhatsMissing.module.scss": 57,

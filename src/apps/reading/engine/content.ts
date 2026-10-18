@@ -9,23 +9,6 @@ export type Difficulty = 1 | 2 | 3;
 
 export type CategoryId = 'animal' | 'food' | 'nature' | 'home' | 'clothes' | 'vehicle' | 'toy';
 
-export interface CategoryInfo {
-  id: CategoryId;
-  label: string;
-  emoji: string;
-  color: string;
-}
-
-export const CATEGORIES: CategoryInfo[] = [
-  { id: 'animal', label: 'Animals', emoji: '🐾', color: '#F97316' },
-  { id: 'food', label: 'Food', emoji: '🍴', color: '#EF4444' },
-  { id: 'nature', label: 'Outside', emoji: '🌳', color: '#16A34A' },
-  { id: 'home', label: 'In the House', emoji: '🏠', color: '#0EA5E9' },
-  { id: 'clothes', label: 'Clothes', emoji: '👕', color: '#A855F7' },
-  { id: 'vehicle', label: 'Things That Go', emoji: '🛞', color: '#0891B2' },
-  { id: 'toy', label: 'Toys', emoji: '🧸', color: '#DB2777' }
-];
-
 export interface WordItem {
   word: string;
   emoji: string;

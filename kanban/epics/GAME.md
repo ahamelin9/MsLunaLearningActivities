@@ -29,6 +29,7 @@ Story · P1 · S · needs: —
 - **Why:** bubbles move by a `setState` every 60ms, and they can overlap and hide the right bubble.
 - **How:** move the bubbles with CSS transforms or `requestAnimationFrame`, add simple spacing so they don't overlap, and keep a target visible at all times.
 - **Complete when:** bubbles move without a state update per frame, never overlap, and at least one target is always on screen. `.claude/skills/know-how/layout-audit.mjs` (DES-10) shows no "(stage) overlapping" line for Bubble Sounds at the four sizes; it showed some at every size on 2026-10-11.
+- **Also from the audit (DES-22b, 2026-10-17):** it lists bubbles as "(stage) cut off" while they're still rising into the water from below its edge. Decide here whether they start inside the water, or the audit leaves the ones still coming in alone.
 
 ### GAME-7 · Bubble Sounds: fewer answer bubbles, fewer still at higher grades
 Story · P1 · S

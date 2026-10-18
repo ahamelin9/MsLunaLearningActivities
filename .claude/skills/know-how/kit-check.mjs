@@ -19,6 +19,9 @@
 // then swaying (still under reduced motion); Petals falling (30, in 7
 // colours, never taking a tap), the delayed ones waiting, none under reduced
 // motion.
+// DES-22b: ChunkyButton's prompt pill (soft accent, round, 48px, flat,
+// faded while it waits); a found ListenCue's burst of five sparks (none
+// under reduced motion).
 // Start Vite on 5199 first, then from the repo root:
 //   node .claude/skills/know-how/kit-check.mjs
 // Exits 1 on any ❌.
@@ -470,6 +473,81 @@ await clickText('Drop again');
 await new Promise(r => setTimeout(r, 600));
 const rmPetals = await petalsNow();
 ok('reduced motion: no petals at all', rmPetals.every(p => p.shown === 0 && p.fall === 'none'), JSON.stringify(rmPetals.map(p => p.shown)));
+await page.evaluate(() => document.documentElement.removeAttribute('data-reduced-motion'));
+
+// ── a game's prompt pill (DES-22b): ChunkyButton's prompt variant ──
+const promptPill = () => page.evaluate(() => {
+  const all = [...document.querySelectorAll('[data-variant="prompt"]')];
+  const idle = all.find(b => !b.disabled && !b.dataset.state);
+  const off = all.find(b => b.disabled);
+  const probe = (near, v) => {
+    const p = document.createElement('span');
+    p.style.color = `var(${v})`;
+    near.parentElement.append(p);
+    const c = getComputedStyle(p).color;
+    p.remove();
+    return c;
+  };
+  const s = getComputedStyle(idle);
+  return {
+    bg: s.backgroundColor === probe(idle, '--accent-soft'),
+    round: parseFloat(s.borderTopLeftRadius) >= idle.offsetHeight / 2,
+    tall: idle.offsetHeight,
+    ledge: s.boxShadow,
+    speaker: Boolean(idle.querySelector('svg')),
+    font: s.fontSize,
+    faded: parseFloat(getComputedStyle(off).opacity) < 1
+  };
+});
+const pill = await promptPill();
+ok('the prompt pill: the soft accent, round ends, 48px, a speaker, the reading size', pill.bg && pill.round && pill.tall >= 48 && pill.speaker && pill.font === '22px', JSON.stringify(pill));
+ok('… flat, with no ledge', pill.ledge === 'none' || /0px 0px 0px/.test(pill.ledge), pill.ledge);
+ok('… and faded while it waits for a try', pill.faded);
+
+// ── a found ListenCue's burst (DES-22b) ──
+// the Try it row's cue (the first, in the light panel), which "Found it" finds
+const sparksNow = () => page.evaluate(() => {
+  const row = [...document.querySelectorAll('h4')].find(h => h.textContent.startsWith('Try it: tap the arch')).parentElement;
+  const burst = row.querySelector('[data-shot="cue-burst"]');
+  if (!burst) return { count: 0, anim: [], colours: false, shown: 0, taps: null };
+  const probe = v => {
+    const p = document.createElement('span');
+    p.style.color = `var(${v})`;
+    burst.append(p);
+    const c = getComputedStyle(p).color;
+    p.remove();
+    return c;
+  };
+  const sparks = [...burst.children];
+  const win = ['--illo-spark-win-1', '--illo-spark-win-2', '--illo-spark-win-3', '--illo-spark-win-4'].map(probe);
+  return {
+    count: sparks.length,
+    anim: sparks.map(s => getComputedStyle(s).animationName),
+    colours: sparks.every(s => win.includes(getComputedStyle(s).color)),
+    shown: sparks.filter(s => parseFloat(getComputedStyle(s).opacity) > 0.05).length,
+    taps: getComputedStyle(burst).pointerEvents
+  };
+});
+ok('only a found cue has a burst', await page.evaluate(() => {
+  const bursts = [...document.querySelectorAll('[data-shot="cue-burst"]')];
+  return bursts.length > 0 && bursts.every(b => (b.parentElement.dataset.state ?? '').split(' ').includes('found'));
+}));
+// a fresh find in the Try it row: back to waiting if an earlier check left it found
+const freshFind = () => page.evaluate(() => {
+  const row = [...document.querySelectorAll('h4')].find(h => h.textContent.startsWith('Try it: tap the arch')).parentElement;
+  const toggle = () => [...row.querySelectorAll('button')].find(b => ['Found it', 'Again'].includes(b.textContent.trim()));
+  if (toggle().textContent.trim() === 'Again') toggle().click();
+  return new Promise(r => requestAnimationFrame(() => { toggle().click(); r(); }));
+});
+await freshFind();
+await new Promise(r => setTimeout(r, 300));
+const sparks = await sparksNow();
+ok('found: five sparks burst out with the shared burst, in the win sparkle colours', sparks.count === 5 && sparks.anim.every(a => a === 'luna-burst') && sparks.colours && sparks.shown >= 3 && sparks.taps === 'none', JSON.stringify(sparks));
+await page.evaluate(() => document.documentElement.setAttribute('data-reduced-motion', ''));
+await freshFind();
+await new Promise(r => setTimeout(r, 300));
+const rmSparks = (await sparksNow()).shown;
+ok('reduced motion: no sparks', rmSparks === 0, `${rmSparks} shown`);
 await page.evaluate(() => document.documentElement.removeAttribute('data-reduced-motion'));
 
 await browser.close();

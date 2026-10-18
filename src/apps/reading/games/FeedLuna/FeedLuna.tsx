@@ -2,9 +2,10 @@ import React, { useEffect, useRef, useState } from 'react';
 import type { GameApi, GameDef } from '../../engine/types';
 import { lettersFor, pick, shuffle, tierFor, wordsUpTo, type LetterItem, type WordItem } from '../../engine/content';
 import { pickWrong, textChoice } from '../../engine/distractors';
-import { Luna } from '@/components/kit';
+import { Icon, ListenCue, Luna } from '@/components/kit';
 import { soundManager } from '@/utils/audio';
 import { pronunciation, type SpeechPart } from '@/utils/pronunciation';
+import { afterMotion } from '@/utils/motion';
 import { GameSurface } from '../shared/GameSurface/GameSurface';
 import { cx, dataState } from '@/utils/cx';
 import styles from './FeedLuna.module.scss';
@@ -149,8 +150,9 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
         { onEnd: cheer }
       );
     } else {
+      // a wrong cookie wobbles, and clears when its wobble ends (components.md)
       setSpat(char);
-      window.setTimeout(() => setSpat(null), 800);
+      afterMotion('emphasis', () => setSpat(null));
       api.miss({ hint: round.hint });
     }
   };
@@ -205,33 +207,29 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
       onPointerUp={onPointerUp}
       onPointerCancel={() => setDragging(null)}
     >
-      <div className={styles.feedTop}>
-        <div className={styles.feedLuna}>
+      <div className={styles.top}>
+        <div className={styles.luna}>
           <Luna mood={chewing ? 'cheer' : spat ? 'oops' : 'happy'} size={152} />
           <div ref={beakRef} className={styles.beakZone}
             data-state={dataState(dragging ? 'armed' : false, chewing ? 'chewing' : false)}>
-            <span aria-hidden="true">{chewing ? '😋' : 'drop here'}</span>
+            {chewing ? <Icon name="check" /> : <span aria-hidden="true">drop here</span>}
           </div>
         </div>
 
-        <button className={styles.feedSign} onClick={sayCue}>
-          <span className={styles.signKicker}>Luna wants…</span>
-          {round.cueEmoji ? (
-            <span className={styles.signPicture}>
-              <span className={styles.signEmoji}>{round.cueEmoji}</span>
-              <span className={styles.signHint}>{round.ask}</span>
-            </span>
-          ) : (
-            <>
-              <span className={styles.signChar} aria-hidden="true">?</span>
-              <span className={styles.signHint}>{round.ask}</span>
-            </>
-          )}
-          <span className={styles.signTap}>🔊 tap to hear</span>
-        </button>
+        {/* what she wants, heard and never shown: the kit's "?" (a word's
+            picture for "the first letter of…"), which shows the letter only
+            once she has eaten it */}
+        <ListenCue
+          state={eaten.includes(round.answer) ? 'found' : 'waiting'}
+          answer={round.answer}
+          picture={round.cueEmoji}
+          listenText={round.ask}
+          label="Hear what Luna wants"
+          onClick={sayCue}
+        />
       </div>
 
-      <div className={styles.cookieTray}>
+      <div className={styles.tray}>
         {round.options.map(char => {
           const isEaten = eaten.includes(char);
           const isSpat = spat === char;
@@ -240,7 +238,8 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
             <button
               key={char}
               className={styles.cookie}
-              data-state={dataState(isEaten ? 'eaten' : false, isSpat ? 'spat' : false, isDragged ? 'dragged' : false)}
+              // a game piece in the one answer language (components.md)
+              data-state={dataState(isEaten ? 'right' : false, isSpat ? 'wrong' : false, isDragged ? 'dragged' : false)}
               onPointerDown={e => onPointerDown(e, char)}
               onClick={() => {
                 // keyboard and assistive clicks never produce a drag
@@ -261,7 +260,7 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
         </span>
       )}
 
-      <p className={styles.feedNote}>Drag a cookie to Luna — or just tap it.</p>
+      <p className={styles.note}>Drag a cookie to Luna — or just tap it.</p>
     </GameSurface>
   );
 };

@@ -10,7 +10,7 @@ Story · P0 · M · needs: — · fixes BUG-1
 - **Complete when:** with clip logging on, every game's choice line plays in full before Luna reacts.
 
 ### FB-2 · "Show me" after repeated misses
-Story · P0 · S · needs: FB-1, DES-11
+Story · P0 · S · needs: FB-1
 - **Why:** `hintLevel` 2 exists but nothing uses it, and the `reveal` lines in `engine/luna.ts` are never said. A stuck kindergartner just hears the same hint on a loop.
 - **How:** games pass a `reveal()` callback. On the third miss the shell calls it: the answer glows and Luna says a reveal line. The round can then be finished but isn't counted as clean.
 - **Complete when:** every game and lesson reveals the answer on the third miss.

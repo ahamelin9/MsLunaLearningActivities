@@ -1,126 +1,155 @@
-@use 'apps/reading/engine/world' as *;
+// Letter Cookies (Feed Luna) on the kit (DES-22b): Luna and the spot under her
+// beak, the kit ListenCue for what she wants, and her cookies, a game piece in
+// the one answer language (components.md). A cookie keeps its drawn colours
+// (_illustration.scss) until DES-14 draws real, different ones.
+
+@use 'styles/mixins' as *;
 
 .feed {
+  gap: var(--space-6);
+}
+
+.top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
   justify-content: center;
-  gap: 1.6rem;
-  padding: 0.4rem 0;
-
-  .feed-top {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 2rem;
-    flex-wrap: wrap;
-  }
-
-  .feed-luna { position: relative; display: flex; flex-direction: column; align-items: center; }
-
-  .beak-zone {
-    margin-top: -0.6rem;
-    width: 118px;
-    padding: 0.35rem;
-    text-align: center;
-    border-radius: 14px;
-    border: 3px dashed rgba(122, 74, 36, 0.45);
-    background: rgba(255, 255, 255, 0.6);
-    font-size: 0.8rem;
-    color: $ink-soft;
-    transition: all 0.2s ease;
-
-    &[data-state~="armed"] {
-      border-color: $moss-deep;
-      background: rgba(74, 160, 90, 0.18);
-      transform: scale(1.08);
-    }
-
-    &[data-state~="chewing"] { border-style: solid; border-color: $moss; font-size: 1.6rem; }
-  }
-
-  .feed-sign {
-    @include paper-card(#FFFFFF);
-    padding: 0.7rem 1.2rem;
-    text-align: center;
-    cursor: pointer;
-    transform: rotate(-2deg);
-
-    .sign-kicker { display: block; font-size: 0.8rem; color: $ink-soft; }
-    .sign-char { display: block; font-size: 3.4rem; font-weight: 600; color: $plum-deep; line-height: 1.05; }
-    .sign-picture { display: block; }
-    .sign-emoji { display: block; font-size: 2.6rem; }
-    .sign-word { display: block; font-size: 1.2rem; font-weight: 600; }
-    .sign-hint { display: block; font-size: 0.75rem; color: $berry-deep; }
-    .sign-tap { display: block; font-size: 0.7rem; color: $ink-soft; margin-top: 0.2rem; }
-
-    &:active { transform: rotate(-2deg) scale(0.97); }
-  }
-
-  .cookie-tray {
-    display: flex;
-    gap: 0.9rem;
-    justify-content: center;
-    flex-wrap: wrap;
-    padding: 0.6rem 1rem;
-    border-radius: 20px 20px 8px 8px;
-    background: linear-gradient(180deg, rgba(169, 113, 63, 0.25), rgba(122, 74, 36, 0.4));
-    box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.35);
-  }
-
-  .cookie {
-    width: 78px;
-    height: 78px;
-    border-radius: 50%;
-    background: radial-gradient(circle at 34% 30%, #E8B978, #C98A45);
-    border: 3px solid #A9713F;
-    box-shadow: 0 5px 0 #8A5A2E, 0 8px 14px rgba(58, 42, 31, 0.3);
-    display: grid;
-    place-items: center;
-    cursor: grab;
-    touch-action: none;
-    position: relative;
-
-    &::after {
-      content: '';
-      position: absolute;
-      inset: 12px;
-      border-radius: 50%;
-      background:
-        radial-gradient(circle at 30% 40%, rgba(74, 46, 16, 0.55) 0 3px, transparent 4px),
-        radial-gradient(circle at 70% 62%, rgba(74, 46, 16, 0.45) 0 3px, transparent 4px);
-      pointer-events: none;
-    }
-
-    .cookie-char {
-      font-family: var(--font-read);
-      font-size: 2.2rem;
-      font-weight: 600;
-      color: #4A2E10;
-      position: relative;
-      z-index: 1;
-    }
-
-    &:active { cursor: grabbing; transform: translateY(3px); }
-    &[data-state~="dragged"] { opacity: 0.35; }
-    &[data-state~="eaten"] { animation: cookieEaten 0.5s ease forwards; }
-    &[data-state~="spat"] { animation: cookieSpat 0.7s ease; }
-
-    &.floating {
-      position: absolute;
-      transform: translate(-50%, -50%) scale(1.12) rotate(-6deg);
-      pointer-events: none;
-      z-index: 20;
-      box-shadow: 0 12px 20px rgba(58, 42, 31, 0.4);
-    }
-  }
-
-  .feed-note { font-size: 0.8rem; color: $ink-soft; }
+  gap: var(--space-10);
 }
 
-@keyframes cookieEaten {
-  to { transform: translateY(-120px) scale(0.2) rotate(40deg); opacity: 0; }
+.luna {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
-@keyframes cookieSpat {
-  0% { transform: translate(0, 0) rotate(0); }
-  30% { transform: translate(0, -60px) rotate(-20deg); }
-  100% { transform: translate(0, 0) rotate(0); }
+// where a dragged cookie goes: just under her beak
+.beak-zone {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: calc(var(--space-16) * 2);
+  min-height: var(--space-10);
+  margin-top: calc(var(--space-2) * -1);
+  padding: var(--space-1) var(--space-3);
+  border: var(--border-thick) dashed var(--soil);
+  border-radius: var(--radius-tile);
+  background: var(--card);
+  color: var(--ink-soft);
+  font: var(--text-label-small);
+  transition:
+    border-color var(--dur-quick) var(--ease-standard),
+    background-color var(--dur-quick) var(--ease-standard),
+    transform var(--dur-quick) var(--ease-standard);
+
+  // a cookie is on its way: she's ready for it
+  &[data-state~='armed'] {
+    border-color: var(--action);
+    background: var(--accent-soft);
+    transform: scale(1.08);
+  }
+
+  // the right one, in the right colours
+  &[data-state~='chewing'] {
+    border-style: solid;
+    border-color: var(--right);
+    background: var(--right-soft);
+    color: var(--right-text);
+  }
+}
+
+// her plate of cookies
+.tray {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-4);
+  padding: var(--space-4) var(--space-6);
+  border: var(--border-regular) solid var(--edge);
+  border-radius: var(--radius-card);
+  background: var(--well);
+}
+
+.cookie {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: calc(var(--space-16) + var(--space-4));
+  height: calc(var(--space-16) + var(--space-4));
+  border: var(--border-thick) solid var(--illo-cookie-edge);
+  border-radius: var(--radius-chip);
+  // the drawn cookie: its dough, a little shaded
+  background: radial-gradient(circle at 34% 30%, var(--illo-cookie-dough), var(--illo-cookie-dough-deep));
+  box-shadow: 0 var(--ledge-medium) 0 var(--illo-cookie-ledge);
+  cursor: grab;
+  touch-action: none;
+  transition:
+    transform var(--dur-tap) var(--ease-standard),
+    box-shadow var(--dur-tap) var(--ease-standard),
+    border-color var(--dur-quick) var(--ease-standard),
+    opacity var(--dur-quick) var(--ease-exit);
+
+  // two chocolate chips
+  &::after {
+    content: '';
+    position: absolute;
+    inset: var(--space-3);
+    border-radius: var(--radius-chip);
+    background:
+      radial-gradient(circle at 30% 40%, var(--illo-cookie-chip) 0 calc(var(--space-1) * 0.75), transparent var(--space-1)),
+      radial-gradient(circle at 70% 62%, var(--illo-cookie-chip-soft) 0 calc(var(--space-1) * 0.75), transparent var(--space-1));
+    pointer-events: none;
+  }
+
+  &:active {
+    cursor: grabbing;
+    transform: translateY(var(--press-depth));
+    box-shadow: 0 var(--border-hair) 0 var(--illo-cookie-ledge);
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+
+  // a wrong one: the try-again edge and the shared wobble
+  &[data-state~='wrong'] {
+    border-color: var(--try-again-edge);
+    animation: var(--motion-wobble);
+  }
+
+  // the right one: the right edge, the glow and the pop, then it's eaten
+  &[data-state~='right'] {
+    border-color: var(--right);
+    box-shadow: 0 var(--ledge-medium) 0 var(--right-edge), var(--glow-ring);
+    opacity: 0;
+    animation: var(--motion-pop);
+    // it goes once the pop has played
+    transition: opacity var(--dur-quick) var(--ease-exit) var(--dur-emphasis);
+  }
+
+  // its place while it's being dragged
+  &[data-state~='dragged'] {
+    opacity: 0.4;
+  }
+
+  // the one under the finger
+  &.floating {
+    position: absolute;
+    z-index: var(--z-float);
+    transform: translate(-50%, -50%) scale(1.12) rotate(-6deg);
+    box-shadow: var(--elevation-lifted);
+    pointer-events: none;
+  }
+}
+
+.cookie-char {
+  position: relative;
+  z-index: var(--z-raised);
+  color: var(--illo-cookie-letter);
+  font: var(--text-answer-word);
+}
+
+.note {
+  color: var(--ink-soft);
+  font: var(--text-label-small);
 }

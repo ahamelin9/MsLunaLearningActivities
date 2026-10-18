@@ -4,7 +4,7 @@ import { lettersFor, pick, tierFor, type LetterItem } from '../../engine/content
 import { pickWrong, textChoice } from '../../engine/distractors';
 import { soundManager } from '@/utils/audio';
 import { pronunciation } from '@/utils/pronunciation';
-import { cx } from '@/utils/cx';
+import { ChunkyButton, ProgressBar } from '@/components/kit';
 import { isReducedMotion, REDUCED_MOTION_PACE } from '@/utils/motion';
 import { GameSurface } from '../shared/GameSurface/GameSurface';
 import styles from './BubbleSounds.module.scss';
@@ -41,7 +41,8 @@ function makeBubble(round: Round, forceTarget = false): Bubble {
     y: 104 + Math.random() * 40,
     // with less motion the bubbles slow down, since their rising is the game (DES-6)
     speed: round.speed * (0.8 + Math.random() * 0.5) * (isReducedMotion() ? REDUCED_MOTION_PACE : 1),
-    size: 0.85 + Math.random() * 0.4,
+    // never under the answer size (DES-22b): a little bigger at most
+    size: 1 + Math.random() * 0.25,
     drift: Math.random() * 2 - 1,
     popped: false
   };
@@ -56,7 +57,6 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
     makeBubble(round)
   ]);
   const [popped, setPopped] = useState(0);
-  const [splash, setSplash] = useState<{ id: number; ok: boolean } | null>(null);
   const doneRef = useRef(false);
   const poppedRef = useRef(0);
 
@@ -112,9 +112,8 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
   const pop = (bubble: Bubble) => {
     if (api.locked || doneRef.current || bubble.popped) return;
 
+    // the bubble itself shows right or wrong as it goes (components.md)
     setBubbles(prev => prev.map(b => (b.id === bubble.id ? { ...b, popped: true, poppedAt: Date.now() } : b)));
-    setSplash({ id: bubble.id, ok: bubble.isTarget });
-    window.setTimeout(() => setSplash(null), 450);
 
     if (bubble.isTarget) {
       soundManager.playPop();
@@ -138,45 +137,38 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
 
   return (
     <GameSurface className={styles.bubbles}>
-      <div className={styles.bubbleHeader}>
+      <div className={styles.header}>
         {/* the sound is only ever heard: written here, it would name the bubble to pop */}
-        <button className={cx(styles.soundHorn, styles.small)} onClick={sayTarget} title="Hear the sound again">
-          <span className={styles.hornIcon} aria-hidden="true">🫧</span>
-          <span className={styles.hornSound}>Listen</span>
-        </button>
-        <div className={styles.bubbleTally} aria-label={`${popped} of ${round.needed} popped`}>
-          {Array.from({ length: round.needed }).map((_, i) => (
-            <span key={i} className={styles.tallyDot} data-state={i < popped ? 'lit' : undefined} />
-          ))}
-        </div>
+        <ChunkyButton variant="prompt" icon="speaker" onClick={sayTarget} title="Hear the sound again">
+          Listen
+        </ChunkyButton>
+        <ProgressBar
+          size="rounds"
+          done={popped}
+          total={round.needed}
+          label={`${popped} of ${round.needed} popped`}
+          className={styles.tally}
+        />
       </div>
 
-      <div className={styles.bubbleTank}>
+      {/* the water, in the game's own tint, as on its Play Shelf picture */}
+      <div className={styles.tank}>
         {bubbles.map(b => (
           <button
             key={b.id}
             className={styles.bubble}
-            data-state={b.popped ? 'popped' : undefined}
+            // a game piece in the one answer language (components.md)
+            data-state={b.popped ? (b.isTarget ? 'right' : 'wrong') : undefined}
             style={{ left: `${b.x}%`, top: `${b.y}%`, '--size': b.size } as React.CSSProperties}
             onClick={() => pop(b)}
             aria-label={`bubble ${b.char}`}
           >
-            <span className={styles.bubbleShine} aria-hidden="true" />
-            <span className={styles.bubbleChar}>{b.char}</span>
+            <span className={styles.shine} aria-hidden="true" />
+            <span className={styles.char}>{b.char}</span>
           </button>
         ))}
 
-        {splash && (
-          <span className={styles.bubbleSplash} data-state={splash.ok ? 'ok' : 'no'} aria-hidden="true">
-            {splash.ok ? '✦' : '💧'}
-          </span>
-        )}
-
-        <div className={styles.tankFloor} aria-hidden="true">
-          <span>🐠</span>
-          <span>🪸</span>
-          <span>🐚</span>
-        </div>
+        <div className={styles.floor} aria-hidden="true" />
       </div>
     </GameSurface>
   );

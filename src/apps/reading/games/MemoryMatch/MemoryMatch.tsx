@@ -7,7 +7,8 @@ import { pronunciation, type SpeechPart } from '@/utils/pronunciation';
 import { StagePrompt } from '../shared/StagePrompt/StagePrompt';
 import { GameSurface } from '../shared/GameSurface/GameSurface';
 import { dataState } from '@/utils/cx';
-import { Icon } from '@/components/kit';
+import { afterMotion } from '@/utils/motion';
+import { Icon, ProgressBar } from '@/components/kit';
 import styles from './MemoryMatch.module.scss';
 
 interface Card {
@@ -133,43 +134,45 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
           soundManager.playTryAgain();
         }
 
-        window.setTimeout(() => {
+        // they turn back over once the wobble has played (components.md)
+        afterMotion('emphasis', () => {
           setWobble([]);
           setFlipped([]);
           busy.current = false;
-        }, 520);
+        });
       }, 760);
     }
   };
 
   return (
     <GameSurface className={styles.memory}>
-      <StagePrompt className={styles.memoryPrompt}>
+      <StagePrompt>
         {round.kind === 'case' ? 'Big letter + little letter' : 'Picture + word'} — find every pair!
       </StagePrompt>
 
-      <div className={styles.memoryBoard} data-cols={round.pairCount >= 6 ? 4 : round.pairCount === 5 ? 5 : 4}>
+      <div className={styles.board} data-cols={round.pairCount === 5 ? 5 : 4}>
         {round.cards.map(card => {
           const isOpen = flipped.includes(card.id) || matched.includes(card.pair);
           const isMatched = matched.includes(card.pair);
           return (
             <button
               key={card.id}
-              className={styles.memoryCard}
-              data-state={dataState(isOpen ? 'open' : false, isMatched ? 'matched' : false, wobble.includes(card.id) ? 'wobble' : false)}
+              className={styles.card}
+              // a game piece in the one answer language (components.md)
+              data-state={dataState(isOpen ? 'open' : false, isMatched ? 'right' : false, wobble.includes(card.id) ? 'wrong' : false)}
               onClick={() => flip(card)}
               aria-label={isOpen ? card.ariaLabel : 'face down card'}
             >
-              <span className={styles.cardInner}>
-                <span className={styles.cardBack} aria-hidden="true">
+              <span className={styles.inner}>
+                <span className={styles.back} aria-hidden="true">
                   {/* a book, not an owl: one Luna per screen (DES-12) */}
                   <Icon name="book" size={32} />
                 </span>
-                <span className={styles.cardFace}>
+                <span className={styles.face}>
                   {card.emoji ? (
-                    <span className={styles.faceEmoji}>{card.emoji}</span>
+                    <span className={styles.picture}>{card.emoji}</span>
                   ) : (
-                    <span className={styles.faceText} data-state={round.kind === 'case' ? 'letter' : undefined}>{card.label}</span>
+                    <span className={styles.text} data-kind={round.kind === 'case' ? 'letter' : 'word'}>{card.label}</span>
                   )}
                 </span>
               </span>
@@ -178,13 +181,13 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
         })}
       </div>
 
-      <div className={styles.memoryTally}>
-        {Array.from({ length: round.pairCount }).map((_, i) => (
-          <span key={i}>
-            {i < matched.length ? '💛' : '🤍'}
-          </span>
-        ))}
-      </div>
+      <ProgressBar
+        size="rounds"
+        done={matched.length}
+        total={round.pairCount}
+        label={`${matched.length} of ${round.pairCount} pairs found`}
+        className={styles.tally}
+      />
     </GameSurface>
   );
 };

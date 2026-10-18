@@ -13,6 +13,8 @@
   --button-ledge: var(--ledge-small);
   --button-height: var(--target-chrome);
   --button-pad: var(--space-5);
+  --button-radius: var(--radius-tile);
+  --button-font: var(--text-label);
 
   @include press(var(--button-ledge), var(--button-edge));
   display: inline-flex;
@@ -23,10 +25,11 @@
   min-height: var(--button-height);
   padding: 0 var(--button-pad);
   border: var(--border-regular) var(--button-border-style) var(--button-border);
-  border-radius: var(--radius-tile);
+  border-radius: var(--button-radius);
   background: var(--button-bg);
   color: var(--button-ink);
-  font: var(--text-label);
+  font: var(--button-font);
+  font-weight: 700; // every chunky button is bold, the prompt's reading type too
   white-space: nowrap;
 
   &:focus-visible {
@@ -90,4 +93,16 @@
 .root[data-variant='icon'] {
   --button-ink: var(--ink-soft);
   --button-pad: 0;
+}
+
+// the Round board's prompt pill (DES-22b): what the game asks, said again on
+// a tap. The soft accent with round ends, flat like the board's (it still
+// sinks when pressed), in the reading type as a game's line of instruction
+.root[data-variant='prompt'] {
+  --button-bg: var(--accent-soft);
+  --button-border: var(--accent-soft);
+  --button-edge: transparent;
+  --button-ledge: 0;
+  --button-radius: var(--radius-chip);
+  --button-font: var(--text-read);
 }

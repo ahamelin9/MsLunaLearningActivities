@@ -60,21 +60,23 @@ export const DoneScreen: React.FC<DoneScreenProps> = ({
       <PaperCard variant="lifted" className={styles.panel}>
         {/* ---- the lesson is done ---- */}
         <div className={styles.done}>
-          <span className={styles.arch} aria-hidden="true" />
-          <button
-            type="button"
-            className={styles.mark}
-            aria-label="See it again"
-            onClick={() => {
-              soundManager.playPop();
-              setPops(n => n + 1);
-            }}
-          >
-            <span key={pops} className={styles.medal}>
-              <Icon name="check" size={96} />
-            </span>
-          </button>
-          <h2 className={styles.title}>{game.lesson ? 'Lesson done!' : 'All done!'}</h2>
+          {/* the mark and the title stand on the arch, which ends just under the title */}
+          <div className={styles.crest}>
+            <button
+              type="button"
+              className={styles.mark}
+              aria-label="See it again"
+              onClick={() => {
+                soundManager.playPop();
+                setPops(n => n + 1);
+              }}
+            >
+              <span key={pops} className={styles.medal}>
+                <Icon name="check" size={96} />
+              </span>
+            </button>
+            <h2 className={styles.title}>{game.lesson ? 'Lesson done!' : 'All done!'}</h2>
+          </div>
           <StarRow earned={stars} animate />
           <p className={styles.solved}>
             {roundsWon} of {game.roundsPerPlay} solved

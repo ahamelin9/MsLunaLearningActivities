@@ -45,6 +45,15 @@ export default function ChunkyButtonKit() {
               </Specimen>
             ))}
           </Specimens>
+          {size === 48 && (
+            <Specimens title="prompt · 48: a game's pill, on the stage (DES-22b)" on="card">
+              {STATES.map(s => (
+                <Specimen key={s.label} label={s.label === 'disabled' ? 'disabled: try it first' : s.label}>
+                  <ChunkyButton variant="prompt" icon="speaker" {...s.props}>Say it again</ChunkyButton>
+                </Specimen>
+              ))}
+            </Specimens>
+          )}
           <Specimens title={`icon · ${size}`}>
             {STATES.map(s => (
               <Specimen key={s.label} label={s.label}>
