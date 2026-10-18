@@ -22,6 +22,7 @@
 // DES-22b: ChunkyButton's prompt pill (soft accent, round, 48px, flat,
 // faded while it waits); a found ListenCue's burst of five sparks (none
 // under reduced motion).
+// DES-22c: Choice's phrase kind (22px, bold, at least 64px tall).
 // Start Vite on 5199 first, then from the repo root:
 //   node .claude/skills/know-how/kit-check.mjs
 // Exits 1 on any ❌.
@@ -548,6 +549,14 @@ await freshFind();
 await new Promise(r => setTimeout(r, 300));
 const rmSparks = (await sparksNow()).shown;
 ok('reduced motion: no sparks', rmSparks === 0, `${rmSparks} shown`);
+
+// ── Choice's phrase kind (DES-22c): a few words, in the reading type ──
+const phrase = await page.evaluate(() => {
+  const c = [...document.querySelectorAll('button[data-kind="phrase"]')].find(b => !b.dataset.state);
+  const s = getComputedStyle(c);
+  return { size: s.fontSize, weight: s.fontWeight, tall: c.offsetHeight };
+});
+ok('a phrase Choice is the reading type, bold, and an answer tall', phrase.size === '22px' && phrase.weight === '700' && phrase.tall >= 64 && phrase.tall < 88, JSON.stringify(phrase));
 await page.evaluate(() => document.documentElement.removeAttribute('data-reduced-motion'));
 
 await browser.close();

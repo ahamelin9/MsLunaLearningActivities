@@ -65,6 +65,13 @@ export default function ChoiceKit() {
           </Specimen>
         ))}
       </Specimens>
+      <Specimens title="phrase: a few words, in the reading type (DES-22c)">
+        {STATES.map(s => (
+          <Specimen key={s.label} label={s.label}>
+            <Choice kind="phrase" state={s.state} data-state={s.held}>Under the bed</Choice>
+          </Specimen>
+        ))}
+      </Specimens>
       <Specimens title="picture (its word shows once it's right)">
         {STATES.map(s => (
           <Specimen key={s.label} label={s.label}>

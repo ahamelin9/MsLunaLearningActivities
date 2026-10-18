@@ -5,6 +5,7 @@ import { pickWrong, textChoice } from '../../engine/distractors';
 import { soundManager } from '@/utils/audio';
 import { pronunciation } from '@/utils/pronunciation';
 import { ChunkyButton } from '@/components/kit';
+import { afterMotion } from '@/utils/motion';
 import { GameSurface } from '../shared/GameSurface/GameSurface';
 import { dataState } from '@/utils/cx';
 import styles from './BuildSentence.module.scss';
@@ -91,8 +92,9 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
       });
       api.win({ delay: 3200 });
     } else {
+      // the page wobbles, and clears when its wobble ends (components.md)
       setShakeSlot(true);
-      window.setTimeout(() => setShakeSlot(false), 500);
+      afterMotion('emphasis', () => setShakeSlot(false));
       const firstWrong = attempt.findIndex((w, i) => w !== round.words[i]);
       api.miss({
         hint:
@@ -130,8 +132,8 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
 
   return (
     <GameSurface className={styles.sentence}>
-      <div className={styles.sentenceScene}>
-        <span className={styles.sceneEmoji}>{round.sentence.emoji}</span>
+      <div className={styles.scene}>
+        <span className={styles.picture}>{round.sentence.emoji}</span>
         <ChunkyButton
           variant="prompt"
           icon="speaker"
@@ -143,28 +145,29 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
         </ChunkyButton>
       </div>
 
-      <div className={styles.sentenceTrack} data-state={dataState(shakeSlot ? 'shaking' : false, solved ? 'solved' : false)}>
+      {/* the page the words go back onto, in the one answer language (components.md) */}
+      <div className={styles.page} data-state={dataState(shakeSlot ? 'wrong' : false, solved ? 'right' : false)}>
         {slots.map((slot, i) => (
           <button
             key={i}
-            className={styles.sentenceSlot}
+            className={styles.slot}
             data-state={dataState(slot ? 'filled' : false, readingIndex === i ? 'reading' : false)}
             onClick={() => slot && removeTile(i)}
             aria-label={slot ? `${slot.word}, tap to take back` : `empty space ${i + 1}`}
           >
-            {slot ? slot.word : <span className={styles.slotLine} />}
+            {slot ? slot.word : <span className={styles.line} />}
           </button>
         ))}
-        {solved && <span className={styles.sentencePeriod}>.</span>}
+        {solved && <span className={styles.period}>.</span>}
       </div>
 
-      <div className={styles.wordShelf}>
+      <div className={styles.shelf}>
         {available.map(tile => (
-          <button key={tile.id} className={styles.wordTile} onClick={() => placeTile(tile)}>
+          <button key={tile.id} className={styles.tile} onClick={() => placeTile(tile)}>
             {tile.word}
           </button>
         ))}
-        {available.length === 0 && !solved && <span className={styles.shelfEmpty}>Tap a word above to take it back</span>}
+        {available.length === 0 && !solved && <span className={styles.empty}>Tap a word above to take it back</span>}
       </div>
     </GameSurface>
   );

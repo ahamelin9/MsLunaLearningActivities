@@ -29,6 +29,7 @@
   background: var(--choice-bg);
   color: var(--choice-ink);
   font: var(--choice-font);
+  font-weight: 700; // every answer is bold, a phrase's reading type too
   animation: var(--choice-motion);
   transition:
     transform var(--dur-tap) var(--ease-standard),
@@ -53,6 +54,14 @@
 .root[data-kind='word'] {
   --choice-size: calc(var(--space-16) + var(--space-8));
   --choice-font: var(--text-answer-word);
+
+  padding-inline: var(--space-6);
+}
+
+// a few words ("Under the bed", DES-22c): the reading type, bold, an answer tall
+.root[data-kind='phrase'] {
+  --choice-size: var(--target-answer);
+  --choice-font: var(--text-read);
 
   padding-inline: var(--space-6);
 }

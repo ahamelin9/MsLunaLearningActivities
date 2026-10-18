@@ -51,7 +51,7 @@ them in.
 | 4 | The kit | DES-7a, DES-7b, DES-7c (done 2026-10-11) | Every kit component on the Kit page in every state |
 | 5 | Frame and shell | DES-8, DES-10, DES-15 (done 2026-10-11), DES-9a, DES-9b, DES-9c, DES-12 (done 2026-10-12) | One header, the layout grid, the new Luna (moved here from Stage 4, Alex 2026-10-11), the restyled home, Settings, trophies and Grade Select; one Luna per screen |
 | 6 | The library | DES-21 → **PRG-7 (pulled in)** → DES-13 (done 2026-10-12) | The library as on the board: lessons in order, one bar |
-| 7 | Play | DES-22a (done 2026-10-12) → DES-22d (done 2026-10-13) → DES-11 (done 2026-10-17) → DES-22b, DES-22c → DES-23 | GameShell (start, stage, perch and the done screen), all 8 games and all 8 lesson types on the kit, with one right/wrong language |
+| 7 | Play | DES-22a (done 2026-10-12) → DES-22d (done 2026-10-13) → DES-11 (done 2026-10-17) → DES-22b (done 2026-10-18) → DES-22c → DES-23 | GameShell (start, stage, perch and the done screen), all 8 games and all 8 lesson types on the kit, with one right/wrong language |
 | 8 | The design system is done | DES-24 | Legacy styles deleted; the check runs strict with no baseline |
 | 9 | What's left of the epic | **SET-1 (pulled in)** → DES-16, then DES-17, then DES-14 | Light/dark follows the iPad with a grown-up choice; the milestone moon; real cookies |
 
@@ -63,12 +63,12 @@ them in.
 - **DES-24 checks light and dark by forcing the theme** (on the Kit page and in the screenshots). DES-16 then lets the iPad and the grown-up switch it for real.
 - **DES-17's full-shelf milestone moved to PRG-4,** so the moon doesn't wait on squishies (PRG-5, Phase 7).
 - **DES-22d** (the done screen) was split from DES-22a before it started (Alex, 2026-10-12), and came before DES-11, whose petals fall on the done screen (both done).
-- **DES-14** (P2) touches the same folder as DES-22b and can slot in straight after it.
+- **DES-14** (P2) redraws Letter Cookies' cookies, whose folder DES-22b put on the kit, so it can slot in any time.
 - **P0 bugs** can still be pulled in between tickets for a break from styling.
 
 
 ### DES-14 · Feed Luna's cookies look like real, different cookies
-Story · P2 · S · needs: DES-22b
+Story · P2 · S · needs: —
 - **Why:** every cookie is the same flat brown circle, which doesn't read as a picture (Alex, 2026-10-09).
 - **How:** a few cookie designs (chocolate chip, sprinkles, jam, and so on), mixed in each round, drawn in the DES-2 style, with their colours in `_illustration.scss`. The letter stays just as easy to read.
 - **Complete when:** a round shows at least two different cookie designs, and every letter still meets the DES-2 type minimums.
@@ -123,28 +123,14 @@ Story · P1 · M · needs: —
   - her clips are rendered and `voice:audit` passes;
   - the MilestoneMoon folder shows zero in `design:status`.
 
-### DES-22b · Games on the kit, part 1: Letter Jar, Bubble Sounds, Letter Cookies, Muddled Cards
-Story · P1 · M · needs: —
-- **How:**
-  - Each game's answer buttons become `Choice`.
-  - Its game pieces (bugs, bubbles, cookies, memory cards) stay in its folder but use the state roles, `data-state` and the shared motion (DES-11).
-  - Its scenery uses roles and `_illustration.scss`, and Icon replaces emoji in the interface.
-  - `engine/content.ts`'s colours go with these games.
-  - **`games/shared`'s SpeakChip** (from DES-22a, Alex 2026-10-12) becomes the Round board's prompt pill (a speaker icon, 48px, on the soft accent) as a kit piece, which DES-22c and DES-23 reuse. Every SpeakChip (Letter Jar, Words Off the Page, Treasure Path, Story Corner) swaps to it, and SpeakChip is deleted.
-  - **Touch targets (from DES-10):** every piece a child taps meets the target roles. On 2026-10-11, `layout-audit.mjs` found Letter Jar's smallest letters at 43–47px and its "Say it again" pill 39px tall; Bubble Sounds' overlapping bubbles are GAME-3's.
-  - **The star burst from the cue (moved from DES-11, Alex 2026-10-17):** on the Round board, five sparks fly out of the "?" cue as it's found (`--illo-spark-win-1`…`4`). It becomes the kit ListenCue's found moment, so every game and lesson with a "?" cue gets it; none under reduced motion.
-  - **Kept as one ticket (Alex, 2026-10-17):** once in the code it's bigger than an M (four whole game scenes, about 276 raw values, the prompt pill and the burst), but Alex chose not to split it. Order: the shared pieces first (the prompt pill, the burst; `content.ts`'s category colours, which nothing reads, go), then Letter Cookies, Letter Jar, Bubble Sounds and Muddled Cards. None of the four has a board, so each game's look is Alex's call from its shots.
-  - **Found along the way (Alex, 2026-10-17):** the done screen's arch (DES-22d) had a fixed height whose foot cut through "All done!"; it's now drawn from the mark and title together, so it ends just under the title. `content.ts`'s category list, colours and all, was read by nothing and went.
-- **Complete when:**
-  - in each of the 4 games, a right and a wrong answer look like they do everywhere else;
-  - `.claude/skills/know-how/layout-audit.mjs` lists no "(stage)" line for these games at the four sizes and three grades, except Bubble Sounds' overlaps if GAME-3 isn't done;
-  - the 4 game folders and `games/shared` show zero in `design:status`;
-  - they're checked in light and dark at the four sizes.
-
 ### DES-22c · Games on the kit, part 2: Words Off the Page, What's Missing?, Treasure Path, Story Corner
 Story · P1 · M · needs: —
-- **How:** the same as DES-22b, for these 4 games. Treasure Path's stopgap passage view stays until GAME-1c designs its real screen. Its walker is the kit's Luna since DES-15 (36px, `talking={false}`); its hop is still the game's own keyframes.
-  - **Touch targets (from DES-10):** on 2026-10-11, `layout-audit.mjs` found Words Off the Page's word tiles and empty slots 46px tall, the "🔊" prompt pills 39px tall (Hear the whole sentence, Read it to me) and Story Corner's "Next line" 38px.
+- **How:** as DES-22b did for the first four (its changelog line has the rules):
+  - Each game's answer buttons become `Choice`.
+  - Its game pieces (word tiles, memory objects, stones) stay in its folder but use the state roles, `data-state` and the shared motion (the table in `components.md`).
+  - Its scenery uses roles and its own Play Shelf picture's colours, and Icon replaces emoji in the interface; none of these has a board, so each look is Alex's call from its shots.
+  - Treasure Path's stopgap passage view stays until GAME-1c designs its real screen. Its walker is the kit's Luna since DES-15 (36px, `talking={false}`); its hop is still the game's own keyframes.
+  - **Touch targets (from DES-10):** on 2026-10-11, `layout-audit.mjs` found Words Off the Page's word tiles and empty slots 46px tall and Story Corner's "Next line" 38px. The prompt pills are the kit's 48px ChunkyButton `prompt` since DES-22b.
 - **Complete when:**
   - in each of the 4 games, a right and a wrong answer look like they do everywhere else;
   - `.claude/skills/know-how/layout-audit.mjs` lists no "(stage)" line for these games at the four sizes and three grades;
@@ -166,7 +152,7 @@ Story · P1 · M · needs: —
   - it's checked in light and dark.
 
 ### DES-24 · Retire the legacy styles
-Task · P1 · S · needs: DES-22b, DES-22c, DES-23
+Task · P1 · S · needs: DES-22c, DES-23
 - **Why:** this is the finish line of the design-system effort (Alex's plan, 2026-10-10).
 - **How:**
   - Delete `src/styles/_variables.scss`, `src/apps/reading/engine/_world.scss`, `src/index.css` (replaced by `styles/base/`), the legacy mixins (`glassmorphism`, `squircle-icon` and the like) and `scripts/design/baseline.json`.

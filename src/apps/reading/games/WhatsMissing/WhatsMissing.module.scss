@@ -1,126 +1,109 @@
-@use 'apps/reading/engine/world' as *;
+// What's Missing? on the kit (DES-22c): Luna's desk with its things, the
+// curtain that sweeps across while she takes one, the countdown, and the kit's
+// Choices for what disappeared. The things are pictures of words, and the
+// curtain moves on the shared durations (it covers, then slides off).
 
-.missing {
-  .desk-scene {
-    position: relative;
-    width: 100%;
-    max-width: 620px;
-    border-radius: 18px;
-    padding: 1.2rem 1rem 0;
-    background: linear-gradient(180deg, #FFF4E1, #F6DCB4);
-    box-shadow: inset 0 0 0 3px rgba(122, 74, 36, 0.22);
-    overflow: hidden;
-  }
+.desk {
+  position: relative;
+  width: 100%;
+  max-width: calc(var(--space-16) * 10);
+  padding: var(--space-5) var(--space-4) 0;
+  border: var(--border-regular) solid var(--edge);
+  border-radius: var(--radius-card);
+  background: var(--card);
+  overflow: hidden;
+}
 
-  .desk-top {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 1rem 1.4rem;
-    min-height: 130px;
-    align-items: flex-end;
-    padding-bottom: 0.6rem;
-  }
+.top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: center;
+  gap: var(--space-4) var(--space-6);
+  min-height: calc(var(--space-16) * 2);
+  padding-bottom: var(--space-3);
+}
 
-  .desk-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    animation: itemSettle 0.4s ease backwards;
+.item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  animation: var(--motion-grow-in);
 
-    .item-emoji { font-size: 2.9rem; filter: drop-shadow(0 4px 3px rgba(58, 42, 31, 0.3)); }
-    .item-word { font-size: 0.8rem; color: $ink-soft; }
-
-    &[data-state="returned"] { animation: itemReturn 0.6s cubic-bezier(0.3, 1.5, 0.5, 1); }
-  }
-
-  .desk-edge {
-    height: 16px;
-    background: linear-gradient(180deg, $wood, $wood-dark);
-    box-shadow: 0 4px 10px rgba(58, 42, 31, 0.3);
-  }
-
-  .desk-curtain {
-    position: absolute;
-    inset: 0;
-    z-index: 4;
-    background: linear-gradient(100deg, $plum-deep, $plum 40%, #C4B5FD);
-    transform: translateX(-105%);
-    display: grid;
-    place-items: center;
-    font-size: 2.6rem;
-    pointer-events: none;
-
-    &[data-state~="sweeping"] { animation: curtainSweep 1.1s ease-in-out forwards; }
-    &[data-state~="gone"] { transform: translateX(105%); }
-  }
-
-  .look-timer {
-    display: flex;
-    align-items: center;
-    gap: 0.55rem;
-
-    .timer-label { font-size: 0.95rem; color: $berry-deep; font-weight: 600; }
-    .timer-count {
-      display: grid;
-      place-items: center;
-      width: 38px;
-      height: 38px;
-      border-radius: 50%;
-      background: $berry;
-      color: #FFFFFF;
-      font-size: 1.3rem;
-      font-weight: 600;
-      animation: tickPulse 1s ease-in-out infinite;
-    }
-  }
-
-  .missing-choices { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 0.5rem; }
-
-  .choice-row { display: flex; gap: 0.7rem; flex-wrap: wrap; justify-content: center; }
-
-  .missing-choice {
-    @include chunky(#FFFFFF, rgba(58, 42, 31, 0.3), $ink);
-    padding: 0.55rem 1rem;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.15rem;
-
-    .choice-emoji { font-size: 2.2rem; }
-    .choice-word { font-size: 1.15rem; &.small { font-size: 0.85rem; color: $ink-soft; } }
-
-    &[data-state~="wrong"] { animation: trackShake 0.4s ease; }
-    &[data-state~="right"] { @include chunky($moss, $moss-deep); }
+  // the one that came back, once found
+  &[data-state='returned'] {
+    animation: var(--motion-pop);
   }
 }
 
-@keyframes curtainSweep {
-  0% { transform: translateX(-105%); }
-  45% { transform: translateX(0); }
-  100% { transform: translateX(105%); }
+.picture {
+  font: var(--text-answer-word);
 }
 
-@keyframes itemSettle {
-  from { transform: translateY(-14px) scale(0.85); opacity: 0; }
-  to { transform: translateY(0) scale(1); opacity: 1; }
+.word {
+  color: var(--ink-soft);
+  font: var(--text-label-small);
 }
 
-@keyframes itemReturn {
-  0% { transform: scale(0.2) rotate(-30deg); opacity: 0; }
-  60% { transform: scale(1.25) rotate(8deg); opacity: 1; }
-  100% { transform: scale(1) rotate(0); }
+// the desk's wooden edge
+.edge {
+  height: var(--space-4);
+  margin: 0 calc(var(--space-4) * -1);
+  background: var(--action);
 }
 
-@keyframes tickPulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.14); }
+// the curtain: off to the left, across while she takes one, then off to the right
+.curtain {
+  position: absolute;
+  inset: 0;
+  z-index: var(--z-raised);
+  display: grid;
+  place-items: center;
+  background: var(--accent);
+  color: var(--accent-ink);
+  transform: translateX(-105%);
+  transition: transform var(--dur-enter) var(--ease-in-out);
+  pointer-events: none;
+
+  &[data-state~='sweeping'] { transform: translateX(0); }
+  &[data-state~='gone'] { transform: translateX(105%); }
 }
 
-// A copy of Words Off the Page's trackShake: modules can't share keyframes.
-// It goes when DES-22c moves this game onto the shared motion.
-@keyframes trackShake {
-  0%, 100% { transform: translateX(0); }
-  25% { transform: translateX(-10px); }
-  75% { transform: translateX(10px); }
+.timer {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.label {
+  color: var(--ink-soft);
+  font: var(--text-label);
+}
+
+// the seconds left, popping as each one goes
+.count {
+  display: grid;
+  place-items: center;
+  width: var(--space-10);
+  height: var(--space-10);
+  border-radius: var(--radius-chip);
+  background: var(--accent);
+  color: var(--accent-ink);
+  font: var(--text-label);
+  animation: var(--motion-pop);
+}
+
+.choices {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  width: 100%;
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--target-gap);
 }

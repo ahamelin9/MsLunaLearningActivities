@@ -210,6 +210,18 @@ Pitfalls that cost time:
   `/Users/scripts/chrome-path.cjs`. Under `-e` find repo files from the repo
   root instead: `createRequire(join(process.cwd(), 'package.json'))('./scripts/chrome-path.cjs')`.
   Packages (`puppeteer-core`, `vite`) still import by name.
+- **Two Kit page rows with the same heading** (*2026-10-18, DES-22b*): a new
+  kit-check line found "the Try it row" by a heading starting "Try it", and
+  read Choice's ("Try it: the answer is M") instead of ListenCue's ("Try it:
+  tap the arch"), so it saw no burst. Match a heading in full. And a Try it
+  row an earlier line left toggled (found, not waiting) has no "Found it"
+  button: put it back to its start inside the check before using it.
+- **Review shots mid-play** (*2026-10-18, DES-22b*): ui:shots stops the clock
+  at a round's start, so it never shows a game being played. `game-shot.mjs`
+  next to this file opens a game, plays a little and shoots: Bubble Sounds'
+  bubbles up in the water, two Muddled Cards turned over, a wrong and a
+  caught Letter Jar letter, a wrong cookie. Add a game's own moments to it
+  the same way (`untilState` taps pieces until one takes a `data-state`).
 - **`pkill -f "vite --port 5199"` killed my own command** (*2026-10-12*):
   `-f` matches whole command lines, so a status check whose own text held
   that string (`pgrep -fl "vite --port 5199|…"`) was killed with it (exit
@@ -492,6 +504,15 @@ Pitfalls that cost time:
   had hidden it. Keep decoration on a parent that clips and never scrolls,
   and put the content on an inner layer that does the scrolling (GameShell's
   `.stage` and `.inside`).
+- **Pitfall, a tilted target overlaps its neighbours** (*2026-10-18, DES-22b*):
+  Letter Jar's bugs were 64px buttons rotated by up to 25°, and the audit
+  measures a box with `getBoundingClientRect`, which grows round a rotated
+  square (about 85px), so neighbours "overlapped" at 1024×768 though the round
+  bugs didn't touch. Keep the button upright and answer-sized and tilt only
+  what's inside it, with the `rotate` property (the wobble and pop animate
+  `transform`, so the two don't cancel). Pieces placed on a grid fixed by the
+  round fit one screen and not another: shape the grid from the measured
+  field instead (`gridFor` in `LetterHunt.tsx`, with a ResizeObserver).
 - **Check:** it passes at every grade today, and fails with GameShell's
   `.shell-stage { min-height }` set to 1400px for a moment.
 

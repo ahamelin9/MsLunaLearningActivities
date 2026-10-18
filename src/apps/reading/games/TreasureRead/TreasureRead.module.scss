@@ -1,146 +1,142 @@
-@use 'apps/reading/engine/world' as *;
+// Treasure Path on the kit (DES-22c): the path of stones to the treasure, the
+// scroll with the passage and its statement, and the kit's Choices. The
+// scroll is still GAME-1b's stopgap layout, now on roles, until GAME-1c
+// designs the stone's real screen. The passage is set at the reading size.
 
-.treasure {
-  .treasure-path {
-    position: relative;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.5rem 0.8rem;
-    border-radius: 999px;
-    background: rgba(255, 255, 255, 0.55);
-    border: 3px dashed rgba(122, 74, 36, 0.45);
+// the path: numbered stones to a star
+.path {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border: var(--border-regular) dashed var(--soil);
+  border-radius: var(--radius-chip);
+  background: var(--card);
+}
 
-    .stone {
-      position: relative;
-      width: 42px;
-      height: 42px;
-      border-radius: 50%;
-      display: grid;
-      place-items: center;
-      background: #E3CDA4;
-      border: 3px solid rgba(122, 74, 36, 0.4);
-      font-size: 1.1rem;
+.stone {
+  display: grid;
+  place-items: center;
+  width: var(--space-10);
+  height: var(--space-10);
+  border: var(--border-regular) solid var(--edge);
+  border-radius: var(--radius-chip);
+  background: var(--well);
+  color: var(--ink-soft);
+  font: var(--text-label-small);
+  transition: transform var(--dur-quick) var(--ease-springy);
 
-      &[data-state~="passed"] { background: $moss; border-color: $moss-deep; }
-      &[data-state~="current"] { transform: scale(1.16); box-shadow: 0 0 0 4px rgba(240, 162, 46, 0.45); }
-    }
-
-    .chest {
-      font-size: 2rem;
-      margin-left: 0.3rem;
-      &[data-state="open"] { animation: chestOpen 0.8s ease; }
-    }
+  // read already: in the right colours, with a check
+  &[data-state~='passed'] {
+    border-color: var(--right-edge);
+    background: var(--right);
+    color: var(--right-ink);
   }
 
-  .treasure-scroll {
-    @include paper-card($paper);
-    padding: 1rem 1.4rem;
-    text-align: center;
-    max-width: 600px;
-    border-radius: 10px 10px 14px 14px;
-    position: relative;
-
-    &::before,
-    &::after {
-      content: '';
-      position: absolute;
-      left: -6px;
-      right: -6px;
-      height: 14px;
-      background: linear-gradient(90deg, $wood, $wood-dark);
-      border-radius: 8px;
-    }
-    &::before { top: -10px; }
-    &::after { bottom: -10px; }
-
-    .scroll-emoji { font-size: 2.6rem; display: block; }
-
-    // GAME-1b stopgap, in the current style until GAME-1c redraws the stone
-    // on the DES-2 design: the passage the child reads, above the statement.
-    // A 2nd-grade passage runs to 5 sentences, so the scroll gets wider and
-    // its picture smaller to keep the stones and choices on screen.
-    &.has-passage {
-      max-width: 720px;
-      padding: 0.7rem 1.4rem;
-
-      .scroll-emoji { font-size: 1.8rem; }
-    }
-
-    .treasure-passage {
-      margin: 0.3rem 0 0.5rem;
-      padding-bottom: 0.5rem;
-      border-bottom: 2px dashed rgba(122, 74, 36, 0.35);
-      font-size: 1.15rem;
-      line-height: 1.45;
-      text-align: left;
-    }
-
-    .scroll-sentence {
-      font-size: 1.45rem;
-      font-weight: 500;
-      line-height: 1.5;
-      margin: 0.4rem 0;
-    }
-
-    .scroll-claim {
-      font-size: 1.15rem;
-      color: $plum-deep;
-      font-style: italic;
-      margin-bottom: 0.5rem;
-    }
-
-    .gap {
-      display: inline-grid;
-      place-items: center;
-      min-width: 86px;
-      padding: 0 0.3rem;
-      border-bottom: 4px solid $amber-deep;
-      color: $berry-deep;
-
-      &[data-state="filled"] { color: $moss-deep; border-color: $moss; animation: dropIn 0.35s ease; }
-    }
-  }
-
-  .treasure-options {
-    display: flex;
-    gap: 0.6rem;
-    flex-wrap: wrap;
-    justify-content: center;
-
-    &[data-state="binary"] .treasure-option { min-width: 130px; }
-  }
-
-  .treasure-option {
-    @include chunky(#FFFFFF, rgba(58, 42, 31, 0.3), $ink);
-    padding: 0.55rem 1.2rem;
-    font-size: 1.2rem;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4rem;
-
-    &[data-state~="wrong"] { animation: trackShake 0.4s ease; }
-    &[data-state~="right"] { @include chunky($moss, $moss-deep); }
+  // where you are: a little bigger, glowing like the thing to do next
+  &[data-state~='current'] {
+    border-color: var(--action);
+    color: var(--ink);
+    transform: scale(1.16);
+    box-shadow: 0 0 0 var(--space-1) var(--action-glow);
   }
 }
 
-@keyframes chestOpen {
-  0% { transform: scale(1) rotate(0); }
-  40% { transform: scale(1.4) rotate(-10deg); }
-  100% { transform: scale(1.15) rotate(0); }
+// the treasure: a star, filled and popping once the last stone is read
+.chest {
+  --icon-fill: var(--illo-star);
+
+  display: flex;
+  margin-left: var(--space-1);
+  color: var(--ink-soft);
+
+  &[data-state='open'] {
+    color: var(--illo-star-edge);
+    animation: var(--motion-pop);
+  }
 }
 
-// A copy of Words Off the Page's trackShake: modules can't share keyframes.
-// It goes when DES-22c moves this game onto the shared motion.
-@keyframes trackShake {
-  0%, 100% { transform: translateX(0); }
-  25% { transform: translateX(-10px); }
-  75% { transform: translateX(10px); }
+// the scroll, on its two wooden rods
+.scroll {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  max-width: calc(var(--space-16) * 11 + var(--space-6));
+  padding: var(--space-3) var(--space-6);
+  border: var(--border-regular) solid var(--edge);
+  border-radius: var(--radius-tile);
+  background: var(--card);
+  box-shadow: var(--elevation-card);
+  text-align: center;
+
+  &::before,
+  &::after {
+    content: '';
+    position: absolute;
+    left: calc(var(--space-2) * -1);
+    right: calc(var(--space-2) * -1);
+    height: var(--space-3);
+    border-radius: var(--radius-chip);
+    background: var(--action);
+  }
+
+  &::before { top: calc(var(--space-2) * -1); }
+  &::after { bottom: calc(var(--space-2) * -1); }
 }
 
-// A copy of Words Off the Page's dropIn: modules can't share keyframes.
-// It goes when DES-22c moves this game onto the shared motion.
-@keyframes dropIn {
-  from { transform: translateY(-22px) rotate(-8deg); opacity: 0; }
-  to { transform: translateY(0) rotate(0); opacity: 1; }
+// the passage's picture: what it's about, never its words
+.picture {
+  font: var(--text-display-l);
+}
+
+// the passage the child reads, above the statement
+.passage {
+  padding-bottom: var(--space-2);
+  border-bottom: var(--border-regular) dashed var(--soil);
+  font: var(--text-read);
+  text-align: left;
+}
+
+// a fill-in-the-blank statement, and its gap
+.sentence {
+  font: var(--text-read);
+  font-weight: 700;
+}
+
+.gap {
+  display: inline-grid;
+  place-items: center;
+  min-width: calc(var(--space-16) + var(--space-6));
+  padding: 0 var(--space-1);
+  border-bottom: var(--border-thick) solid var(--action);
+  color: var(--accent-text);
+
+  // solved: the word, in the right colours, popping in
+  &[data-state='filled'] {
+    border-color: var(--right);
+    color: var(--right-text);
+    animation: var(--motion-pop);
+  }
+}
+
+// a true-or-false statement
+.claim {
+  font: var(--text-read);
+  font-style: italic;
+}
+
+.options {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--target-gap);
+}
+
+// True or False: its mark beside the word
+.truth {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
 }

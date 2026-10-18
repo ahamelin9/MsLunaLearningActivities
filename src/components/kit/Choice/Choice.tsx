@@ -3,7 +3,8 @@
  * answer in every game and lesson is a Choice, so right and wrong look the
  * same everywhere (components.md, "One answer language").
  *
- * Props:  kind: 'letter' | 'word' | 'picture' (default 'letter')
+ * Props:  kind: 'letter' | 'word' | 'phrase' | 'picture' (default 'letter');
+ *         a phrase is a few words ("Under the bed"), in the reading type (DES-22c)
  *         state: 'idle' | 'wrong' | 'right' | 'revealed' | 'faded' (default 'idle')
  *         children: the letter, word or picture · caption?: words under a
  *         picture, which the screen passes only once the round is solved
@@ -23,7 +24,7 @@
  * Reads:  --card, --ink, --edge, --try-again-soft, --try-again-edge, --right,
  *         --right-ink, --right-edge, --glow-ring, --accent-soft, --accent-edge,
  *         --ledge-large, --press-depth, --border-thick, --radius-card,
- *         --text-answer-letter, --text-answer-word, --text-label,
+ *         --text-answer-letter, --text-answer-word, --text-read, --text-label,
  *         --target-answer, --motion-wobble, --motion-pop, --space-*
  * Board:  the Round board's four letters (idle, wrong, right, faded)
  */
@@ -35,7 +36,7 @@ import styles from './Choice.module.scss';
 export type ChoiceState = 'idle' | 'wrong' | 'right' | 'revealed' | 'faded';
 
 interface ChoiceProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  kind?: 'letter' | 'word' | 'picture';
+  kind?: 'letter' | 'word' | 'phrase' | 'picture';
   state?: ChoiceState;
   caption?: ReactNode;
   /** Only the Kit page passes this: "pressed" holds the press. */

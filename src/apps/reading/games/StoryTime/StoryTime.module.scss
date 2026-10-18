@@ -1,113 +1,114 @@
-@use 'apps/reading/engine/world' as *;
+// Story Corner on the kit (DES-22c): an open book, its cover on the left and
+// the story on the right line by line, then the question with the kit's
+// Choices. The story is set at the reading size; the found word and the
+// answers speak the one answer language (components.md).
 
-.story {
-  .storybook {
-    position: relative;
-    display: flex;
-    width: 100%;
-    max-width: 680px;
-    min-height: 240px;
-    border-radius: 14px;
-    background: linear-gradient(180deg, #FFFDF2, #F6EAD0);
-    box-shadow: 0 10px 22px rgba(58, 42, 31, 0.28), inset 0 0 0 3px rgba(122, 74, 36, 0.2);
-    overflow: hidden;
-  }
+.book {
+  position: relative;
+  display: flex;
+  width: 100%;
+  max-width: calc(var(--space-16) * 11);
+  min-height: calc(var(--space-16) * 4);
+  border: var(--border-regular) solid var(--edge);
+  border-radius: var(--radius-card);
+  background: var(--card);
+  box-shadow: var(--elevation-card);
+  overflow: hidden;
+}
 
-  .book-spine {
-    position: absolute;
-    left: 50%;
-    top: 0;
-    bottom: 0;
-    width: 12px;
-    transform: translateX(-50%);
-    background: linear-gradient(90deg, rgba(122, 74, 36, 0.05), rgba(122, 74, 36, 0.3), rgba(122, 74, 36, 0.05));
-  }
+// the fold down the middle
+.spine {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: var(--space-2);
+  transform: translateX(-50%);
+  border-inline: var(--border-hair) solid var(--edge);
+  background: var(--well);
+}
 
-  .book-page {
-    flex: 1;
-    padding: 1rem 1.2rem;
-    display: flex;
-    flex-direction: column;
-    gap: 0.4rem;
+.cover,
+.page {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-4) var(--space-5);
+}
 
-    &.left { align-items: center; justify-content: center; text-align: center; }
-    &.right { justify-content: flex-start; }
-  }
+.cover {
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
 
-  .story-emoji { font-size: 3.6rem; }
-  .story-title { font-size: 1.3rem; font-weight: 600; }
+// the story's picture: what it's about, never its words
+.picture {
+  font: var(--text-answer-letter);
+}
 
-  .hunt-task {
-    @include tape-label;
-    font-size: 0.9rem;
-    strong { font-size: 1.1rem; }
-  }
+.title {
+  font: var(--text-display-m);
+}
 
-  .story-line {
-    font-size: 1.12rem;
-    line-height: 1.6;
+// "Find the word I say", and the word once it's found
+.hunt {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  color: var(--ink-soft);
+  font: var(--text-label);
+}
+
+.found {
+  color: var(--right-text);
+  font: var(--text-read);
+  font-weight: 700;
+}
+
+// a line of the story, appearing as it's turned to
+.line {
+  font: var(--text-read);
+  animation: var(--motion-open);
+  cursor: pointer;
+}
+
+.word {
+  border-radius: var(--radius-tile);
+
+  .line[data-state='huntable'] & {
     cursor: pointer;
-    animation: lineAppear 0.35s ease;
-    border-radius: 6px;
-    padding: 0.1rem 0.2rem;
-
-    &:hover { background: rgba(240, 162, 46, 0.18); }
-
-    &[data-state="huntable"] .story-word {
-      cursor: pointer;
-      border-radius: 4px;
-      &:hover { background: rgba(124, 58, 237, 0.18); }
-    }
   }
 
-  .story-word[data-state="found"] {
-    background: $moss;
-    color: #FFFFFF;
-    animation: foundPop 0.5s ease;
-  }
-
-  .book-page.right .page-chip {
-    align-self: flex-start;
-    margin-top: 0.4rem;
-  }
-
-  .page-turn {
-    @include chunky($amber, $amber-deep, #46280A);
-    align-self: flex-start;
-    margin-top: auto;
-    padding: 0.4rem 0.9rem;
-    font-size: 0.95rem;
-  }
-
-  .story-question { display: flex; flex-direction: column; align-items: center; gap: 0.5rem; }
-
-  .story-answers { display: flex; gap: 0.5rem; flex-wrap: wrap; justify-content: center; }
-
-  .story-answer {
-    @include chunky(#FFFFFF, rgba(58, 42, 31, 0.3), $ink);
-    padding: 0.5rem 1rem;
-    font-size: 1.05rem;
-
-    &[data-state~="wrong"] { animation: trackShake 0.4s ease; }
-    &[data-state~="right"] { @include chunky($moss, $moss-deep); }
+  // the word they were hunting for: in the right colours, popping
+  &[data-state='right'] {
+    display: inline-block;
+    padding: 0 var(--space-1);
+    background: var(--right);
+    color: var(--right-ink);
+    animation: var(--motion-pop);
   }
 }
 
-@keyframes lineAppear {
-  from { transform: translateY(8px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
+// "Next line", or "Read me the story", under the lines
+.page-button {
+  align-self: flex-start;
+  margin-top: auto;
 }
 
-@keyframes foundPop {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.25); }
-  100% { transform: scale(1); }
+.question {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
 }
 
-// A copy of Words Off the Page's trackShake: modules can't share keyframes.
-// It goes when DES-22c moves this game onto the shared motion.
-@keyframes trackShake {
-  0%, 100% { transform: translateX(0); }
-  25% { transform: translateX(-10px); }
-  75% { transform: translateX(10px); }
+.answers {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--target-gap);
 }

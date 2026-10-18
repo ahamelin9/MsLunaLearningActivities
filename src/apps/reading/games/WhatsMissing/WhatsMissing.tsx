@@ -6,7 +6,9 @@ import { soundManager } from '@/utils/audio';
 import { pronunciation } from '@/utils/pronunciation';
 import { StagePrompt } from '../shared/StagePrompt/StagePrompt';
 import { GameSurface } from '../shared/GameSurface/GameSurface';
-import { cx, dataState } from '@/utils/cx';
+import { dataState } from '@/utils/cx';
+import { afterMotion } from '@/utils/motion';
+import { Choice, Icon } from '@/components/kit';
 import styles from './WhatsMissing.module.scss';
 
 interface Round {
@@ -68,8 +70,9 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
       setFound(true);
       api.win({ delay: 2000 });
     } else {
+      // a wrong pick wobbles, and clears when its wobble ends (components.md)
       setWrong(item.word);
-      window.setTimeout(() => setWrong(null), 600);
+      afterMotion('emphasis', () => setWrong(null));
       api.miss({
         hint: [{ word: item.word }, { text: 'is still on the desk. Which one is not there any more?' }]
       });
@@ -80,60 +83,61 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
 
   return (
     <GameSurface className={styles.missing}>
-      <div className={styles.deskScene}>
-        <div className={styles.deskCurtain}
+      <div className={styles.desk}>
+        {/* the curtain slides across while Luna takes something, then off again */}
+        <div className={styles.curtain}
           data-state={dataState(phase === 'curtain' ? 'sweeping' : false, phase === 'guess' ? 'gone' : false)}>
-          <span aria-hidden="true">✨</span>
+          <Icon name="sparkle" size={40} filled />
         </div>
 
-        <div className={styles.deskTop}>
+        <div className={styles.top}>
           {visible.map(item => (
-            <span key={item.word} className={styles.deskItem} title={item.word}>
-              <span className={styles.itemEmoji}>{item.emoji}</span>
-              {phase === 'look' && <span className={styles.itemWord}>{item.word}</span>}
+            <span key={item.word} className={styles.item} title={item.word}>
+              <span className={styles.picture}>{item.emoji}</span>
+              {phase === 'look' && <span className={styles.word}>{item.word}</span>}
             </span>
           ))}
           {found && (
-            <span className={styles.deskItem} data-state="returned">
-              <span className={styles.itemEmoji}>{round.missing.emoji}</span>
-              <span className={styles.itemWord}>{round.missing.word}</span>
+            <span className={styles.item} data-state="returned">
+              <span className={styles.picture}>{round.missing.emoji}</span>
+              <span className={styles.word}>{round.missing.word}</span>
             </span>
           )}
         </div>
 
-        <div className={styles.deskEdge} aria-hidden="true" />
+        <div className={styles.edge} aria-hidden="true" />
       </div>
 
       {phase === 'look' && (
-        <div className={styles.lookTimer}>
-          <span className={styles.timerLabel}>Memorise!</span>
-          <span className={styles.timerCount}>{Math.max(1, countdown)}</span>
+        <div className={styles.timer}>
+          <span className={styles.label}>Memorise!</span>
+          {/* a fresh key each second, so the count pops as it changes */}
+          <span key={countdown} className={styles.count}>{Math.max(1, countdown)}</span>
         </div>
       )}
 
       {phase === 'curtain' && <StagePrompt>Luna is taking something…</StagePrompt>}
 
       {phase === 'guess' && (
-        <div className={styles.missingChoices}>
+        <div className={styles.choices}>
           <StagePrompt>What disappeared?</StagePrompt>
-          <div className={styles.choiceRow}>
-            {round.options.map(opt => (
-              <button
-                key={opt.word}
-                className={styles.missingChoice}
-                data-state={dataState(wrong === opt.word ? 'wrong' : false, found && opt.word === round.missing.word ? 'right' : false)}
-                onClick={() => guess(opt)}
-              >
-                {round.wordChoices ? (
-                  <span className={styles.choiceWord}>{opt.word}</span>
-                ) : (
-                  <>
-                    <span className={styles.choiceEmoji}>{opt.emoji}</span>
-                    <span className={cx(styles.choiceWord, styles.small)}>{opt.word}</span>
-                  </>
-                )}
-              </button>
-            ))}
+          <div className={styles.row}>
+            {round.options.map(opt => {
+              const isAnswer = opt.word === round.missing.word;
+              return (
+                <Choice
+                  key={opt.word}
+                  kind={round.wordChoices ? 'word' : 'picture'}
+                  state={wrong === opt.word ? 'wrong' : found ? (isAnswer ? 'right' : 'faded') : 'idle'}
+                  // every choice is named: the target is the one that's gone, never shown
+                  caption={round.wordChoices ? undefined : opt.word}
+                  aria-label={opt.word}
+                  onClick={() => guess(opt)}
+                >
+                  {round.wordChoices ? opt.word : opt.emoji}
+                </Choice>
+              );
+            })}
           </div>
         </div>
       )}

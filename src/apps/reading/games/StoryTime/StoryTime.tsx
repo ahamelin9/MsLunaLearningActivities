@@ -3,10 +3,10 @@ import type { GameApi, GameDef } from '../../engine/types';
 import { MINI_STORIES, pick, shuffle, tierFor, type MiniStory } from '../../engine/content';
 import { soundManager } from '@/utils/audio';
 import { pronunciation } from '@/utils/pronunciation';
-import { ChunkyButton } from '@/components/kit';
+import { Choice, ChunkyButton } from '@/components/kit';
+import { afterMotion } from '@/utils/motion';
 import { StagePrompt } from '../shared/StagePrompt/StagePrompt';
 import { GameSurface } from '../shared/GameSurface/GameSurface';
-import { cx, dataState } from '@/utils/cx';
 import styles from './StoryTime.module.scss';
 
 interface Round {
@@ -111,28 +111,29 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
       setAnswered(true);
       api.win({ delay: 2100 });
     } else {
+      // a wrong answer wobbles, and clears when its wobble ends (components.md)
       setWrongAnswer(text);
       setMissedQuestion(true);
-      window.setTimeout(() => setWrongAnswer(null), 600);
+      afterMotion('emphasis', () => setWrongAnswer(null));
       api.miss({ hint: [{ text: 'Peek back at the story — the answer is hiding in one of the lines.' }] });
     }
   };
 
   return (
     <GameSurface className={styles.story}>
-      <div className={styles.storybook}>
-        <div className={styles.bookSpine} aria-hidden="true" />
+      <div className={styles.book}>
+        <div className={styles.spine} aria-hidden="true" />
 
-        <div className={cx(styles.bookPage, styles.left)}>
-          <span className={styles.storyEmoji}>{story.emoji}</span>
-          <h3 className={styles.storyTitle}>{story.title}</h3>
+        <div className={styles.cover}>
+          <span className={styles.picture}>{story.emoji}</span>
+          <h3 className={styles.title}>{story.title}</h3>
           {/* the word is heard, not shown: written here, the hunt is matching
               letters rather than reading the story */}
           {phase === 'hunt' && (
-            <p className={styles.huntTask}>
+            <p className={styles.hunt}>
               {foundWord ? (
                 <>
-                  Found it: <strong>{round.hunt}</strong>
+                  Found it: <strong className={styles.found}>{round.hunt}</strong>
                 </>
               ) : (
                 <>
@@ -153,11 +154,11 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
           )}
         </div>
 
-        <div className={cx(styles.bookPage, styles.right)}>
+        <div className={styles.page}>
           {story.lines.slice(0, revealed).map((line, i) => (
             <p
               key={i}
-              className={styles.storyLine}
+              className={styles.line}
               data-state={phase === 'hunt' ? 'huntable' : undefined}
               onClick={() => canHearLines && readLine(i)}
             >
@@ -167,8 +168,9 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
                 return (
                   <span
                     key={wi}
-                    className={styles.storyWord}
-                    data-state={isFound ? 'found' : undefined}
+                    className={styles.word}
+                    // the found word, in the one answer language (components.md)
+                    data-state={isFound ? 'right' : undefined}
                     onClick={e => {
                       if (phase === 'hunt') {
                         e.stopPropagation();
@@ -191,7 +193,7 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
             <ChunkyButton
               variant="prompt"
               icon="speaker"
-              className={styles.pageChip}
+              className={styles.pageButton}
               disabled={!canHearLines}
               title={canHearLines ? 'Hear the story' : 'Try it first!'}
               onClick={() => {
@@ -205,26 +207,26 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
           )}
 
           {phase === 'read' && (
-            <button className={styles.pageTurn} onClick={turnPage}>
-              {allRevealed ? 'I have read it! →' : 'Next line →'}
-            </button>
+            <ChunkyButton variant="action" iconAfter="arrow-right" className={styles.pageButton} onClick={turnPage}>
+              {allRevealed ? 'I have read it!' : 'Next line'}
+            </ChunkyButton>
           )}
         </div>
       </div>
 
       {phase === 'question' && (
-        <div className={styles.storyQuestion}>
+        <div className={styles.question}>
           <StagePrompt>{story.question}</StagePrompt>
-          <div className={styles.storyAnswers}>
+          <div className={styles.answers}>
             {answers.map(a => (
-              <button
+              <Choice
                 key={a.text}
-                className={styles.storyAnswer}
-                data-state={dataState(wrongAnswer === a.text ? 'wrong' : false, answered && a.correct ? 'right' : false)}
+                kind="phrase"
+                state={wrongAnswer === a.text ? 'wrong' : answered ? (a.correct ? 'right' : 'faded') : 'idle'}
                 onClick={() => answer(a.text, a.correct)}
               >
                 {a.text}
-              </button>
+              </Choice>
             ))}
           </div>
         </div>
