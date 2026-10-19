@@ -1,17 +1,5 @@
 # OPS — Housekeeping (anytime)
 
-### OPS-9 · Know-how browser checks find things by `data-shot`
-Task · P1 · S · needs: —
-- **Why:** found while closing DES-18a (2026-10-11). `speech-check.cjs`, `treasure-check.cjs` and `treasure-fit.cjs` in `.claude/skills/know-how/` find everything by class name (`.ipad-reading-app-card`, `.game-thing`, `.cookie.is-eaten`, `.treasure-option.is-right`…). DES-18b–d turn those into CSS-module names, so the checks stop finding anything partway through the stage. `ui:shots` already moved to `data-shot` names (DES-18a).
-- **How:**
-  - the walk from home to a game uses the `data-shot` names that exist since DES-18a (`open-reading`, `grade-card`, `hub`, `lesson-tile`, `game-tile`, `tile-title`, `play`, `shell-play`, `round-pips`);
-  - the game pieces they read (Feed Luna's cookies; Treasure Path's passage, claim, options and gaps; the speak chip) get `data-shot` names, and their states are read from `data-state` once DES-18c/d have moved them there;
-  - the "Selectors that work" list in the know-how skill names only those.
-  - **From DES-12 (2026-10-12):** `treasure-check.cjs` couldn't run to judge Treasure Path's new passage pictures (it still clicks `.ipad-reading-app-card`). The harness's clip labels also stick to the first line said (know-how, "Every clip carries the first line's label"); label each clip where it starts.
-  - **From DES-22c (2026-10-18):** `treasure-fit.mjs` next to them is a fit check written fresh on `data-shot` and Choice's `data-kind`; it can replace `treasure-fit.cjs` (delete the old one).
-- **Complete when:** the three checks pass against the moved tree, no class selector is left in them, and the know-how list names only `data-shot` and `data-state`.
-- **Blocked (2026-10-18): built and checked; waits for Alex to delete `treasure-fit.cjs` (`git rm`) and OK it.** Treasure Path's passage, claim, sentence, gap and "Read it to me" and Letter Cookies' cookies carry `data-shot` names (no screen changed: `ui:shots --diff` 0 of 104). `speech-check.cjs` and `treasure-check.cjs` walk in by `data-shot` and read answers from the stage's Choices and `data-state`; their clips are labelled where they're fetched, so each carries its own line (the old harness stuck every clip to the first line once two overlapped). The speak chip is gone from the app (DES-22), so nothing reads it. `treasure-fit.mjs` replaces `treasure-fit.cjs`, and now waits for each stone before measuring (it measured stone 1 twice). Runs: `treasure-check.cjs` at K, 1st and 2nd (both kinds, no leak, "Read it to me" locked at 1st and 2nd until a miss, every line a clip); `speech-check.cjs` (every line a clip, labels match); `treasure-fit.mjs` 2nd grade at 1024×768 every stone fits (32–50 words), and fails at 1024×560. Only `treasure-fit.cjs` still has class selectors, until it's deleted.
-
 ### OPS-1 · Delete dead code
 Task · P2 · S
 - (`src/App.css` went with DES-18a and `components/os/AppDock` with DES-18b, both 2026-10-11.)
