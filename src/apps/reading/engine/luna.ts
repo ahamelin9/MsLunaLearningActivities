@@ -145,9 +145,43 @@ export const PER_GAME: Record<string, Partial<Bank>> = {
   }
 };
 
+/**
+ * The milestone moon's lines (DES-17): she visits the done screen for a big
+ * milestone and says one of these, in the same voice. Short and warm, "good
+ * job" as on her board. Her look is always cheer.
+ */
+export type Milestone = 'first' | 'half' | 'all';
+
+export const MOON: Record<Milestone, { text: string }[]> = {
+  // the first lesson a child ever finishes
+  first: [
+    { text: 'Good job! You finished your very first lesson!' },
+    { text: 'Hello from the moon! Your first lesson is done.' },
+    { text: 'I saw you from the sky. Your first lesson! Good job!' }
+  ],
+  // half of a grade's lessons done
+  half: [
+    { text: 'Good job! Half of your lessons are done!' },
+    { text: 'You are halfway there! I came down to say good job.' },
+    { text: 'Look at you go! Half of your lessons, all done!' }
+  ],
+  // all of a grade's lessons done
+  all: [
+    { text: 'Good job! You finished every lesson!' },
+    { text: 'All of your lessons are done! The whole sky is proud of you.' },
+    { text: 'Every lesson, all done! I came down from the sky to see you.' }
+  ]
+};
+
+/** One of the moon's lines for a milestone. */
+export function moonSay(milestone: Milestone): string {
+  return pick(MOON[milestone]).text;
+}
+
 /** Every line Luna can say, for pre-generating her voice. */
 export const LUNA_PHRASES: string[] = [
   ...Object.values(GENERAL).flat().map(l => l.text),
+  ...Object.values(MOON).flat().map(l => l.text),
   ...Object.values(PER_GAME)
     .flatMap(bank => Object.values(bank))
     .flatMap(lines => lines ?? [])

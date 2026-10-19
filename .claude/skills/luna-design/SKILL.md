@@ -168,7 +168,11 @@ changed screens.
   DES-18a).
 - Does Luna's beak move only while a clip plays?
   `node .claude/skills/know-how/luna-talk-check.mjs 5199` (Vite on 5199;
-  DES-15). Her moods and blink are in `kit-check.mjs`. Her library greeting,
+  DES-15). Her moods and blink are in `kit-check.mjs`, and so are the
+  milestone moon's. Does the moon visit for the milestones only, once each,
+  talking alone? `moon-check.mjs` (DES-17; add `--reduced-motion` for the
+  second pass). Letter Cookies' plates mix their four cookies, letters
+  at size: `cookie-check.mjs` (DES-14). Her library greeting,
   the header's grade button and her mute: `greeting-check.mjs` (DES-21).
   The game's perch (her line, a no-tail bubble, "Hear my clue") and the
   stage's flash: `perch-check.mjs` (DES-22a), which also checks a won
@@ -176,7 +180,7 @@ changed screens.
   `win-shot.mjs` next to it.
 - Does the grown-up gate hold (SET-1)? `node .claude/skills/know-how/gate-check.mjs 5199`
   (and `--reduced-motion`): a tap or a short hold on the gears or the grade
-  opens nothing, a 2s hold does.
+  opens nothing, a 1.5s hold does.
 - Does a screen fit? `node .claude/skills/know-how/layout-audit.mjs 5199 <grade 0|1|2>`
   (Vite on 5199): nothing scrolls or is cut off mid-round, and no tap target
   outside a game's stage is small, overlapping or in the edge band (DES-10).
@@ -188,9 +192,11 @@ changed screens.
   `className="…"` string is left. For a refactor, the know-how entry "A move to
   CSS modules" has the rule-by-rule comparison too.
 - Dark mode: force it on the Kit page, or in the shots with
-  `npm run ui:shots -- --theme dark --label <name>-dark` (DES-8), and compare
-  each label with `--diff` as usual. Until DES-16 the app itself stays light,
-  and every screen is on roles (DES-24), so those shots show it all in dark.
+  `npm run ui:shots -- --theme dark --label <name>-dark`, which sets the
+  browser's light/dark setting as an iPad set to dark would; the app follows
+  it (DES-16). Compare each label with `--diff` as usual. Does the app follow
+  the iPad, Settings and the home screen's sun/moon button?
+  `node .claude/skills/know-how/theme-check.mjs 5199`.
 
 ### When a hook speaks
 - **Before an edit** (`design-guide.mjs`, DES-25): the first edit in an area

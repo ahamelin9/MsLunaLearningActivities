@@ -3,14 +3,15 @@ import type { GradeLevel } from '@/types/reading';
 import type { UserProgress } from '@/types/user';
 import type { AnyGameDef, GameApi, GameContext } from '../types';
 import type { Difficulty } from '../content';
-import { lunaSay, type LunaMood } from '../luna';
+import { lunaSay, moonSay, type LunaMood } from '../luna';
 import { lessonStates } from '../lessons';
+import { milestoneId, milestoneReached } from '../milestones';
 import { nextSticker, type Sticker } from '../stickers';
 import { soundManager } from '@/utils/audio';
 import { pronunciation, type SpeechPart } from '@/utils/pronunciation';
 import { warmGameIntro } from '../warmup';
 import { storageService } from '@/utils/storage';
-import { ChunkyButton, Flower, Luna, Petals, SpeechBubble } from '@/components/kit';
+import { Chip, ChunkyButton, Flower, Luna, Petals, SpeechBubble } from '@/components/kit';
 import { AppHeader } from '@/components/os/AppHeader/AppHeader';
 import { GAME_TINTS, GamePicture } from '../../games/shared/GamePicture/GamePicture';
 import { DoneScreen, type LessonPath } from '../DoneScreen/DoneScreen';
@@ -36,6 +37,13 @@ interface GameShellProps {
   /** a lesson's grade's lessons, in order: its done screen shows the bar moving on */
   lessons?: AnyGameDef[];
 }
+
+/**
+ * How long an answer may take to be said before the shell reacts anyway
+ * (FB-1): a miss's line is short; a right answer's read-back can be a sentence.
+ */
+const ANSWER_WATCHDOG_WRONG_MS = 2500;
+const ANSWER_WATCHDOG_RIGHT_MS = 7000;
 
 /** How tricky a game is, picked on its start screen: the words a child reads. */
 const DIFFICULTY_LABELS: { value: Difficulty; label: string }[] = [
@@ -87,6 +95,8 @@ export const GameShell: React.FC<GameShellProps> = ({
 
   const timers = useRef<number[]>([]);
   const [award, setAward] = useState<{ sticker: Sticker | null; stars: number; points: number } | null>(null);
+  // a big milestone's visit on the done screen: the moon's line (DES-17)
+  const [moon, setMoon] = useState<string | null>(null);
   const wonRef = useRef(0);
   const cleanRef = useRef(0);
   const recorded = useRef(false);
@@ -149,6 +159,7 @@ export const GameShell: React.FC<GameShellProps> = ({
     cleanRef.current = 0;
     recorded.current = false;
     setAward(null);
+    setMoon(null);
     setPhase('play');
   };
 
@@ -199,7 +210,7 @@ export const GameShell: React.FC<GameShellProps> = ({
   );
 
   const handleMiss = useCallback(
-    (opts?: { lunaLine?: string; hint?: SpeechPart[] }) => {
+    (opts?: { lunaLine?: string; hint?: SpeechPart[]; reveal?: () => void }) => {
       const attemptNumber = attempts + 1;
       setAttempts(attemptNumber);
       setWinStreak(0);
@@ -215,6 +226,14 @@ export const GameShell: React.FC<GameShellProps> = ({
       const spokenHint = nextHintLevel > 0 && opts?.hint?.length ? opts.hint : null;
       if (spokenHint) setHint(spokenHint);
 
+      // "Show me" (FB-2): from the third miss the game points at the answer,
+      // and Luna says so instead of another "try again"
+      if (nextHintLevel === 2 && opts?.reveal) {
+        opts.reveal();
+        speak(lunaSay('reveal', game.id).text, 'surprise', spokenHint ?? []);
+        return;
+      }
+
       const line =
         opts?.lunaLine ??
         (attemptNumber >= 2 ? lunaSay('missAgain', game.id).text : lunaSay('missFirst', game.id).text);
@@ -223,14 +242,76 @@ export const GameShell: React.FC<GameShellProps> = ({
     [attempts, game.id, later, speak]
   );
 
+  // An answer is being said (FB-1): input waits, and Luna with it.
+  const [answering, setAnswering] = useState(false);
+  // an answer is being said right now, before `answering` has re-rendered
+  const saying = useRef(false);
+  // set on every mount: StrictMode mounts twice in dev, running the cleanup between
+  const alive = useRef(true);
+  useEffect(() => {
+    alive.current = true;
+    return () => {
+      alive.current = false;
+    };
+  }, []);
+
+  /**
+   * The one answer path (FB-1): the game's own line first, whole, then the
+   * shell's reaction. Speech that is cut short (the child taps Again while it
+   * plays) never reports its end, so a watchdog settles the answer too: soon
+   * for a miss, later for a right answer, whose read-back can run a few
+   * seconds. Lessons' useAnswer goes through here as well.
+   */
+  const sayThen = useCallback((say: SpeechPart[] | undefined, watchdogMs: number, react: () => void) => {
+    // a second answer in the same moment (a tap that is also a click) is
+    // ignored: `api.locked` only reaches the game on its next render
+    if (saying.current) return;
+    if (!say?.length) {
+      react();
+      return;
+    }
+    saying.current = true;
+    setAnswering(true);
+    let settled = false;
+    const settle = () => {
+      if (settled || !alive.current) return;
+      settled = true;
+      saying.current = false;
+      window.clearTimeout(watchdog);
+      setAnswering(false);
+      react();
+    };
+    const watchdog = window.setTimeout(settle, watchdogMs);
+    timers.current.push(watchdog);
+    pronunciation.speakSequence(say, { onEnd: settle });
+  }, []);
+
+  const handleAnswer = useCallback(
+    (opts: {
+      correct: boolean;
+      say?: SpeechPart[];
+      hint?: SpeechPart[];
+      lunaLine?: string;
+      delay?: number;
+      reveal?: () => void;
+    }) =>
+      sayThen(opts.say, opts.correct ? ANSWER_WATCHDOG_RIGHT_MS : ANSWER_WATCHDOG_WRONG_MS, () =>
+        opts.correct
+          ? handleWin({ lunaLine: opts.lunaLine, delay: opts.delay })
+          : handleMiss({ lunaLine: opts.lunaLine, hint: opts.hint, reveal: opts.reveal })
+      ),
+    [sayThen, handleWin, handleMiss]
+  );
+
+  // a small good beat; its `say` (the word found) is said whole first (FB-1)
   const handleTick = useCallback(
-    (opts?: { lunaLine?: string }) => {
+    (opts?: { lunaLine?: string; say?: SpeechPart[] }) => {
       soundManager.playLetterSnap();
-      if (opts?.lunaLine) {
-        speak(opts.lunaLine, 'happy');
-      }
+      sayThen(opts?.say, ANSWER_WATCHDOG_WRONG_MS, () => {
+        if (opts?.lunaLine) speak(opts.lunaLine, 'happy');
+      });
     },
-    [speak]
+    [sayThen, speak]
   );
 
   const ctx: GameContext = useMemo(
@@ -243,13 +324,12 @@ export const GameShell: React.FC<GameShellProps> = ({
       ctx,
       attempts,
       hintLevel,
-      locked: flash === 'win',
-      win: handleWin,
-      miss: handleMiss,
+      locked: flash === 'win' || answering,
+      answer: handleAnswer,
       tick: handleTick,
       say: (text: string, m: LunaMood = 'happy') => speak(text, m)
     }),
-    [ctx, attempts, hintLevel, flash, handleWin, handleMiss, handleTick, speak]
+    [ctx, attempts, hintLevel, flash, answering, handleAnswer, handleTick, speak]
   );
 
   // The done screen's side effects: save progress, the fanfare, Luna's
@@ -257,6 +337,10 @@ export const GameShell: React.FC<GameShellProps> = ({
   useEffect(() => {
     if (phase !== 'reward' || !award || recorded.current) return;
     recorded.current = true;
+
+    // Luna's closing line, and the sticker's after it
+    const closing = () =>
+      speak(lunaSay('finish', game.id).text, 'cheer', award.sticker ? [{ text: award.sticker.line }] : []);
 
     if (game.lesson) {
       storageService.recordLessonCompletion(
@@ -266,6 +350,17 @@ export const GameShell: React.FC<GameShellProps> = ({
         game.lesson.skillId,
         award.sticker?.id ?? null
       );
+      // a big milestone brings the moon, once per child; while she's here
+      // only she talks, and Luna says her line once she's gone (DES-17)
+      const reached = lessons?.length
+        ? milestoneReached(lessons, doneBefore, storageService.getProgress().completedLessons)
+        : null;
+      if (reached && storageService.claimOnce(milestoneId(reached, grade))) {
+        soundManager.playFanfare();
+        const line = moonSay(reached);
+        later(() => setMoon(line), 0);
+        return;
+      }
     } else {
       storageService.recordGameCompletion({
         gameId: game.id,
@@ -276,10 +371,8 @@ export const GameShell: React.FC<GameShellProps> = ({
     }
 
     soundManager.playFanfare();
-    later(() => {
-      speak(lunaSay('finish', game.id).text, 'cheer', award.sticker ? [{ text: award.sticker.line }] : []);
-    }, 700);
-  }, [phase, award, game.id, game.lesson, later, speak]);
+    later(closing, 700);
+  }, [phase, award, game.id, game.lesson, later, speak, lessons, doneBefore, grade]);
 
   // the one header (DES-8): back to the library and the game's name; in play,
   // the rounds and Again too, as on the round 2 Round and Done boards
@@ -332,7 +425,15 @@ export const GameShell: React.FC<GameShellProps> = ({
           onPlayAgain={() => startPlay(difficulty)}
           onPlayAnother={onPlayAnother}
           playAnotherLabel={playAnotherLabel}
-          onLuna={() => speak(bubble, 'cheer')}
+          onLuna={() => {
+            // while the moon visits, only she talks
+            if (!moon) speak(bubble, 'cheer');
+          }}
+          moon={moon}
+          onMoonGone={() => {
+            setMoon(null);
+            speak(lunaSay('finish', game.id).text, 'cheer', award?.sticker ? [{ text: award.sticker.line }] : []);
+          }}
         />
       </>
     );
@@ -443,6 +544,15 @@ export const GameShell: React.FC<GameShellProps> = ({
           >
             {bubble}
           </SpeechBubble>
+          {/* her voice is off, and the games need it: say so, and who can
+              help; it names no target (SET-2) */}
+          {!progress.settings.speechEnabled && (
+            <span className={styles.resting} data-shot="luna-resting" role="status">
+              <Chip variant="accent" icon="mute">
+                Ms. Luna is resting. Ask a grown-up!
+              </Chip>
+            </span>
+          )}
         </div>
 
         {/* each win's petals drift down over the stage and the perch, and

@@ -84,7 +84,7 @@ export default function ChunkyButtonKit() {
           </Specimen>
         ))}
       </Specimens>
-      <Specimens title="hold: the grown-up gate, a 2s press and hold (SET-1)">
+      <Specimens title="hold: the grown-up gate, a 1.5s press and hold (SET-1)">
         <Specimen label="idle">
           <ChunkyButton variant="icon" icon="gear" aria-label="Grown-ups: settings" onHold={noop} />
         </Specimen>
@@ -101,6 +101,11 @@ export default function ChunkyButtonKit() {
           {/* room for the note, which hangs left from the button's right edge, as under the header's gear */}
           <div style={{ paddingLeft: 'calc(var(--space-16) * 3)', paddingBottom: 'var(--space-10)' }}>
             <ChunkyButton variant="icon" icon="gear" aria-label="Grown-ups: settings" onHold={noop} holdNote />
+          </div>
+        </Specimen>
+        <Specimen label="holdNoteAt start: from its left edge (Luna's mute)">
+          <div style={{ paddingRight: 'calc(var(--space-16) * 3)', paddingBottom: 'var(--space-10)' }}>
+            <ChunkyButton variant="icon" icon="speaker" aria-label="Grown-ups: mute Ms. Luna" onHold={noop} holdNote holdNoteAt="start" />
           </div>
         </Specimen>
       </Specimens>

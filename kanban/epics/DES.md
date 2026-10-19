@@ -53,13 +53,13 @@ them in.
 | 6 | The library | DES-21 → **PRG-7 (pulled in)** → DES-13 (done 2026-10-12) | The library as on the board: lessons in order, one bar |
 | 7 | Play | DES-22a (done 2026-10-12) → DES-22d (done 2026-10-13) → DES-11 (done 2026-10-17) → DES-22b, DES-22c → DES-23 (done 2026-10-18) | GameShell (start, stage, perch and the done screen), all 8 games and all 8 lesson types on the kit, with one right/wrong language |
 | 8 | The design system is done | DES-24 (done 2026-10-18) | Legacy styles deleted; the check runs strict with no baseline |
-| 9 | What's left of the epic | **SET-1 (pulled in)** → DES-16, then DES-17, then DES-14 | Light/dark follows the iPad with a grown-up choice; the milestone moon; real cookies |
+| 9 | What's left of the epic | **SET-1 (pulled in, done 2026-10-18)** → DES-16, then DES-17, then DES-14 | Light/dark follows the iPad with a grown-up choice; the milestone moon; real cookies |
 
 **Notes on the order:**
 - **Why structure comes before tokens:** the design check's baseline (DES-19) is taken on the final tree, so moving files later doesn't upset it.
 - **The two pulled-in tickets:**
   - PRG-7 (lessons open in order, Phase 7) was pulled into Stage 6 for DES-13, and both are done (2026-10-12).
-  - SET-1 (the grown-up gate, Phase 3) needs DES-9b, and DES-16's Settings choice lives behind it. If Alex would rather keep it in its phase, DES-16 waits for it, and the epic closes later.
+  - SET-1 (the grown-up gate, Phase 3) was pulled into Stage 9 because DES-16's Settings choice lives behind it, and is done (2026-10-18).
 - **DES-24 checks light and dark by forcing the theme** (on the Kit page and in the screenshots). DES-16 then lets the iPad and the grown-up switch it for real.
 - **DES-17's full-shelf milestone moved to PRG-4,** so the moon doesn't wait on squishies (PRG-5, Phase 7).
 - **DES-22d** (the done screen) was split from DES-22a before it started (Alex, 2026-10-12), and came before DES-11, whose petals fall on the done screen (both done).
@@ -69,6 +69,7 @@ them in.
 
 ### DES-14 · Feed Luna's cookies look like real, different cookies
 Story · P2 · S · needs: —
+- **Blocked (2026-10-18): redone after Alex's review; waits for his OK on the look.** Alex didn't like the four kinds (sprinkles, jam, iced): every cookie stays chocolate chip, with its chips in different spots. Rebuilt that way: four chip layouts by `data-chips`, the chips a little bigger, kept near the rim and out of the middle low down (where a g, p, q or y hangs); no new colours (the six sprinkle/jam/icing ones are gone). Checked: `cookie-check.mjs` at all three grades, lint, shots (only Letter Cookies' plate changed). Review sheet: `screenshots/review/des14-cookies.png`.
 - **Why:** every cookie is the same flat brown circle, which doesn't read as a picture (Alex, 2026-10-09).
 - **How:** a few cookie designs (chocolate chip, sprinkles, jam, and so on), mixed in each round, drawn in the DES-2 style, with their colours in `_illustration.scss`. The letter stays just as easy to read.
 - **Complete when:** a round shows at least two different cookie designs, and every letter still meets the DES-2 type minimums.
@@ -83,11 +84,12 @@ Task · P2 · S · needs: —
   - `components/kit` is still at zero.
 
 ### DES-16 · Light and dark mode
-Story · P1 · M · needs: SET-1
+Story · P1 · M · needs: —
+- **Blocked (2026-10-18): waits for Alex's review.** Built and checked while he was away (`theme-check.mjs` 22 of 22, lint, shots, the layout audit at K); the review sheet is `screenshots/review/des16-light-and-dark.png`, and `screenshots/review/HANDOVER.md` has the rest. Left for Alex: his OK on the sun/moon button's shots (it isn't on the board) and every screen in dark on the real iPad. Then it closes out.
 - **Why:** Alex wants a real dark mode (2026-10-09), and building the components on role tokens from the start keeps every screen working in both.
 - **How:** the dark roles already exist (DES-3), and the contrast check runs in lint (DES-19). What's left:
   - **Follow the iPad's light/dark setting by default:** a `prefers-color-scheme: dark` block (`:root:not([data-theme="light"])`) outputs the dark roles. An inline script in `index.html` sets `data-theme` on `<html>` before the first paint, so there's no flash.
-  - **A grown-up's choice:** Light, Dark or "Match the iPad" in Settings, behind the gate (SET-1). The choice is saved.
+  - **A grown-up's choice:** Light, Dark or "Match the system" in Settings, behind the gate (SET-1). The choice is saved. ("the system", not "the iPad": it may be a Chromebook; Alex, 2026-10-18.)
   - **A sun/moon button on the home screen (Alex, 2026-10-12):** beside the gear in the status bar, a kit icon button a child can tap to turn day into night (the moon and stars) and back. It's saved like the Settings choice, which still works; the gear stays Settings. The Home board has no such button, so Alex OKs its shots. It comes only here: before every screen is on the roles, dark would show a dark header over light screens.
   - Every screen uses the roles only. Illustrations (Luna, squishies, flowers) keep their own colours from `_illustration.scss`.
   - At night the home screen shows a crescent moon in moon gold and twinkling stars instead of the sun (round 2 Home board), using the night scenery from `_illustration.scss`.
@@ -102,6 +104,7 @@ Story · P1 · M · needs: SET-1
 
 ### DES-17 · The moon visits for big milestones
 Story · P1 · M · needs: —
+- **Blocked (2026-10-18): waits for Alex's review.** Built and checked while he was away: every Complete when point passes (`moon-check.mjs`, with and without reduced motion; clips rendered, `voice:audit`; lint). Left for Alex: the moon's 9 lines, the two new shared animations (`--motion-glide-in`, `--motion-glide-out`), where she lands, and decisions.md's open question on the milestones. Review sheet: `screenshots/review/des17-milestone-moon.png`; `screenshots/review/HANDOVER.md` has the rest.
 - **Why:** the teacher (2026-10-10): the second moon on the round 2 Ms. Luna board, a crescent with a face and black glasses, comes in every once in a while to say "good job" for big milestones. The owl stays Luna.
 - **How:**
   - Draw that moon (round 2 Ms. Luna board, moon 6, marked "Milestone moon") as its own kit component, `src/components/kit/MilestoneMoon/`, in moon gold from `_illustration.scss`, the one colour outside the palette. She needs a happy and a cheer look, both shown on the Kit page. Her mouth moves only while her clip plays: she can follow `useSpeaking()` as Luna does (DES-15), and Luna gets `talking={false}` while the moon visits, or both would talk.

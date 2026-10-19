@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import type { GameApi, GameDef } from '../../engine/types';
-import { lettersFor, pick, tierFor, type LetterItem } from '../../engine/content';
+import { lettersFor, pick, sample, tierFor, type LetterItem } from '../../engine/content';
 import { pickWrong, textChoice } from '../../engine/distractors';
 import { soundManager } from '@/utils/audio';
 import { pronunciation } from '@/utils/pronunciation';
@@ -57,6 +57,8 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
     makeBubble(round)
   ]);
   const [popped, setPopped] = useState(0);
+  // "show me" (FB-2): the bubbles that make the sound are pointed at from the third miss
+  const [shown, setShown] = useState(false);
   const doneRef = useRef(false);
   const poppedRef = useRef(0);
 
@@ -117,19 +119,23 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
 
     if (bubble.isTarget) {
       soundManager.playPop();
-      pronunciation.speakLetterSound(round.letter.letter);
       poppedRef.current += 1;
       setPopped(poppedRef.current);
 
       if (poppedRef.current >= round.needed) {
         doneRef.current = true;
-        api.win({ delay: 1500 });
+        // its sound, whole, then Luna's cheer (FB-1)
+        api.answer({ correct: true, say: [{ sound: round.letter.letter }], delay: 1500 });
       } else {
+        pronunciation.speakLetterSound(round.letter.letter);
         api.tick();
       }
     } else {
-      pronunciation.speakSequence([{ text: 'That one says' }, { sound: bubble.char }]);
-      api.miss({
+      // "That one says /m/", whole, before Luna's line (FB-1)
+      api.answer({
+        correct: false,
+        say: [{ text: 'That one says' }, { sound: bubble.char }],
+        reveal: () => setShown(true),
         hint: [{ text: 'Listen for' }, { sound: round.letter.letter }, { text: 'like' }, { word: round.letter.anchor }]
       });
     }
@@ -158,7 +164,7 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
             key={b.id}
             className={styles.bubble}
             // a game piece in the one answer language (components.md)
-            data-state={b.popped ? (b.isTarget ? 'right' : 'wrong') : undefined}
+            data-state={b.popped ? (b.isTarget ? 'right' : 'wrong') : shown && b.isTarget ? 'revealed' : undefined}
             style={{ left: `${b.x}%`, top: `${b.y}%`, '--size': b.size } as React.CSSProperties}
             onClick={() => pop(b)}
             aria-label={`bubble ${b.char}`}
@@ -189,9 +195,12 @@ export const bubbleSounds: GameDef<Round> = {
     const tier = tierFor(grade, difficulty);
     const pool = lettersFor(tier);
     const rounds: Round[] = [];
+    // any letter in the tier's pool, none twice in a play (BUG-21: slots i*3
+    // to i*3+2 only ever reached the pool's first 12)
+    const letters = sample(pool, count);
 
     for (let i = 0; i < count; i++) {
-      const letter = pool[(i * 3 + Math.floor(Math.random() * 3)) % pool.length];
+      const letter = letters[i % letters.length];
       const decoys = pickWrong(letter.letter, pool.map(l => l.letter), 10, { as: textChoice, letterBy: 'sound' });
 
       rounds.push({

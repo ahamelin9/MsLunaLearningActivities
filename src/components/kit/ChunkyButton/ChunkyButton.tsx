@@ -20,6 +20,8 @@
  *         "Grown-ups: press and hold" under it for a while (the note's
  *         data-state="shown"). holdNote shows the note without a tap (the
  *         Kit page), and --hold-progress (0–1) holds the ring part-filled.
+ *         holdNoteAt="start" lines the note up with the button's left edge,
+ *         for a button near the screen's left edge (SET-2)
  *         className goes on the wrapper here
  * Tokens: --button-bg, --button-ink, --button-border, --button-border-style,
  *         --button-edge, --button-ledge, --button-height, --button-pad,
@@ -52,6 +54,8 @@ interface ChunkyButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   onHold?: () => void;
   /** Shows the hold note without a tap (the Kit page). */
   holdNote?: boolean;
+  /** Where the note lines up: the button's right edge (default) or its left, for a button near the screen's left edge. */
+  holdNoteAt?: 'end' | 'start';
 }
 
 const HOLD_NOTE = 'Grown-ups: press and hold';
@@ -66,6 +70,7 @@ export function ChunkyButton({
   children,
   onHold,
   holdNote,
+  holdNoteAt,
   ...rest
 }: ChunkyButtonProps) {
   const edge = icon && !iconAfter ? 'start' : iconAfter && !icon ? 'end' : undefined;
@@ -83,7 +88,7 @@ export function ChunkyButton({
       </>
     ),
   };
-  if (onHold) return <HoldButton {...props} className={className} onHold={onHold} holdNote={holdNote} />;
+  if (onHold) return <HoldButton {...props} className={className} onHold={onHold} holdNote={holdNote} holdNoteAt={holdNoteAt} />;
   return <button {...props} className={cx(styles.root, className)} />;
 }
 
@@ -97,9 +102,10 @@ function HoldButton({
   className,
   onHold,
   holdNote,
+  holdNoteAt,
   style,
   ...rest
-}: ButtonHTMLAttributes<HTMLButtonElement> & { onHold: () => void; holdNote?: boolean }) {
+}: ButtonHTMLAttributes<HTMLButtonElement> & { onHold: () => void; holdNote?: boolean; holdNoteAt?: 'end' | 'start' }) {
   const [progress, setProgress] = useState(0);
   const [noted, setNoted] = useState(false);
   const holding = useRef(false);
@@ -143,7 +149,7 @@ function HoldButton({
 
   const shown = noted || holdNote;
   return (
-    <span className={cx(styles.hold, className)}>
+    <span className={cx(styles.hold, className)} data-note={holdNoteAt === 'start' ? 'start' : undefined}>
       <button
         {...rest}
         className={styles.root}

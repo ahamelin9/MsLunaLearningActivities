@@ -14,7 +14,7 @@ import kit from '../shared/LessonKit.module.scss';
  */
 export const RhymeMatch: React.FC<{ question: RhymeMatchQuestion; api: GameApi }> = ({ question, api }) => {
   const options = useMemo(() => shuffle(question.options), [question.options]);
-  const { solved, wrongId, choose } = useAnswer(api, question.hint);
+  const { solved, wrongId, revealed, choose } = useAnswer(api, question.hint);
 
   const sayPrompt = () => soundManager.speak(question.speechPrompt ?? question.prompt);
   usePrompt(sayPrompt);
@@ -45,9 +45,9 @@ export const RhymeMatch: React.FC<{ question: RhymeMatchQuestion; api: GameApi }
             key={option.word}
             kind="picture"
             data-shot="lesson-choice"
-            state={choiceState(option.word, option.isRhyme, wrongId, solved)}
+            state={choiceState(option.word, option.isRhyme, wrongId, solved, revealed)}
             onClick={() =>
-              choose(option.word, option.isRhyme, onEnd => pronunciation.speakWord(option.word, { onEnd }))
+              choose(option.word, option.isRhyme, [{ word: option.word }])
             }
             aria-label={option.word}
             caption={solved ? option.word : undefined}

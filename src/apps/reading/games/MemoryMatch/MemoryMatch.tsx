@@ -75,6 +75,9 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
   const [flipped, setFlipped] = useState<string[]>([]);
   const [matched, setMatched] = useState<string[]>([]);
   const [wobble, setWobble] = useState<string[]>([]);
+  // "show me" (FB-2): from the third miss, both cards of the pair just
+  // tried again glow face down
+  const [shownPair, setShownPair] = useState<string | null>(null);
   const tried = useRef<Set<string>>(new Set());
   const busy = useRef(false);
 
@@ -94,45 +97,48 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
     if (flipped.includes(card.id) || matched.includes(card.pair)) return;
 
     soundManager.playLetterTap();
-    pronunciation.speakSequence(cardParts(card));
 
     const next = [...flipped, card.id];
     setFlipped(next);
-    if (next.length < 2) return;
+    if (next.length < 2) {
+      pronunciation.speakSequence(cardParts(card));
+      return;
+    }
 
     busy.current = true;
     const [firstId, secondId] = next;
     const first = round.cards.find(c => c.id === firstId)!;
     const second = round.cards.find(c => c.id === secondId)!;
+    const isMatch = first.pair === second.pair;
+    const lastPair = isMatch && matched.length + 1 >= round.pairCount;
+    const key = [firstId, secondId].sort().join('|');
+    const repeat = !isMatch && tried.current.has(key);
+    if (!isMatch) tried.current.add(key);
 
-    if (first.pair === second.pair) {
+    // the second card is said whole before Luna reacts to the pair (FB-1)
+    if (lastPair) api.answer({ correct: true, say: cardParts(card), delay: 1700 });
+    else if (repeat)
+      api.answer({
+        correct: false,
+        say: cardParts(card),
+        lunaLine: 'We already tried those two! Remember where they live.',
+        reveal: () => setShownPair(first.pair),
+        hint: [{ text: 'Look for the partner of' }, ...cardParts(first)]
+      });
+    else pronunciation.speakSequence(cardParts(card));
+
+    if (isMatch) {
       window.setTimeout(() => {
-        const nowMatched = [...matched, first.pair];
-        setMatched(nowMatched);
+        setMatched([...matched, first.pair]);
         setFlipped([]);
         busy.current = false;
-
-        if (nowMatched.length >= round.pairCount) {
-          api.win({ delay: 1700 });
-        } else {
-          api.tick();
-        }
+        if (!lastPair) api.tick();
       }, 620);
     } else {
-      const key = [firstId, secondId].sort().join('|');
-      const repeat = tried.current.has(key);
-      tried.current.add(key);
-
       window.setTimeout(() => {
         setWobble([firstId, secondId]);
-        if (repeat) {
-          api.miss({
-            lunaLine: 'We already tried those two! Remember where they live.',
-            hint: [{ text: 'Look for the partner of' }, ...cardParts(first)]
-          });
-        } else {
-          soundManager.playTryAgain();
-        }
+        // a repeat's try-again sound comes with Luna's line (api.answer)
+        if (!repeat) soundManager.playTryAgain();
 
         // they turn back over once the wobble has played (components.md)
         afterMotion('emphasis', () => {
@@ -159,7 +165,12 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
               key={card.id}
               className={styles.card}
               // a game piece in the one answer language (components.md)
-              data-state={dataState(isOpen ? 'open' : false, isMatched ? 'right' : false, wobble.includes(card.id) ? 'wrong' : false)}
+              data-state={dataState(
+                isOpen ? 'open' : false,
+                isMatched ? 'right' : false,
+                wobble.includes(card.id) ? 'wrong' : false,
+                shownPair === card.pair && !isMatched ? 'revealed' : false
+              )}
               onClick={() => flip(card)}
               aria-label={isOpen ? card.ariaLabel : 'face down card'}
             >

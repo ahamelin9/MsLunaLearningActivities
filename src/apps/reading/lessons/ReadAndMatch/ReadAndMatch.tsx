@@ -11,7 +11,7 @@ import kit from '../shared/LessonKit.module.scss';
 /** Read a word, find its picture. */
 export const ReadAndMatch: React.FC<{ question: ReadAndMatchQuestion; api: GameApi }> = ({ question, api }) => {
   const options = useMemo(() => shuffle(question.options), [question.options]);
-  const { solved, wrongId, choose } = useAnswer(api, question.hint);
+  const { solved, wrongId, revealed, choose } = useAnswer(api, question.hint);
 
   // the word is the child's to read: Luna never says it until it is found
   const sayPrompt = () => soundManager.speak(question.speechPrompt ?? 'Read the word, then find its picture.');
@@ -43,9 +43,9 @@ export const ReadAndMatch: React.FC<{ question: ReadAndMatchQuestion; api: GameA
             key={option.id}
             kind="picture"
             data-shot="lesson-choice"
-            state={choiceState(option.id, option.isCorrect, wrongId, solved)}
+            state={choiceState(option.id, option.isCorrect, wrongId, solved, revealed)}
             onClick={() =>
-              choose(option.id, option.isCorrect, onEnd => pronunciation.speakText(option.text, { onEnd }))
+              choose(option.id, option.isCorrect, [{ text: option.text }])
             }
             aria-label={option.text}
             // named once found: written, it would be matched to the word letter for letter

@@ -13,8 +13,9 @@
 //   - back from a game: no greeting;
 //   - the header's grade (data-shot="change-grade"): Grade Select with that
 //     grade picked; picking 1st returns to the library on 1st, no greeting;
-//   - the mute beside her (data-shot="luna-mute") stops her mid-line, keeps
-//     her taps silent, matches Settings' "Ms. Luna's voice", and unmutes;
+//   - the mute beside her (data-shot="luna-mute"): a quick tap leaves her
+//     voice on, a 1.5s hold mutes her (SET-2); muted, her taps are silent and
+//     Settings' "Ms. Luna's voice" is off; one tap unmutes her;
 //   - nothing falls back to the browser voice.
 // It fails on the commit before DES-21, where she greeted no one.
 
@@ -24,7 +25,7 @@ import { chromePath } from '../../../scripts/chrome-path.cjs';
 const port = process.argv[2] ?? '5199';
 const at = n => `[data-shot="${n}"]`;
 const wait = ms => new Promise(r => setTimeout(r, ms));
-// the grown-up gate (SET-1): press and hold for --dur-hold (2s), then let go
+// the grown-up gate (SET-1): press and hold for --dur-hold (1.5s), then let go
 const hold = async selector => {
   const box = await (await page.$(selector)).boundingBox();
   await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
@@ -116,9 +117,10 @@ const change = await step('changing grade from the header', async () => {
 }, 3500);
 const nowShows = await page.$eval(at('change-grade'), el => el.textContent.trim()).catch(() => null);
 
-// the mute beside her (Alex, 2026-10-12): it stops her mid-line, keeps her
+// the mute beside her (Alex, 2026-10-12): it stops her talking, keeps her
 // taps silent, is the same setting as Settings' "Ms. Luna's voice", and
-// unmutes her again
+// unmutes her again. Since SET-2 muting is a grown-up's 1.5s hold, so a quick
+// tap must leave her voice on; unmuting is still one tap
 const talking = () => page.evaluate(() => !!document.querySelector('[data-shot="hub"] [data-mood][data-state~="talking"]'));
 await page.click('[data-shot="hub"] [data-mood]');
 let talkingBefore = false;
@@ -127,6 +129,9 @@ for (let i = 0; i < 40 && !talkingBefore; i++) {
   talkingBefore = await talking();
 }
 await page.click(at('luna-mute'));
+await wait(300);
+const tapLeftOn = (await page.$eval(at('luna-mute'), el => el.getAttribute('aria-label'))) === 'Grown-ups: mute Ms. Luna';
+await hold(at('luna-mute'));
 await wait(150);
 const talkingAfter = await talking();
 const mutedLabel = await page.$eval(at('luna-mute'), el => el.getAttribute('aria-label'));
@@ -152,9 +157,10 @@ const checks = [
   ['back from a game: no greeting', game.greeting.length === 0],
   [`the header's grade opens Grade Select with Kindergarten picked (${JSON.stringify(picked)})`, JSON.stringify(picked) === '["true","false","false"]'],
   [`picking 1st returns to the library on 1st ("${nowShows}"), "Let’s start First Grade!" said, no greeting`, nowShows === '1st Grade' && change.greeting.length === 0 && change.said.some(t => /start First Grade/.test(t))],
-  [`the mute stops her mid-line (talking before: ${talkingBefore}, after: ${talkingAfter}) and becomes "${mutedLabel}"`, talkingBefore && !talkingAfter && mutedLabel === 'Unmute Ms. Luna'],
+  [`a quick tap on the mute leaves her voice on (SET-2)`, tapLeftOn],
+  [`a 1.5s hold mutes her: she stops talking (talking before: ${talkingBefore}, after: ${talkingAfter}) and it becomes "${mutedLabel}"`, talkingBefore && !talkingAfter && mutedLabel === 'Unmute Ms. Luna'],
   [`while muted, a tap on her plays no clip (${mutedTap.clips}), and Settings' "Ms. Luna’s voice" is off (aria-checked ${settingsSwitch})`, mutedTap.clips === 0 && settingsSwitch === 'false'],
-  [`unmuting ("${unmutedLabel}") brings her voice back: a tap plays a clip (${unmutedTap.clips})`, unmutedLabel === 'Mute Ms. Luna' && unmutedTap.clips >= 1],
+  [`unmuting ("${unmutedLabel}") brings her voice back: a tap plays a clip (${unmutedTap.clips})`, unmutedLabel === 'Grown-ups: mute Ms. Luna' && unmutedTap.clips >= 1],
   ['no line fell back to the browser voice', spoke.length === 0]
 ];
 for (const [what, ok] of checks) console.log(`${ok ? '✅' : '❌'} ${what}`);

@@ -1,9 +1,13 @@
 // Letter Cookies (Feed Luna) on the kit (DES-22b): Luna and the spot under her
 // beak, the kit ListenCue for what she wants, and her cookies, a game piece in
-// the one answer language (components.md). A cookie keeps its drawn colours
-// (_illustration.scss) until DES-14 draws real, different ones.
+// the one answer language (components.md). The cookies are chocolate chip,
+// drawn in the illustration palette, their chips in different spots (DES-14).
 
 @use 'styles/mixins' as *;
+
+// a chocolate chip, and where its soft edge ends (DES-14)
+$chip: calc(var(--space-1) * 1.2);
+$chip-edge: calc(var(--space-1) * 1.5);
 
 .feed {
   gap: var(--space-6);
@@ -89,16 +93,44 @@
     border-color var(--dur-quick) var(--ease-standard),
     opacity var(--dur-quick) var(--ease-exit);
 
-  // two chocolate chips
+  // its chocolate chips (DES-14): every cookie is chocolate chip, and
+  // `data-chips` puts them in one of four places, so no two neighbours look
+  // alike. They keep near the rim, clear of the letter; low down they stay
+  // out of the middle, where a g, p, q or y hangs.
   &::after {
     content: '';
     position: absolute;
-    inset: var(--space-3);
+    inset: var(--space-2);
     border-radius: var(--radius-chip);
     background:
-      radial-gradient(circle at 30% 40%, var(--illo-cookie-chip) 0 calc(var(--space-1) * 0.75), transparent var(--space-1)),
-      radial-gradient(circle at 70% 62%, var(--illo-cookie-chip-soft) 0 calc(var(--space-1) * 0.75), transparent var(--space-1));
+      radial-gradient(circle at 24% 26%, var(--illo-cookie-chip) 0 $chip, transparent $chip-edge),
+      radial-gradient(circle at 80% 30%, var(--illo-cookie-chip-soft) 0 $chip, transparent $chip-edge),
+      radial-gradient(circle at 78% 80%, var(--illo-cookie-chip) 0 $chip, transparent $chip-edge);
     pointer-events: none;
+  }
+
+  &[data-chips='2']::after {
+    background:
+      radial-gradient(circle at 16% 38%, var(--illo-cookie-chip-soft) 0 $chip, transparent $chip-edge),
+      radial-gradient(circle at 70% 16%, var(--illo-cookie-chip) 0 $chip, transparent $chip-edge),
+      radial-gradient(circle at 86% 64%, var(--illo-cookie-chip) 0 $chip, transparent $chip-edge),
+      radial-gradient(circle at 22% 80%, var(--illo-cookie-chip-soft) 0 $chip, transparent $chip-edge);
+  }
+
+  &[data-chips='3']::after {
+    background:
+      radial-gradient(circle at 36% 14%, var(--illo-cookie-chip) 0 $chip, transparent $chip-edge),
+      radial-gradient(circle at 16% 76%, var(--illo-cookie-chip) 0 $chip, transparent $chip-edge),
+      radial-gradient(circle at 84% 78%, var(--illo-cookie-chip-soft) 0 $chip, transparent $chip-edge);
+  }
+
+  &[data-chips='4']::after {
+    background:
+      radial-gradient(circle at 14% 36%, var(--illo-cookie-chip) 0 $chip, transparent $chip-edge),
+      radial-gradient(circle at 58% 12%, var(--illo-cookie-chip-soft) 0 $chip, transparent $chip-edge),
+      radial-gradient(circle at 88% 46%, var(--illo-cookie-chip) 0 $chip, transparent $chip-edge),
+      radial-gradient(circle at 22% 78%, var(--illo-cookie-chip-soft) 0 $chip, transparent $chip-edge),
+      radial-gradient(circle at 74% 86%, var(--illo-cookie-chip) 0 $chip, transparent $chip-edge);
   }
 
   &:active {
@@ -115,6 +147,13 @@
   &[data-state~='wrong'] {
     border-color: var(--try-again-edge);
     animation: var(--motion-wobble);
+  }
+
+  // "show me" (FB-2): the right one, pointed at after three misses; it keeps
+  // its dough and takes the revealed piece's dashed accent edge (components.md)
+  &[data-state~='revealed'] {
+    border-style: dashed;
+    border-color: var(--accent-edge);
   }
 
   // the right one: the right edge, the glow and the pop, then it's eaten

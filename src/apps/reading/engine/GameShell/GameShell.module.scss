@@ -187,3 +187,9 @@
 .bubble {
   min-width: 0;
 }
+
+// Luna's voice is off (SET-2): the note sits at the perch's end
+.resting {
+  flex: none;
+  margin-left: auto;
+}

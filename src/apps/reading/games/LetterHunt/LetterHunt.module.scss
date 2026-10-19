@@ -54,6 +54,14 @@
     animation: var(--motion-wobble);
   }
 
+  // "show me" (FB-2): the letters still to catch, pointed at after three
+  // misses; each keeps its tint and takes the revealed piece's dashed accent
+  // edge (components.md)
+  &[data-state~='revealed'] .body {
+    border-style: dashed;
+    border-color: var(--accent-edge);
+  }
+
   // a caught one: the right edge, the glow and the pop, then it's in the jar
   &[data-state~='right'] {
     opacity: 0;

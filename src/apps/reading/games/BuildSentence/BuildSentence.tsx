@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import type { GameApi, GameDef } from '../../engine/types';
 import { pick, sentencesFor, shuffle, tierFor, type SentenceItem } from '../../engine/content';
 import { pickWrong, textChoice } from '../../engine/distractors';
@@ -44,13 +44,23 @@ function buildRound(tier: 1 | 2 | 3): Round {
   return { sentence, words, tiles: shuffle(tiles) };
 }
 
+/** The longest a word of the read-aloud may take before the read-back goes on without it. */
+const WORD_READ_MS = 1500;
+
 const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
   const [slots, setSlots] = useState<(Tile | null)[]>(() => round.words.map(() => null));
   const [readingIndex, setReadingIndex] = useState(-1);
   const [solved, setSolved] = useState(false);
   const [shakeSlot, setShakeSlot] = useState(false);
+  // "show me" (FB-2): from the third miss the words from the first wrong place
+  // go back to the shelf, and the word for the next space glows, one by one
+  const [shown, setShown] = useState(false);
+  // a read-aloud cut short never ends: the cheer comes anyway (FB-1)
+  const readWatchdog = useRef<number | undefined>(undefined);
+  useEffect(() => () => window.clearTimeout(readWatchdog.current), []);
 
   const placed = slots.filter(Boolean) as Tile[];
+  const nextWord = round.words[slots.findIndex(s => s === null)];
   const available = round.tiles.filter(t => !placed.some(p => p.id === t.id));
 
   useEffect(() => {
@@ -87,16 +97,28 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
     if (correct) {
       setSolved(true);
       soundManager.playCorrect();
-      readAloud(attempt, () => {
-        pronunciation.speakSentence(round.sentence.text);
-      });
-      api.win({ delay: 3200 });
+      // word by word, then the whole sentence, and only then Luna's cheer
+      // (FB-1, BUG-1: the cheer used to cut the read-back off)
+      let settled = false;
+      const readBack = () => {
+        if (settled) return;
+        settled = true;
+        window.clearTimeout(readWatchdog.current);
+        api.answer({ correct: true, say: [{ text: round.sentence.text }], delay: 1800 });
+      };
+      readWatchdog.current = window.setTimeout(readBack, attempt.length * WORD_READ_MS);
+      readAloud(attempt, readBack);
     } else {
       // the page wobbles, and clears when its wobble ends (components.md)
       setShakeSlot(true);
       afterMotion('emphasis', () => setShakeSlot(false));
       const firstWrong = attempt.findIndex((w, i) => w !== round.words[i]);
-      api.miss({
+      api.answer({
+        correct: false,
+        reveal: () => {
+          setSlots(prev => prev.map((slot, i) => (i < firstWrong ? slot : null)));
+          setShown(true);
+        },
         hint:
           firstWrong === 0
             ? [{ text: 'A sentence starts with a capital letter. Which word begins with a big letter?' }]
@@ -163,7 +185,13 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
 
       <div className={styles.shelf}>
         {available.map(tile => (
-          <button key={tile.id} className={styles.tile} onClick={() => placeTile(tile)}>
+          <button
+            key={tile.id}
+            className={styles.tile}
+            // the word for the next space, once "show me" is on (FB-2)
+            data-state={shown && !solved && tile.word === nextWord ? 'revealed' : undefined}
+            onClick={() => placeTile(tile)}
+          >
             {tile.word}
           </button>
         ))}

@@ -32,8 +32,8 @@ list. Restyling the app means changing these, not every screen. The Kit page
 
 | Component | What it is | Variants and states | Ticket |
 |---|---|---|---|
-| `Icon` | The drawn icon set: round-capped strokes in `currentColor`, no colour of its own | check, clock, lock, unlock, chevron and arrow left/right, home, speaker, mute, ear, replay, gear, info, book, dice, play, star, sparkle, close, trophy, lightbulb; sizes 16, 20, 24, 32, 40 (the ListenCue's ear) and 96 (the done screen's mark); filled | DES-7a (done), 96 DES-22d |
-| `ChunkyButton` | The pressable button with a hard ledge | action, accent (Luna's own: "Hear my clue", Luna's Pick), secondary, quiet (dashed), icon; sizes 48 and 64; an icon before or after the words; pressed, disabled, selected (`aria-pressed`: the picked one in a pick-one row takes the action look, DES-9b); prompt (the Round board's pill a game puts by its text, "Say it again", "Read it to me": the soft accent, round ends, no ledge, the reading type in bold, a speaker icon; disabled while the child should try first; DES-22b); hold (`onHold`: the grown-up gate, SET-1. It opens only after a press held for `--dur-hold`, while a ring of the action colour fills round it; a quick tap only shows a small "Grown-ups: press and hold" note. On the home screen's gear, the library's gear and the library's grade button) | DES-7a (done), accent DES-7b, prompt DES-22b, hold SET-1 |
+| `Icon` | The drawn icon set: round-capped strokes in `currentColor`, no colour of its own | check, clock, lock, unlock, chevron and arrow left/right, home, speaker, mute, ear, replay, gear, info, book, dice, play, star, sparkle, close, trophy, lightbulb, sun and moon (home's day/night button, DES-16); sizes 16, 20, 24, 32, 40 (the ListenCue's ear) and 96 (the done screen's mark); filled | DES-7a (done), 96 DES-22d, sun and moon DES-16 |
+| `ChunkyButton` | The pressable button with a hard ledge | action, accent (Luna's own: "Hear my clue", Luna's Pick), secondary, quiet (dashed), icon; sizes 48 and 64; an icon before or after the words; pressed, disabled, selected (`aria-pressed`: the picked one in a pick-one row takes the action look, DES-9b); prompt (the Round board's pill a game puts by its text, "Say it again", "Read it to me": the soft accent, round ends, no ledge, the reading type in bold, a speaker icon; disabled while the child should try first; DES-22b); hold (`onHold`: the grown-up gate, SET-1. It opens only after a press held for `--dur-hold`, while a ring of the action colour fills round it; a quick tap only shows a small "Grown-ups: press and hold" note. On the home screen's gear, the library's gear and the library's grade button, and muting Luna beside her in the library, SET-2; `holdNoteAt="start"` lines the note up with the button's left edge, for a button near the screen's left) | DES-7a (done), accent DES-7b, prompt DES-22b, hold SET-1, holdNoteAt SET-2 |
 | `PaperCard` | The card surface | flat, card, lifted; reward (the done screen's panel for a new reward: flat, a thick dashed accent border, as on the Done board) | DES-7a (done), reward DES-22d |
 | `Chip` | A small pill: tag, count or time | time ("about 5 min"), took ("took 4 min"), accent ("Up next", "12 min today"), count (stars), rare and super-rare (a squishy's colour tag, with `shimmer`); `ground="well"` for a chip on a well. `TimeChip` is a preset: `minutes`, `took`, `highlight` | DES-7a (done), rarity tags DES-7c |
 | `Tile` | A card with a picture area and a name | the Play Shelf's games; picture tints 1–5; pressed; picked (`aria-pressed`: the picked one in a pick-one set takes the action look, its picture keeping its tint and ink; Grade Select, DES-9c) | DES-7a (done), picked DES-9c |
@@ -49,7 +49,7 @@ list. Restyling the app means changing these, not every screen. The Kit page
 | `Luna` | Ms. Luna, the owl the teacher picked (round 2, owl 1) | 8 moods (idle, happy, cheer, think, oops, surprise, listen, sleepy), each a pose of one drawing; blinks in idle, happy, think and listen; talking follows the voice by itself (her beak moves only while a clip plays; `talking={false}` keeps her quiet while someone else speaks); `float` for screens where nothing is being played; any `size`; tappable with `onClick`. Her colours come only from `--illo-luna-*` | DES-15 (done) |
 | `Flower` | A flower in its mound of soil: the garden a won round grows (never progress) | daisy, red rose, blush rose; small, medium, large (56, 64, 84px wide); still, or `grow` (the shared grow-in on its `step`, a little after the step before, then the shared sway). Its colours come only from `_illustration.scss`; the soil is `--soil` | DES-11 |
 | `Petals` | Petals drifting down instead of confetti | at once (a won round) or `delayed` (the done screen, once it has arrived); `count` (30). Each falls once; mount it again with a new `key` to drop them again. It fills its nearest positioned parent on `--z-celebrate` and places itself, as the Modal does; it never takes a tap. None under reduced motion | DES-11 |
-| `MilestoneMoon` | The crescent moon with glasses who visits for big milestones | happy, cheer, talking | DES-17 |
+| `MilestoneMoon` | The crescent moon in Luna's round black glasses, who visits for big milestones (round 2 Ms. Luna board, moon 6) | happy (open eyes that blink, a small smile), cheer (smiling eyes, a wide smile, rosier cheeks); she rocks gently; talking follows the voice by itself (her mouth moves only while a clip plays); any `size`. Her colours come only from `--illo-moon-*`. The done screen's `MoonVisit` brings her in (DES-17) | DES-17 (done) |
 
 ## One answer language
 
@@ -80,6 +80,16 @@ DES-22b, DES-22c and DES-23):
 
 A piece with no fill of its own (a bubble, a cookie) takes the edge, ledge,
 glow and motion, and keeps its drawn colours.
+
+**`revealed` is "show me" (FB-2):** from the third miss in a round the shell
+calls the game's `reveal`, and the answer's piece takes `revealed` until it's
+chosen: Letter Jar's letters still to catch, Bubble Sounds' bubbles with the
+sound, Feed Luna's cookie and the jar letters (edge only, keeping their own
+colours), Muddled Cards' pair tried again (face down), the next word's tile in
+Words Off the Page, the hunted word in Story Corner, and the right Choice in
+What's Missing?, Treasure Path, Story Corner's question and every lesson
+(`choiceState(…, revealed)`). Luna says a reveal line instead of another
+"try again".
 
 **The stage speaks the same language** (GameShell, `data-flash`): a miss turns
 its edge `--try-again-edge`, a win `--right` with the `--right-edge` ledge and

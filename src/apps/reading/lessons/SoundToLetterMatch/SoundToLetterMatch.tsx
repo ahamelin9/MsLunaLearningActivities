@@ -14,7 +14,7 @@ export const SoundToLetterMatch: React.FC<{ question: SoundToLetterQuestion; api
   api
 }) => {
   const options = useMemo(() => shuffle(question.options), [question.options]);
-  const { solved, wrongId, choose } = useAnswer(api, question.hint);
+  const { solved, wrongId, revealed, choose } = useAnswer(api, question.hint);
 
   // the written prompt never names the sound; only the spoken one does
   const sayPrompt = () => {
@@ -42,11 +42,9 @@ export const SoundToLetterMatch: React.FC<{ question: SoundToLetterQuestion; api
           <Choice
             key={option.id}
             data-shot="lesson-choice"
-            state={choiceState(option.id, option.isCorrect, wrongId, solved)}
+            state={choiceState(option.id, option.isCorrect, wrongId, solved, revealed)}
             onClick={() =>
-              choose(option.id, option.isCorrect, onEnd =>
-                pronunciation.speakSequence([{ text: 'Letter' }, { name: option.letter }], { onEnd })
-              )
+              choose(option.id, option.isCorrect, [{ text: 'Letter' }, { name: option.letter }])
             }
             aria-label={`letter ${option.letter}`}
           >

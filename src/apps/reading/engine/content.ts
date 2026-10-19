@@ -792,14 +792,16 @@ export const MINI_STORIES: MiniStory[] = [
     tier: 3,
     lines: [
       'Rain tapped on the library window all morning.',
-      'Luna could not fly outside, so she read three books instead.',
+      // "reading", never past-tense "read": the voice can't tell the tense and
+      // says "reed" (BUG-22)
+      'Luna could not fly outside, so she spent the morning reading three books.',
       'When the sun came back, a bright rainbow stretched over the tree.'
     ],
     question: 'What did Luna do while it rained?',
     answers: [
-      { text: 'She read three books', correct: true },
-      { text: 'She flew to the beach', correct: false },
-      { text: 'She painted the window', correct: false }
+      { text: 'She was reading books', correct: true },
+      { text: 'She was flying to the beach', correct: false },
+      { text: 'She was painting the window', correct: false }
     ]
   }
 ];

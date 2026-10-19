@@ -9,7 +9,7 @@ import { ICON_NAMES } from './shapes';
 export default function IconKit() {
   return (
     <>
-      <Specimens title="The set (24)">
+      <Specimens title={`The set (${ICON_NAMES.length})`}>
         {ICON_NAMES.map(name => (
           <Specimen key={name} label={name}><Icon name={name} /></Specimen>
         ))}

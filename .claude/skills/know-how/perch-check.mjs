@@ -142,13 +142,25 @@ const again = await step(() => page.click('button[aria-label^="Hear Ms. Luna aga
 const norm = t => t.toLowerCase().replace(/[^a-z ]/g, '');
 ok('… a tap on her line says it again', again.said.some(t => norm(play.line).startsWith(norm(t).slice(0, 10))) && again.clips > 0, `${again.said.join(' | ')}; ${again.clips} clip(s)`);
 
-// miss twice (cookies are tried in turn; a right one wins the round, so try the next round's)
+// miss twice: wrong cookies on purpose, from the round's answer in the game's
+// props (it's heard, never shown). Since BUG-2 one wrong tap is one miss, so
+// cookies tried in turn could hit the right one between two misses.
 const tryAgain = await role('try-again-edge');
 const right = await role('right');
+const answerNow = () => page.evaluate(() => {
+  const el = document.querySelector('[data-shot="stage"] button[aria-label^="letter"]');
+  const key = el && Object.keys(el).find(k => k.startsWith('__reactFiber'));
+  for (let f = key ? el[key] : null; f; f = f.return) if (f.memoizedProps?.round?.answer) return f.memoizedProps.round.answer;
+  return null;
+});
 let misses = 0;
 let clue = null;
 for (let tries = 0; tries < 12 && !clue; tries++) {
-  const cookies = await page.$$('[data-shot="stage"] button[aria-label^="letter"]');
+  const answer = await answerNow();
+  const cookies = [];
+  for (const c of await page.$$('[data-shot="stage"] button[aria-label^="letter"]')) {
+    if ((await c.evaluate(e => e.getAttribute('aria-label'))) !== `letter ${answer}`) cookies.push(c);
+  }
   if (!cookies.length) { await wait(500); continue; }
   const pick = cookies[misses % cookies.length];
   const n = await page.evaluate(() => window.__flashes.length);

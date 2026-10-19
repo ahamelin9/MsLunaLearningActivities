@@ -21,19 +21,35 @@ export interface GameApi {
   attempts: number;
   /** 0 = no help yet, 1 = nudge, 2 = show me */
   hintLevel: 0 | 1 | 2;
-  /** the round is over; ignore further input */
+  /** the round is over, or an answer is being said; ignore further input */
   locked: boolean;
-  /** round solved */
-  win: (opts?: { lunaLine?: string; delay?: number }) => void;
   /**
-   * wrong attempt — never a failure, always another go. The hint is spoken
-   * from the second miss on, never shown: written on screen it would hand a
-   * child who knows their letters the answer. Build it from parts so a
-   * phoneme stays a phoneme and every piece is a clip that was rendered.
+   * The one way to answer (FB-1): the shell says `say` (the choice, a
+   * read-back), waits for it to end, then reacts, so Luna never cuts the
+   * game's own line off. A watchdog settles it if the speech never reports
+   * its end. Input is locked meanwhile.
+   * - correct: the round is solved; `delay` is how long the win shows
+   *   before the next round.
+   * - not correct: never a failure, always another go. The hint is spoken
+   *   from the second miss on, never shown: written on screen it would hand
+   *   a child who knows their letters the answer. Build it from parts so a
+   *   phoneme stays a phoneme and every piece is a clip that was rendered.
+   * `lunaLine` replaces Luna's usual line.
+   * - `reveal` (FB-2): from the third miss in a round the shell calls it, so
+   *   the game points at the answer (its piece in the `revealed` state), and
+   *   Luna says a reveal line instead of another "try again". The round can
+   *   still be finished; it just isn't clean.
    */
-  miss: (opts?: { lunaLine?: string; hint?: SpeechPart[] }) => void;
-  /** a small good beat inside a round, e.g. 2 of 4 letters found */
-  tick: (opts?: { lunaLine?: string }) => void;
+  answer: (opts: {
+    correct: boolean;
+    say?: SpeechPart[];
+    hint?: SpeechPart[];
+    lunaLine?: string;
+    delay?: number;
+    reveal?: () => void;
+  }) => void;
+  /** a small good beat inside a round, e.g. 2 of 4 letters found; `say` is said whole before Luna's line */
+  tick: (opts?: { lunaLine?: string; say?: SpeechPart[] }) => void;
   /** let Luna speak out of turn */
   say: (text: string, mood?: LunaMood) => void;
 }

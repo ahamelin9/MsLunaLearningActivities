@@ -105,17 +105,33 @@ export const Hub: React.FC<HubProps> = ({
         <span className={styles.luna}>
           <Luna mood={mood} size={108} float onClick={hearAgain} label={`Hear Ms. Luna: ${hello.text}`} />
           {/* she talks with no bubble; beside her, her voice switches off and on
-              (Alex, 2026-10-12): the same setting as Settings' "Ms. Luna's voice" */}
-          <ChunkyButton
-            variant="icon"
-            icon={voiceOn ? 'speaker' : 'mute'}
-            aria-label={voiceOn ? 'Mute Ms. Luna' : 'Unmute Ms. Luna'}
-            data-shot="luna-mute"
-            onClick={() => {
-              soundManager.playPop();
-              storageService.updateSettings({ speechEnabled: !voiceOn });
-            }}
-          />
+              (Alex, 2026-10-12): the same setting as Settings' "Ms. Luna's voice".
+              The games need her voice, so muting her is a grown-up's 1.5s press
+              and hold (SET-2, the gate from SET-1); giving it back is one tap */}
+          {voiceOn ? (
+            <ChunkyButton
+              variant="icon"
+              icon="speaker"
+              aria-label="Grown-ups: mute Ms. Luna"
+              data-shot="luna-mute"
+              holdNoteAt="start"
+              onHold={() => {
+                soundManager.playPop();
+                storageService.updateSettings({ speechEnabled: false });
+              }}
+            />
+          ) : (
+            <ChunkyButton
+              variant="icon"
+              icon="mute"
+              aria-label="Unmute Ms. Luna"
+              data-shot="luna-mute"
+              onClick={() => {
+                soundManager.playPop();
+                storageService.updateSettings({ speechEnabled: true });
+              }}
+            />
+          )}
         </span>
 
         <PaperCard className={styles.tin} data-shot="hub-tin">

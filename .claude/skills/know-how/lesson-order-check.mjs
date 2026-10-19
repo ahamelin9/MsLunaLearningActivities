@@ -31,7 +31,7 @@ import { chromePath } from '../../../scripts/chrome-path.cjs';
 const port = process.argv[2] ?? '5199';
 const at = n => `[data-shot="${n}"]`;
 const wait = ms => new Promise(r => setTimeout(r, ms));
-// the grown-up gate (SET-1): press and hold for --dur-hold (2s), then let go
+// the grown-up gate (SET-1): press and hold for --dur-hold (1.5s), then let go
 const hold = async selector => {
   const box = await (await page.$(selector)).boundingBox();
   await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);

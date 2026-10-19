@@ -1,14 +1,17 @@
 import type { GradeLevel } from './reading';
 
+/** Light, dark, or whatever the iPad is set to (DES-16) */
+export type ThemeChoice = 'match' | 'light' | 'dark';
+
 export interface UserSettings {
   soundEnabled: boolean;
   speechEnabled: boolean;
   speechRate: number;
   reducedMotion: boolean;
-  /** which Kokoro voice Ms. Luna speaks with */
+  /** light or dark: "match" follows the iPad (DES-16) */
+  theme: ThemeChoice;
+  /** which Kokoro voice Ms. Luna speaks with; its accent comes with it (SET-3) */
   voiceId: string;
-  /** accent the voices are drawn from */
-  voiceLanguage: 'en-US' | 'en-GB';
 }
 
 export interface UserProgress {

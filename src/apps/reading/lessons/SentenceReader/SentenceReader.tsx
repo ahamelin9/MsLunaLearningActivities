@@ -15,7 +15,7 @@ export const SentenceReader: React.FC<{ question: SentenceComprehensionQuestion;
   api
 }) => {
   const options = useMemo(() => shuffle(question.options), [question.options]);
-  const { solved, tried, wrongId, choose } = useAnswer(api, question.hint);
+  const { solved, tried, wrongId, revealed, choose } = useAnswer(api, question.hint);
   const [active, setActive] = useState<number | null>(null);
 
   const sayPrompt = () => soundManager.speak(question.speechPrompt ?? question.prompt);
@@ -72,9 +72,9 @@ export const SentenceReader: React.FC<{ question: SentenceComprehensionQuestion;
             // a picture to pick; with no picture, the words themselves
             kind={option.imageEmoji ? 'picture' : 'phrase'}
             data-shot="lesson-choice"
-            state={choiceState(option.id, option.isCorrect, wrongId, solved)}
+            state={choiceState(option.id, option.isCorrect, wrongId, solved, revealed)}
             onClick={() =>
-              choose(option.id, option.isCorrect, onEnd => pronunciation.speakText(option.text, { onEnd }))
+              choose(option.id, option.isCorrect, [{ text: option.text }])
             }
             aria-label={option.text}
             // a written label repeats the sentence's words, so it waits for the answer

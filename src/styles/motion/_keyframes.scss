@@ -98,6 +98,18 @@
   100% { opacity: 1; transform: scale(1); }
 }
 
+// the milestone moon's visit (DES-17): she glides down from the top right
+// corner, tipping as she comes, and glides back up the way she came
+@keyframes luna-glide-in {
+  0% { opacity: 0; transform: translate(60%, -120%) rotate(18deg); }
+  100% { opacity: 1; transform: none; }
+}
+
+@keyframes luna-glide-out {
+  0% { opacity: 1; transform: none; }
+  100% { opacity: 0; transform: translate(60%, -120%) rotate(18deg); }
+}
+
 // Luna's eyes: a quick blink near the end of each slow loop (DES-15, as on the
 // round 2 Ms. Luna board)
 @keyframes luna-blink {

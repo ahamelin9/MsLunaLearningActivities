@@ -102,8 +102,10 @@ build, or a tool that misbehaved. Skip routine fixes.
   `letterNameSpeech`. Every one should be its letter's name alone.
 - **Past-tense "read" says "reed"** (*2026-10-10, GAME-1a*): espeak can't
   tell the tense, so "Luna read until…" comes out `ɹˈiːd`. Reword the line
-  ("Luna kept reading…", "Luna learned about…"). The old story line "so she
-  read three books" is BUG-22.
+  ("Luna kept reading…", "Luna learned about…"); respelling only the audio
+  would still leave a tapped "read" saying "reed". `read-tense-check.mjs`
+  lists every spoken "read" with its sound and flags the past tense (BUG-22
+  reworded "The Rainy Day Plan").
 - **Check:** before rendering, run each line through the phonemizer that
   kokoro-js uses, and look for `ˈeɪ` where you meant "a", and `ɹˈiːd` where
   you meant the past:
@@ -125,14 +127,34 @@ build, or a tool that misbehaved. Skip routine fixes.
   moment. The shell starts Luna's reaction, then the game's line `stop()`s it a
   few hundred ms in. Every new utterance stops the previous one, so "overlap"
   is usually a cut-off burst, not two clips playing together.
-- **Fix:** take turns. Say the game's line, then call `api.win/miss` from its
-  `onEnd`, with a watchdog timer (in case `onEnd` never fires) and a busy ref
-  that ignores taps meanwhile. Two working examples: `useAnswer` in
-  `lessons/shared/lessonHooks.ts` and `feed()` in `games/FeedLuna/FeedLuna.tsx`. FB-1 will
-  move every game onto one `api.answer()`.
-- **Check:** measure, don't guess. `speech-check.cjs` in this folder times
-  every clip and marks the ones that were cut. Fixed looks like
-  `little@8–550 | ell@670–1113 | <cheer>@1235–2698`, with nothing marked `(cut)`.
+- **Fix (FB-1, 2026-10-18):** there is one answer path. A game calls
+  `api.answer({ correct, say, hint, lunaLine, delay })`; the shell says `say`
+  whole, then reacts from its `onEnd` (with a watchdog: 2.5 s for a miss, 7 s
+  for a right answer, whose read-back can be a sentence), and `api.locked` is
+  true meanwhile, so taps wait. `api.tick({ say })` does the same for a small
+  beat. `win`/`miss` aren't on `GameApi` any more, so a game can't react over
+  its own line again; lessons' `useAnswer` is a thin wrapper over `answer`.
+  A game line that isn't an answer (a tick's letter, a flip) is still said
+  with `pronunciation` directly.
+- **Check:** measure, don't guess. `answer-check.mjs` in this folder plays all
+  8 games (`--only <title words>` for one) and checks that every answer's
+  sequence ended by itself (its `onEnd` came, so no watchdog) with no clip cut
+  meanwhile. `speech-check.cjs` times every clip and marks the cut ones, but it
+  still finds things by the old class names (OPS-9).
+- **Pitfall, two answers in one moment:** `api.locked` reaches a game only on
+  its next render, so a tap that is also a click (Feed Luna's pointer-up, then
+  its button's `onClick`, BUG-2) answered twice, and the second `speakSequence`
+  cut the first. The shell guards with a ref (`saying`), not only the
+  `answering` state.
+- **Pitfall, StrictMode:** in dev React mounts, cleans up and mounts again. A
+  "still mounted" ref set `false` in a cleanup must be set `true` again in the
+  effect, or everything it guards stops (the shell never reacted to an answer).
+- **Pitfall, Story Corner's words:** they're spans in its lines while it hunts
+  (`[data-state="huntable"] > span`), not buttons.
+- **Pitfall, a round's own data:** Words Off the Page's right order isn't on
+  screen (it's heard). A check reads it from React: from a tile button up the
+  fiber (`__reactFiber…`, then `.return`) to the props holding `round.words`.
+  Starting from the stage walks the wrong way: the game is below it.
 
 ## Proving a fix in a real browser, silently
 
@@ -272,7 +294,7 @@ Pitfalls that cost time:
   `open-trophies`, `trophies`, `modal-close`, `app-home` (DES-8), `stage`
   (GameShell's stage, DES-10), and on the library `change-grade` (the
   header's grade) and `luna-mute` (the button beside her) (DES-21). Since
-  SET-1, `open-settings` and `change-grade` open only on a 2s hold, and the
+  SET-1, `open-settings` and `change-grade` open only on a 1.5s hold, and the
   Kit page's hold to try is `kit-hold`. OPS-9
   moves the checks in this folder onto them.
 - **"Does it still fit?"** for a screen whose content grows by grade (Treasure
@@ -319,7 +341,7 @@ Pitfalls that cost time:
 
 - **Symptom:** you need to know a child tapping around can't open Settings
   or change the grade: the home gear, the library gear and the grade button
-  open only after a 2s press and hold, a quick tap shows "Grown-ups: press
+  open only after a 1.5s press and hold, a quick tap shows "Grown-ups: press
   and hold", and the ring fills, under reduced motion too.
 - **Fix:** with Vite on 5199, `node .claude/skills/know-how/gate-check.mjs 5199`
   (add `--reduced-motion` for the second pass). It taps, holds 1s and holds
@@ -336,6 +358,117 @@ Pitfalls that cost time:
 - **Pitfall, two browsers at once:** `greeting-check.mjs` failed its "from
   home" step once while `kit-check.mjs` ran beside it, and passed alone. Run
   the timing-sensitive checks one at a time.
+
+## Does the app follow light and dark? (DES-16)
+
+*2026-10-18 · DES-16*
+
+- **Symptom:** you need to know the app opens dark on an iPad set to dark
+  (with no light flash first), turns light again when the iPad does without a
+  reload, that Settings and the home screen's sun/moon button override the
+  iPad and survive a reload, and that home shows the moon and stars at night.
+- **Fix:** with Vite on 5199, `node .claude/skills/know-how/theme-check.mjs 5199`.
+  It sets the browser's own setting with
+  `page.emulateMediaFeatures([{ name: 'prefers-color-scheme', value: 'dark' }])`,
+  which is what `ui:shots --theme dark` does too, and reads `data-theme` on
+  `<html>` at `readyState` "interactive", before any module runs, to prove the
+  inline script in `index.html` set it.
+- **Pitfall, hidden by a parent:** the moon's own `display` stays `block`
+  while its night layer is `display: none`, so "is it showing?" read from
+  `getComputedStyle(el).display` says yes by day. Use `el.checkVisibility()`.
+- **Pitfall, two places set the mode:** `index.html`'s inline script (before
+  the first paint) and `src/utils/theme.ts` (after) both turn the saved choice
+  into a mode. Change one, change the other.
+
+## Does the milestone moon visit when she should? (DES-17)
+
+*2026-10-18 · DES-17*
+
+- **Symptom:** you need to know the moon comes for the first lesson ever,
+  half a grade and a whole grade, once each, never after an ordinary lesson;
+  that only she talks while she's there; and that she leaves by herself.
+- **Fix:** with Vite on 5199, `node .claude/skills/know-how/moon-check.mjs 5199`
+  (and `--reduced-motion`). It plays kindergarten's lessons through for real,
+  setting `completedLessons` in the save to reach half and all quickly, and
+  samples every frame while `[data-shot="moon-visit"]` is on screen: the done
+  screen's Luna (`data-shot="done-luna"`) must never be `talking`, and the
+  moon's mouth must be. The milestone rule is `engine/milestones.ts`; each
+  visit is claimed once in `unlockedAchievements` (`moon-first-lesson`,
+  `moon-half-<grade>`, `moon-all-<grade>`), so clear those to see her again.
+- **Pitfall, a fresh save:** opening Reading on a fresh save lands on Grade
+  Select, not the library. Click a grade card before waiting for `hub`.
+- **Pitfall, `ui:shots`:** its run finishes Lesson 1 on a fresh save, so its
+  done screen (`26-reward`) now shows the moon mid-visit. That's expected.
+
+## A tap counts twice, or a drag let go anywhere still counts (BUG-2)
+
+*2026-10-18 · BUG-2*
+
+- **Symptom:** in Feed Luna one wrong tap was two misses (the hint came after
+  the first mistake), and a cookie dragged and let go far from Luna's beak was
+  still fed to her.
+- **Cause:** the cookie fed on pointer-up (tap or drop) *and* on the button's
+  `onClick`. A tap is also a click; and with `setPointerCapture`, a drag's
+  release lands on the same button, so the browser fires a click for it too,
+  wherever it was let go.
+- **Fix:** `onClick` feeds only when `e.detail === 0`: a keyboard or
+  assistive click. Mouse and touch go through pointer-up alone.
+- **Check:** `feed-check.mjs` (a tap, Enter, a tap on the right one, a drag to
+  the beak, a drag let go elsewhere), counting misses by wrapping
+  `soundManager.playTryAgain`. With the old `onClick` it fails two of them.
+- **Pitfall, checks that leaned on the bug:** `perch-check.mjs` reached "Hear
+  my clue" by trying cookies in turn; one tap used to be two misses. It now
+  picks wrong cookies from the round's answer in the game's props.
+
+## A game never asks for some letters (BUG-21)
+
+*2026-10-18 · BUG-21*
+
+- **Symptom:** over many plays, some letters of a tier's pool are never the
+  target (Bubble Sounds: only the pool's first 12).
+- **Cause:** round *i* took its letter from slots `i*3` to `i*3+2`, and a play
+  has 4 rounds.
+- **Fix:** `sample(pool, count)` from `engine/content.ts`: distinct letters
+  from the whole pool.
+- **Check:** `bubble-letters-check.mjs` (no browser; 400 plays per grade ×
+  dial; give it a `src-root` from `git archive HEAD src` to judge old code).
+- **Pitfall, the shots then all differ:** `ui:shots` runs on one seeded random
+  stream, so a game drawing its numbers differently changes what every later
+  game deals. Check that only content moved, not layout.
+
+## A screen plays the wrong speed (BUG-8)
+
+*2026-10-18 · BUG-8*
+
+- **Symptom:** with Beginner (or Quick) picked in Settings, something still
+  plays at Normal.
+- **Cause:** a `rate` passed to a `pronunciation.speak*` call picks the clip's
+  speed bucket by itself (`bucketFor`: below 0.85 slow, up to 1.05 normal,
+  above that quick). The story lesson passed 0.9 and 0.85, both Normal.
+- **Fix:** leave `rate` out, so the setting decides. `grep -rn "rate: [01]\."
+  src` finds any left.
+- **Check:** `story-speed-check.mjs` logs the bucket of every clip asked for
+  (`req.bucket` in a `pronunciation.say` wrapper) at each speed.
+
+## Does "show me" point at the answer? (FB-2)
+
+*2026-10-18 · FB-2*
+
+- **Symptom:** you need to know every game and lesson reveals the answer on
+  the third miss in a round, with a reveal line, and that the round can then
+  be finished.
+- **Fix:** with Vite on 5199, `node .claude/skills/know-how/reveal-check.mjs 5199`
+  (`--only <title words>` for one; `SHOTS=<dir>` saves a picture of each
+  revealed state, `THEME=dark` for dark). It misses on purpose, choosing wrong
+  pieces from the round in the game's props, counts misses by the shell's
+  try-again sound, and looks for `[data-state~="revealed"]`.
+- **Pitfall, Muddled Cards:** a mismatch is only a miss when that pair was
+  tried before, so it takes four tries for three misses; and flips need about
+  0.9 s apart, or one lands while the last match is still settling.
+- **Pitfall, headless Chrome is dark now:** since DES-16 the app follows the
+  browser's light/dark setting, and headless Chrome follows the Mac's. A check
+  that takes review pictures should set
+  `page.emulateMediaFeatures([{ name: 'prefers-color-scheme', value: 'light' }])`.
 
 ## Does the perch work? (Luna's line, the clue, the flash, the win)
 

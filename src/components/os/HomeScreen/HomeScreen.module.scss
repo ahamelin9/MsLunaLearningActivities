@@ -23,7 +23,7 @@
   pointer-events: none;
 }
 
-// the day's pale sun; at night (DES-16) the moon and stars take its place
+// the day's pale sun; at night the moon and stars take its place (DES-16)
 .sun {
   position: absolute;
   top: 12vh;
@@ -40,6 +40,50 @@
 
 [data-theme='dark'] .sun {
   display: none;
+}
+
+// the night sky (DES-16), as on the Home board: a crescent moon where the sun
+// was, and stars that twinkle (still under reduced motion: the motion roles are off)
+.night {
+  display: none;
+}
+
+[data-theme='dark'] .night {
+  display: block;
+}
+
+.moon {
+  position: absolute;
+  top: 8vh;
+  right: 15vw;
+  width: 23vmin;
+  height: 23vmin;
+  overflow: visible;
+  filter: drop-shadow(0 0 2vmin var(--illo-moon-glow));
+  animation: var(--motion-float);
+}
+
+.moonBody { fill: var(--illo-moon-gold); }
+.moonCrater { fill: var(--illo-moon-crater); }
+
+.star {
+  position: absolute;
+  width: 0.5vmin;
+  height: 0.5vmin;
+  border-radius: var(--radius-chip);
+  background: var(--illo-night-star);
+  animation: var(--motion-twinkle);
+  animation-delay: calc(var(--dur-loop) * var(--star-at, 0) * -1);
+
+  &[data-size='small'] {
+    width: 0.37vmin;
+    height: 0.37vmin;
+  }
+
+  &[data-size='big'] {
+    width: 0.62vmin;
+    height: 0.62vmin;
+  }
 }
 
 .dune {

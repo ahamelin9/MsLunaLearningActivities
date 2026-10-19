@@ -1,6 +1,6 @@
 /**
  * Switch: an on/off setting for grown-ups (Settings: sound effects, Ms.
- * Luna's voice, Less Motion; later DES-16's choices).
+ * Luna's voice, Less Motion).
  *
  * Props:  on · onChange(next) · label: what it switches, for screen readers
  *         (the row beside it shows the words) · disabled

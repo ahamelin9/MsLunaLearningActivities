@@ -165,7 +165,7 @@ $duration: (
 );
 // how long a grown-up holds a gated button (SET-1). A wait, not motion, so
 // reduced motion keeps it: outside $duration, which reduced motion zeroes
-$hold: 2s;
+$hold: 1.5s; // 2s until SET-2 (Alex, 2026-10-18)
 $easing: (
   standard: cubic-bezier(0.2, 0, 0, 1),
   springy: cubic-bezier(0.34, 1.56, 0.64, 1),     // a pop with a little overshoot

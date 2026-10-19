@@ -12,7 +12,7 @@ import styles from './BlendAndRead.module.scss';
 /** Sound out the letters, blend them, find the picture. */
 export const BlendAndRead: React.FC<{ question: BlendAndReadQuestion; api: GameApi }> = ({ question, api }) => {
   const options = useMemo(() => shuffle(question.options), [question.options]);
-  const { solved, wrongId, choose } = useAnswer(api, question.hint);
+  const { solved, wrongId, revealed, choose } = useAnswer(api, question.hint);
   const [active, setActive] = useState<number | null>(null);
 
   const sayPrompt = () => soundManager.speak(question.speechPrompt ?? 'Blend the sounds to read the word!');
@@ -63,9 +63,9 @@ export const BlendAndRead: React.FC<{ question: BlendAndReadQuestion; api: GameA
             key={option.id}
             kind="picture"
             data-shot="lesson-choice"
-            state={choiceState(option.id, option.isCorrect, wrongId, solved)}
+            state={choiceState(option.id, option.isCorrect, wrongId, solved, revealed)}
             onClick={() =>
-              choose(option.id, option.isCorrect, onEnd => pronunciation.speakText(option.text, { onEnd }))
+              choose(option.id, option.isCorrect, [{ text: option.text }])
             }
             aria-label={option.text}
             // named once found: written, it could be matched letter for letter without blending

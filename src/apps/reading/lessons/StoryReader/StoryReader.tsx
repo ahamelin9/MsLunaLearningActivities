@@ -24,7 +24,7 @@ export const StoryReader: React.FC<{ question: StoryReadQuestion; api: GameApi }
     () => shuffle(quiz.options.map((text, i) => ({ id: String(i), text, isCorrect: i === quiz.correctIndex }))),
     [quiz]
   );
-  const { solved, tried, wrongId, choose } = useAnswer(api, question.hint ?? STORY_HINT.text);
+  const { solved, tried, wrongId, revealed, choose } = useAnswer(api, question.hint ?? STORY_HINT.text);
   const [activeLine, setActiveLine] = useState<number | null>(null);
   const [activeWord, setActiveWord] = useState<string | null>(null);
 
@@ -33,13 +33,14 @@ export const StoryReader: React.FC<{ question: StoryReadQuestion; api: GameApi }
   const readLine = (index: number) => {
     soundManager.playLetterTap();
     setActiveLine(index);
-    pronunciation.speakSentence(question.sentences[index].text, { rate: 0.9, onEnd: () => setActiveLine(null) });
+    // at the speed picked in Settings: a fixed rate here always played Normal (BUG-8)
+    pronunciation.speakSentence(question.sentences[index].text, { onEnd: () => setActiveLine(null) });
   };
 
   const readWord = (word: string, key: string) => {
     soundManager.playPop();
     setActiveWord(key);
-    pronunciation.speakWord(word.replace(/[^a-zA-Z0-9]/g, ''), { rate: 0.85, onEnd: () => setActiveWord(null) });
+    pronunciation.speakWord(word.replace(/[^a-zA-Z0-9]/g, ''), { onEnd: () => setActiveWord(null) });
   };
 
   const sayQuestion = () => pronunciation.speakSentence(quiz.question);
@@ -104,13 +105,13 @@ export const StoryReader: React.FC<{ question: StoryReadQuestion; api: GameApi }
             key={answer.id}
             kind="phrase"
             data-shot="lesson-choice"
-            state={choiceState(answer.id, answer.isCorrect, wrongId, solved)}
+            state={choiceState(answer.id, answer.isCorrect, wrongId, solved, revealed)}
             onClick={() =>
-              choose(answer.id, answer.isCorrect, onEnd =>
+              choose(
+                answer.id,
+                answer.isCorrect,
                 // a right answer is followed by why it is right
-                answer.isCorrect
-                  ? pronunciation.speakSentence(quiz.explanation, { onEnd })
-                  : pronunciation.speakSentence(answer.text, { onEnd })
+                [{ text: answer.isCorrect ? quiz.explanation : answer.text }]
               )
             }
           >

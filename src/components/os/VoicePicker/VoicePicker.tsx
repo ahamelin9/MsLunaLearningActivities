@@ -42,23 +42,22 @@ export const VoicePicker: React.FC<VoicePickerProps> = ({ settings, onChange }) 
   }, []);
 
   const available = LUNA_VOICES.filter(v => !rendered || rendered.has(v.id));
-  // A voice or accent saved before it stopped being offered (every voice used
-  // to run on-device) shows as Luna, which is what the child is hearing,
-  // rather than as an empty list with nothing selected.
+  // A voice saved before it stopped being offered (every voice used to run
+  // on-device) shows as Luna, which is what the child is hearing, rather than
+  // as an empty list with nothing selected.
   const savedVoiceGone = rendered !== null && !rendered.has(settings.voiceId);
   const voiceId = savedVoiceGone ? DEFAULT_VOICE_ID : settings.voiceId;
-  const savedLanguage = settings.voiceLanguage ?? 'en-US';
-  const language = available.some(v => v.language === savedLanguage)
-    ? savedLanguage
-    : (LUNA_VOICES.find(v => v.id === DEFAULT_VOICE_ID)?.language ?? 'en-US');
+  // the accent is the voice's own (SET-3): no setting of its own
+  const language = LUNA_VOICES.find(v => v.id === voiceId)?.language ?? 'en-US';
   const voices = available.filter(v => v.language === language);
+  const accents = (['en-US', 'en-GB'] as const).filter(code => available.some(v => v.language === code));
+  // with one rendered voice there is nothing to pick, so no picker (SET-3)
+  const picking = available.length > 1;
 
   // ...and the saved settings are corrected to match
   useEffect(() => {
-    if (savedVoiceGone || language !== savedLanguage) {
-      onChange({ voiceId, voiceLanguage: language });
-    }
-  }, [savedVoiceGone, language, savedLanguage, voiceId, onChange]);
+    if (savedVoiceGone) onChange({ voiceId });
+  }, [savedVoiceGone, voiceId, onChange]);
 
   const preview = (voiceId: string) => {
     soundManager.playLetterTap();
@@ -108,42 +107,48 @@ export const VoicePicker: React.FC<VoicePickerProps> = ({ settings, onChange }) 
         )}
       </div>
 
-      <span className={styles.choices} role="group" aria-label="Accent">
-        {(['en-US', 'en-GB'] as const)
-          .filter(code => available.some(v => v.language === code))
-          .map(code => (
+      {/* an accent only when both have a rendered voice */}
+      {picking && accents.length > 1 && (
+        <span className={styles.choices} role="group" aria-label="Accent">
+          {accents.map(code => (
             <ChunkyButton
               key={code}
               aria-pressed={language === code}
               onClick={() => {
                 soundManager.playPop();
                 const first = available.find(v => v.language === code);
-                onChange({ voiceLanguage: code, voiceId: first?.id ?? voiceId });
-                if (first) pronunciation.setVoice(first.id);
+                if (first) {
+                  onChange({ voiceId: first.id });
+                  pronunciation.setVoice(first.id);
+                }
               }}
             >
               {code === 'en-US' ? 'American' : 'British'}
             </ChunkyButton>
           ))}
-      </span>
+        </span>
+      )}
 
-      <span className={styles.choices} role="group" aria-label="Voice">
-        {voices.map(voice => (
-          <ChunkyButton
-            key={voice.id}
-            icon="speaker"
-            aria-pressed={voiceId === voice.id}
-            data-state={previewing === voice.id ? 'playing' : undefined}
-            onClick={() => preview(voice.id)}
-          >
-            {voice.name}
-          </ChunkyButton>
-        ))}
-      </span>
+      {picking && (
+        <span className={styles.choices} role="group" aria-label="Voice">
+          {voices.map(voice => (
+            <ChunkyButton
+              key={voice.id}
+              icon="speaker"
+              aria-pressed={voiceId === voice.id}
+              data-state={previewing === voice.id ? 'playing' : undefined}
+              onClick={() => preview(voice.id)}
+            >
+              {voice.name}
+            </ChunkyButton>
+          ))}
+        </span>
+      )}
 
       <p className={styles.desc}>
         {activeVoice && <>{activeVoice.description}. </>}
-        Tap a voice to hear it. Ms. Luna’s voice is built into the app: nothing is sent to a server.
+        {picking && 'Tap a voice to hear it. '}
+        Ms. Luna’s voice is built into the app: nothing is sent to a server.
       </p>
     </div>
   );

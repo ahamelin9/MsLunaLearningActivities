@@ -72,8 +72,8 @@ be pulled into Phase 1 for a break from styling.
 
 ### Now / Next
 
-- **Now:** SET-1: the grown-up gate for Settings (pulled into Stage 9, because DES-16's light/dark choice lives behind it). Stage 8 is done (2026-10-18): the legacy styles are gone, and the design check is strict with no baseline.
-- **Next:** the rest of Stage 9: DES-16 (light and dark), then DES-17 (the milestone moon), then DES-14 (real cookies, which can slot in any time). OPS-11 (a first cloud session) waits until Alex wants to work away from the Mac. PRG-8 (pick up a lesson where you left off) was split from DES-13 and needs nothing. OPS-9 (know-how checks onto `data-shot`) can start any time: the checks lost their last class names with DES-18d. FB-1 (Phase 2) no longer waits on the layout; GAME-1c, Treasure Path's screen, waits on it
+- **Now:** DES-16: light and dark mode (Stage 9). SET-1 is done (2026-10-18): the gears and the grade button open only after a 2s press and hold, so the grown-up's light/dark choice has its gate.
+- **Next:** the rest of Stage 9: DES-17 (the milestone moon), then DES-14 (real cookies, which can slot in any time). SET-2 (P0, Luna's mute) and SET-5 (the objectives behind the gate) no longer wait on SET-1. OPS-11 (a first cloud session) waits until Alex wants to work away from the Mac. PRG-8 (pick up a lesson where you left off) was split from DES-13 and needs nothing. OPS-9 (know-how checks onto `data-shot`) can start any time: the checks lost their last class names with DES-18d. FB-1 (Phase 2) no longer waits on the layout; GAME-1c, Treasure Path's screen, waits on it
 
 ## Epics
 
@@ -97,29 +97,29 @@ In board order. A new epic gets its file in `epics/` first, then a link here
 | ID | Title | Type | P | Size | Status |
 |---|---|---|---|---|---|
 | **DES** | **Design system & layout** | Epic | **P0** | | |
-| DES-16 | Light and dark mode | Story | P1 | M | Todo |
-| DES-17 | The moon visits for big milestones | Story | P1 | M | Todo |
-| DES-14 | Feed Luna's cookies look like real, different cookies | Story | P2 | S | Todo |
+| DES-16 | Light and dark mode | Story | P1 | M | Blocked |
+| DES-17 | The moon visits for big milestones | Story | P1 | M | Blocked |
+| DES-14 | Feed Luna's cookies look like real, different cookies | Story | P2 | S | Blocked |
 | DES-26 | Make the arch radius work at any size | Task | P2 | S | Todo |
 | **FB** | **Shell feedback & hints** | Epic | **P0** | | |
-| FB-1 | One answer-feedback path in GameShell | Story | P0 | M | Todo |
-| FB-2 | "Show me" after repeated misses | Story | P0 | S | Todo |
+| FB-1 | One answer-feedback path in GameShell | Story | P0 | M | Blocked |
+| FB-2 | "Show me" after repeated misses | Story | P0 | S | Blocked |
 | **BUG** | **Bugs** | | | | |
 | BUG-1 | Game speech is cut off by Luna's reaction | Bug | P0 | — | Todo (via FB-1) |
-| BUG-2 | Feed Luna: one wrong tap counts as two misses | Bug | P0 | S | Todo |
-| BUG-8 | Story lessons ignore the Beginner speed | Bug | P1 | S | Todo |
-| BUG-21 | Bubble Sounds only ever asks for the first 12 letters | Bug | P1 | S | Todo |
-| BUG-22 | Story Corner says "she reed three books" | Bug | P1 | S | Todo |
+| BUG-2 | Feed Luna: one wrong tap counts as two misses | Bug | P0 | S | Blocked |
+| BUG-8 | Story lessons ignore the Beginner speed | Bug | P1 | S | Blocked |
+| BUG-21 | Bubble Sounds only ever asks for the first 12 letters | Bug | P1 | S | Blocked |
+| BUG-22 | Story Corner says "she reed three books" | Bug | P1 | S | Blocked |
+| BUG-25 | The milestone moon never shows in Alex's app | Bug | P1 | S | Todo |
 | BUG-9 | Story Corner K warm-up plays one story twice | Bug | P2 | S | Todo |
 | BUG-10 | Settings may loop saving when the voice index fails | Bug | P2 | S | Todo |
 | BUG-12 | Day streak rolls over at 7 pm (UTC date) | Bug | P2 | S | Todo |
 | BUG-13 | Trophy dot never clears | Bug | P2 | S | Todo |
 | **SET** | **Settings & grown-up area** | Epic | **P0** | | |
-| SET-1 | Grown-up gate for settings | Story | P0 | M | In progress |
-| SET-2 | A child can't silence Luna by accident | Story | P0 | S | Todo |
-| SET-3 | Simplify the voice section | Story | P2 | S | Todo |
-| SET-4 | Settings grade list uses `GRADES` | Task | P2 | S | Todo |
-| SET-5 | Grown-ups can see what each game and lesson teaches | Story | P2 | S | Todo |
+| SET-2 | A child can't silence Luna by accident | Story | P0 | S | Blocked |
+| SET-3 | Simplify the voice section | Story | P2 | S | Blocked |
+| SET-4 | Settings grade list uses `GRADES` | Task | P2 | S | Blocked |
+| SET-5 | Grown-ups can see what each game and lesson teaches | Story | P2 | S | Blocked |
 | **LVL** | **Difficulty** | Epic | **P0** | | |
 | LVL-1 | Explicit grade × dial difficulty table | Story | P0 | S | Todo |
 | LVL-2 | Remember the chosen difficulty per game | Story | P2 | S | Todo |
@@ -144,6 +144,7 @@ In board order. A new epic gets its file in `epics/` first, then a link here
 | **PRG** | **Progress & rewards** | Epic | **P1** | | |
 | PRG-1 | Stars reflect performance | Story | P1 | M | Todo |
 | PRG-5 | Squishies instead of the sticker tin | Story | P1 | M | Todo |
+| PRG-9 | A game's done screen shows the squishy shelf | Story | P1 | S | Todo |
 | PRG-6 | Time per lesson: know it before, see it after | Story | P1 | M | Todo |
 | PRG-8 | Pick up a lesson where you left off | Story | P1 | M | Todo |
 | PRG-2 | Points: remove or give them a meaning | Story | P2 | S | Todo |

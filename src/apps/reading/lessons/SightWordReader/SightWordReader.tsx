@@ -17,7 +17,7 @@ export const SightWordReader: React.FC<{ question: SightWordReaderQuestion; api:
   api
 }) => {
   const options = useMemo(() => shuffle(question.options), [question.options]);
-  const { solved, wrongId, choose } = useAnswer(api, question.hint);
+  const { solved, wrongId, revealed, choose } = useAnswer(api, question.hint);
 
   // the written prompt never names the word; only the spoken one does
   const sayPrompt = () => {
@@ -54,9 +54,9 @@ export const SightWordReader: React.FC<{ question: SightWordReaderQuestion; api:
             key={option.id}
             kind="word"
             data-shot="lesson-choice"
-            state={choiceState(option.id, option.isCorrect, wrongId, solved)}
+            state={choiceState(option.id, option.isCorrect, wrongId, solved, revealed)}
             onClick={() =>
-              choose(option.id, option.isCorrect, onEnd => pronunciation.speakWord(option.word, { onEnd }))
+              choose(option.id, option.isCorrect, [{ word: option.word }])
             }
           >
             {option.word}

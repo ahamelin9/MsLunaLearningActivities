@@ -1,8 +1,27 @@
-import React from 'react';
+import React, { type CSSProperties } from 'react';
 import type { AppDefinition } from '@/types/app';
 import { Chip } from '@/components/kit';
 import { cx } from '@/utils/cx';
 import styles from './HomeScreen.module.scss';
+
+/**
+ * The night sky's stars, placed as on the round 2 Home board (DES-16): where
+ * each sits (share of the screen), its size, and how far into the twinkle it
+ * starts (share of the loop), so they don't twinkle as one.
+ */
+const STARS: { left: string; top: string; size?: 'small' | 'big'; at: number }[] = [
+  { left: '7.6%', top: '11%', at: 0 },
+  { left: '19.5%', top: '22%', size: 'small', at: 0.24 },
+  { left: '32.2%', top: '8.5%', size: 'big', at: 0.51 },
+  { left: '44%', top: '18.3%', at: 0.13 },
+  { left: '54.2%', top: '7.3%', size: 'small', at: 0.69 },
+  { left: '59.3%', top: '28%', at: 0.4 },
+  { left: '88.1%', top: '36.6%', size: 'big', at: 0.6 },
+  { left: '94%', top: '14.6%', size: 'small', at: 0.07 },
+  { left: '81.4%', top: '48.8%', size: 'small', at: 0.8 },
+  { left: '12.7%', top: '40.2%', size: 'small', at: 0.44 },
+  { left: '25.4%', top: '51.2%', at: 0.89 }
+];
 
 interface HomeScreenProps {
   apps: AppDefinition[];
@@ -14,7 +33,8 @@ interface HomeScreenProps {
  * sand and cocoa. A sky with the sun, dunes and pampas, the one Reading app
  * in the middle (room is left for ESL companion apps, WRT-1), and the home
  * indicator. The status bar sits over it (App). The night scene, the moon
- * and stars, comes with DES-16.
+ * and stars, shows in dark mode (DES-16): the scenery switches on
+ * `data-theme` alone, so it follows whatever set the mode.
  */
 export const HomeScreen: React.FC<HomeScreenProps> = ({ apps, onLaunchApp }) => {
   const readingApp = apps.find(a => a.id === 'reading') || apps[0];
@@ -22,7 +42,26 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ apps, onLaunchApp }) => 
   return (
     <div className={styles.root} data-shot="home">
       <div className={styles.scenery} aria-hidden="true">
-        <span className={styles.sun} />
+        <span className={styles.sun} data-shot="sun" />
+        <span className={styles.night}>
+          {STARS.map(star => (
+            <span
+              key={`${star.left} ${star.top}`}
+              className={styles.star}
+              data-shot="star"
+              data-size={star.size}
+              style={{ left: star.left, top: star.top, '--star-at': star.at } as CSSProperties}
+            />
+          ))}
+          {/* the crescent moon in moon gold, with two craters (the Home board's) */}
+          <svg className={styles.moon} viewBox="0 0 200 200" data-shot="moon">
+            <g transform="rotate(62 100 110)">
+              <path className={styles.moonBody} d="M40 60.2 A72 72 0 1 0 160 60.2 A60 60 0 1 1 40 60.2 Z" />
+              <circle className={styles.moonCrater} cx="68" cy="152" r="5" />
+              <circle className={styles.moonCrater} cx="132" cy="150" r="7" />
+            </g>
+          </svg>
+        </span>
         <span className={cx(styles.dune, styles.dune1)} />
         <span className={cx(styles.dune, styles.dune2)} />
         <span className={cx(styles.dune, styles.dune3)} />

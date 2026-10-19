@@ -570,7 +570,16 @@ const heldRing = await page.evaluate(() => {
 });
 ok('a held-part-way gate draws its ring round the button, in the action colour', heldRing.bg.startsWith('conic-gradient') && heldRing.wider, JSON.stringify(heldRing));
 const notes = await page.$$eval('button[data-hold] + [role="status"]', els => els.map(el => `${el.dataset.state ?? '-'}:${getComputedStyle(el).display}`));
-ok('the note shows only where it was asked for', notes.filter(n => n === 'shown:block').length === 1 && notes.every(n => n === 'shown:block' || n.endsWith(':none')), notes.join(' '));
+ok('the note shows only where it was asked for', notes.filter(n => n === 'shown:block').length === 2 && notes.every(n => n === 'shown:block' || n.endsWith(':none')), notes.join(' '));
+// SET-2: by default the note lines up with the button's right edge; with
+// holdNoteAt="start", its left edge (for Luna's mute, near the screen's left)
+const edges = await page.$$eval('button[data-hold] + [role="status"][data-state="shown"]', els => els.map(el => {
+  const b = el.previousElementSibling.getBoundingClientRect();
+  const n = el.getBoundingClientRect();
+  return { start: el.parentElement.dataset.note === 'start', left: Math.round(n.left - b.left), right: Math.round(b.right - n.right) };
+}));
+ok('the note lines up with the button\'s right edge, or its left with holdNoteAt="start"',
+  edges.length === 2 && edges.every(e => (e.start ? e.left === 0 : e.right === 0)) && edges.some(e => e.start), JSON.stringify(edges));
 const tryHold = await page.$('[data-shot="kit-hold"]');
 const tryLabel = () => tryHold.evaluate(b => b.closest('figure').querySelector('figcaption').textContent.trim());
 const holdFor = async (ms, mid) => {
@@ -594,10 +603,44 @@ for (const rm of [false, true]) {
   const afterShort = await tryLabel();
   await holdFor(2300, 1000);
   const afterLong = await tryLabel();
-  ok(`${rm ? 'reduced motion: ' : ''}a tap or a 1s hold doesn't open, a 2s hold does; the ring fills meanwhile`,
+  ok(`${rm ? 'reduced motion: ' : ''}a tap or a 1s hold doesn't open, a 1.5s hold does; the ring fills meanwhile`,
     afterShort === before && afterLong !== before && tapNote === 'block' && ring > 0.1 && ring < 0.5,
     `${before} → ${afterShort} → ${afterLong}, note ${tapNote}, ring ${ring.toFixed(2)} at 0.5s`);
 }
+await page.evaluate(() => document.documentElement.removeAttribute('data-reduced-motion'));
+
+// ── MilestoneMoon (DES-17) ─────────────────────────────────────────────────
+// her specimens, found by their captions; her parts by what they animate
+const moonIn = l => page.evaluateHandle(l => [...document.querySelectorAll('figure')].find(f => f.textContent.includes(l))?.querySelector('[data-mood]'), l);
+const moonAnim = el => el.evaluate(m => [...m.querySelectorAll('g')].map(p => getComputedStyle(p).animationName).filter(n => n !== 'none').join(' ') || 'none');
+const moonHappy = await moonIn('happy: open eyes');
+const moonCheer = await moonIn('cheer: smiling eyes');
+const moonTalker = await moonIn('her mouth talking');
+const moonFollower = await moonIn('her mouth follows');
+ok('the moon\'s two looks differ', await moonHappy.evaluate(m => m.innerHTML) !== await moonCheer.evaluate(m => m.innerHTML));
+ok('the moon is drawn in moon colours from the illustration palette', await moonHappy.evaluate(m => {
+  const face = m.querySelector('path');
+  const probe = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+  probe.style.fill = 'var(--illo-moon-pale)';
+  m.querySelector('svg').append(probe);
+  const want = getComputedStyle(probe).fill;
+  probe.remove();
+  return getComputedStyle(face).fill === want;
+}));
+const happyMoon = await moonAnim(moonHappy);
+ok('happy rocks and blinks, her mouth still', happyMoon.includes('luna-sway') && happyMoon.includes('luna-blink') && !happyMoon.includes('luna-talk'), happyMoon);
+ok('cheer doesn\'t blink (her eyes are lines)', !(await moonAnim(moonCheer)).includes('luna-blink'));
+ok('held talking moves her mouth', (await moonAnim(moonTalker)).includes('luna-talk'), await moonAnim(moonTalker));
+ok('left to follow the voice, her mouth is still while no clip plays', !(await moonAnim(moonFollower)).includes('luna-talk'));
+await speak(true);
+await sleep(100);
+ok('… and moves while a clip plays', (await moonAnim(moonFollower)).includes('luna-talk'));
+await speak(false);
+await sleep(100);
+ok('… and stops when it ends', !(await moonAnim(moonFollower)).includes('luna-talk'));
+await page.evaluate(() => document.documentElement.setAttribute('data-reduced-motion', ''));
+await sleep(100);
+ok('reduced motion: the moon is still', (await moonAnim(moonTalker)) === 'none', await moonAnim(moonTalker));
 await page.evaluate(() => document.documentElement.removeAttribute('data-reduced-motion'));
 
 await browser.close();

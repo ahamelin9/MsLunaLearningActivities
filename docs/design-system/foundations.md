@@ -150,7 +150,7 @@ In code: `--target-answer`, `--target-chrome`, `--target-gap` and
 | `celebrate` | Big pops, stars landing |
 | `petals` | Falling petals after a win |
 | `loop` | The shortest ambient loop |
-| `hold` | A grown-up's press and hold on a gated button (2s; SET-1). A wait, not motion, so reduced motion keeps it |
+| `hold` | A grown-up's press and hold on a gated button (1.5s, SET-2; it was 2s with SET-1). A wait, not motion, so reduced motion keeps it |
 
 - **In code:** durations are `--dur-tap` … `--dur-loop` and `--dur-hold`, easings `--ease-standard`,
   `--ease-springy`, `--ease-soft-spring`, `--ease-exit` and `--ease-in-out`, and
@@ -163,8 +163,9 @@ In code: `--target-answer`, `--target-chrome`, `--target-gap` and
   overshoot, `soft-spring` for bars filling, `exit` for things leaving.
 - **The shared animations:** pop, wobble, glow, float, sway, twinkle, squish,
   shimmer, petal-fall, grow-in, burst (sparks out of a found "?", DES-22b),
-  talk, blink (Luna's eyes, DES-15) and open (an
-  app window opening from the home screen, DES-9a). Each is a `--motion-*`
+  talk, blink (Luna's eyes, DES-15), open (an
+  app window opening from the home screen, DES-9a), and glide-in and glide-out
+  (the milestone moon arriving from the top corner and leaving, DES-17). Each is a `--motion-*`
   role, used as `animation: var(--motion-pop)`.
 - **Luna's beak follows the voice:** the voice code reports when one of her
   clips starts and when the last one ends (`pronunciation.onSpeaking`, read
@@ -181,7 +182,11 @@ What the moments look like:
 - **Rare things shimmer:** a light sweep and sparkles on rare tags and Pearl
   Moon.
 - **Squishies squish** when tapped: squash, stretch, settle.
-- **The milestone moon glides in,** says her line and glides out (DES-17).
+- **The milestone moon glides in,** says her line and glides out once her clip
+  ends, about 3 seconds in all, over the done screen's empty space; she never
+  takes a tap. Her mouth follows the voice as Luna's beak does, and Luna's
+  beak stays still while she's there (DES-17). With reduced motion she appears
+  and goes without gliding.
 - **Reduced motion:** loops stop, petals and sparkles hide, and things fade
   instead of travelling. It comes from the Settings switch (Less Motion) or the
   iPad's setting (DES-6), as `data-reduced-motion` on `<html>`. Under it every

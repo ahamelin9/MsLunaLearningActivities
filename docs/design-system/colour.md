@@ -79,16 +79,22 @@ different jobs.
 - **How it works:** every role is defined twice, once for light and once for
   dark, and the `data-theme` attribute on `<html>` picks one. All of a role's
   pieces are defined in both blocks, so even combined roles like shadows switch.
-- **Until DES-16, the app stays light.** Following the iPad's setting while
-  screens are only half moved would show half-dark screens. DES-16 then follows
-  the iPad, and lets a grown-up pick Light, Dark or "Match the iPad" behind the
-  gate.
+- **Who picks the mode (DES-16):** the app follows the iPad's own light/dark
+  setting by default, and switches with it at once. A grown-up can pick Light,
+  Dark or "Match the system" in Settings, behind the gate, and a child can turn
+  day into night with the home screen's sun/moon button; both save the same
+  choice. An inline script in `index.html` sets `data-theme` before the first
+  paint, so there's no flash, and `src/utils/theme.ts` keeps it in step after
+  that.
+- **At night the home screen** shows the crescent moon in moon gold and
+  twinkling stars instead of the sun, from the night scenery in
+  `_illustration.scss`; the stars stand still with reduced motion.
 - **Dark isn't inverted.** The browns get deeper, text becomes milk, and the
   main button flips to a light caramel with dark text. Right and try again keep
   their meaning with lighter text on deeper tints.
 - **The teacher prefers light,** but dark has to be just as good.
 - **Check both, every time:** the Kit page's side-by-side view, and screenshots
-  with dark forced.
+  with the iPad set to dark (`--theme dark`).
 - **No `light-dark()`.** It needs a newer iPadOS than some classroom tablets
   have, so plain custom properties do the job.
 

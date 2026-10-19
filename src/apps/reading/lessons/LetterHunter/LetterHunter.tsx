@@ -11,7 +11,7 @@ import kit from '../shared/LessonKit.module.scss';
 /** Hear a letter's name, find it among letters that look alike. */
 export const LetterHunter: React.FC<{ question: FindLetterQuestion; api: GameApi }> = ({ question, api }) => {
   const options = useMemo(() => shuffle(question.options), [question.options]);
-  const { solved, wrongId, choose } = useAnswer(api, question.hint);
+  const { solved, wrongId, revealed, choose } = useAnswer(api, question.hint);
 
   // the written prompt never names the letter; only the spoken one does
   const sayPrompt = () => {
@@ -39,11 +39,9 @@ export const LetterHunter: React.FC<{ question: FindLetterQuestion; api: GameApi
           <Choice
             key={option.id}
             data-shot="lesson-choice"
-            state={choiceState(option.id, option.isCorrect, wrongId, solved)}
+            state={choiceState(option.id, option.isCorrect, wrongId, solved, revealed)}
             onClick={() =>
-              choose(option.id, option.isCorrect, onEnd =>
-                pronunciation.speakSequence([{ text: 'Letter' }, { name: option.letter }], { onEnd })
-              )
+              choose(option.id, option.isCorrect, [{ text: 'Letter' }, { name: option.letter }])
             }
             aria-label={`letter ${option.letter}`}
           >

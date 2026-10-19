@@ -126,6 +126,29 @@
   bottom: var(--space-2);
 }
 
+// ---------- the milestone moon's visit (DES-17) ----------
+// gliding in and back out over the panel's empty space, covering no words;
+// never a tap. Landscape: under the reward, above the buttons. Portrait: the
+// top corner, beside the mark.
+.moon {
+  position: absolute;
+  right: var(--space-12);
+  bottom: calc(var(--space-16) * 2);
+  z-index: var(--z-celebrate);
+  pointer-events: none;
+  animation: var(--motion-glide-in);
+
+  @include bp(narrow) {
+    top: var(--space-2);
+    right: var(--space-8);
+    bottom: auto;
+  }
+
+  &[data-state='leaving'] {
+    animation: var(--motion-glide-out);
+  }
+}
+
 // ---------- what comes next ----------
 .next {
   display: flex;

@@ -104,7 +104,7 @@ export const ReadingApp: React.FC<ReadingAppProps> = ({ progress, onReturnToHome
   // the one header (DES-8): home, where you are, stars, the grown-ups' gear.
   // In the library the grade sits by the title, and it changes the grade
   // (DES-21): the teacher swaps grades as her groups come and go. The gear and
-  // the grade are behind the grown-up gate, a 2s press and hold (SET-1)
+  // the grade are behind the grown-up gate, a 1.5s press and hold (SET-1)
   const gradeButton = (grade: string) => (
     <ChunkyButton aria-label={`Change grade: ${grade}`} data-shot="change-grade" onHold={() => setIsChangingGrade(true)}>
       {grade}

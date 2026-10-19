@@ -34,6 +34,15 @@
     .face { border-color: var(--try-again-edge); background: var(--try-again-soft); }
   }
 
+  // "show me" (FB-2): the pair tried again, pointed at face down after three
+  // misses, as a revealed piece (components.md)
+  &[data-state~='revealed'] .back {
+    border-style: dashed;
+    border-color: var(--accent-edge);
+    background: var(--accent-soft);
+    color: var(--accent-text);
+  }
+
   // a pair: the right edge, the glow and the pop
   &[data-state~='right'] {
     animation: var(--motion-pop);

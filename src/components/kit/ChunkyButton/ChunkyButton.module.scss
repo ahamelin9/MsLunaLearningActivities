@@ -148,6 +148,13 @@
   }
 }
 
+// a button near the screen's left edge: the note runs rightwards from its
+// left edge instead (SET-2, Luna's mute)
+.hold[data-note='start'] .note {
+  right: auto;
+  left: 0;
+}
+
 // the Round board's prompt pill (DES-22b): what the game asks, said again on
 // a tap. The soft accent with round ends, flat like the board's (it still
 // sinks when pressed), in the reading type as a game's line of instruction

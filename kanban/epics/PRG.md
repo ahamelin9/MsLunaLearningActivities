@@ -52,6 +52,12 @@ Story · P1 · M · needs: —
   - a save with old stickers loads with the same number of squishies;
   - every squishy's line has a clip, and `voice:audit` passes.
 
+### PRG-9 · A game's done screen shows the squishy shelf
+Story · P1 · S · needs: PRG-5
+- **Why:** a lesson's done screen shows its lessons bar on the right, but a game's shows nothing there unless it gave a new sticker, so the right half is empty (Alex, 2026-10-18, from his shots of Feed Luna). He liked the squishy shelf for it.
+- **How:** on a game's done screen, the right side shows the child's squishy shelf (PRG-5's), with the squishy just won picked out when there is one; a lesson keeps its bar above it. Until PRG-5 lands nothing changes here.
+- **Complete when:** a game's done screen shows the shelf on the right at all four sizes, light and dark, with no empty half; a lesson's still shows its bar; checked in `ui:shots` and against the Done board.
+
 ### PRG-6 · Time per lesson: know it before, see it after
 Story · P1 · M · needs: —
 - **Why:** the teacher wants to know how long a lesson takes before starting, and to see how much time and progress a child took (2026-10-09).

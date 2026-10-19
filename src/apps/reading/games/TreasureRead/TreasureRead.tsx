@@ -83,6 +83,8 @@ const TreasurePassage: React.FC<{ lines: string[] }> = ({ lines }) => (
 const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
   const [solved, setSolved] = useState(false);
   const [wrong, setWrong] = useState<string | null>(null);
+  // "show me" (FB-2): the right stone glows from the third miss
+  const [shown, setShown] = useState(false);
   const step = api.ctx.roundIndex;
   const total = api.ctx.totalRounds;
   // Kindergarten is a read-along. From 1st grade the passage is the child's
@@ -111,13 +113,15 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
 
     if (option === round.answer) {
       setSolved(true);
-      if (round.blank) pronunciation.speakSentence(round.blank.text);
-      api.win({ delay: 2400 });
+      // the finished sentence, read back whole before Luna cheers (FB-1, BUG-1)
+      api.answer({ correct: true, say: round.blank ? [{ text: round.blank.text }] : undefined, delay: 2400 });
     } else {
       // a wrong answer wobbles, and clears when its wobble ends (components.md)
       setWrong(option);
       afterMotion('emphasis', () => setWrong(null));
-      api.miss({
+      api.answer({
+        correct: false,
+        reveal: () => setShown(true),
         hint:
           round.kind === 'truefalse'
             ? [{ text: 'Read the story once more.' }, { text: 'Does it say the same thing?' }]
@@ -179,7 +183,13 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
           <Choice
             key={option}
             kind="word"
-            state={wrong === option ? 'wrong' : solved ? (option === round.answer ? 'right' : 'faded') : 'idle'}
+            state={
+              wrong === option
+                ? 'wrong'
+                : solved
+                  ? option === round.answer ? 'right' : 'faded'
+                  : shown && option === round.answer ? 'revealed' : 'idle'
+            }
             aria-label={option}
             onClick={() => choose(option)}
           >

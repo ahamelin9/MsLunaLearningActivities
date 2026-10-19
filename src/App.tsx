@@ -7,6 +7,7 @@ import { storageService } from './utils/storage';
 import { soundManager } from './utils/audio';
 import { pronunciation } from './utils/pronunciation';
 import { useReducedMotion } from './utils/motion';
+import { useTheme } from './utils/theme';
 import { StatusBar } from './components/os/StatusBar/StatusBar';
 import { HomeScreen } from './components/os/HomeScreen/HomeScreen';
 import { AppWindow } from './components/os/AppWindow/AppWindow';
@@ -23,6 +24,9 @@ export function App() {
 
   // less motion: the Settings switch or the iPad's own setting (DES-6)
   useReducedMotion(progress.settings.reducedMotion);
+
+  // light or dark: the saved choice, or the iPad's own setting (DES-16)
+  const theme = useTheme(progress.settings.theme);
 
   // Ms. Luna's voice is a set of pre-rendered clips, so it can be loaded
   // immediately rather than waiting for a tap: decoding audio works on a
@@ -58,6 +62,12 @@ export function App() {
     setIsSettingsOpen(true);
   };
 
+  // the home screen's day/night button saves the same choice as Settings (DES-16)
+  const handleToggleTheme = () => {
+    soundManager.playPop();
+    storageService.updateSettings({ theme: theme === 'dark' ? 'light' : 'dark' });
+  };
+
   const handleGradeChange = (grade: GradeLevel) => {
     storageService.setGrade(grade);
   };
@@ -66,7 +76,7 @@ export function App() {
     <div className={styles.tabletOsRoot}>
       {/* the home screen's status bar, as on the round 2 Home board: the time and
           the gear (DES-9a); inside an app, the app's own header takes its place (DES-8) */}
-      {!activeApp && <StatusBar onOpenSettings={handleOpenSettings} />}
+      {!activeApp && <StatusBar onOpenSettings={handleOpenSettings} theme={theme} onToggleTheme={handleToggleTheme} />}
 
       {/* Main OS View: Either Home Screen or Active App Window */}
       <div className={styles.osViewport}>

@@ -7,6 +7,7 @@ import { useEffect, useRef, useState } from 'react';
 import type { ChoiceState } from '@/components/kit';
 import { afterMotion } from '@/utils/motion';
 import type { GameApi } from '../../engine/types';
+import type { SpeechPart } from '@/utils/pronunciation';
 
 /** Says the question's prompt once, a moment after it appears. */
 export function usePrompt(say: () => void) {
@@ -18,21 +19,24 @@ export function usePrompt(say: () => void) {
 }
 
 /**
- * Answering. The choice is said aloud first — "letter D", "dog" — and only
- * then does the shell cheer or console, so neither cuts the other off. Taps
- * while that plays are ignored. The question's own hint is what Luna says
- * from the second miss on.
+ * Answering, through the shell's one answer path (FB-1): the choice is said
+ * aloud first — "letter D", "dog" — and only then does the shell cheer or
+ * console, so neither cuts the other off. Taps while that plays are ignored.
+ * The question's own hint is what Luna says from the second miss on, and from
+ * the third the right choice is revealed (FB-2).
  */
 export function useAnswer(api: GameApi, hint?: string) {
   const [solved, setSolved] = useState(false);
   const [wrongId, setWrongId] = useState<string | null>(null);
+  // "show me" (FB-2): the shell asks for it from the third miss
+  const [revealed, setRevealed] = useState(false);
+  // two taps in one frame, before the shell's lock reaches this question
   const busy = useRef(false);
-  const fallback = useRef<number | undefined>(undefined);
+  useEffect(() => {
+    if (!api.locked) busy.current = false;
+  }, [api.locked]);
 
-  // a timer must not settle an answer for a question the child has left
-  useEffect(() => () => window.clearTimeout(fallback.current), []);
-
-  const choose = (id: string, correct: boolean, say: (onEnd: () => void) => void) => {
+  const choose = (id: string, correct: boolean, say: SpeechPart[]) => {
     if (busy.current || solved || api.locked) return;
     busy.current = true;
     if (correct) setSolved(true);
@@ -41,26 +45,13 @@ export function useAnswer(api: GameApi, hint?: string) {
       setWrongId(id);
       afterMotion('emphasis', () => setWrongId(null));
     }
-
-    let settled = false;
-    const settle = () => {
-      if (settled) return;
-      settled = true;
-      window.clearTimeout(fallback.current);
-      if (correct) {
-        api.win({ delay: 1600 });
-        return;
-      }
-      busy.current = false;
-      api.miss({ hint: hint ? [{ text: hint }] : undefined });
-    };
-    // Speech that is cut short — the child taps "listen" while their answer
-    // is being said — never reports that it ended, and waiting for it left
-    // the question deaf to every later tap. So the answer also settles on its
-    // own: soon for a miss, later for a right answer, whose explanation can
-    // run a few seconds.
-    fallback.current = window.setTimeout(settle, correct ? 7000 : 2500);
-    say(settle);
+    api.answer({
+      correct,
+      say,
+      delay: 1600,
+      hint: hint ? [{ text: hint }] : undefined,
+      reveal: () => setRevealed(true)
+    });
   };
 
   // A sentence or story is the child's to read first: read aloud whole before
@@ -69,15 +60,23 @@ export function useAnswer(api: GameApi, hint?: string) {
   // the way a child would ask the teacher.)
   const tried = solved || api.attempts > 0;
 
-  return { solved, tried, wrongId, choose };
+  return { solved, tried, wrongId, revealed, choose };
 }
 
 /**
  * A choice's state in the one answer language (DES-23): wobbling while
- * wrong; once solved, the right one right and the others faded.
+ * wrong; once solved, the right one right and the others faded; and after
+ * three misses, the right one revealed (FB-2) until it's chosen.
  */
-export function choiceState(id: string, correct: boolean, wrongId: string | null, solved: boolean): ChoiceState {
+export function choiceState(
+  id: string,
+  correct: boolean,
+  wrongId: string | null,
+  solved: boolean,
+  revealed = false
+): ChoiceState {
   if (wrongId === id) return 'wrong';
   if (solved) return correct ? 'right' : 'faded';
+  if (revealed && correct) return 'revealed';
   return 'idle';
 }

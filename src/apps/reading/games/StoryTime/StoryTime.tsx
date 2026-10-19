@@ -29,6 +29,9 @@ function buildRound(story: MiniStory): Round {
   return { story, hunt: pick(words.length > 0 ? words : ['luna']) };
 }
 
+/** After the hunted word is found: the word, then Luna's "Found it!", then the question. */
+const QUESTION_AFTER_FOUND_MS = 3400;
+
 const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
   const [revealed, setRevealed] = useState(1);
   const [phase, setPhase] = useState<'read' | 'hunt' | 'question'>('read');
@@ -36,6 +39,8 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
   const [wrongAnswer, setWrongAnswer] = useState<string | null>(null);
   const [answered, setAnswered] = useState(false);
   const [missedQuestion, setMissedQuestion] = useState(false);
+  // "show me" (FB-2): from the third miss, the hunted word or the right answer glows
+  const [shown, setShown] = useState(false);
 
   const story = round.story;
   const allRevealed = revealed >= story.lines.length;
@@ -86,18 +91,26 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
   const tapWord = (raw: string) => {
     if (phase !== 'hunt' || foundWord) return;
     const clean = raw.replace(/[^a-zA-Z]/g, '').toLowerCase();
-    pronunciation.speakWord(clean);
 
     if (clean === round.hunt) {
       setFoundWord(true);
       soundManager.playCorrect();
-      api.tick({ lunaLine: 'Found it! Right there in the middle of the page.' });
+      // the word, whole, before Luna's line (FB-1)
+      api.tick({ say: [{ word: clean }], lunaLine: 'Found it! Right there in the middle of the page.' });
+      // the question waits for the word and Luna's line (FB-1); at 1.1s it
+      // used to cut her line off
       window.setTimeout(() => {
         setPhase('question');
+        // the question's answer isn't shown until a miss there asks for it
+        // (the round's misses carry on, so after a hard hunt that's the first)
+        setShown(false);
         pronunciation.speakSentence(story.question);
-      }, 1100);
+      }, QUESTION_AFTER_FOUND_MS);
     } else {
-      api.miss({
+      api.answer({
+        correct: false,
+        say: [{ word: clean }],
+        reveal: () => setShown(true),
         hint: [{ text: 'You are looking for' }, { word: round.hunt }, { text: 'Read each line slowly with your finger.' }]
       });
     }
@@ -105,17 +118,22 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
 
   const answer = (text: string, correct: boolean) => {
     if (api.locked || answered) return;
-    pronunciation.speakSentence(text);
 
     if (correct) {
       setAnswered(true);
-      api.win({ delay: 2100 });
+      // the answer, said whole before Luna reacts (FB-1)
+      api.answer({ correct: true, say: [{ text }], delay: 2100 });
     } else {
       // a wrong answer wobbles, and clears when its wobble ends (components.md)
       setWrongAnswer(text);
       setMissedQuestion(true);
       afterMotion('emphasis', () => setWrongAnswer(null));
-      api.miss({ hint: [{ text: 'Peek back at the story — the answer is hiding in one of the lines.' }] });
+      api.answer({
+        correct: false,
+        say: [{ text }],
+        reveal: () => setShown(true),
+        hint: [{ text: 'Peek back at the story — the answer is hiding in one of the lines.' }]
+      });
     }
   };
 
@@ -165,12 +183,13 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
               {line.split(' ').map((word, wi) => {
                 const clean = word.replace(/[^a-zA-Z]/g, '').toLowerCase();
                 const isFound = foundWord && clean === round.hunt;
+                const isShown = shown && phase === 'hunt' && clean === round.hunt;
                 return (
                   <span
                     key={wi}
                     className={styles.word}
                     // the found word, in the one answer language (components.md)
-                    data-state={isFound ? 'right' : undefined}
+                    data-state={isFound ? 'right' : isShown ? 'revealed' : undefined}
                     onClick={e => {
                       if (phase === 'hunt') {
                         e.stopPropagation();
@@ -222,7 +241,13 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
               <Choice
                 key={a.text}
                 kind="phrase"
-                state={wrongAnswer === a.text ? 'wrong' : answered ? (a.correct ? 'right' : 'faded') : 'idle'}
+                state={
+                  wrongAnswer === a.text
+                    ? 'wrong'
+                    : answered
+                      ? a.correct ? 'right' : 'faded'
+                      : shown && phase === 'question' && a.correct ? 'revealed' : 'idle'
+                }
                 onClick={() => answer(a.text, a.correct)}
               >
                 {a.text}

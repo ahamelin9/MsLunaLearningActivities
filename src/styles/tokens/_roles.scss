@@ -7,7 +7,8 @@
 // paper grain) are in both blocks too, so they switch with the mode. No
 // `light-dark()`: older classroom iPads don't have it.
 //
-// The app stays light until DES-16 (`data-theme="light"` on <html>).
+// `data-theme` on <html> follows the iPad, Settings or the home screen's
+// sun/moon button (DES-16; src/utils/theme.ts).
 // A new role is step 3 of the ladder in fitting-in.md: Alex's OK, both values,
 // its text pairs, and a line in decisions.md.
 
@@ -200,6 +201,9 @@ $text-pairs: (
   --motion-blink: luna-blink calc(var(--dur-loop) * 1.3) var(--ease-in-out) infinite;
   // an app window opening from the home screen (DES-9a)
   --motion-open: luna-open var(--dur-enter) var(--ease-standard) both;
+  // the milestone moon arriving and leaving (DES-17)
+  --motion-glide-in: luna-glide-in var(--dur-celebrate) var(--ease-springy) both;
+  --motion-glide-out: luna-glide-out var(--dur-enter) var(--ease-standard) forwards;
 
   // stacking
   @each $name, $z in p.$z {
@@ -229,7 +233,7 @@ $text-pairs: (
   @each $name, $ms in p.$duration {
     --dur-#{$name}: 0ms;
   }
-  @each $name in (pop, wobble, glow, float, sway, twinkle, squish, shimmer, petal-fall, grow-in, burst, talk, blink, open) {
+  @each $name in (pop, wobble, glow, float, sway, twinkle, squish, shimmer, petal-fall, grow-in, burst, talk, blink, open, glide-in, glide-out) {
     --motion-#{$name}: none;
   }
 }

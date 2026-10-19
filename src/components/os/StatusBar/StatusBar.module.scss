@@ -1,6 +1,6 @@
 // The home screen's status bar (DES-9a), as on the round 2 Home board: the
-// time on the left, the gear on the right, over the home sky. Roles and the
-// space scale only.
+// time on the left, the day/night button (DES-16) and the gear on the right,
+// over the home sky. Roles and the space scale only.
 
 .root {
   position: absolute;
@@ -17,4 +17,9 @@
 
 .time {
   font: var(--text-label);
+}
+
+.buttons {
+  display: flex;
+  gap: var(--space-3);
 }

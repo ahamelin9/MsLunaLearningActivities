@@ -91,6 +91,13 @@
     color: var(--right-ink);
     animation: var(--motion-pop);
   }
+
+  // "show me" (FB-2): after three misses the hunted word is pointed at, as a
+  // revealed piece (components.md): the soft accent and a dashed accent ring
+  &[data-state='revealed'] {
+    background: var(--accent-soft);
+    outline: var(--border-regular) dashed var(--accent-edge);
+  }
 }
 
 // "Next line", or "Read me the story", under the lines

@@ -11,8 +11,8 @@ export const DEFAULT_SETTINGS: UserSettings = {
   speechEnabled: true,
   speechRate: 0.95,
   reducedMotion: false,
+  theme: 'match',
   voiceId: DEFAULT_VOICE_ID,
-  voiceLanguage: 'en-US',
 };
 
 export const DEFAULT_PROGRESS: UserProgress = {
@@ -46,9 +46,12 @@ class StorageService {
       const raw = localStorage.getItem(STORAGE_KEY);
       if (!raw) return { ...DEFAULT_PROGRESS };
       const parsed = JSON.parse(raw);
+      // an older save's accent setting is gone: the voice carries its accent (SET-3)
+      const { voiceLanguage: _accent, ...savedSettings } = parsed.settings || {};
+      void _accent;
       const loadedSettings = {
         ...DEFAULT_SETTINGS,
-        ...(parsed.settings || {})
+        ...savedSettings
       };
       return {
         ...DEFAULT_PROGRESS,
@@ -261,6 +264,20 @@ class StorageService {
 
     this.persist();
     return { newAchievements };
+  }
+
+  /**
+   * Records a one-time event in the achievements (the milestone moon's
+   * visits, DES-17). True the first time, false once it's been claimed.
+   */
+  public claimOnce(id: string): boolean {
+    if (this.progress.unlockedAchievements.includes(id)) return false;
+    this.progress = {
+      ...this.progress,
+      unlockedAchievements: [...this.progress.unlockedAchievements, id]
+    };
+    this.persist();
+    return true;
   }
 
   public resetProgress() {

@@ -36,6 +36,9 @@ export const SHAPES = {
   close: <path d="M6 6l12 12M18 6L6 18" />,
   trophy: <path d="M8 4h8v6a4 4 0 0 1-8 0zM8 6H5.5a3 3 0 0 0 3 4.2M16 6h2.5a3 3 0 0 1-3 4.2M12 14v4M8.5 20h7" />,
   lightbulb: <path d="M9.5 18h5M10.5 21h3M12 3a6 6 0 0 0-3.6 10.8c.7.5 1.1 1.3 1.1 2.2h5c0-.9.4-1.7 1.1-2.2A6 6 0 0 0 12 3z" />,
+  // the home screen's day/night button (DES-16): the sun shows at night, the moon by day
+  sun: <><circle cx="12" cy="12" r="4" /><path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M5.3 18.7l1.4-1.4M17.3 6.7l1.4-1.4" /></>,
+  moon: <path d="M19.5 14.5A8 8 0 1 1 9.5 4.5a6.5 6.5 0 0 0 10 10z" />,
 } satisfies Record<string, ReactNode>;
 
 export type IconName = keyof typeof SHAPES;

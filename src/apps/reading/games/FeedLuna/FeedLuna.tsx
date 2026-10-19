@@ -97,21 +97,29 @@ function buildRound(tier: 1 | 2 | 3): Round {
   };
 }
 
+/** Where a cookie's chocolate chips sit (DES-14): four layouts, drawn in FeedLuna.module.scss by `data-chips`. */
+const CHIP_LAYOUTS = 4;
+
+/**
+ * Which chips each letter's cookie has: neighbours on the plate always
+ * differ, and where the layouts start moves with the round's answer, so the
+ * rounds don't all look alike.
+ */
+const chipsOf = (round: Round, char: string) =>
+  ((round.options.indexOf(char) + round.answer.charCodeAt(0)) % CHIP_LAYOUTS) + 1;
+
 const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
   const [eaten, setEaten] = useState<string[]>([]);
   const [spat, setSpat] = useState<string | null>(null);
   const [dragging, setDragging] = useState<{ char: string; x: number; y: number } | null>(null);
   const [chewing, setChewing] = useState(false);
+  // "show me" (FB-2): the right cookie is pointed at from the third miss
+  const [shown, setShown] = useState(false);
 
   const beakRef = useRef<HTMLDivElement | null>(null);
   const surfaceRef = useRef<HTMLDivElement | null>(null);
   const startRef = useRef<{ x: number; y: number } | null>(null);
-  /** she is naming the cookie she ate: taps wait until she has cheered */
-  const naming = useRef(false);
-  const cheerTimer = useRef<number | undefined>(undefined);
 
-  // a timer must not cheer for a round the child has left
-  useEffect(() => () => window.clearTimeout(cheerTimer.current), []);
 
   const sayCue = () => {
     soundManager.playLetterTap();
@@ -125,35 +133,26 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
   }, []);
 
   const feed = (char: string) => {
-    if (api.locked || naming.current || eaten.includes(char)) return;
+    if (api.locked || eaten.includes(char)) return;
 
     if (char === round.answer) {
-      naming.current = true;
       setEaten([...eaten, char]);
       setChewing(true);
       soundManager.playLetterSnap();
 
-      // She names what she ate (no "Mmm!", Alex), and only then cheers. Both
-      // at once, the cheer was cut off a quarter-second in and the two
-      // sounded like one jumble. A watchdog cheers anyway if the name's end
-      // is never reported.
-      let cheered = false;
-      const cheer = () => {
-        if (cheered) return;
-        cheered = true;
-        window.clearTimeout(cheerTimer.current);
-        api.win({ delay: 1900 });
-      };
-      cheerTimer.current = window.setTimeout(cheer, 2500);
-      pronunciation.speakSequence(
-        [char === char.toLowerCase() ? { text: 'little' } : { text: 'big' }, { name: char }],
-        { onEnd: cheer }
-      );
+      // She names what she ate (no "Mmm!", Alex), and only then cheers: the
+      // shell's one answer path says it whole first (FB-1; BUG-19 did this
+      // here alone before)
+      api.answer({
+        correct: true,
+        say: [char === char.toLowerCase() ? { text: 'little' } : { text: 'big' }, { name: char }],
+        delay: 1900
+      });
     } else {
       // a wrong cookie wobbles, and clears when its wobble ends (components.md)
       setSpat(char);
       afterMotion('emphasis', () => setSpat(null));
-      api.miss({ hint: round.hint });
+      api.answer({ correct: false, hint: round.hint, reveal: () => setShown(true) });
     }
   };
 
@@ -238,12 +237,20 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
             <button
               key={char}
               className={styles.cookie}
+              data-chips={chipsOf(round, char)}
               // a game piece in the one answer language (components.md)
-              data-state={dataState(isEaten ? 'right' : false, isSpat ? 'wrong' : false, isDragged ? 'dragged' : false)}
+              data-state={dataState(
+                isEaten ? 'right' : false,
+                isSpat ? 'wrong' : false,
+                isDragged ? 'dragged' : false,
+                shown && !isEaten && char === round.answer ? 'revealed' : false
+              )}
               onPointerDown={e => onPointerDown(e, char)}
-              onClick={() => {
-                // keyboard and assistive clicks never produce a drag
-                if (!dragging) feed(char);
+              onClick={e => {
+                // only a keyboard or assistive click (detail 0) feeds here: a
+                // tap already fed her on pointer-up, and its click would feed
+                // her again, two misses for one wrong tap (BUG-2)
+                if (e.detail === 0) feed(char);
               }}
               disabled={isEaten}
               aria-label={`letter ${char}`}
@@ -255,7 +262,12 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
       </div>
 
       {dragging && (
-        <span className={cx(styles.cookie, styles.floating)} style={{ left: dragging.x, top: dragging.y }} aria-hidden="true">
+        <span
+          className={cx(styles.cookie, styles.floating)}
+          data-chips={chipsOf(round, dragging.char)}
+          style={{ left: dragging.x, top: dragging.y }}
+          aria-hidden="true"
+        >
           <span className={styles.cookieChar}>{dragging.char}</span>
         </span>
       )}

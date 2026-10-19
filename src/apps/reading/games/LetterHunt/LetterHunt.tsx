@@ -113,6 +113,8 @@ function gridFor(bugs: Bug[], width: number, height: number) {
 const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
   const [caught, setCaught] = useState<string[]>([]);
   const [missId, setMissId] = useState<string | null>(null);
+  // "show me" (FB-2): the letters still to catch are pointed at from the third miss
+  const [shown, setShown] = useState(false);
   // the field's shape, measured, so the grid fits it (and follows a turn of the iPad)
   const crawlRef = useRef<HTMLDivElement | null>(null);
   const [field, setField] = useState({ width: 5, height: 2 });
@@ -148,19 +150,23 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
     if (bug.isTarget) {
       const next = [...caught, bug.id];
       setCaught(next);
-      pronunciation.speakLetterName(bug.char);
 
       if (next.length >= round.targetCount) {
-        api.win({ delay: 1600 });
+        // its name, whole, then Luna's cheer (FB-1)
+        api.answer({ correct: true, say: [{ name: bug.char }], delay: 1600 });
       } else {
+        pronunciation.speakLetterName(bug.char);
         api.tick();
       }
     } else {
       // a wrong letter wobbles, and clears when its wobble ends (components.md)
       setMissId(bug.id);
       afterMotion('emphasis', () => setMissId(null));
-      pronunciation.speakSequence([{ text: 'That is' }, { name: bug.char }]);
-      api.miss({
+      // "That is G", whole, before Luna's line (FB-1, BUG-1)
+      api.answer({
+        correct: false,
+        say: [{ text: 'That is' }, { name: bug.char }],
+        reveal: () => setShown(true),
         hint: [
           { text: 'That one is a tricky twin!' },
           { text: 'Find every letter' },
@@ -193,7 +199,11 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
                 key={bug.id}
                 className={styles.bug}
                 // a game piece in the one answer language (components.md)
-                data-state={dataState(isCaught ? 'right' : false, missId === bug.id ? 'wrong' : false)}
+                data-state={dataState(
+                  isCaught ? 'right' : false,
+                  missId === bug.id ? 'wrong' : false,
+                  shown && bug.isTarget && !isCaught ? 'revealed' : false
+                )}
                 data-tint={bug.tint}
                 style={{ ...spots[i], '--tilt': `${bug.tilt}deg` } as React.CSSProperties}
                 onClick={() => grab(bug)}

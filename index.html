@@ -1,11 +1,25 @@
 <!doctype html>
-<html lang="en" data-theme="light">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>Ms. Luna's Learning Pad · Reading & Phonics</title>
     <!-- Andika and Fraunces are served from public/fonts/ (src/styles/base/_fonts.scss) -->
+    <!-- Light or dark before the first paint, so there's no flash (DES-16): the
+         saved choice, or the iPad's own setting for "match". src/utils/theme.ts
+         keeps it in step after that; keep the two alike. -->
+    <script>
+      (function () {
+        var choice = 'match';
+        try {
+          var saved = JSON.parse(localStorage.getItem('ms_luna_learning_progress_v1') || '{}');
+          if (saved.settings && saved.settings.theme) choice = saved.settings.theme;
+        } catch (e) {}
+        var dark = choice === 'dark' || (choice !== 'light' && matchMedia('(prefers-color-scheme: dark)').matches);
+        document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

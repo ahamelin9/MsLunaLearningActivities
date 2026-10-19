@@ -44,6 +44,8 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
   const [countdown, setCountdown] = useState(round.lookSeconds);
   const [found, setFound] = useState(false);
   const [wrong, setWrong] = useState<string | null>(null);
+  // "show me" (FB-2): the missing one glows from the third miss
+  const [shown, setShown] = useState(false);
 
   useEffect(() => {
     pronunciation.speakText('Look carefully at my desk...');
@@ -64,16 +66,19 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
 
   const guess = (item: WordItem) => {
     if (api.locked || phase !== 'guess' || found) return;
-    pronunciation.speakWord(item.word);
 
+    // the word, said whole before Luna reacts (FB-1)
     if (item.word === round.missing.word) {
       setFound(true);
-      api.win({ delay: 2000 });
+      api.answer({ correct: true, say: [{ word: item.word }], delay: 2000 });
     } else {
       // a wrong pick wobbles, and clears when its wobble ends (components.md)
       setWrong(item.word);
       afterMotion('emphasis', () => setWrong(null));
-      api.miss({
+      api.answer({
+        correct: false,
+        say: [{ word: item.word }],
+        reveal: () => setShown(true),
         hint: [{ word: item.word }, { text: 'is still on the desk. Which one is not there any more?' }]
       });
     }
@@ -128,7 +133,7 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
                 <Choice
                   key={opt.word}
                   kind={round.wordChoices ? 'word' : 'picture'}
-                  state={wrong === opt.word ? 'wrong' : found ? (isAnswer ? 'right' : 'faded') : 'idle'}
+                  state={wrong === opt.word ? 'wrong' : found ? (isAnswer ? 'right' : 'faded') : shown && isAnswer ? 'revealed' : 'idle'}
                   // every choice is named: the target is the one that's gone, never shown
                   caption={round.wordChoices ? undefined : opt.word}
                   aria-label={opt.word}

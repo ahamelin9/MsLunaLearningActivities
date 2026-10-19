@@ -1,0 +1,57 @@
+// MilestoneMoon (DES-17): component tokens first; her moods and talking swap
+// only these. Every colour is from the illustration palette, so she looks
+// like herself in light and dark (colour.md, Illustrations). Her two looks are
+// drawn in MilestoneMoon.tsx; the motions here run on wrappers.
+
+.root {
+  --moon-rock: var(--motion-sway);
+  --moon-blink: none;
+  --moon-talk: none;
+
+  display: inline-block;
+  flex: none;
+  line-height: 0;
+}
+
+// her eyes blink while they're open
+.root[data-mood='happy'] { --moon-blink: var(--motion-blink); }
+
+// only while a clip plays (MilestoneMoon.tsx follows the voice)
+.root[data-state~='talking'] { --moon-talk: var(--motion-talk); }
+
+.svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  filter: drop-shadow(0 0 var(--space-3) var(--illo-moon-glow));
+}
+
+// she rocks about the middle of her drawing, as on the board
+.rock {
+  transform-box: view-box;
+  transform-origin: 50% 55%;
+  animation: var(--moon-rock);
+}
+
+.eyes {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: var(--moon-blink);
+}
+
+.mouthMove {
+  transform-box: fill-box;
+  transform-origin: 50% 0;
+  animation: var(--moon-talk);
+}
+
+// ── her colours ────────────────────────────────────────────────────────────
+.face { fill: var(--illo-moon-pale); stroke: var(--illo-moon-edge); }
+.crater { fill: var(--illo-moon-pale-crater); }
+.pupil { fill: var(--illo-line); }
+.glint { fill: var(--illo-shine); }
+.eyeLine { fill: none; stroke: var(--illo-line); }
+.frame { fill: none; stroke: var(--illo-frames); }
+.cheek { fill: var(--illo-moon-cheek); }
+.mouth { fill: var(--illo-moon-mouth); }

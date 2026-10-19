@@ -10,8 +10,7 @@
 //                                                and components-{light,dark}.png (DES-7a)
 //   npm run ui:shots -- --reduced-motion      -> the same run with Reduce Motion on; fails if anything still moves (DES-6)
 //   npm run ui:shots -- --theme dark --label after-dark
-//                                             -> the same run in the dark roles (DES-8): data-theme="dark" on <html>.
-//                                                Until DES-16 the app itself stays light
+//                                             -> the same run with the iPad set to dark, which the app follows (DES-16).
 //
 // It starts its own Vite dev server and drives the Chrome already installed
 // on this machine (puppeteer-core downloads no browser of its own), found by
@@ -491,7 +490,11 @@ async function shootViewport(browser, url, viewport, outDir, reduced = false, th
   await page.setViewport({ ...viewport, deviceScaleFactor: 1, hasTouch: true });
   await page.emulateTimezone('UTC');
   // DES-6: the iPad's own Reduce Motion, so every screen must stand still
-  if (reduced) await page.emulateMediaFeatures([{ name: 'prefers-reduced-motion', value: 'reduce' }]);
+  // DES-16: the iPad's own light/dark setting, which the app follows by default
+  await page.emulateMediaFeatures([
+    { name: 'prefers-color-scheme', value: theme },
+    ...(reduced ? [{ name: 'prefers-reduced-motion', value: 'reduce' }] : [])
+  ]);
   const moving = [];
   await page.evaluateOnNewDocument(installPageClock, { start: CLOCK_START, seed: RANDOM_SEED });
   // CSS animations would otherwise run on the browser's real clock; standing
@@ -526,8 +529,6 @@ async function shootViewport(browser, url, viewport, outDir, reduced = false, th
     await page.goto(url, { waitUntil: 'networkidle0' });
     await page.evaluate(() => localStorage.clear());
     await page.reload({ waitUntil: 'networkidle0' });
-    // DES-8: index.html pins the app light, and nothing changes it until DES-16
-    await page.evaluate(theme => document.documentElement.setAttribute('data-theme', theme), theme);
     await until('home');
     await shot('home');
 

@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
-import type { UserProgress, UserSettings } from '@/types/user';
+import type { ThemeChoice, UserProgress, UserSettings } from '@/types/user';
 import type { GradeLevel } from '@/types/reading';
 import { storageService } from '@/utils/storage';
+import { GRADES } from '@/data/readingCurriculum';
 import { soundManager } from '@/utils/audio';
 import { ChunkyButton, Icon, Modal, Switch } from '@/components/kit';
 import { VoicePicker } from '../VoicePicker/VoicePicker';
+import { TeachesList } from './TeachesList';
 import styles from './SettingsModal.module.scss';
 
 interface SettingsModalProps {
@@ -20,10 +22,12 @@ const SPEEDS = [
   { label: 'Quick', value: 1.15 }
 ];
 
-const GRADE_CHOICES: { id: GradeLevel; label: string }[] = [
-  { id: 'kindergarten', label: 'Kindergarten' },
-  { id: 'grade1', label: '1st grade' },
-  { id: 'grade2', label: '2nd grade' }
+// light and dark (DES-16): the home screen's day/night button picks Light or Dark too;
+// "Match the system", not "the iPad": it may be a Chromebook (Alex, 2026-10-18)
+const THEMES: { label: string; value: ThemeChoice }[] = [
+  { label: 'Match the system', value: 'match' },
+  { label: 'Light', value: 'light' },
+  { label: 'Dark', value: 'dark' }
 ];
 
 /** Which speed button a saved rate belongs to. */
@@ -31,10 +35,14 @@ const speedOf = (rate: number) => (rate < 0.85 ? 0.75 : rate <= 1.05 ? 0.95 : 1.
 
 /**
  * Settings, for grown-ups (DES-9b): a kit Modal of switches and pick-one
- * rows, in plain words. SET-1 puts it behind a grown-up gate.
+ * rows, in plain words, behind the grown-up gate (SET-1). Light and dark
+ * is a pick-one row (DES-16). "What they learn" swaps the panel for what each
+ * game and lesson teaches (SET-5, TeachesList).
  */
 export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, progress, onClose, onGradeChange }) => {
   const [confirmingReset, setConfirmingReset] = useState(false);
+  // what each game and lesson teaches, in place of the settings (SET-5)
+  const [teaching, setTeaching] = useState(false);
   const [resetDone, setResetDone] = useState(false);
   const { settings } = progress;
 
@@ -46,6 +54,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, progress, 
   const close = () => {
     soundManager.playPop();
     setConfirmingReset(false);
+    setTeaching(false);
     onClose();
   };
 
@@ -61,7 +70,22 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, progress, 
   };
 
   return (
-    <Modal open={isOpen} onClose={close} title="Settings" closeLabel="Close settings" data-shot="settings">
+    <Modal
+      open={isOpen}
+      onClose={close}
+      title={teaching ? 'What each one teaches' : 'Settings'}
+      closeLabel="Close settings"
+      data-shot="settings"
+    >
+      {teaching ? (
+        <TeachesList
+          onBack={() => {
+            soundManager.playPop();
+            setTeaching(false);
+          }}
+        />
+      ) : (
+      <>
       <section className={styles.group}>
         <h3 className={styles.groupName}>Sound</h3>
         <div className={styles.row}>
@@ -116,9 +140,32 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, progress, 
       </section>
 
       <section className={styles.group}>
+        <h3 className={styles.groupName}>Light and dark</h3>
+        <div className={styles.row}>
+          <span className={styles.text}>
+            <span className={styles.name}>Day or night</span>
+            <span className={styles.desc}>“Match the system” follows the device’s own light or dark</span>
+          </span>
+          <span className={styles.choices} role="group" aria-label="Light and dark">
+            {THEMES.map(theme => (
+              <ChunkyButton
+                key={theme.value}
+                aria-pressed={settings.theme === theme.value}
+                onClick={() => update({ theme: theme.value })}
+                data-shot={`theme-${theme.value}`}
+              >
+                {theme.label}
+              </ChunkyButton>
+            ))}
+          </span>
+        </div>
+      </section>
+
+      <section className={styles.group}>
         <h3 className={styles.groupName}>Grade</h3>
         <span className={styles.choices} role="group" aria-label="Grade">
-          {GRADE_CHOICES.map(grade => (
+          {/* the curriculum's own list, so a grade added there shows here (SET-4) */}
+          {GRADES.map(grade => (
             <ChunkyButton
               key={grade.id}
               aria-pressed={progress.selectedGrade === grade.id}
@@ -127,10 +174,30 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, progress, 
                 onGradeChange(grade.id);
               }}
             >
-              {grade.label}
+              {grade.title}
             </ChunkyButton>
           ))}
         </span>
+      </section>
+
+      <section className={styles.group}>
+        <h3 className={styles.groupName}>What they learn</h3>
+        <div className={styles.row}>
+          <span className={styles.text}>
+            <span className={styles.name}>What each game and lesson teaches</span>
+            <span className={styles.desc}>The skill behind each one, in plain words</span>
+          </span>
+          <ChunkyButton
+            iconAfter="arrow-right"
+            data-shot="open-teaches"
+            onClick={() => {
+              soundManager.playPop();
+              setTeaching(true);
+            }}
+          >
+            See them
+          </ChunkyButton>
+        </div>
       </section>
 
       <section className={styles.group}>
@@ -168,6 +235,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, progress, 
           </div>
         )}
       </section>
+      </>
+      )}
     </Modal>
   );
 };
