@@ -313,7 +313,8 @@ export const READING_CURRICULUM: Record<GradeLevel, ReadingSkill[]> = {
             {
               id: 'q-k-sw-see',
               type: 'sight-word-reader',
-              prompt: 'Find the word Ms. Luna says!',
+              // none of the lesson's words on screen, not even "the" (CUR-3)
+              prompt: 'Which word does Ms. Luna say?',
               speechPrompt: 'Find the sight word SEE: "I see a smiling star!"',
               word: 'see',
               exampleSentence: 'I see a smiling star! ⭐',
@@ -324,32 +325,67 @@ export const READING_CURRICULUM: Record<GradeLevel, ReadingSkill[]> = {
                 { id: 'opt-she', word: 'she', isCorrect: false }
               ]
             },
+            // the, like, I and a, which can't be sounded out the way "big"
+            // and "can" could (CUR-3); each against two real look-alikes,
+            // never a word that sounds the same
             {
-              id: 'q-k-sw-big',
+              id: 'q-k-sw-the',
               type: 'sight-word-reader',
-              prompt: 'Find the word Ms. Luna says!',
-              speechPrompt: 'Find the sight word BIG: "The elephant is big!"',
-              word: 'big',
-              exampleSentence: 'The elephant is very big! 🐘',
-              hint: 'Listen closely: big. An elephant is big!',
+              // none of the lesson's words on screen, not even "the" (CUR-3)
+              prompt: 'Which word does Ms. Luna say?',
+              speechPrompt: 'Find the sight word THE: "The moon is up!"',
+              word: 'the',
+              exampleSentence: 'The moon is up! 🌙',
+              hint: 'Listen closely: the. The moon is up!',
               options: [
-                { id: 'opt-bag', word: 'bag', isCorrect: false },
-                { id: 'opt-big', word: 'big', isCorrect: true },
-                { id: 'opt-bug', word: 'bug', isCorrect: false }
+                { id: 'opt-she', word: 'she', isCorrect: false },
+                { id: 'opt-the', word: 'the', isCorrect: true },
+                { id: 'opt-then', word: 'then', isCorrect: false }
               ]
             },
             {
-              id: 'q-k-sw-can',
+              id: 'q-k-sw-like',
               type: 'sight-word-reader',
-              prompt: 'Find the word Ms. Luna says!',
-              speechPrompt: 'Find the sight word CAN: "I can read books!"',
-              word: 'can',
-              exampleSentence: 'I can read books! 📚',
-              hint: 'Listen closely: can. I can read books!',
+              // none of the lesson's words on screen, not even "the" (CUR-3)
+              prompt: 'Which word does Ms. Luna say?',
+              speechPrompt: 'Find the sight word LIKE: "I like red apples!"',
+              word: 'like',
+              exampleSentence: 'I like red apples! 🍎',
+              hint: 'Listen closely: like. I like red apples!',
               options: [
-                { id: 'opt-cat', word: 'cat', isCorrect: false },
-                { id: 'opt-car', word: 'car', isCorrect: false },
-                { id: 'opt-can', word: 'can', isCorrect: true }
+                { id: 'opt-lake', word: 'lake', isCorrect: false },
+                { id: 'opt-bike', word: 'bike', isCorrect: false },
+                { id: 'opt-like', word: 'like', isCorrect: true }
+              ]
+            },
+            {
+              id: 'q-k-sw-i',
+              type: 'sight-word-reader',
+              // none of the lesson's words on screen, not even "the" (CUR-3)
+              prompt: 'Which word does Ms. Luna say?',
+              speechPrompt: 'Find the sight word I: "I can hop!"',
+              word: 'I',
+              exampleSentence: 'I can hop! 🐰',
+              hint: 'Listen closely: I. I can hop!',
+              options: [
+                { id: 'opt-i', word: 'I', isCorrect: true },
+                { id: 'opt-it', word: 'it', isCorrect: false },
+                { id: 'opt-in', word: 'in', isCorrect: false }
+              ]
+            },
+            {
+              id: 'q-k-sw-a',
+              type: 'sight-word-reader',
+              // none of the lesson's words on screen, not even "the" (CUR-3)
+              prompt: 'Which word does Ms. Luna say?',
+              speechPrompt: 'Find the sight word A: "I see a bug!"',
+              word: 'a',
+              exampleSentence: 'I see a bug! 🐞',
+              hint: 'Listen closely: a. I see a bug!',
+              options: [
+                { id: 'opt-at', word: 'at', isCorrect: false },
+                { id: 'opt-a', word: 'a', isCorrect: true },
+                { id: 'opt-an', word: 'an', isCorrect: false }
               ]
             }
           ]
@@ -671,7 +707,9 @@ export const READING_CURRICULUM: Record<GradeLevel, ReadingSkill[]> = {
           id: 'g2-bw-compounds',
           skillId: 'g2-compounds',
           grade: 'grade2',
-          title: 'Rainbow, Cupcake & Starfish',
+          // its two questions (CUR-1): no emoji draws a starfish, so the
+          // title lost it rather than the lesson gaining one
+          title: 'Rainbow & Cupcake',
           description: 'Read colorful compound words.',
           icon: '🌈',
           difficulty: 2,
@@ -721,7 +759,9 @@ export const READING_CURRICULUM: Record<GradeLevel, ReadingSkill[]> = {
           description: 'Read about Ms. Luna flying past shiny stars and moons.',
           icon: '🚀',
           difficulty: 3,
-          starsToEarn: 5,
+          // 3, as every lesson, for its one story (CUR-1; it paid 5); PRG-1
+          // makes every lesson's stars follow how it was played
+          starsToEarn: 3,
           questions: [
             {
               id: 'q-g2-story-1',

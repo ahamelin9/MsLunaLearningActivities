@@ -46,6 +46,12 @@ Task · P2 · S
 - **How:** a small skill (`.claude/skills/away-mode/SKILL.md`), triggered by "auto mode", "away mode" or "keep going until the limit": work the board in order with each ticket's full process; reproduce a bug before fixing it; prove each new check fails with the fix off; never commit; a built ticket goes Blocked "waits for Alex's OK" with its section in `screenshots/review/HANDOVER.md` (what's built, Complete when, his call, exact `git add`), with a "where things stand" block at the top; skip tickets that need his OK before they start; his "pushed!" closes them. It points to the `backlog` and `luna-design` skills rather than repeating them. Keep it small (building over tooling).
 - **Complete when:** saying "away mode" loads the skill, which states those rules in under a page, and the memory note points to it.
 
+### OPS-13 · Class references that point at nothing
+Task · P2 · S · needs: —
+- **Why:** found in BUG-26 (2026-10-19). `module-refs-check.mjs` over all of `src` lists seven `styles.x` with no class behind them: six games' root (`styles.bubbles`, `.sentence`, `.hunt`, `.memory`, `.story`, `.missing`, passed to GameSurface, so `undefined`) and `styles.ear` in kit `ListenCue`; and one class string built by hand in kit Squishy's `drawings.tsx` (`` `${styles.body} ${styles.halfScale}` ``, not `cx()`). Treasure Path's went with GAME-1c. The games' roots set nothing, but ListenCue's ear may be a style that never applied.
+- **How:** drop each dangling `className` (or add the class if a look was meant: check ListenCue's ear against its Kit page in both modes), and join Squishy's with `cx()`. Screens shouldn't change; prove it with `ui:shots --diff` and `--kit`.
+- **Complete when:** `module-refs-check.mjs "$PWD" src` lists no MISSING or GLOBAL line, and `ui:shots --diff` (and `--kit`) shows 0 changed screens, or Alex OKs any that change.
+
 ### OPS-11 · A first cloud session (parked)
 Task · P2 · M
 - **Why:** the rest of OPS-10, parked by Alex on 2026-10-17: the cloud set-up was taking time away from building the app, and he hasn't needed to work away from the Mac yet. OPS-10 left the groundwork in the repo (one Chrome helper, the boards as pictures, `CLAUDE.md`, the backlog's **Git** section, the `voice-queue` skill, `docs/cloud-sessions.md`). Pick this up only if Alex wants to work from claude.ai/code.

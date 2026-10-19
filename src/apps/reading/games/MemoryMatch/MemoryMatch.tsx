@@ -31,6 +31,12 @@ interface Round {
   pairCount: number;
 }
 
+/**
+ * A word card stays silent until its pair is found (GAME-4): read aloud on
+ * flipping, it let a child match by ear. Pictures and letters are still said.
+ */
+const silentUntilFound = (card: Card) => card.kind === 'word' && !card.emoji;
+
 /** How a card is said: "big" + the letter's name, or the word. Literal parts, so each has a clip. */
 function cardParts(card: Card): SpeechPart[] {
   if (card.kind === 'word') return [{ word: card.pair }];
@@ -101,7 +107,7 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
     const next = [...flipped, card.id];
     setFlipped(next);
     if (next.length < 2) {
-      pronunciation.speakSequence(cardParts(card));
+      if (!silentUntilFound(card)) pronunciation.speakSequence(cardParts(card));
       return;
     }
 
@@ -115,17 +121,23 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
     const repeat = !isMatch && tried.current.has(key);
     if (!isMatch) tried.current.add(key);
 
-    // the second card is said whole before Luna reacts to the pair (FB-1)
-    if (lastPair) api.answer({ correct: true, say: cardParts(card), delay: 1700 });
+    // the second card is said whole before Luna reacts to the pair (FB-1); a
+    // word card only once it is found (GAME-4)
+    const said = isMatch || !silentUntilFound(card) ? cardParts(card) : undefined;
+    // the hint names a picture, never a word card the child has to read
+    const named = round.kind === 'case' ? first : [first, second].find(c => c.emoji);
+    if (lastPair) api.answer({ correct: true, say: said, delay: 1700 });
     else if (repeat)
       api.answer({
         correct: false,
-        say: cardParts(card),
+        say: said,
         lunaLine: 'We already tried those two! Remember where they live.',
         reveal: () => setShownPair(first.pair),
-        hint: [{ text: 'Look for the partner of' }, ...cardParts(first)]
+        hint: named
+          ? [{ text: 'Look for the partner of' }, ...cardParts(named)]
+          : [{ text: 'Turn over a picture first, then find its word.' }]
       });
-    else pronunciation.speakSequence(cardParts(card));
+    else if (said) pronunciation.speakSequence(said);
 
     if (isMatch) {
       window.setTimeout(() => {

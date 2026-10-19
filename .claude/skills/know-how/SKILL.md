@@ -310,7 +310,9 @@ Pitfalls that cost time:
   Path's 2nd-grade passages): `ui:shots` only plays Kindergarten. Play the game
   at 2nd grade at 1024×768 (the smallest landscape iPad) and compare the
   stones' and choices' `getBoundingClientRect()` with the stage's.
-  `treasure-fit.mjs` in this folder does that for Treasure Path, and
+  `treasure-fit.mjs` in this folder does that for Treasure Path (give it an
+  out folder and it saves each stone, light or dark: review shots at 1st and
+  2nd grade, GAME-1c), and
   `treasure-check.cjs` plays it at one grade and reports anything said or
   shown that gives an answer away.
 
@@ -482,6 +484,56 @@ Pitfalls that cost time:
   popping and the worst 20 s stretch, and fails with `--before` and `--chance`;
   `bubble-check.mjs` measures the share in the real game. Keep the sim's
   lanes (6 at every iPad size) and crossing times in step with the game.
+
+## Settings saves over and over when offline (BUG-10)
+
+*2026-10-19 · BUG-10*
+
+- **Symptom:** with the voice index unreachable, Settings saved thousands of
+  times a second while open; the page still felt fine.
+- **Cause:** an index that didn't load read as "no voices", so the saved
+  voice looked gone; the picker's effect corrected it with `onChange`, which
+  is a new function on each render and re-renders Settings through the save.
+- **Fix:** "no voices" means "don't know", and the correction runs once per
+  open (a ref).
+- **Check:** `settings-offline-check.mjs` blocks `/voice/*/manifest.json` by
+  request interception and counts `setItem` on the progress key. **Pitfall:**
+  count from before Settings opens; a one-off save right at the open is
+  missed otherwise.
+
+## A sight word on screen in Luna's own words (CUR-3, BUG-27)
+
+*2026-10-19 · CUR-3, BUG-27*
+
+- **Symptom:** in the sight-word lesson the word to find was on screen
+  before it was found: in the prompt ("Find **the** word…"), Luna's opening
+  line ("…when we **see** them") and, at random, her reactions ("Are you
+  **a** wizard?" staying up into the "a" round).
+- **Fix:** the prompt and her opening line were reworded (CUR-3). A game or
+  lesson can name a round's heard-only word (`hiddenWord` on its GameDef);
+  the shell then asks `lunaSay(kind, id, avoid)` for a line without it:
+  this round's after a miss, the next round's after a win. Every kind of
+  line keeps at least two for each word.
+- **Check:** `sight-check.mjs` reads the whole play screen (perch included)
+  at each round's start and after two misses; `--runs 20`, because the lines
+  are random and one run can miss it. A stage-only read missed the perch.
+
+## A game that reads its own answer aloud (GAME-4)
+
+*2026-10-19 · GAME-4*
+
+- **Symptom:** Muddled Cards at tier 2+ could be won by ear: flipping a word
+  card read it, so a child matched the sound to the picture's.
+- **Fix:** a word card is silent until its pair is found (pictures and
+  letters are still said), and the repeat hint names the picture, or says
+  "Turn over a picture first, then find its word." when two word cards were
+  tried.
+- **Check:** `muddled-check.mjs` logs every line asked for and reads the cards
+  from the round (buttons follow `round.cards`); it fails on the commit
+  before.
+- **Pitfall, the clue never came:** only a repeated pair counts as a miss in
+  this game, and "Hear my clue" shows from the second miss: try the same
+  two cards three times before tapping it.
 
 ## A game never asks for some letters (BUG-21)
 

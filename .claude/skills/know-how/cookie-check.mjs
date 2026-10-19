@@ -4,7 +4,7 @@
 //
 //   node .claude/skills/know-how/cookie-check.mjs [port=5199]
 //
-// Needs Vite running on the port. At each grade it plays Feed Luna through,
+// Needs Vite running on the port. At each grade it plays Letter Cookies through,
 // trying the cookies in turn until the round moves on (the target is heard,
 // never shown, so it can't be read first), and for each round's plate checks:
 //   - at least two different chip layouts (`data-chips`), and no two neighbours alike;
@@ -36,7 +36,7 @@ for (const grade of [0, 1, 2]) {
   await (await page.$$(at('grade-card')))[grade].click();
   await page.waitForSelector(at('hub'));
   for (const t of await page.$$(at('game-tile'))) {
-    if ((await t.evaluate(e => e.textContent)).includes('Feed Luna')) { await t.click(); break; }
+    if ((await t.evaluate(e => e.textContent)).includes('Letter Cookies')) { await t.click(); break; }
   }
   await page.waitForSelector(at('play'));
   await page.click(at('play'));

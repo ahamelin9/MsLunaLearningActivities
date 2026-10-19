@@ -190,14 +190,21 @@ export const LUNA_PHRASES: string[] = [
 
 let lastText = '';
 
+/** Whether a line has one of these words as a whole word ("a" in "Are you a wizard?", not in "and"). */
+export function saysAny(text: string, words: string[]): boolean {
+  const said = text.toLowerCase().split(/[^a-z']+/);
+  return words.some(w => said.includes(w.toLowerCase()));
+}
+
 /**
  * Pick a line for a moment, preferring game-specific flavour and avoiding
- * an immediate repeat of the previous line.
+ * an immediate repeat of the previous line, and any line that has one of the
+ * `avoid` words: a word the child must find by ear (BUG-27).
  */
-export function lunaSay(kind: keyof typeof GENERAL | 'intro', gameId?: string): LunaLine {
+export function lunaSay(kind: keyof typeof GENERAL | 'intro', gameId?: string, avoid: string[] = []): LunaLine {
   const specific = gameId ? PER_GAME[gameId]?.[kind] : undefined;
   const general = GENERAL[kind] ?? GENERAL.happy ?? GENERAL.correct;
-  const pool = [...(specific ?? []), ...(kind === 'intro' ? [] : general ?? [])];
+  const pool = [...(specific ?? []), ...(kind === 'intro' ? [] : general ?? [])].filter(l => !saysAny(l.text, avoid));
   const options = pool.length > 0 ? pool : general;
 
   let line = pick(options);

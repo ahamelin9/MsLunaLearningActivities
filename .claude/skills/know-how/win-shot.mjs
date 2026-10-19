@@ -1,5 +1,5 @@
 // A won round, shot just after the win (DES-11), for review sheets: ui:shots
-// never wins one. Feed Luna at Kindergarten, cookies tried in turn until the
+// never wins one. Letter Cookies at Kindergarten, cookies tried in turn until the
 // stage's flash says "win", then shots 350, 900, 1500 and 2300ms after it
 // (the last one in the next round). With DONE=1 it wins the other rounds too
 // and shoots the done screen as its petals fall. From the repo root, with
@@ -35,7 +35,7 @@ await page.waitForSelector(at('grade-card'));
 await page.click(at('grade-card'));
 await page.waitForSelector(at('hub'));
 for (const t of await page.$$(at('game-tile'))) {
-  if ((await t.evaluate(e => e.textContent)).includes('Feed Luna')) { await t.click(); break; }
+  if ((await t.evaluate(e => e.textContent)).includes('Letter Cookies')) { await t.click(); break; }
 }
 await page.waitForSelector(at('play'));
 await page.click(at('play'));

@@ -152,5 +152,6 @@ export interface Lesson {
   icon: string;
   difficulty: 1 | 2 | 3;
   questions: LessonQuestion[];
+  /** the most a lesson can earn: 3, as every game; how many follows PRG-1's rule (`engine/stars.ts`) */
   starsToEarn: number;
 }

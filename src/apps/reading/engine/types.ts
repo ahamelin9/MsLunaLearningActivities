@@ -92,12 +92,19 @@ export interface GameDef<TRound = never> {
   makeRounds: (opts: { grade: GradeLevel; difficulty: Difficulty; count: number }) => TRound[];
   Play: React.FC<{ round: TRound; api: GameApi }>;
   /**
+   * The word a round is about, when it is heard and never shown (a sight
+   * word). Luna's lines on the perch never contain it while it is unsolved,
+   * nor the next round's after a win, as her line stays into it (BUG-27).
+   */
+  hiddenWord?: (round: TRound) => string | undefined;
+  /**
    * Set when this is one of the curriculum's guided lessons rather than a
    * game (see engine/lessons.tsx). Its rounds are the lesson's fixed
    * questions, so there is no difficulty to choose; it earns the lesson's own
-   * stars and points, and finishing it marks the lesson done.
+   * points, stars by the same rule as a game (PRG-1), and finishing it marks
+   * the lesson done.
    */
-  lesson?: { id: string; skillId: string; stars: number; points: number };
+  lesson?: { id: string; skillId: string; points: number };
 }
 
 /** Registry entry with the round type erased. */

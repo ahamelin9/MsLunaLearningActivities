@@ -144,10 +144,10 @@ if (want('Bubble Sounds')) {
     isTarget, tapRevealed(page));
 }
 
-if (want('Feed Luna')) {
-  const page = await open('Feed Luna');
+if (want('Letter Cookies')) {
+  const page = await open('Letter Cookies');
   const r = await round(page);
-  await run('Feed Luna', page,
+  await run('Letter Cookies', page,
     i => tap(page, `${at('stage')} button[aria-label^="letter"]`, l => l !== `letter ${r.answer}`, i),
     l => l === `letter ${r.answer}`, tapRevealed(page));
 }

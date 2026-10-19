@@ -16,7 +16,7 @@ Story · P1 · M · needs: —
 - **Complete when:** the home screen shows Reading and Writing, Writing opens to a hub listing the punctuation game, and build and lint pass.
 
 ### WRT-2 · Punctuation game: where does the mark go?
-Story · P1 · L · needs: WRT-1, LVL-1 · split per grade before starting
+Story · P1 · L · needs: WRT-1 · split per grade before starting
 - **Why:** children need to learn where periods, commas and other marks go. For ESL learners, punctuation also changes how a sentence sounds (a stop, a pause, a question that rises), so it can be taught by ear.
 - **How:**
   - A short sentence sits on a paper card with a mark missing. Luna reads it aloud with the right pause and tone. The child taps the gap, then picks the mark from a tray (or drags it in).

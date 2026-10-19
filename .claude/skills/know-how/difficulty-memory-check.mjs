@@ -6,7 +6,7 @@
 //
 // Needs Vite running on the port. At kindergarten it opens The Letter Jar
 // (expects "Just right"), picks "Tricky", goes back, reopens it, reloads and
-// reopens it again, and opens Feed Luna (expects "Just right"). It fails on
+// reopens it again, and opens Letter Cookies (expects "Just right"). It fails on
 // the commit before LVL-2, where every game opened on "Just right".
 
 import puppeteer from 'puppeteer-core';
@@ -58,7 +58,7 @@ await page.waitForSelector(at('hub'));
 await open('Letter Jar');
 ok('… after a reload too', (await picked()) === 'Tricky', await picked());
 await back();
-await open('Feed Luna');
+await open('Letter Cookies');
 ok('another game still opens on "Just right"', (await picked()) === 'Just right', await picked());
 
 await browser.close();

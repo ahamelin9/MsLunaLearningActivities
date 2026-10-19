@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import type { UserSettings } from '@/types/user';
 import { DEFAULT_VOICE_ID, LUNA_VOICES, pronunciation, type VoiceStatus } from '@/utils/pronunciation';
 import { soundManager } from '@/utils/audio';
@@ -45,7 +45,9 @@ export const VoicePicker: React.FC<VoicePickerProps> = ({ settings, onChange }) 
   // A voice saved before it stopped being offered (every voice used to run
   // on-device) shows as Luna, which is what the child is hearing, rather than
   // as an empty list with nothing selected.
-  const savedVoiceGone = rendered !== null && !rendered.has(settings.voiceId);
+  // None found means the index didn't load (offline), not that every voice
+  // is gone: nothing is corrected then (BUG-10).
+  const savedVoiceGone = rendered !== null && rendered.size > 0 && !rendered.has(settings.voiceId);
   const voiceId = savedVoiceGone ? DEFAULT_VOICE_ID : settings.voiceId;
   // the accent is the voice's own (SET-3): no setting of its own
   const language = LUNA_VOICES.find(v => v.id === voiceId)?.language ?? 'en-US';
@@ -54,9 +56,14 @@ export const VoicePicker: React.FC<VoicePickerProps> = ({ settings, onChange }) 
   // with one rendered voice there is nothing to pick, so no picker (SET-3)
   const picking = available.length > 1;
 
-  // ...and the saved settings are corrected to match
+  // ...and the saved settings are corrected to match, once per open of
+  // Settings: `onChange` is a new function on every render, and each save
+  // re-renders Settings (BUG-10 saved thousands of times a second)
+  const corrected = useRef(false);
   useEffect(() => {
-    if (savedVoiceGone) onChange({ voiceId });
+    if (!savedVoiceGone || corrected.current) return;
+    corrected.current = true;
+    onChange({ voiceId });
   }, [savedVoiceGone, voiceId, onChange]);
 
   const preview = (voiceId: string) => {

@@ -3,7 +3,7 @@
 //
 //   node .claude/skills/know-how/perch-check.mjs [port=5199]
 //
-// Needs Vite running on the port. In a muted Chrome it plays Feed Luna (the
+// Needs Vite running on the port. In a muted Chrome it plays Letter Cookies (the
 // game with its own Luna on the stage) at Kindergarten and checks:
 //   - the start screen: one Luna, on the perch, her bubble with a tail, and
 //     the mission said;
@@ -94,14 +94,14 @@ const step = async (act, ms) => {
   return { said: after.said.slice(before.said), clips: after.starts - before.starts };
 };
 
-// into Feed Luna, at Kindergarten
+// into Letter Cookies, at Kindergarten
 await page.click(at('open-reading'));
 await page.waitForSelector(at('grade-card'));
 await page.click(at('grade-card'));
 await page.waitForSelector(at('hub'));
 const tiles = await page.$$(at('game-tile'));
 let feed = null;
-for (const t of tiles) if ((await t.evaluate(e => e.textContent)).includes('Feed Luna')) feed = t;
+for (const t of tiles) if ((await t.evaluate(e => e.textContent)).includes('Letter Cookies')) feed = t;
 const intro = await step(async () => {
   await feed.click();
   await page.waitForSelector(at('shell-intro'));
@@ -249,7 +249,7 @@ const done = await page.evaluate(() => {
   };
 });
 ok('a game\'s done screen: "All done!", no lessons bar, "Another game", the game\'s name in the header',
-  done?.title === 'All done!' && !done.lessons && done.another && done.header === 'Feed Luna the Letter', JSON.stringify(done));
+  done?.title === 'All done!' && !done.lessons && done.another && done.header === 'Letter Cookies', JSON.stringify(done));
 await wait(800);
 const donePetals = await page.evaluate(() => {
   const p = document.querySelector('[data-shot="shell-reward"] [data-shot="petals"]');

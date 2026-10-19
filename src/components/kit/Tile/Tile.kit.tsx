@@ -9,7 +9,7 @@ import { Tile } from './Tile';
 const GAMES = [
   { name: 'The Letter Jar', icon: 'book', tint: 1 },
   { name: 'Bubble Sounds', icon: 'ear', tint: 2 },
-  { name: 'Feed Luna', icon: 'star', tint: 3 },
+  { name: 'Letter Cookies', icon: 'star', tint: 3 },
   { name: 'Muddled Cards', icon: 'dice', tint: 4 },
   { name: 'Treasure Path', icon: 'sparkle', tint: 5 },
 ] as const;

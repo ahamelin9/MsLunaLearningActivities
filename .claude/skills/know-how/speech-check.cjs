@@ -22,7 +22,7 @@ const CONFIG = {
   chrome: chromePath(),
   grade: 0, // 0 Kindergarten, 1 1st grade, 2 2nd grade
   kind: 'game', // 'game' (the play rug) or 'lesson'
-  title: 'Feed Luna the Letter' // as on its tile (a lesson's tile has its number too)
+  title: 'Letter Cookies' // as on its tile (a lesson's tile has its number too)
 };
 
 const sleep = ms => new Promise(r => setTimeout(r, ms));

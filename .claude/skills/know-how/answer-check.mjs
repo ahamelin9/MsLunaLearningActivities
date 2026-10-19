@@ -27,7 +27,7 @@ const results = [];
 const ok = (name, pass, detail = '') => { results.push(pass); console.log(`${pass ? '✅' : '❌'} ${name}${detail ? `  (${detail})` : ''}`); };
 
 // found on the shelf by a part of each title (What’s Missing? has a curly apostrophe)
-const ALL = ['Letter Jar', 'Bubble Sounds', 'Feed Luna', 'Muddled Cards', 'Words Off the Page', 'Missing', 'Treasure Path', 'Story Corner'];
+const ALL = ['Letter Jar', 'Bubble Sounds', 'Letter Cookies', 'Muddled Cards', 'Words Off the Page', 'Missing', 'Treasure Path', 'Story Corner'];
 const only = process.argv.indexOf('--only');
 const GAMES = only === -1 ? ALL : ALL.filter(t => t.includes(process.argv[only + 1]));
 

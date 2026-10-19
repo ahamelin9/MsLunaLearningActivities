@@ -280,7 +280,9 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
 
 export const feedLuna: GameDef<Round> = {
   id: 'feed-luna',
-  title: 'Feed Luna the Letter',
+  // the name the teacher asked for (GAME-6, Alex 2026-10-10); the id stays
+  // `feed-luna`, so saved progress carries over
+  title: 'Letter Cookies',
   emoji: '🍪',
   tagline: 'She only eats the letter she asked for.',
   objective: 'Hear a letter’s name, its sound or a word, then find that letter — big or little.',

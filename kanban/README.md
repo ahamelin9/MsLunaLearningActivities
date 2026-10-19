@@ -72,7 +72,7 @@ be pulled into Phase 1 for a break from styling.
 
 ### Now / Next
 
-- **Now:** GAME-1c, Treasure Path's screen for passages (its checks back on `data-shot` with OPS-9). Built and waiting for Alex's OK (2026-10-18, `screenshots/review/HANDOVER.md`): LVL-1, LVL-2, CNT-3, CNT-4, GAME-3 GAME-7 and OPS-9; CNT-2 waits for him to OK a split. DES-16 waits only for his dark check on the real iPad; DES-26 needs his OK before it starts (a primitive change); BUG-25 needs his browser.
+- **Now:** GAME-1c, Treasure Path's screen for passages (its checks back on `data-shot` with OPS-9). LVL-1, LVL-2, CNT-4 and GAME-3 are done (2026-10-18). Waiting on Alex (`screenshots/review/HANDOVER.md`): CNT-3 (his call on a few pictures), GAME-7 (watch the shares in play), OPS-9 (delete `treasure-fit.cjs`); CNT-2 waits for him to OK a split. DES-16 waits only for his dark check on the real iPad; DES-26 needs his OK before it starts (a primitive change); BUG-25 needs his browser.
 - **Next:** GAME-2, GAME-4 and GAME-6; GAME-5 waits on CNT-2. PRG-9 (a game's done screen shows the squishy shelf) waits on PRG-5. OPS-12 (an "away mode" skill) and OPS-11 (a first cloud session) are small housekeeping for when Alex wants them.
 
 ## Epics
@@ -99,34 +99,32 @@ In board order. A new epic gets its file in `epics/` first, then a link here
 | DES-26 | Make the arch radius work at any size | Task | P2 | S | Todo |
 | **BUG** | **Bugs** | | | | |
 | BUG-25 | The milestone moon never shows in Alex's app | Bug | P1 | S | Todo |
+| BUG-27 | Luna's perch can show a sight word before it's found | Bug | P1 | S | Blocked |
+| BUG-28 | A tap in a round's first half-second is cut off by its question | Bug | P2 | S | Todo |
 | BUG-9 | Story Corner K warm-up plays one story twice | Bug | P2 | S | Todo |
-| BUG-10 | Settings may loop saving when the voice index fails | Bug | P2 | S | Todo |
-| BUG-12 | Day streak rolls over at 7 pm (UTC date) | Bug | P2 | S | Todo |
+| BUG-10 | Settings may loop saving when the voice index fails | Bug | P2 | S | Blocked |
+| BUG-12 | Day streak rolls over at 7 pm (UTC date) | Bug | P2 | S | Blocked |
 | BUG-13 | Trophy dot never clears | Bug | P2 | S | Todo |
-| BUG-26 | Bubble Sounds' shine is a grey smudge in dark mode | Bug | P2 | S | Todo |
+| BUG-26 | Bubble Sounds' shine is a grey smudge in dark mode | Bug | P2 | S | Blocked |
 | **LVL** | **Difficulty** | Epic | **P0** | | |
-| LVL-1 | Explicit grade × dial difficulty table | Story | P0 | S | Blocked |
-| LVL-2 | Remember the chosen difficulty per game | Story | P2 | S | Blocked |
 | LVL-3 | Adaptive difficulty from skill mastery | Story | P2 | L | Todo |
 | **CNT** | **One content model** | Epic | **P1** | | |
 | CNT-2 | Lessons generated from the content bank | Story | P1 | L | Blocked |
 | CNT-3 | Content QA pass | Task | P1 | S | Blocked |
-| CNT-4 | Automated content checks in `voice:audit` | Task | P2 | S | Blocked |
 | **GAME** | **Games to standard** | Epic | **P1** | | |
-| GAME-1c | Treasure Path screen for passages | Story | P1 | M | In progress |
-| GAME-2 | Story Corner: the child reads first | Story | P1 | M | Todo |
-| GAME-3 | Bubble Sounds: smooth, fair bubbles | Story | P1 | S | Blocked |
+| GAME-1c | Treasure Path screen for passages | Story | P1 | M | Blocked |
+| GAME-2 | Story Corner: the child reads first | Story | P1 | M | Blocked |
 | GAME-7 | Bubble Sounds: fewer answer bubbles, fewer still at higher grades | Story | P1 | S | Blocked |
-| GAME-4 | Muddled Cards: reading required at tier 2+ | Story | P2 | S | Todo |
+| GAME-4 | Muddled Cards: reading required at tier 2+ | Story | P2 | S | Blocked |
 | GAME-5 | Words Off the Page: bigger sentence pool | Story | P2 | S | Todo |
-| GAME-6 | Rename "Feed Luna the Letter" | Story | P2 | S | Todo |
+| GAME-6 | Rename "Feed Luna the Letter" | Story | P2 | S | Blocked |
 | **CUR** | **Curriculum** | Epic | **P1** | | |
-| CUR-1 | Fix lesson/title/copy mismatches | Task | P1 | S | Todo |
-| CUR-3 | Real sight words | Story | P1 | S | Todo |
+| CUR-1 | Fix lesson/title/copy mismatches | Task | P1 | S | Blocked |
+| CUR-3 | Real sight words | Story | P1 | S | Blocked |
 | CUR-4 | Expand the curriculum per grade | Story | P1 | L | Todo |
 | CUR-5 | Merge the two K blending lessons | Story | P2 | S | Todo |
 | **PRG** | **Progress & rewards** | Epic | **P1** | | |
-| PRG-1 | Stars reflect performance | Story | P1 | M | Todo |
+| PRG-1 | Stars reflect performance | Story | P1 | M | In progress |
 | PRG-5 | Squishies instead of the sticker tin | Story | P1 | M | Todo |
 | PRG-9 | A game's done screen shows the squishy shelf | Story | P1 | S | Todo |
 | PRG-6 | Time per lesson: know it before, see it after | Story | P1 | M | Todo |
@@ -144,4 +142,5 @@ In board order. A new epic gets its file in `epics/` first, then a link here
 | OPS-7 | Drop Treasure Path's leftovers from the sentence bank | Task | P2 | S | Todo |
 | OPS-8 | Retarget the backlog guard check's two stale cases | Task | P2 | S | Todo |
 | OPS-12 | An "away mode" skill | Task | P2 | S | Todo |
+| OPS-13 | Class references that point at nothing | Task | P2 | S | Todo |
 | OPS-11 | A first cloud session (parked) | Task | P2 | M | Todo |

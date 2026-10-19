@@ -32,7 +32,8 @@ const LUNA_LINES: Record<string, string> = {
   'k-match-sounds': 'Ears on! I make a sound, and you find the letter that makes it.',
   'k-letter-hunter': 'I say a letter, you spot it. Watch out for look-alikes!',
   'k-blend-words': 'Tap each sound, then smoosh them together into a word!',
-  'k-sight-words': 'Some words we just know when we see them. Let’s find them!',
+  // none of the lesson's words (the, see, like, I, a) on her perch (CUR-3)
+  'k-sight-words': 'Some words we just know by heart. Let’s find them!',
   'k-rhyming': 'Rhyming words end with the same sound. Listen closely!',
   'g1-digraphs': 'Some letters team up to make one sound. Let’s sound them out!',
   'g1-magic-e': 'A silent E at the end makes the vowel say its name. Watch it work!',
@@ -63,10 +64,11 @@ export function lessonGame(lesson: Lesson, skill: ReadingSkill): GameDef<LessonQ
     sticker: SIGNATURE_STICKER[skill.id] ?? 'book',
     makeRounds: () => lesson.questions,
     Play: LessonRound,
+    // a sight word is heard, never shown: Luna's lines keep off it (BUG-27)
+    hiddenWord: q => (q.type === 'sight-word-reader' ? q.word : undefined),
     lesson: {
       id: lesson.id,
       skillId: lesson.skillId,
-      stars: lesson.starsToEarn,
       points: lesson.questions.length * 20
     }
   };

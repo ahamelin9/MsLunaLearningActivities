@@ -129,7 +129,7 @@ await untilState(page, '[data-shot="stage"] button[aria-label^="letter"]', 'righ
 await page.close();
 
 // Letter Cookies: a wrong cookie mid-wobble
-page = await open('Feed Luna');
+page = await open('Letter Cookies');
 await untilState(page, '[data-shot="stage"] button[aria-label^="letter"]', 'wrong', 'cookies-wrong', 120);
 await page.close();
 

@@ -84,7 +84,7 @@ glow and motion, and keeps its drawn colours.
 **`revealed` is "show me" (FB-2):** from the third miss in a round the shell
 calls the game's `reveal`, and the answer's piece takes `revealed` until it's
 chosen: Letter Jar's letters still to catch, Bubble Sounds' bubbles with the
-sound, Feed Luna's cookie and the jar letters (edge only, keeping their own
+sound, Letter Cookies' cookie and the jar letters (edge only, keeping their own
 colours), Muddled Cards' pair tried again (face down), the next word's tile in
 Words Off the Page, the hunted word in Story Corner, and the right Choice in
 What's Missing?, Treasure Path, Story Corner's question and every lesson
@@ -108,7 +108,7 @@ reduced motion the flowers are simply there and no petals fall.
 
 **One Luna per screen** (DES-12), and no owl emoji beside her: a child reads
 any owl as Luna. A game that draws her on its own stage sets `ownLuna` on its
-definition (Feed Luna), and the shell's perch then shows her line with no owl
+definition (Letter Cookies), and the shell's perch then shows her line with no owl
 and no tail; tapping the line says it again. `layout-audit.mjs` (know-how)
 fails a screen with two. While the milestone moon visits (DES-17), Luna stays
 with `talking={false}` and only the moon talks.
@@ -122,10 +122,10 @@ what's happening, and let the line and the mood agree:
 
 | Mood | What it's for | Where it's used today |
 |---|---|---|
-| `happy` | Her everyday face: hello, a start screen, a calm "well done" | the library (and most of its greetings; each greeting line carries its own mood), Grade Select, start screens, the perch's default, Feed Luna waiting |
-| `cheer` | A right answer to celebrate, a streak, a finished game or lesson | the perch after a win, the done screen, Feed Luna chewing |
+| `happy` | Her everyday face: hello, a start screen, a calm "well done" | the library (and most of its greetings; each greeting line carries its own mood), Grade Select, start screens, the perch's default, Letter Cookies waiting |
+| `cheer` | A right answer to celebrate, a streak, a finished game or lesson | the perch after a win, the done screen, Letter Cookies chewing |
 | `think` | Let's look again: a second miss, a clue. Never a telling-off | the perch from the second miss, with the spoken hint |
-| `oops` | A little slip: a first miss, a wrong cookie, her own mishaps (lost glasses). It's about the moment, never the child | the perch on a first miss, Feed Luna spitting out a wrong cookie, the library's greeting "I dusted the shelves AND lost my glasses" |
+| `oops` | A little slip: a first miss, a wrong cookie, her own mishaps (lost glasses). It's about the moment, never the child | the perch on a first miss, Letter Cookies spitting out a wrong cookie, the library's greeting "I dusted the shelves AND lost my glasses" |
 | `surprise` | Something found or a fun fact: a reveal, a streak, "letters are hiding!" | the perch on a reveal or a streak, the library's greetings that tease ("some letters are hiding"), Luna's Pick |
 | `listen` | Asking the child to listen again | the perch's "Let's listen one more time" |
 | `idle` | Resting, nothing going on | not used yet (Treasure Path's walker was the last, gone in DES-12) |

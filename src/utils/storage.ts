@@ -6,6 +6,15 @@ import { DEFAULT_VOICE_ID, pronunciation } from './pronunciation';
 
 const STORAGE_KEY = 'ms_luna_learning_progress_v1';
 
+/**
+ * The date where the iPad is, as YYYY-MM-DD. The streak counted UTC dates,
+ * which roll over at 7 or 8 pm on the East Coast (BUG-12).
+ */
+export function localDay(now: Date): string {
+  const two = (n: number) => String(n).padStart(2, '0');
+  return `${now.getFullYear()}-${two(now.getMonth() + 1)}-${two(now.getDate())}`;
+}
+
 export const DEFAULT_SETTINGS: UserSettings = {
   soundEnabled: true,
   speechEnabled: true,
@@ -27,8 +36,20 @@ export const DEFAULT_PROGRESS: UserProgress = {
   stickers: [],
   gamePlays: {},
   gameDifficulty: {},
+  bestStars: {},
   settings: DEFAULT_SETTINGS
 };
+
+/**
+ * A save from before PRG-1 has no best stars, and its stars were paid per
+ * round (5 for a lesson, up to 6 a game): anything it finished counts as a
+ * best of 3, so no child loses a star and a replay adds none.
+ */
+function bestStarsOf(parsed: Partial<UserProgress>): Record<string, number> {
+  if (parsed.bestStars && typeof parsed.bestStars === 'object') return parsed.bestStars;
+  const done = [...(Array.isArray(parsed.completedLessons) ? parsed.completedLessons : []), ...Object.keys(parsed.gamePlays ?? {})];
+  return Object.fromEntries(done.map(id => [id, 3]));
+}
 
 type ProgressListener = (progress: UserProgress) => void;
 
@@ -61,6 +82,7 @@ class StorageService {
         stickers: Array.isArray(parsed.stickers) ? parsed.stickers : [],
         gamePlays: parsed.gamePlays && typeof parsed.gamePlays === 'object' ? parsed.gamePlays : {},
         gameDifficulty: parsed.gameDifficulty && typeof parsed.gameDifficulty === 'object' ? parsed.gameDifficulty : {},
+        bestStars: bestStarsOf(parsed),
         settings: loadedSettings
       };
     } catch (e) {
@@ -152,7 +174,8 @@ class StorageService {
 
     const { streak, today } = this.computeStreak();
 
-    const totalStars = this.progress.totalStars + starsEarned;
+    const { gain, bestStars } = this.starsAbove(lessonId, starsEarned);
+    const totalStars = this.progress.totalStars + gain;
     const totalPoints = this.progress.totalPoints + pointsEarned;
 
     const { updatedAchievements, newAchievements } = this.checkAchievements(
@@ -171,6 +194,7 @@ class StorageService {
       totalStars,
       totalPoints,
       skillMastery: updatedMastery,
+      bestStars,
       streakDays: streak,
       lastPlayedDate: today,
       unlockedAchievements: updatedAchievements
@@ -180,14 +204,24 @@ class StorageService {
     return { isFirstCompletion, newAchievements };
   }
 
+  /** What a play's stars add: only those above this game's or lesson's best (PRG-1). */
+  private starsAbove(id: string, stars: number): { gain: number; bestStars: Record<string, number> } {
+    const best = this.progress.bestStars[id] ?? 0;
+    return {
+      gain: Math.max(0, stars - best),
+      bestStars: stars > best ? { ...this.progress.bestStars, [id]: stars } : this.progress.bestStars
+    };
+  }
+
   private computeStreak(): { streak: number; today: string } {
     let streak = this.progress.streakDays;
-    const today = new Date().toISOString().split('T')[0];
+    const today = localDay(new Date());
 
     if (this.progress.lastPlayedDate && this.progress.lastPlayedDate !== today) {
+      // both read as midnight UTC on their dates, so whole days apart
       const lastDate = new Date(this.progress.lastPlayedDate);
       const currentDate = new Date(today);
-      const diffDays = Math.ceil(
+      const diffDays = Math.round(
         Math.abs(currentDate.getTime() - lastDate.getTime()) / (1000 * 60 * 60 * 24)
       );
       if (diffDays === 1) {
@@ -235,7 +269,8 @@ class StorageService {
     const { gameId, starsEarned, pointsEarned, stickerId } = opts;
     const { streak, today } = this.computeStreak();
 
-    const totalStars = this.progress.totalStars + starsEarned;
+    const { gain, bestStars } = this.starsAbove(gameId, starsEarned);
+    const totalStars = this.progress.totalStars + gain;
     const totalPoints = this.progress.totalPoints + pointsEarned;
 
     const stickers = stickerId && !this.progress.stickers.includes(stickerId)
@@ -259,6 +294,7 @@ class StorageService {
       totalPoints,
       stickers,
       gamePlays,
+      bestStars,
       streakDays: streak,
       lastPlayedDate: today,
       unlockedAchievements: updatedAchievements

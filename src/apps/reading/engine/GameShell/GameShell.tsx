@@ -7,6 +7,7 @@ import { lunaSay, moonSay, type LunaMood } from '../luna';
 import { lessonStates } from '../lessons';
 import { milestoneId, milestoneReached } from '../milestones';
 import { nextSticker, type Sticker } from '../stickers';
+import { starsFor } from '../stars';
 import { soundManager } from '@/utils/audio';
 import { pronunciation, type SpeechPart } from '@/utils/pronunciation';
 import { warmGameIntro } from '../warmup';
@@ -175,8 +176,8 @@ export const GameShell: React.FC<GameShellProps> = ({
       const perfect = cleanRef.current === game.roundsPerPlay;
       setAward({
         sticker: nextSticker(progress.stickers, game.sticker),
-        // a lesson is worth what the curriculum says, however it went
-        stars: game.lesson?.stars ?? Math.max(1, wonRef.current) + (perfect ? 1 : 0),
+        // 1–3 by how it went, the same rule for games and lessons (PRG-1)
+        stars: starsFor(cleanRef.current, game.roundsPerPlay),
         points: game.lesson?.points ?? wonRef.current * 15 + (perfect ? 25 : 0)
       });
       setPhase('reward');
@@ -184,6 +185,15 @@ export const GameShell: React.FC<GameShellProps> = ({
       setRoundIndex(roundIndex + 1);
     }
   }, [game.lesson, game.roundsPerPlay, game.sticker, progress.stickers, roundIndex]);
+
+  // the words Luna's line must not have (BUG-27): a round's heard-only word
+  const hiddenAt = useCallback(
+    (i: number): string[] => {
+      const word = i < rounds.length ? game.hiddenWord?.(rounds[i]) : undefined;
+      return word ? [word] : [];
+    },
+    [game, rounds]
+  );
 
   const handleWin = useCallback(
     (opts?: { lunaLine?: string; delay?: number }) => {
@@ -197,16 +207,18 @@ export const GameShell: React.FC<GameShellProps> = ({
       const streakNow = winStreak + 1;
       setWinStreak(streakNow);
 
+      // her line stays on the perch into the next round: never its word
+      const avoid = hiddenAt(roundIndex + 1);
       const line =
         opts?.lunaLine ??
         (streakNow >= 3 && Math.random() < 0.5
-          ? lunaSay('streak', game.id).text
-          : lunaSay('correct', game.id).text);
+          ? lunaSay('streak', game.id, avoid).text
+          : lunaSay('correct', game.id, avoid).text);
       speak(line, 'cheer');
 
       later(goToNextRound, opts?.delay ?? 1750);
     },
-    [attempts, game.id, goToNextRound, later, speak, winStreak]
+    [attempts, game.id, goToNextRound, hiddenAt, later, roundIndex, speak, winStreak]
   );
 
   const handleMiss = useCallback(
@@ -228,18 +240,20 @@ export const GameShell: React.FC<GameShellProps> = ({
 
       // "Show me" (FB-2): from the third miss the game points at the answer,
       // and Luna says so instead of another "try again"
+      // the round is still unsolved: her line never has its word (BUG-27)
+      const avoid = hiddenAt(roundIndex);
       if (nextHintLevel === 2 && opts?.reveal) {
         opts.reveal();
-        speak(lunaSay('reveal', game.id).text, 'surprise', spokenHint ?? []);
+        speak(lunaSay('reveal', game.id, avoid).text, 'surprise', spokenHint ?? []);
         return;
       }
 
       const line =
         opts?.lunaLine ??
-        (attemptNumber >= 2 ? lunaSay('missAgain', game.id).text : lunaSay('missFirst', game.id).text);
+        (attemptNumber >= 2 ? lunaSay('missAgain', game.id, avoid).text : lunaSay('missFirst', game.id, avoid).text);
       speak(line, attemptNumber >= 2 ? 'think' : 'oops', spokenHint ?? []);
     },
-    [attempts, game.id, later, speak]
+    [attempts, game.id, hiddenAt, later, roundIndex, speak]
   );
 
   // An answer is being said (FB-1): input waits, and Luna with it.

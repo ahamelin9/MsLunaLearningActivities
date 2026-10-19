@@ -80,18 +80,8 @@
   }
 }
 
-// the light catching it
-.shine {
-  position: absolute;
-  top: 14%;
-  left: 20%;
-  width: 26%;
-  height: 20%;
-  border-radius: var(--radius-chip);
-  background: var(--illo-shine);
-  opacity: 0.7;
-}
-
+// a bubble is plain: its shine was a grey smudge on the letter in dark mode
+// (BUG-26; Alex wasn't sure it fit)
 .char {
   position: relative;
   color: var(--ink);

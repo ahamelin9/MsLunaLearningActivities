@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Feed Luna's three ways to feed (BUG-2): does one wrong tap count as one
+// Letter Cookies' three ways to feed (BUG-2): does one wrong tap count as one
 // miss, and do a tap, a drag and the keyboard each still feed her?
 //
 //   node .claude/skills/know-how/feed-check.mjs [port=5199]
@@ -41,7 +41,7 @@ async function open() {
   await (await page.$$(at('grade-card')))[0].click();
   await page.waitForSelector(at('hub'));
   for (const t of await page.$$(at('game-tile'))) {
-    if ((await t.evaluate(e => e.textContent)).includes('Feed Luna')) { await t.click(); break; }
+    if ((await t.evaluate(e => e.textContent)).includes('Letter Cookies')) { await t.click(); break; }
   }
   await page.waitForSelector(at('play'));
   await page.click(at('play'));

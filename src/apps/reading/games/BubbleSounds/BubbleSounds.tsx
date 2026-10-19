@@ -278,7 +278,6 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
               onClick={e => pop(b, e.timeStamp)}
               aria-label={`bubble ${b.char}`}
             >
-              <span className={styles.shine} aria-hidden="true" />
               <span className={styles.char}>{b.char}</span>
             </button>
           </span>
