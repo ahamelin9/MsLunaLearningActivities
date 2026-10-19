@@ -72,8 +72,8 @@ be pulled into Phase 1 for a break from styling.
 
 ### Now / Next
 
-- **Now:** DES-16: light and dark mode (Stage 9). SET-1 is done (2026-10-18): the gears and the grade button open only after a 2s press and hold, so the grown-up's light/dark choice has its gate.
-- **Next:** the rest of Stage 9: DES-17 (the milestone moon), then DES-14 (real cookies, which can slot in any time). SET-2 (P0, Luna's mute) and SET-5 (the objectives behind the gate) no longer wait on SET-1. OPS-11 (a first cloud session) waits until Alex wants to work away from the Mac. PRG-8 (pick up a lesson where you left off) was split from DES-13 and needs nothing. OPS-9 (know-how checks onto `data-shot`) can start any time: the checks lost their last class names with DES-18d. FB-1 (Phase 2) no longer waits on the layout; GAME-1c, Treasure Path's screen, waits on it
+- **Now:** GAME-1c, Treasure Path's screen for passages (its checks back on `data-shot` with OPS-9). Built and waiting for Alex's OK (2026-10-18, `screenshots/review/HANDOVER.md`): LVL-1, LVL-2, CNT-3, CNT-4, GAME-3 GAME-7 and OPS-9; CNT-2 waits for him to OK a split. DES-16 waits only for his dark check on the real iPad; DES-26 needs his OK before it starts (a primitive change); BUG-25 needs his browser.
+- **Next:** GAME-2, GAME-4 and GAME-6; GAME-5 waits on CNT-2. PRG-9 (a game's done screen shows the squishy shelf) waits on PRG-5. OPS-12 (an "away mode" skill) and OPS-11 (a first cloud session) are small housekeeping for when Alex wants them.
 
 ## Epics
 
@@ -81,9 +81,7 @@ In board order. A new epic gets its file in `epics/` first, then a link here
 (the tools only read linked files), then its rows on the board.
 
 - [DES — Design system & layout](epics/DES.md) · Phase 1
-- [FB — Shell feedback & hints](epics/FB.md) · Phase 2
 - [BUG — Bugs](epics/BUG.md) · P0/P1 in Phase 2, P2 anytime
-- [SET — Settings & grown-up area](epics/SET.md) · Phase 3
 - [LVL — Difficulty](epics/LVL.md) · Phase 4
 - [CNT — One content model](epics/CNT.md) · Phase 4
 - [GAME — Games to standard](epics/GAME.md) · Phase 5
@@ -98,41 +96,27 @@ In board order. A new epic gets its file in `epics/` first, then a link here
 |---|---|---|---|---|---|
 | **DES** | **Design system & layout** | Epic | **P0** | | |
 | DES-16 | Light and dark mode | Story | P1 | M | Blocked |
-| DES-17 | The moon visits for big milestones | Story | P1 | M | Blocked |
-| DES-14 | Feed Luna's cookies look like real, different cookies | Story | P2 | S | Blocked |
 | DES-26 | Make the arch radius work at any size | Task | P2 | S | Todo |
-| **FB** | **Shell feedback & hints** | Epic | **P0** | | |
-| FB-1 | One answer-feedback path in GameShell | Story | P0 | M | Blocked |
-| FB-2 | "Show me" after repeated misses | Story | P0 | S | Blocked |
 | **BUG** | **Bugs** | | | | |
-| BUG-1 | Game speech is cut off by Luna's reaction | Bug | P0 | — | Todo (via FB-1) |
-| BUG-2 | Feed Luna: one wrong tap counts as two misses | Bug | P0 | S | Blocked |
-| BUG-8 | Story lessons ignore the Beginner speed | Bug | P1 | S | Blocked |
-| BUG-21 | Bubble Sounds only ever asks for the first 12 letters | Bug | P1 | S | Blocked |
-| BUG-22 | Story Corner says "she reed three books" | Bug | P1 | S | Blocked |
 | BUG-25 | The milestone moon never shows in Alex's app | Bug | P1 | S | Todo |
 | BUG-9 | Story Corner K warm-up plays one story twice | Bug | P2 | S | Todo |
 | BUG-10 | Settings may loop saving when the voice index fails | Bug | P2 | S | Todo |
 | BUG-12 | Day streak rolls over at 7 pm (UTC date) | Bug | P2 | S | Todo |
 | BUG-13 | Trophy dot never clears | Bug | P2 | S | Todo |
-| **SET** | **Settings & grown-up area** | Epic | **P0** | | |
-| SET-2 | A child can't silence Luna by accident | Story | P0 | S | Blocked |
-| SET-3 | Simplify the voice section | Story | P2 | S | Blocked |
-| SET-4 | Settings grade list uses `GRADES` | Task | P2 | S | Blocked |
-| SET-5 | Grown-ups can see what each game and lesson teaches | Story | P2 | S | Blocked |
+| BUG-26 | Bubble Sounds' shine is a grey smudge in dark mode | Bug | P2 | S | Todo |
 | **LVL** | **Difficulty** | Epic | **P0** | | |
-| LVL-1 | Explicit grade × dial difficulty table | Story | P0 | S | Todo |
-| LVL-2 | Remember the chosen difficulty per game | Story | P2 | S | Todo |
+| LVL-1 | Explicit grade × dial difficulty table | Story | P0 | S | Blocked |
+| LVL-2 | Remember the chosen difficulty per game | Story | P2 | S | Blocked |
 | LVL-3 | Adaptive difficulty from skill mastery | Story | P2 | L | Todo |
 | **CNT** | **One content model** | Epic | **P1** | | |
-| CNT-2 | Lessons generated from the content bank | Story | P1 | L | Todo |
-| CNT-3 | Content QA pass | Task | P1 | S | Todo |
-| CNT-4 | Automated content checks in `voice:audit` | Task | P2 | S | Todo |
+| CNT-2 | Lessons generated from the content bank | Story | P1 | L | Blocked |
+| CNT-3 | Content QA pass | Task | P1 | S | Blocked |
+| CNT-4 | Automated content checks in `voice:audit` | Task | P2 | S | Blocked |
 | **GAME** | **Games to standard** | Epic | **P1** | | |
-| GAME-1c | Treasure Path screen for passages | Story | P1 | M | Todo |
+| GAME-1c | Treasure Path screen for passages | Story | P1 | M | In progress |
 | GAME-2 | Story Corner: the child reads first | Story | P1 | M | Todo |
-| GAME-3 | Bubble Sounds: smooth, fair bubbles | Story | P1 | S | Todo |
-| GAME-7 | Bubble Sounds: fewer answer bubbles, fewer still at higher grades | Story | P1 | S | Todo |
+| GAME-3 | Bubble Sounds: smooth, fair bubbles | Story | P1 | S | Blocked |
+| GAME-7 | Bubble Sounds: fewer answer bubbles, fewer still at higher grades | Story | P1 | S | Blocked |
 | GAME-4 | Muddled Cards: reading required at tier 2+ | Story | P2 | S | Todo |
 | GAME-5 | Words Off the Page: bigger sentence pool | Story | P2 | S | Todo |
 | GAME-6 | Rename "Feed Luna the Letter" | Story | P2 | S | Todo |
@@ -154,9 +138,10 @@ In board order. A new epic gets its file in `epics/` first, then a link here
 | WRT-1 | Writing app on the home screen | Story | P1 | M | Todo |
 | WRT-2 | Punctuation game: where does the mark go? | Story | P1 | L | Todo |
 | **OPS** | **Housekeeping** | Epic | **P2** | | |
-| OPS-9 | Know-how browser checks find things by `data-shot` | Task | P1 | S | Todo |
+| OPS-9 | Know-how browser checks find things by `data-shot` | Task | P1 | S | Blocked |
 | OPS-1 | Delete dead code | Task | P2 | S | Todo |
 | OPS-2 | README and stale copy | Task | P2 | S | Todo |
 | OPS-7 | Drop Treasure Path's leftovers from the sentence bank | Task | P2 | S | Todo |
 | OPS-8 | Retarget the backlog guard check's two stale cases | Task | P2 | S | Todo |
+| OPS-12 | An "away mode" skill | Task | P2 | S | Todo |
 | OPS-11 | A first cloud session (parked) | Task | P2 | M | Todo |

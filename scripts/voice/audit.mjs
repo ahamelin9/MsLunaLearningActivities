@@ -323,14 +323,55 @@ for (const [bucket, rate] of Object.entries(RATES)) {
   console.log(`  ${bucket.padEnd(7)} ${bucketBroken ? `✗ ${bucketBroken} fell back` : '✓ all rendered'}`);
 }
 
+let failed = false;
 if (!broken.size) {
   console.log(`✓ all ${calls.length * Object.keys(RATES).length} utterances play a rendered clip`);
-  process.exit(0);
+} else {
+  failed = true;
+  console.error(`\n✗ ${broken.size} utterance(s) fall back to the browser voice:\n`);
+  for (const [text, what] of [...broken].slice(0, 40)) {
+    console.error(`    ${JSON.stringify(text)}${what !== text ? `   (via ${JSON.stringify(what)})` : ''}`);
+  }
+  if (broken.size > 40) console.error(`    … and ${broken.size - 40} more`);
+  console.error('\n  Add them to the inventory, then `npm run voice:render`.\n');
 }
-console.error(`\n✗ ${broken.size} utterance(s) fall back to the browser voice:\n`);
-for (const [text, what] of [...broken].slice(0, 40)) {
-  console.error(`    ${JSON.stringify(text)}${what !== text ? `   (via ${JSON.stringify(what)})` : ''}`);
+
+// --- what she says has to be right, too (CNT-4) ---
+//
+// The content rules run here, so a bad item can't come back unnoticed: the
+// wrong-answer rules and every blank's also-fits list (distractor-check), the
+// passages' rules, a claim never copying its passage among them
+// (passage-check), and one picture per word (CNT-3's mismatches).
+console.log('• checking the content');
+const KNOW_HOW = join(root, '.claude/skills/know-how');
+for (const check of ['distractor-check.mjs', 'passage-check.mjs']) {
+  try {
+    const out = execFileSync(process.execPath, [join(KNOW_HOW, check)], { cwd: root, encoding: 'utf8' });
+    console.log(`  ✓ ${check}: ${out.trim().split('\n').at(-1).replace(/^✅\s*/, '')}`);
+  } catch (e) {
+    failed = true;
+    console.error(`  ✗ ${check}:\n${String(e.stdout ?? '').trim().split('\n').slice(-12).map(l => `      ${l}`).join('\n')}`);
+  }
 }
-if (broken.size > 40) console.error(`    … and ${broken.size - 40} more`);
-console.error('\n  Add them to the inventory, then `npm run voice:render`.\n');
-process.exit(1);
+
+// one picture per word: two words drawn the same can't be told apart, and the
+// stand-ins CNT-3 replaced stay gone (no emoji draws a mop, a table or a sleepy cat)
+const WRONG_PICTURES = { mop: '🧹', 'The little cat is sleeping.': '😴', 'The little cat is sleeping under the table.': '🛋️' };
+const pictureProblems = [];
+const drawnAs = new Map();
+for (const w of content.WORDS) {
+  if (drawnAs.has(w.emoji)) pictureProblems.push(`"${w.word}" and "${drawnAs.get(w.emoji)}" share ${w.emoji}`);
+  drawnAs.set(w.emoji, w.word);
+}
+for (const item of [...content.WORDS, ...content.SENTENCES]) {
+  const name = item.word ?? item.text;
+  if (WRONG_PICTURES[name] && item.emoji === WRONG_PICTURES[name]) pictureProblems.push(`"${name}" is drawn as ${item.emoji} again (CNT-3)`);
+}
+if (pictureProblems.length) {
+  failed = true;
+  console.error(`  ✗ pictures:\n${pictureProblems.map(p => `      ${p}`).join('\n')}`);
+} else {
+  console.log(`  ✓ pictures: ${content.WORDS.length} words, one picture each`);
+}
+
+process.exit(failed ? 1 : 0);

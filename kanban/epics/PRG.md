@@ -19,7 +19,7 @@ Task · P2 · S
 - **Complete when:** achievements are checked only in `utils/storage.ts`, `TrophyModal` only reads them, and BUG-13 is closed.
 
 ### PRG-4 · Secret platinum trophy for a full squishy shelf
-Story · P2 · S · needs: PRG-3, PRG-5, DES-17
+Story · P2 · S · needs: PRG-3, PRG-5
 - **Why:** collecting every squishy should feel like a big moment (Alex, 2026-10-09).
 - **How:**
   - A hidden achievement, checked with the others in `utils/storage.ts` (PRG-3), unlocks when every squishy (PRG-5) is on the shelf in at least one colour. It counts the whole set, so adding a squishy later raises the bar. Rare colours aren't needed (proposal, to confirm with Alex).

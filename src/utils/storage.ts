@@ -26,6 +26,7 @@ export const DEFAULT_PROGRESS: UserProgress = {
   unlockedAchievements: [],
   stickers: [],
   gamePlays: {},
+  gameDifficulty: {},
   settings: DEFAULT_SETTINGS
 };
 
@@ -59,6 +60,7 @@ class StorageService {
         selectedGrade: parsed.selectedGrade || null,
         stickers: Array.isArray(parsed.stickers) ? parsed.stickers : [],
         gamePlays: parsed.gamePlays && typeof parsed.gamePlays === 'object' ? parsed.gamePlays : {},
+        gameDifficulty: parsed.gameDifficulty && typeof parsed.gameDifficulty === 'object' ? parsed.gameDifficulty : {},
         settings: loadedSettings
       };
     } catch (e) {
@@ -264,6 +266,16 @@ class StorageService {
 
     this.persist();
     return { newAchievements };
+  }
+
+  /** Remembers the dial picked on a game's start screen (LVL-2). */
+  public setGameDifficulty(gameId: string, difficulty: 1 | 2 | 3) {
+    if (this.progress.gameDifficulty[gameId] === difficulty) return;
+    this.progress = {
+      ...this.progress,
+      gameDifficulty: { ...this.progress.gameDifficulty, [gameId]: difficulty }
+    };
+    this.persist();
   }
 
   /**

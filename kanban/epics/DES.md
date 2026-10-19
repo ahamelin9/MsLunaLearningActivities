@@ -67,13 +67,6 @@ them in.
 - **P0 bugs** can still be pulled in between tickets for a break from styling.
 
 
-### DES-14 · Feed Luna's cookies look like real, different cookies
-Story · P2 · S · needs: —
-- **Blocked (2026-10-18): redone after Alex's review; waits for his OK on the look.** Alex didn't like the four kinds (sprinkles, jam, iced): every cookie stays chocolate chip, with its chips in different spots. Rebuilt that way: four chip layouts by `data-chips`, the chips a little bigger, kept near the rim and out of the middle low down (where a g, p, q or y hangs); no new colours (the six sprinkle/jam/icing ones are gone). Checked: `cookie-check.mjs` at all three grades, lint, shots (only Letter Cookies' plate changed). Review sheet: `screenshots/review/des14-cookies.png`.
-- **Why:** every cookie is the same flat brown circle, which doesn't read as a picture (Alex, 2026-10-09).
-- **How:** a few cookie designs (chocolate chip, sprinkles, jam, and so on), mixed in each round, drawn in the DES-2 style, with their colours in `_illustration.scss`. The letter stays just as easy to read.
-- **Complete when:** a round shows at least two different cookie designs, and every letter still meets the DES-2 type minimums.
-
 ### DES-26 · Make the arch radius work at any size
 Task · P2 · S · needs: —
 - **Why:** `--radius-arch` is `999px 999px 22px 22px`. When the corners add up to more than the box, the browser shrinks all four in proportion, so the bottom corners come out about 2px, not the 22px `foundations.md` describes (the round 2 board's "?" cue has the same flaw). Found in DES-7b: ListenCue works round it with its own arch, built from its width.
@@ -85,7 +78,7 @@ Task · P2 · S · needs: —
 
 ### DES-16 · Light and dark mode
 Story · P1 · M · needs: —
-- **Blocked (2026-10-18): waits for Alex's review.** Built and checked while he was away (`theme-check.mjs` 22 of 22, lint, shots, the layout audit at K); the review sheet is `screenshots/review/des16-light-and-dark.png`, and `screenshots/review/HANDOVER.md` has the rest. Left for Alex: his OK on the sun/moon button's shots (it isn't on the board) and every screen in dark on the real iPad. Then it closes out.
+- **Blocked (2026-10-18): waits only for Alex's dark check on the real iPad.** Built, checked and committed (`theme-check.mjs` 22 of 22, lint, shots, the layout audit at K; sheet `screenshots/review/des16-light-and-dark.png`); Alex OKed the rest, and the choice now reads "Match the system". Once he's seen every screen in dark on the iPad, it closes out.
 - **Why:** Alex wants a real dark mode (2026-10-09), and building the components on role tokens from the start keeps every screen working in both.
 - **How:** the dark roles already exist (DES-3), and the contrast check runs in lint (DES-19). What's left:
   - **Follow the iPad's light/dark setting by default:** a `prefers-color-scheme: dark` block (`:root:not([data-theme="light"])`) outputs the dark roles. An inline script in `index.html` sets `data-theme` on `<html>` before the first paint, so there's no flash.
@@ -101,27 +94,3 @@ Story · P1 · M · needs: —
   - the Settings choice overrides the iPad and survives a reload;
   - tapping the home screen's sun/moon button turns day into night and back, and the choice survives a reload;
   - every screen is checked in dark on the real iPad (Alex).
-
-### DES-17 · The moon visits for big milestones
-Story · P1 · M · needs: —
-- **Blocked (2026-10-18): waits for Alex's review.** Built and checked while he was away: every Complete when point passes (`moon-check.mjs`, with and without reduced motion; clips rendered, `voice:audit`; lint). Left for Alex: the moon's 9 lines, the two new shared animations (`--motion-glide-in`, `--motion-glide-out`), where she lands, and decisions.md's open question on the milestones. Review sheet: `screenshots/review/des17-milestone-moon.png`; `screenshots/review/HANDOVER.md` has the rest.
-- **Why:** the teacher (2026-10-10): the second moon on the round 2 Ms. Luna board, a crescent with a face and black glasses, comes in every once in a while to say "good job" for big milestones. The owl stays Luna.
-- **How:**
-  - Draw that moon (round 2 Ms. Luna board, moon 6, marked "Milestone moon") as its own kit component, `src/components/kit/MilestoneMoon/`, in moon gold from `_illustration.scss`, the one colour outside the palette. She needs a happy and a cheer look, both shown on the Kit page. Her mouth moves only while her clip plays: she can follow `useSpeaking()` as Luna does (DES-15), and Luna gets `talking={false}` while the moon visits, or both would talk.
-  - **Milestones (proposal; Alex left the choice to Claude, 2026-10-10):**
-    - the first lesson a child ever finishes;
-    - half of a grade's lessons done;
-    - all of a grade's lessons done;
-    - a full squishy shelf. PRG-4 wires this visit when the shelf exists (moved 2026-10-10, so this epic doesn't wait on PRG-5).
-
-    Not after an ordinary lesson, so a visit stays special ("every once in a while"). At most one visit per done screen.
-  - **The visit:** on the done screen she glides in from a top corner, says her line (pre-rendered, a few variants per milestone), and glides out. About 3 seconds, and it never blocks the next tap. With reduced motion she fades in and out.
-  - The owl stays and watches while she talks (DES-12).
-  - Milestones are checked with the achievements in `utils/storage.ts`, so each one fires once per child.
-- **Complete when:**
-  - the moon appears only during a milestone visit, and while she's there only she talks: Luna stays and watches, beak still (moved here from DES-12);
-  - each lesson milestone above brings the moon exactly once, with her line playing;
-  - an ordinary lesson never does;
-  - with reduced motion she appears without gliding;
-  - her clips are rendered and `voice:audit` passes;
-  - the MilestoneMoon folder shows zero in `design:status`.

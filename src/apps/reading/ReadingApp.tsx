@@ -65,7 +65,10 @@ export const ReadingApp: React.FC<ReadingAppProps> = ({ progress, onReturnToHome
     begin({ game, autoStart: true, difficulty });
   };
 
-  const play = (game: AnyGameDef) => begin({ game, autoStart: false, difficulty: 2 });
+  // a game opens on the dial last picked for it, or "Just right" (LVL-2); Luna's
+  // Pick above rolls its own and doesn't change it
+  const play = (game: AnyGameDef) =>
+    begin({ game, autoStart: false, difficulty: progress.gameDifficulty?.[game.id] ?? 2 });
 
   // View 1: a lesson or a mini-game, both run by the same shell, which has its own header
   if (activeGame && currentGrade) {

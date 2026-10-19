@@ -237,6 +237,7 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
             <button
               key={char}
               className={styles.cookie}
+              data-shot="cookie"
               data-chips={chipsOf(round, char)}
               // a game piece in the one answer language (components.md)
               data-state={dataState(

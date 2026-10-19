@@ -288,3 +288,36 @@ only record of them. One line each: date, ID, title, and `Done` or
   |---|---|
   | the home screen's gear, the library's gear, the library's grade button | opens nothing; a 2s press and hold opens it (ChunkyButton `hold`) |
   | Luna's mute beside her in the library | still one tap, for SET-2 to settle |
+- **2026-10-18** — DES-17 The moon visits for big milestones — Done. The kit's `MilestoneMoon` (the board's moon 6, the crescent in Luna's glasses; happy and cheer; her mouth follows the voice) visits the done screen through `MoonVisit`: she glides in from the top corner, says one of 9 new lines, and glides out once her clip ends (about 3 s, never a tap; she lands over empty space, above the buttons in landscape and in the top corner in portrait). Luna's beak stays still while she's there, and Luna says her usual closing line after. Two new shared animations, `--motion-glide-in` and `--motion-glide-out` (none under reduced motion). `moon-check.mjs` and `kit-check.mjs` (9 moon checks) pass; clips rendered, `voice:audit` passes. Alex OKed it; BUG-25 follows up the moon not showing in his own save. Kept as a rule (DES-17):
+
+  | The moon visits when a lesson… | Claimed once per child as |
+  |---|---|
+  | is the first lesson ever finished | `moon-first-lesson` |
+  | brings a grade to half its lessons done (half rounded up) | `moon-half-<grade>` |
+  | finishes a grade's lessons | `moon-all-<grade>` |
+  | anything else (a replay, an ordinary lesson) | no visit; at most one visit per done screen, the biggest |
+- **2026-10-18** — DES-14 Feed Luna's cookies look like real, different cookies — Done. Every cookie is chocolate chip, with its chips in one of four spots (`data-chips`), so no two side by side look alike and the rounds don't all look the same; the chips sit near the rim and out of the middle low down, where a g, p, q or y hangs. A first try with sprinkles, jam and iced cookies (and six new colours) was dropped at Alex's review: variety within one familiar kind, not new kinds. `cookie-check.mjs` passes at every grade; only Letter Cookies' plate changed in the shots. Alex OKed it.
+- **2026-10-18** — FB-1 One answer-feedback path in GameShell — Done, and with it BUG-1. `api.answer({ correct, say, hint, lunaLine, delay })` says the game's own line whole, then reacts (a watchdog: 2.5 s for a miss, 7 s for a right answer), with input locked meanwhile (a ref too, so a second answer in the same moment is ignored); `api.tick({ say })` does the same for a small beat. All 8 games and lessons' `useAnswer` use it, and `win`/`miss` are off `GameApi`. Story Corner asks its question 3.4 s after the hunted word (it was 1.1 s, which cut Luna's "Found it!" off). `answer-check.mjs` passes for all 8 games and fails with the fix off; it also caught a StrictMode bug where the shell never reacted in dev. Alex OKed it. Kept as a rule (FB-1):
+
+  | A game's own line (the choice, "That is G", a read-back) | How |
+  |---|---|
+  | before Luna reacts | `api.answer({ say })`: never speak and then react in the same moment |
+  | inside a round (a letter caught, a word found) | `api.tick({ say })`, or `pronunciation` when Luna says nothing |
+- **2026-10-18** — BUG-1 Game speech is cut off by Luna's reaction — Done with FB-1: Letter Jar's "That is G" and Treasure Path's and Words Off the Page's read-backs play in full before Luna reacts (`answer-check.mjs`).
+- **2026-10-18** — FB-2 "Show me" after repeated misses — Done. From the third miss in a round the shell calls the game's `reveal`, the answer's piece takes the kit's `revealed` look, and Luna says one of her reveal lines (written long ago, never said before). Every game and every lesson reveals (components.md lists what glows in each); the round can still be finished, just not clean. `reveal-check.mjs` passes for all 8 games and Lesson 1, and fails with the shell's reveal off. Alex OKed it.
+- **2026-10-18** — BUG-2 Feed Luna: one wrong tap counts as two misses — Done. A cookie's click feeds only for a keyboard or assistive click (`e.detail === 0`); a tap or a drop goes through pointer-up alone. That also stopped a drag let go anywhere from feeding her (pointer capture fired a click). `feed-check.mjs` passes and fails two of six with the old handler. Alex OKed it.
+- **2026-10-18** — BUG-8 Story lessons ignore the Beginner speed — Done. The story lesson's fixed rates (0.9, 0.85, both Normal) are gone, so its words and lines follow Settings; `story-speed-check.mjs` passes at all three speeds. Alex OKed it.
+- **2026-10-18** — BUG-21 Bubble Sounds only ever asks for the first 12 letters — Done. Each play samples distinct letters from the whole pool; `bubble-letters-check.mjs` (400 plays per grade × dial) passes everywhere and failed everywhere before. Alex OKed it.
+- **2026-10-18** — BUG-22 Story Corner says "she reed three books" — Done. Reworded rather than respelled, so a tapped "read" can't say "reed" either: "…so she spent the morning reading three books.", answers "She was reading books" / "She was flying to the beach" / "She was painting the window". `read-tense-check.mjs` lists every spoken "read" and flags the past tense: none left. Alex OKed the wording.
+- **2026-10-18** — SET-2 A child can't silence Luna by accident — Done. Muting Luna beside her in the library is a grown-up's press and hold, unmuting one tap, and a game says "Ms. Luna is resting. Ask a grown-up!" while she's muted. At Alex's review every gated hold went from 2 s to 1.5 s (`--dur-hold`). The kit's hold note can line up with a button's left edge (`holdNoteAt="start"`). `gate-check.mjs` and `greeting-check.mjs` pass. Alex OKed it. Kept as a rule (SET-2, replacing SET-1's table above):
+
+  | Control | A child's tap |
+  |---|---|
+  | the home screen's gear, the library's gear, the library's grade button | opens nothing; a 1.5 s press and hold opens it |
+  | muting Luna beside her in the library | does nothing; a 1.5 s press and hold mutes her |
+  | unmuting her | one tap (it can only make a game playable again) |
+- **2026-10-18** — SET-3 Simplify the voice section — Done. The accent comes with the voice (`voiceLanguage` is gone, and stripped from older saves as they load), and the accent and voice buttons show only when two or more voices are rendered. `voice-section-check.mjs` passes. Alex OKed it.
+- **2026-10-18** — SET-4 Settings grade list uses `GRADES` — Done. Settings lists the curriculum's grades ("1st Grade", as the library says). Alex OKed it.
+- **2026-10-18** — SET-5 Grown-ups can see what each game and lesson teaches — Done. Settings' "What they learn" row swaps the panel for every game's and lesson's objective (`SettingsModal/TeachesList.tsx`), behind the gate; nothing else in `src` reads `objective`. `gate-check.mjs` checks all 20. Alex OKed it.
+- **2026-10-18** — Epic FB complete (shell feedback and hints): one answer path (FB-1) and "show me" (FB-2).
+- **2026-10-18** — Epic SET complete (settings and the grown-up area): the gate (SET-1), Luna's mute (SET-2), the voice section (SET-3), the grade list (SET-4) and what each game teaches (SET-5).

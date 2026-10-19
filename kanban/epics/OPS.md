@@ -10,6 +10,7 @@ Task · P1 · S · needs: —
   - **From DES-12 (2026-10-12):** `treasure-check.cjs` couldn't run to judge Treasure Path's new passage pictures (it still clicks `.ipad-reading-app-card`). The harness's clip labels also stick to the first line said (know-how, "Every clip carries the first line's label"); label each clip where it starts.
   - **From DES-22c (2026-10-18):** `treasure-fit.mjs` next to them is a fit check written fresh on `data-shot` and Choice's `data-kind`; it can replace `treasure-fit.cjs` (delete the old one).
 - **Complete when:** the three checks pass against the moved tree, no class selector is left in them, and the know-how list names only `data-shot` and `data-state`.
+- **Blocked (2026-10-18): built and checked; waits for Alex to delete `treasure-fit.cjs` (`git rm`) and OK it.** Treasure Path's passage, claim, sentence, gap and "Read it to me" and Letter Cookies' cookies carry `data-shot` names (no screen changed: `ui:shots --diff` 0 of 104). `speech-check.cjs` and `treasure-check.cjs` walk in by `data-shot` and read answers from the stage's Choices and `data-state`; their clips are labelled where they're fetched, so each carries its own line (the old harness stuck every clip to the first line once two overlapped). The speak chip is gone from the app (DES-22), so nothing reads it. `treasure-fit.mjs` replaces `treasure-fit.cjs`, and now waits for each stone before measuring (it measured stone 1 twice). Runs: `treasure-check.cjs` at K, 1st and 2nd (both kinds, no leak, "Read it to me" locked at 1st and 2nd until a miss, every line a clip); `speech-check.cjs` (every line a clip, labels match); `treasure-fit.mjs` 2nd grade at 1024×768 every stone fits (32–50 words), and fails at 1024×560. Only `treasure-fit.cjs` still has class selectors, until it's deleted.
 
 ### OPS-1 · Delete dead code
 Task · P2 · S
@@ -38,6 +39,12 @@ Task · P2 · S
 - **Why:** found while closing DES-25 (2026-10-10): `node .claude/skills/backlog/guard-check.mjs "$PWD"` shows 2 cases wrong. "A second In progress" edits a DES-3 row followed by DES-4, but the board now runs DES-3, DES-19; "a ticket losing its Complete when" looks for DES-4's old one-line Complete when, which is now a list. Their edits miss, so the guard never sees them and they show as allowed. The guard itself is fine. (DES-3 closed on 2026-10-11, so its row is gone too; still the same 2 cases.) Since DES-4 closed, a third shows the same way (found in OPS-10, 2026-10-13): "a status that is not allowed" edits DES-4's board row, which is gone.
 - **How:** point both cases at text that's on the board and in `epics/DES.md` today (two rows next to each other; a one-line `- **Complete when:**`), ideally rows less likely to move, and keep the script's note on what to do when a target goes.
 - **Complete when:** the guard check shows all 14 cases as expected.
+
+### OPS-12 · An "away mode" skill
+Task · P2 · S
+- **Why:** Alex hands over for long stretches ("keep going until the limit") and liked how the 2026-10-18 run went (2026-10-18): it should be a skill he can call by name, not something Claude remembers. The rules are in Claude's memory today (`away-mode`).
+- **How:** a small skill (`.claude/skills/away-mode/SKILL.md`), triggered by "auto mode", "away mode" or "keep going until the limit": work the board in order with each ticket's full process; reproduce a bug before fixing it; prove each new check fails with the fix off; never commit; a built ticket goes Blocked "waits for Alex's OK" with its section in `screenshots/review/HANDOVER.md` (what's built, Complete when, his call, exact `git add`), with a "where things stand" block at the top; skip tickets that need his OK before they start; his "pushed!" closes them. It points to the `backlog` and `luna-design` skills rather than repeating them. Keep it small (building over tooling).
+- **Complete when:** saying "away mode" loads the skill, which states those rules in under a page, and the memory note points to it.
 
 ### OPS-11 · A first cloud session (parked)
 Task · P2 · M

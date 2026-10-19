@@ -12,7 +12,7 @@ import {
 } from '../../engine/content';
 import { pickWrong, textChoice } from '../../engine/distractors';
 import { pronunciation, type SpeechPart } from '@/utils/pronunciation';
-import { Choice, ChunkyButton, Icon } from '@/components/kit';
+import { Choice, ChunkyButton, Icon, PaperCard } from '@/components/kit';
 import { afterMotion } from '@/utils/motion';
 import { GameSurface } from '../shared/GameSurface/GameSurface';
 import { dataState } from '@/utils/cx';
@@ -72,14 +72,6 @@ function buildRound(passage: PassageItem, kind: Round['kind']): Round {
   };
 }
 
-/**
- * The passage on the stone. A stopgap (GAME-1b), on roles since DES-22c,
- * until GAME-1c designs the stone's real screen: it only needs the lines.
- */
-const TreasurePassage: React.FC<{ lines: string[] }> = ({ lines }) => (
-  <p className={styles.passage}>{lines.join(' ')}</p>
-);
-
 const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
   const [solved, setSolved] = useState(false);
   const [wrong, setWrong] = useState<string | null>(null);
@@ -133,7 +125,7 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
   const open = solved && step === total - 1;
 
   return (
-    <GameSurface className={styles.treasure}>
+    <GameSurface>
       {/* the current stone's glow says where you are; Luna stays on her perch,
           one Luna per screen (DES-12) */}
       <div className={styles.path} aria-label={`Stone ${step + 1} of ${total}`}>
@@ -148,35 +140,43 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
         </span>
       </div>
 
-      <div className={styles.scroll}>
-        <span className={styles.picture}>{round.passage.emoji}</span>
-        <TreasurePassage lines={round.passage.lines} />
+      {/* the stone being read (GAME-1c): its picture and "Read it to me" beside
+          the passage, as Story Corner's book sets its cover beside the story,
+          so a 2nd-grade passage of 50 words has the width it needs */}
+      <PaperCard className={styles.story} data-shot="treasure-stone">
+        <div className={styles.side}>
+          <span className={styles.picture}>{round.passage.emoji}</span>
+          <ChunkyButton
+            variant="prompt"
+            icon="speaker"
+            data-shot="read-to-me"
+            onClick={readToMe}
+            disabled={!readAlong && !tried}
+            title={readAlong || tried ? 'Hear the story' : 'Try it first!'}
+          >
+            Read it to me
+          </ChunkyButton>
+        </div>
+        <p className={styles.passage} data-shot="treasure-passage">{round.passage.lines.join(' ')}</p>
+      </PaperCard>
 
+      {/* the question under it: a claim to judge, or a sentence with a gap */}
+      <PaperCard variant="flat" className={styles.question} data-shot="treasure-question">
         {round.kind === 'truefalse' ? (
-          <p className={styles.claim}>“{round.statement}”</p>
+          <p className={styles.claim} data-shot="treasure-claim">“{round.statement}”</p>
         ) : (
-          <p className={styles.sentence}>
+          <p className={styles.sentence} data-shot="treasure-sentence">
             {round.statement.split(GAP).map((chunk, i, arr) => (
               <React.Fragment key={i}>
                 {chunk}
                 {i < arr.length - 1 && (
-                  <span className={styles.gap} data-state={solved ? 'filled' : undefined}>{solved ? round.answer : '?'}</span>
+                  <span className={styles.gap} data-shot="treasure-gap" data-state={solved ? 'filled' : undefined}>{solved ? round.answer : '?'}</span>
                 )}
               </React.Fragment>
             ))}
           </p>
         )}
-
-        <ChunkyButton
-          variant="prompt"
-          icon="speaker"
-          onClick={readToMe}
-          disabled={!readAlong && !tried}
-          title={readAlong || tried ? 'Hear the story' : 'Try it first!'}
-        >
-          Read it to me
-        </ChunkyButton>
-      </div>
+      </PaperCard>
 
       <div className={styles.options}>
         {round.options.map(option => (

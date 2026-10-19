@@ -1,7 +1,7 @@
-// Treasure Path on the kit (DES-22c): the path of stones to the treasure, the
-// scroll with the passage and its statement, and the kit's Choices. The
-// scroll is still GAME-1b's stopgap layout, now on roles, until GAME-1c
-// designs the stone's real screen. The passage is set at the reading size.
+// Treasure Path on the kit (DES-22c, GAME-1c): the path of stones to the
+// treasure, the stone being read (its picture and passage on a PaperCard),
+// the question on a flat card under it, and the kit's Choices. The passage
+// is set at the reading size.
 
 // the path: numbered stones to a star
 .path {
@@ -56,47 +56,38 @@
   }
 }
 
-// the scroll, on its two wooden rods
-.scroll {
-  position: relative;
+// the stone being read (GAME-1c): a PaperCard, its picture and "Read it to
+// me" down the left, the passage on the right
+.story {
+  display: flex;
+  align-items: center;
+  gap: var(--space-5);
+  width: 100%;
+}
+
+.side {
   display: flex;
   flex-direction: column;
+  flex-shrink: 0;
   align-items: center;
-  gap: var(--space-2);
-  max-width: calc(var(--space-16) * 11 + var(--space-6));
-  padding: var(--space-3) var(--space-6);
-  border: var(--border-regular) solid var(--edge);
-  border-radius: var(--radius-tile);
-  background: var(--card);
-  box-shadow: var(--elevation-card);
-  text-align: center;
-
-  &::before,
-  &::after {
-    content: '';
-    position: absolute;
-    left: calc(var(--space-2) * -1);
-    right: calc(var(--space-2) * -1);
-    height: var(--space-3);
-    border-radius: var(--radius-chip);
-    background: var(--action);
-  }
-
-  &::before { top: calc(var(--space-2) * -1); }
-  &::after { bottom: calc(var(--space-2) * -1); }
+  gap: var(--space-3);
 }
 
 // the passage's picture: what it's about, never its words
 .picture {
-  font: var(--text-display-l);
+  font: var(--text-answer-letter);
 }
 
-// the passage the child reads, above the statement
+// the passage the child reads, at the reading size
 .passage {
-  padding-bottom: var(--space-2);
-  border-bottom: var(--border-regular) dashed var(--soil);
+  flex: 1;
   font: var(--text-read);
-  text-align: left;
+}
+
+// the question under the stone, on a flat card
+.question {
+  width: 100%;
+  text-align: center;
 }
 
 // a fill-in-the-blank statement, and its gap

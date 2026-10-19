@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import type { GameApi, GameDef } from '../../engine/types';
-import { lettersFor, pick, sample, tierFor, type LetterItem } from '../../engine/content';
+import { lettersFor, pick, sample, shuffle, tierFor, type LetterItem } from '../../engine/content';
 import { pickWrong, textChoice } from '../../engine/distractors';
 import { soundManager } from '@/utils/audio';
 import { pronunciation } from '@/utils/pronunciation';
@@ -13,13 +13,15 @@ interface Bubble {
   id: number;
   char: string;
   isTarget: boolean;
-  x: number;
-  y: number;
-  speed: number;
+  /** which lane of the tank it rises in: one bubble per lane near the bottom (GAME-3) */
+  lane: number;
+  /** when it set off (performance.now()), so the frame loop knows how far it has risen */
+  born: number;
   size: number;
-  drift: number;
   popped: boolean;
+  /** how far it had risen when popped: it stays there while its burst plays */
   poppedAt?: number;
+  poppedRise?: number;
 }
 
 interface Round {
@@ -27,42 +29,57 @@ interface Round {
   decoys: string[];
   needed: number;
   speed: number;
+  /** how many of the bubbles on the regular rhythm are the answer (GAME-7): fewer at higher tiers */
+  bag: { answers: number; of: number };
 }
+
+/**
+ * How many bubbles coming in on the regular rhythm are the answer, by tier
+ * (GAME-7): a shuffled bag, so a short play is never mostly the answer by
+ * chance. With the extra answer that comes in whenever none is left on screen,
+ * the answer is about 1 in 3 of the bubbles on screen at tier 1, 1 in 4 at
+ * tier 2 and 1 in 5 at tier 3 (proposed to Alex 2026-10-10, his to settle once
+ * he's seen them in play; `bubble-share-sim.mjs` checks these bags against
+ * those aims). It was about half at every tier, so a child could pop without
+ * listening.
+ */
+const ANSWER_BAG = {
+  1: { answers: 2, of: 7 },
+  2: { answers: 1, of: 6 },
+  3: { answers: 1, of: 10 }
+} as const;
+
+/** Room round a bubble in its lane, as a share of its size (GAME-3: never touching). */
+const LANE_ROOM = 1.3;
+/** The most bubbles in the water at once. */
+const MOST_BUBBLES = 6;
+/** How long a bubble takes to fade in at the bottom and out at the top, in ms. */
+const FADE_MS = 300;
+/** How long a popped bubble stays for its burst, in ms. */
+const BURST_MS = 420;
 
 let bubbleId = 0;
 
-function makeBubble(round: Round, forceTarget = false): Bubble {
-  const isTarget = forceTarget || Math.random() < 0.38;
+function makeBubble(round: Round, lane: number, born: number, isTarget: boolean): Bubble {
   return {
     id: ++bubbleId,
     char: isTarget ? round.letter.letter : pick(round.decoys),
     isTarget,
-    x: 8 + Math.random() * 84,
-    y: 104 + Math.random() * 40,
-    // with less motion the bubbles slow down, since their rising is the game (DES-6)
-    speed: round.speed * (0.8 + Math.random() * 0.5) * (isReducedMotion() ? REDUCED_MOTION_PACE : 1),
+    lane,
+    born,
     // never under the answer size (DES-22b): a little bigger at most
     size: 1 + Math.random() * 0.25,
-    drift: Math.random() * 2 - 1,
     popped: false
   };
 }
 
 const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
-  const [bubbles, setBubbles] = useState<Bubble[]>(() => [
-    makeBubble(round, true),
-    makeBubble(round),
-    makeBubble(round),
-    makeBubble(round, true),
-    makeBubble(round)
-  ]);
+  const [bubbles, setBubbles] = useState<Bubble[]>([]);
   const [popped, setPopped] = useState(0);
   // "show me" (FB-2): the bubbles that make the sound are pointed at from the third miss
   const [shown, setShown] = useState(false);
   const doneRef = useRef(false);
   const poppedRef = useRef(0);
-
-  const spawn = useCallback((forceTarget = false) => makeBubble(round, forceTarget), [round]);
 
   const sayTarget = useCallback(() => {
     soundManager.playLetterTap();
@@ -77,45 +94,128 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
     return () => window.clearTimeout(t);
   }, [sayTarget]);
 
-  // The float loop: bubbles rise, drift, and are replaced when they escape.
-  // The next frame is built outside setState so spawning stays a side effect.
+  // The float loop (GAME-3): bubbles rise by a transform written straight to
+  // their element each frame, so React only hears of a bubble when it comes,
+  // goes or is popped. The tank is split into lanes a bubble and a bit wide,
+  // and all of a round's bubbles rise at one speed, so a lane's bubbles never
+  // catch each other up: none ever overlaps. They come in inside the water and
+  // leave just under its top, so none is ever cut off.
+  const tankRef = useRef<HTMLDivElement | null>(null);
+  const slots = useRef(new Map<number, HTMLSpanElement>());
   const liveRef = useRef<Bubble[]>(bubbles);
   useEffect(() => {
     liveRef.current = bubbles;
   }, [bubbles]);
 
   useEffect(() => {
-    const interval = window.setInterval(() => {
-      if (doneRef.current) return;
-      const now = Date.now();
-      const moved = liveRef.current
-        .map(b => (b.popped ? b : { ...b, y: b.y - b.speed, x: b.x + b.drift * 0.12 }))
-        // popped bubbles linger just long enough for the burst to play
-        .filter(b => b.y > -18 && (!b.popped || now - (b.poppedAt ?? 0) < 420));
+    let frame = 0;
+    // when the last bubble came in: they arrive evenly spaced, not as a row
+    let lastSpawn = -Infinity;
+    let started = false;
+    // whether each bubble on the rhythm is the answer: dealt from a shuffled bag (GAME-7)
+    let bag: boolean[] = [];
+    const deal = () => {
+      if (!bag.length) bag = shuffle(Array.from({ length: round.bag.of }, (_, i) => i < round.bag.answers));
+      return bag.pop() ?? false;
+    };
+    const loop = () => {
+      frame = window.requestAnimationFrame(loop);
+      const tank = tankRef.current;
+      if (!tank || doneRef.current) return;
+      const width = tank.clientWidth;
+      const height = tank.clientHeight;
+      const style = getComputedStyle(tank);
+      const answer = parseFloat(style.getPropertyValue('--target-answer')) || 64;
+      const floor = parseFloat(style.getPropertyValue('--space-8')) || 32;
+      const biggest = answer * 1.25;
+      const lanes = Math.max(3, Math.min(MOST_BUBBLES, Math.floor(width / (biggest * LANE_ROOM))));
+      // the round's pace was a share of the tank's height per 60 ms tick
+      const pace = ((round.speed / 100) * height) / 60 * (isReducedMotion() ? REDUCED_MOTION_PACE : 1);
+      const start = height - floor - biggest; // a bubble's top as it comes in, above the sand
+      const travel = start; // up to the top of the water
+      const now = performance.now();
+      // one comes in every crossing ÷ lanes, so about one per lane is in the water
+      const gap = travel / pace / lanes;
 
-      while (moved.length < 6) {
-        const live = moved.filter(b => !b.popped);
-        const needTarget = live.filter(b => b.isTarget).length < 2;
-        const fresh = spawn(needTarget);
-        // avoid two identical decoys drifting side by side
+      const rise = (b: Bubble) => (b.popped ? (b.poppedRise ?? 0) : (now - b.born) * pace);
+
+      // the round starts with the water already part full, at staggered heights
+      if (!started) {
+        started = true;
+        const first = sample(Array.from({ length: lanes }, (_, i) => i), Math.max(2, lanes - 1)).map((lane, k) =>
+          makeBubble(round, lane, now - (k + 1) * gap, k === 0 || deal())
+        );
+        liveRef.current = first;
+        setBubbles(first);
+        lastSpawn = now;
+        return;
+      }
+      let changed = false;
+      const kept = liveRef.current.filter(b => {
+        const gone = b.popped ? now - (b.poppedAt ?? now) > BURST_MS : rise(b) >= travel;
+        if (gone) changed = true;
+        return !gone;
+      });
+
+      // a new bubble goes in a lane whose last bubble has risen clear of the bottom
+      const clear = (lane: number) => kept.every(b => b.lane % lanes !== lane || rise(b) >= biggest * LANE_ROOM);
+      const free = Array.from({ length: lanes }, (_, i) => i).filter(clear);
+      const live = kept.filter(b => !b.popped);
+      const targets = live.filter(b => b.isTarget).length;
+      // the regular rhythm, at the tier's chance; and, outside it, an extra
+      // answer whenever none is left, so popping fast never fills the water
+      // with answers (GAME-7)
+      const onRhythm = kept.length < lanes && now - lastSpawn >= gap;
+      if (free.length && (onRhythm || targets === 0)) {
+        if (onRhythm) lastSpawn = now;
+        const lane = free[Math.floor(Math.random() * free.length)];
+        const fresh = makeBubble(round, lane, now, targets === 0 || (onRhythm && deal()));
+        // two of the same wrong letter don't rise side by side
         if (!fresh.isTarget && live.some(b => b.char === fresh.char)) {
-          fresh.char = pick(round.decoys.filter(d => !live.some(b => b.char === d)) ?? [fresh.char]);
+          const other = round.decoys.filter(d => !live.some(b => b.char === d));
+          if (other.length) fresh.char = pick(other);
         }
-        moved.push(fresh);
+        kept.push(fresh);
+        changed = true;
+      }
+      if (changed) {
+        liveRef.current = kept;
+        setBubbles(kept);
       }
 
-      liveRef.current = moved;
-      setBubbles(moved);
-    }, 60);
+      // place every bubble: its lane across, its rise up, fading in and out
+      for (const b of liveRef.current) {
+        const el = slots.current.get(b.id);
+        if (!el) continue;
+        const r = rise(b);
+        const x = ((b.lane % lanes) + 0.5) * (width / lanes);
+        el.style.transform = `translate(${x}px, ${start - r}px) translateX(-50%)`;
+        if (!b.popped) el.style.opacity = String(Math.min(1, (r / pace) / FADE_MS, (travel - r) / pace / FADE_MS));
+      }
+    };
+    frame = window.requestAnimationFrame(loop);
+    return () => window.cancelAnimationFrame(frame);
+  }, [round]);
 
-    return () => window.clearInterval(interval);
-  }, [spawn, round.decoys]);
-
-  const pop = (bubble: Bubble) => {
+  // `when` is the tap's time stamp: the same clock as the frame loop's performance.now()
+  const pop = (bubble: Bubble, when: number) => {
     if (api.locked || doneRef.current || bubble.popped) return;
 
     // the bubble itself shows right or wrong as it goes (components.md)
-    setBubbles(prev => prev.map(b => (b.id === bubble.id ? { ...b, popped: true, poppedAt: Date.now() } : b)));
+    const next = liveRef.current.map(b => {
+      if (b.id !== bubble.id) return b;
+      // it stays where it was popped while its burst plays
+      const el = slots.current.get(b.id);
+      const at = el ? new DOMMatrixReadOnly(getComputedStyle(el).transform).m42 : 0;
+      const tank = tankRef.current;
+      const style = tank ? getComputedStyle(tank) : null;
+      const height = tank?.clientHeight ?? 0;
+      const biggest = (parseFloat(style?.getPropertyValue('--target-answer') ?? '') || 64) * 1.25;
+      const start = height - (parseFloat(style?.getPropertyValue('--space-8') ?? '') || 32) - biggest;
+      return { ...b, popped: true, poppedAt: when, poppedRise: start - at };
+    });
+    liveRef.current = next;
+    setBubbles(next);
 
     if (bubble.isTarget) {
       soundManager.playPop();
@@ -158,20 +258,30 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
       </div>
 
       {/* the water, in the game's own tint, as on its Play Shelf picture */}
-      <div className={styles.tank}>
+      <div className={styles.tank} ref={tankRef}>
         {bubbles.map(b => (
-          <button
+          // the slot rises (the frame loop moves it); the bubble inside keeps
+          // its own pop and wobble
+          <span
             key={b.id}
-            className={styles.bubble}
-            // a game piece in the one answer language (components.md)
-            data-state={b.popped ? (b.isTarget ? 'right' : 'wrong') : shown && b.isTarget ? 'revealed' : undefined}
-            style={{ left: `${b.x}%`, top: `${b.y}%`, '--size': b.size } as React.CSSProperties}
-            onClick={() => pop(b)}
-            aria-label={`bubble ${b.char}`}
+            className={styles.slot}
+            style={{ '--size': b.size, opacity: 0 } as React.CSSProperties}
+            ref={el => {
+              if (el) slots.current.set(b.id, el);
+              else slots.current.delete(b.id);
+            }}
           >
-            <span className={styles.shine} aria-hidden="true" />
-            <span className={styles.char}>{b.char}</span>
-          </button>
+            <button
+              className={styles.bubble}
+              // a game piece in the one answer language (components.md)
+              data-state={b.popped ? (b.isTarget ? 'right' : 'wrong') : shown && b.isTarget ? 'revealed' : undefined}
+              onClick={e => pop(b, e.timeStamp)}
+              aria-label={`bubble ${b.char}`}
+            >
+              <span className={styles.shine} aria-hidden="true" />
+              <span className={styles.char}>{b.char}</span>
+            </button>
+          </span>
         ))}
 
         <div className={styles.floor} aria-hidden="true" />
@@ -207,7 +317,8 @@ export const bubbleSounds: GameDef<Round> = {
         letter,
         decoys,
         needed: tier === 1 ? 3 : 4,
-        speed: tier === 1 ? 0.55 : tier === 2 ? 0.75 : 0.95
+        speed: tier === 1 ? 0.55 : tier === 2 ? 0.75 : 0.95,
+        bag: ANSWER_BAG[tier]
       });
     }
     return rounds;

@@ -181,18 +181,27 @@ Copy `speech-check.cjs` from this folder and edit its scenario. It already:
     reason. Import the URL the page actually loaded:
     `performance.getEntriesByType('resource').map(e => e.name).find(n => n.includes('/src/utils/pronunciation.ts'))`
     (as `kit-check.mjs` does), or restart Vite.
-- times every clip by wrapping `AudioBufferSourceNode.prototype.start/stop`.
+- times every clip by wrapping `AudioBufferSourceNode.prototype.start/stop`,
+  each labelled with the line it was fetched for (it wraps `fetchClip` and
+  keeps each decoded clip's line; OPS-9).
 
-Selectors that work (the shell's and the hub's classes went with DES-18b
-and DES-18c): `[data-shot="open-reading"]` for the home icon;
+Selectors that work: only `data-shot` names and `data-state` (OPS-9; CSS
+modules rename every class). `[data-shot="open-reading"]` for the home icon;
 `[data-shot="grade-card"]` (0 K, 1 1st, 2 2nd); lessons are
-`[data-shot="lesson-tile"]` and games `[data-shot="game-tile"]`, a game
-named by its `[data-shot="tile-title"]`; `[data-shot="play"]`;
+`[data-shot="lesson-tile"]` and games `[data-shot="game-tile"]`, either
+found by its text (a game's name is its `[data-shot="tile-title"]`; a
+lesson's tile has its number too); `[data-shot="play"]`;
 `[data-shot="shell-play"]` / `[data-shot="shell-reward"]`; and
 `[data-shot="round-pips"][aria-label]`, which changes each round. Since DES-8
 the header (`AppHeader`) carries `shell-back` (Library), `round-pips` and
 `app-home` (Home, which leaves the app); the Trophy room opens from the home
-screen only.
+screen only. A game's answers are the stage's Choices,
+`[data-shot="stage"] button[data-kind]`, right once
+`[data-state~="right"]`. Game pieces: Letter Cookies' `cookie` (its letter
+in `aria-label`, eaten as `right`); Treasure Path's `treasure-passage`,
+`treasure-claim` or `treasure-sentence`, `treasure-gap` (`filled` once
+solved) and `read-to-me`; Bubble Sounds' bubbles by
+`[aria-label^="bubble "]`.
 
 Prove the check can fail: switch the fix off for a moment (for example, set
 its constant to something huge), rerun, and watch it go ❌, then put the fix
@@ -272,15 +281,15 @@ Pitfalls that cost time:
   stops the first before its clip loads, so only one clip plays. Count clips
   (`AudioBufferSourceNode.start`), not `say` calls; the production build
   says it once.
-- **Every clip carries the first line's label** (*2026-10-12, DES-12*): in
-  a copy of `speech-check.cjs`'s harness, the clips after the first few all
-  logged "Hi! Which grade are you in?", so a check matching a clip by its
-  label saw 0 plays of a line that had played. Likely cause: `say` resolves
-  before the clip is fetched and decoded, so its `finally` puts the real
-  `playBuffer` back before the clip starts, and `__label` keeps whatever it
-  last held. Count instead: the line in `pronunciation.say`'s log, plus one
-  more `AudioBufferSourceNode.start`. OPS-9 can fix the label when it moves
-  the harness onto `data-shot`.
+- **Every clip carries the first line's label** (*2026-10-12, DES-12; fixed
+  2026-10-18, OPS-9*): in `speech-check.cjs`'s old harness, the clips after
+  the first few all logged "Hi! Which grade are you in?". Cause: it swapped
+  `playBuffer` for a one-off wrapper per line, and when two lines overlapped
+  the second captured the first's wrapper, which then stayed in place for
+  good. The harness now wraps `fetchClip` once and keeps each decoded clip's
+  line (a `WeakMap` from buffer to `req.text`), and `start` reads it there.
+  A copy of an older harness still has the bug: count instead (the line in
+  `say`'s log, plus one more `start`).
 - **A puppeteer press does nothing** (*2026-10-11, DES-5*): `page.mouse.down()`
   at a `boundingBox()` below the fold lands outside the viewport, so `:active`
   never applies and the check reads the resting style. Scroll the element into
@@ -295,25 +304,26 @@ Pitfalls that cost time:
   (GameShell's stage, DES-10), and on the library `change-grade` (the
   header's grade) and `luna-mute` (the button beside her) (DES-21). Since
   SET-1, `open-settings` and `change-grade` open only on a 1.5s hold, and the
-  Kit page's hold to try is `kit-hold`. OPS-9
-  moves the checks in this folder onto them.
+  Kit page's hold to try is `kit-hold`. The checks in this folder use only
+  these (OPS-9).
 - **"Does it still fit?"** for a screen whose content grows by grade (Treasure
   Path's 2nd-grade passages): `ui:shots` only plays Kindergarten. Play the game
   at 2nd grade at 1024×768 (the smallest landscape iPad) and compare the
   stones' and choices' `getBoundingClientRect()` with the stage's.
-  `treasure-fit.cjs` in this folder does that for Treasure Path, and
+  `treasure-fit.mjs` in this folder does that for Treasure Path, and
   `treasure-check.cjs` plays it at one grade and reports anything said or
   shown that gives an answer away.
 
-- `.round-pips` disappears when a lesson ends, so treat a missing one as
-  finished.
+- `[data-shot="round-pips"]` disappears when a lesson ends, so treat a
+  missing one as finished.
 - A round advances only after the win delay. Detect a right answer from state
-  (for example `.cookie.is-eaten`), not by waiting a fixed time.
+  (for example `[data-shot="cookie"][data-state~="right"]`), not by waiting a
+  fixed time.
 - "Let's start Kindergarten!" plays before the first clip of anything opened
   from the hub.
 - Word chips have no spaces between them in `textContent`. Join their texts
   with `' '`.
-- Scan what a child can see with `document.querySelector('.game-shell').innerText`.
+- Scan what a child can see with `document.querySelector('[data-shot="shell-play"]').innerText`.
 
 ## When does Luna greet on the library, and does her mute work?
 
@@ -398,7 +408,10 @@ Pitfalls that cost time:
 - **Pitfall, a fresh save:** opening Reading on a fresh save lands on Grade
   Select, not the library. Click a grade card before waiting for `hub`.
 - **Pitfall, `ui:shots`:** its run finishes Lesson 1 on a fresh save, so its
-  done screen (`26-reward`) now shows the moon mid-visit. That's expected.
+  done screen (`26-reward`) may show the moon mid-visit, or not: on the shots'
+  frozen page clock no clip plays, and when her clip hasn't started she leaves
+  after 3 s (`MOON_WAIT_MS`), sometimes before the shot. After LVL-1 she was
+  gone by then. Judge the moon with `moon-check.mjs`, not the shots.
 
 ## A tap counts twice, or a drag let go anywhere still counts (BUG-2)
 
@@ -419,6 +432,56 @@ Pitfalls that cost time:
 - **Pitfall, checks that leaned on the bug:** `perch-check.mjs` reached "Hear
   my clue" by trying cookies in turn; one tap used to be two misses. It now
   picks wrong cookies from the round's answer in the game's props.
+
+## Pieces that move every frame, and proving React isn't (GAME-3)
+
+*2026-10-18 · GAME-3*
+
+- **Symptom:** Bubble Sounds' bubbles moved by a `setState` every 60 ms (170
+  React commits in 10 s), jerky, and could overlap or rise in from below the
+  water ("(stage) cut off" in the layout audit).
+- **Fix:** a `requestAnimationFrame` loop writes each bubble's transform to its
+  element (a `.slot` wrapper, so the bubble inside keeps its pop and wobble);
+  React hears only when a bubble comes, goes or is popped. No overlap by
+  construction: lanes a bubble and a bit wide, one speed per round, a new
+  bubble only in a lane whose last one has risen clear, arrivals spaced evenly
+  (crossing ÷ lanes), and the round starts part full at staggered heights.
+  Bubbles come in inside the water and fade out under its top.
+- **Check:** `bubble-check.mjs` samples every frame for 20 s: overlaps, boxes
+  outside the water, a target on screen, the answer's share (GAME-7), and
+  React commits, counted by a stub
+  of `window.__REACT_DEVTOOLS_GLOBAL_HOOK__` installed before the page loads
+  (`onCommitFiberRoot` counts). Counting style changes or child changes isn't
+  enough: the old code passed both.
+- **Pitfall, the purity lint:** `performance.now()` in a click handler tripped
+  `react-hooks/purity`; the click event's `timeStamp` is on the same clock.
+- **Pitfall, a poor shuffle:** `sort(() => Math.random() - 0.5)` laid the
+  first bubbles out as a staircase; use `sample`/`shuffle` from
+  `engine/content.ts`.
+
+## A share that holds in a short play, not just on average (GAME-7)
+
+*2026-10-18 · GAME-7*
+
+- **Symptom:** Bubble Sounds' water was about half the answer at every tier
+  (each bubble 38% the answer, topped up to two answers), and all answer while
+  a child popped fast.
+- **Cause:** the top-up to two answers replaced the regular bubble, so every
+  answer popped brought another in its place, and 38% was the same at every
+  tier.
+- **Fix:** each bubble on the regular rhythm is dealt from a shuffled bag per
+  tier (2 in 7, 1 in 6, 1 in 10), and when no answer is left the next bubble
+  is the answer, at once if it isn't time for one: an extra outside the rhythm,
+  so popping never speeds the answers up.
+- **Pitfall, coin flips:** a per-bubble chance lands on the aim over an hour
+  and still gave 27–66% in a 20 s kindergarten play (streaks). Judge a share
+  over short stretches too; a bag keeps the worst 20 s within about 10 points.
+- **Pitfall, top-ups:** forcing an answer in place of the regular bubble, or
+  topping up to a minimum, pushes the share up the faster the child pops.
+- **Check:** `bubble-share-sim.mjs` (no browser) checks each tier's share,
+  popping and the worst 20 s stretch, and fails with `--before` and `--chance`;
+  `bubble-check.mjs` measures the share in the real game. Keep the sim's
+  lanes (6 at every iPad size) and crossing times in step with the game.
 
 ## A game never asks for some letters (BUG-21)
 
@@ -844,6 +907,14 @@ Pitfalls that cost time:
 ## Checking every lesson's text without a browser
 
 *2026-10-09 · BUG-5*
+
+Since CNT-4 (2026-10-18) `npm run voice:audit` also runs the content rules:
+`distractor-check.mjs` (wrong answers, also-fits lists), `passage-check.mjs`
+(Treasure Path's passages; a claim never copies 4 words of its passage) and a
+picture rule (one picture per word in the bank; CNT-3's stand-ins stay gone).
+A planted bad item of each kind fails it. A planted wrong word that has no
+clip also fails the voice part, so to see which rule caught it, run the two
+checks on their own.
 
 Bundle the curriculum and scan it in plain Node:
 

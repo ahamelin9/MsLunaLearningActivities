@@ -27,6 +27,8 @@ export interface UserProgress {
   stickers: string[];
   /** How many times each mini-game has been finished */
   gamePlays: Record<string, number>;
+  /** the dial last picked on each game's start screen (LVL-2): 1 Warm up, 2 Just right, 3 Tricky */
+  gameDifficulty: Record<string, 1 | 2 | 3>;
   settings: UserSettings;
 }
 

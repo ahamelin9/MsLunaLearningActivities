@@ -506,6 +506,8 @@ export const GameShell: React.FC<GameShellProps> = ({
                       onClick={() => {
                         soundManager.playLetterTap();
                         setDifficulty(level.value);
+                        // the game opens on it next time, after a reload too (LVL-2)
+                        storageService.setGameDifficulty(game.id, level.value);
                       }}
                     >
                       {level.label}

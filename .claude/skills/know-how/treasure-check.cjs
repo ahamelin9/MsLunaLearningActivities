@@ -27,7 +27,7 @@ const CONFIG = {
   chrome: chromePath(),
   grade: Number(process.env.GRADE ?? 0), // 0 Kindergarten, 1 1st grade, 2 2nd grade
   kind: 'game', // 'game' (the play rug) or 'lesson'
-  title: 'Treasure Path' // exactly as on its hub card
+  title: 'Treasure Path' // as on its tile
 };
 
 const sleep = ms => new Promise(r => setTimeout(r, ms));
@@ -36,39 +36,47 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
 async function scenario(page, h) {
   const rounds = [];
   const words = t => t.toLowerCase().replace(/[^a-z'\s]/g, ' ').split(/\s+/).filter(Boolean);
+  // the game's pieces, by data-shot; the answers are the stage's Choices
+  // (data-kind), read by data-state (OPS-9)
+  const at = n => `[data-shot="${n}"]`;
+  const option = '[data-shot="stage"] button[data-kind]';
   const listen = async passage => {
-    await page.click('.speak-chip');
+    await page.click(at('read-to-me'));
     await sleep(passage.split(/[.!?]/).length * 2400 + 4000);
   };
   for (let r = 0; r < 5; r++) {
-    await page.waitForSelector('.treasure-passage');
+    await page.waitForSelector(at('treasure-passage'));
     await sleep(1500);
-    const info = await page.evaluate(() => ({
-      pips: document.querySelector('.round-pips')?.getAttribute('aria-label'),
-      passage: document.querySelector('.treasure-passage').innerText.trim(),
-      kind: document.querySelector('.scroll-claim') ? 'truefalse' : 'cloze',
-      statement: (document.querySelector('.scroll-claim') ?? document.querySelector('.scroll-sentence')).innerText.trim(),
-      locked: document.querySelector('.speak-chip').disabled
-    }));
+    const info = await page.evaluate(() => {
+      const shot = n => document.querySelector(`[data-shot="${n}"]`);
+      return {
+        pips: shot('round-pips')?.getAttribute('aria-label'),
+        passage: shot('treasure-passage').innerText.trim(),
+        kind: shot('treasure-claim') ? 'truefalse' : 'cloze',
+        statement: (shot('treasure-claim') ?? shot('treasure-sentence')).innerText.trim(),
+        locked: shot('read-to-me').disabled
+      };
+    });
     const saidFrom = (await h.said()).length;
     if (!info.locked) await listen(info.passage);
     let solvedAt = null;
     let unlockedAfterMiss = null;
-    const n = (await page.$$('.treasure-option')).length;
+    const n = (await page.$$(option)).length;
     for (let i = 0; i < n && solvedAt === null; i++) {
       const pre = (await h.said()).length;
-      await (await page.$$('.treasure-option'))[i].evaluate(el => el.click());
+      await (await page.$$(option))[i].evaluate(el => el.click());
       await sleep(500);
-      if (await page.$('.treasure-option.is-right')) { solvedAt = pre; break; }
+      if (await page.$(`${option}[data-state~="right"]`)) { solvedAt = pre; break; }
       await sleep(2800); // the hint
       if (info.locked && unlockedAfterMiss === null) {
-        unlockedAfterMiss = await page.$eval('.speak-chip', el => !el.disabled);
+        unlockedAfterMiss = await page.$eval(at('read-to-me'), el => !el.disabled);
         if (unlockedAfterMiss) await listen(info.passage);
       }
     }
     const before = (await h.said()).slice(saidFrom, solvedAt);
-    const answer = await page.evaluate(() =>
-      (document.querySelector('.gap.is-filled') ?? document.querySelector('.treasure-option.is-right')).innerText.replace(/[✅❌]/g, '').trim()
+    const answer = await page.evaluate(
+      o => (document.querySelector('[data-shot="treasure-gap"][data-state~="filled"]') ?? document.querySelector(`${o}[data-state~="right"]`)).innerText.trim(),
+      option
     );
     const sentences = info.passage.split(/(?<=[.!?])\s+/);
     // what was said before the right answer, besides the passage itself
@@ -87,7 +95,10 @@ async function scenario(page, h) {
       saidBesidesPassage: outside
     });
     await page.waitForFunction(
-      p => !document.querySelector('.round-pips') || document.querySelector('.round-pips').getAttribute('aria-label') !== p,
+      p => {
+        const pips = document.querySelector('[data-shot="round-pips"]');
+        return !pips || pips.getAttribute('aria-label') !== p;
+      },
       { timeout: 15000 },
       info.pips
     );
@@ -112,11 +123,12 @@ async function scenario(page, h) {
     // every clip that starts, when it ends, and whether something stopped it
     window.__said = [];
     window.__plays = [];
-    window.__label = '';
+    // each decoded clip's line, set where it is fetched (below)
+    window.__clipText = new WeakMap();
     const start = AudioBufferSourceNode.prototype.start;
     const stop = AudioBufferSourceNode.prototype.stop;
     AudioBufferSourceNode.prototype.start = function (...a) {
-      const rec = { what: window.__label, t0: performance.now(), dur: (this.buffer?.duration ?? 0) * 1000, end: null, cut: false };
+      const rec = { what: window.__clipText.get(this.buffer) ?? '?', t0: performance.now(), dur: (this.buffer?.duration ?? 0) * 1000, end: null, cut: false };
       window.__plays.push(rec);
       this.addEventListener('ended', () => { rec.end = rec.end ?? performance.now(); });
       this.__rec = rec;
@@ -132,36 +144,39 @@ async function scenario(page, h) {
   await page.evaluate(() => localStorage.clear()); // a fresh child
   await page.reload({ waitUntil: 'networkidle0' });
 
-  // the app's own speech module (same instance under Vite): log each utterance
-  // and label the clip it starts
+  // the app's own speech module (same instance under Vite): log each line
+  // asked for, and give each decoded clip its line where it is fetched, so a
+  // clip carries its own label when it starts. (Swapping playBuffer for each
+  // line, as this did before OPS-9, stuck every clip to the first line once
+  // two lines overlapped.)
   await page.evaluate(async () => {
     const { pronunciation } = await import('/src/utils/pronunciation.ts');
     const say = pronunciation.say;
-    pronunciation.say = async function (r, text, o) {
+    pronunciation.say = function (r, text, o) {
       window.__said.push(String(text));
-      const self = this;
-      const play = self.playBuffer;
-      self.playBuffer = function (buf, onEnd) {
-        window.__label = String(text);
-        self.playBuffer = play;
-        return play.call(self, buf, onEnd);
-      };
-      try { return await say.call(this, r, text, o); } finally { self.playBuffer = play; }
+      return say.call(this, r, text, o);
+    };
+    const fetchClip = pronunciation.fetchClip;
+    pronunciation.fetchClip = async function (req) {
+      const buffer = await fetchClip.call(this, req);
+      if (buffer) window.__clipText.set(buffer, String(req.text));
+      return buffer;
     };
   });
 
-  await page.click('.ipad-reading-app-card');
-  await page.waitForSelector('.grade-card-item');
-  await (await page.$$('.grade-card-item'))[CONFIG.grade].click();
-  await page.waitForSelector('.reading-hub');
-  const tiles = await page.$$(CONFIG.kind === 'lesson' ? '.hub-lessons .game-thing' : '.hub-rug .game-thing:not(.nook)');
+  // from home to the game, by the data-shot names (know-how, "Selectors that work")
+  const at = n => `[data-shot="${n}"]`;
+  await page.click(at('open-reading'));
+  await page.waitForSelector(at('grade-card'));
+  await (await page.$$(at('grade-card')))[CONFIG.grade].click();
+  await page.waitForSelector(at('hub'));
   let opened = false;
-  for (const tile of tiles) {
-    if ((await tile.$eval('.thing-title', el => el.textContent.trim())) === CONFIG.title) { await tile.click(); opened = true; break; }
+  for (const tile of await page.$$(at(CONFIG.kind === 'lesson' ? 'lesson-tile' : 'game-tile'))) {
+    if ((await tile.evaluate(el => el.textContent)).includes(CONFIG.title)) { await tile.click(); opened = true; break; }
   }
   if (!opened) throw new Error(`no ${CONFIG.kind} titled "${CONFIG.title}" at grade ${CONFIG.grade}`);
-  await page.click('.play-button');
-  await page.waitForSelector('.game-shell.phase-play');
+  await page.click(at('play'));
+  await page.waitForSelector(at('shell-play'));
   await sleep(2500); // the round's opening line
 
   const h = {

@@ -27,18 +27,26 @@
   overflow: hidden;
 }
 
-// placed by the round as it rises; a bubble is round, never smaller than an answer
-.bubble {
+// a bubble's place in the water: the frame loop moves it up its lane with a
+// transform (GAME-3), so the bubble inside keeps its own pop and wobble
+.slot {
   position: absolute;
+  top: 0;
+  left: 0;
   z-index: var(--z-raised);
-  display: grid;
-  place-items: center;
   width: calc(var(--target-answer) * var(--size, 1));
   height: calc(var(--target-answer) * var(--size, 1));
+}
+
+// a bubble is round, never smaller than an answer
+.bubble {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
   border: var(--border-thick) solid var(--action);
   border-radius: var(--radius-chip);
   background: var(--card);
-  transform: translate(-50%, -50%);
   transition: opacity var(--dur-quick) var(--ease-exit);
 
   // a wrong one: the try-again edge and the shared wobble, and it's gone

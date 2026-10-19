@@ -70,7 +70,8 @@ export const WORDS: WordItem[] = [
   { word: 'seed', emoji: '🌱', initial: 's', cat: 'nature', tier: 2 },
   { word: 'tree', emoji: '🌳', initial: 't', cat: 'nature', tier: 2 },
   { word: 'tent', emoji: '⛺', initial: 't', cat: 'nature', tier: 1 },
-  { word: 'mop', emoji: '🧹', initial: 'm', cat: 'home', tier: 1 },
+  // no emoji draws a mop (it was a broom), so the M word is monkey (CNT-3)
+  { word: 'monkey', emoji: '🐒', initial: 'm', cat: 'animal', tier: 1 },
   { word: 'web', emoji: '🕸️', initial: 'w', cat: 'nature', tier: 1 },
   { word: 'yarn', emoji: '🧶', initial: 'y', cat: 'toy', tier: 2 },
   { word: 'zebra', emoji: '🦓', initial: 'z', cat: 'animal', tier: 2 },
@@ -254,7 +255,8 @@ export const SENTENCES: SentenceItem[] = [
   // tier 2 — 5 to 6 words
   {
     text: 'The little cat is sleeping.',
-    emoji: '😴',
+    // the cat, not a sleepy face (CNT-3)
+    emoji: '🐱',
     tier: 2,
     key: 'sleeping',
     decoys: ['reading', 'driving', 'cooking'],
@@ -301,7 +303,8 @@ export const SENTENCES: SentenceItem[] = [
   // tier 3 — 7+ words
   {
     text: 'The little cat is sleeping under the table.',
-    emoji: '🛋️',
+    // the cat: no emoji draws a table, and a couch isn't one (CNT-3)
+    emoji: '🐱',
     tier: 3,
     key: 'under',
     decoys: ['over', 'before', 'into'],
@@ -825,11 +828,24 @@ export function sample<T>(items: T[], count: number): T[] {
   return shuffle(items).slice(0, count);
 }
 
-/** Grade sets the baseline tier; the difficulty dial nudges it up or down. */
+/**
+ * The content tier each grade and start-screen dial ("Warm up", "Just right",
+ * "Tricky") gives, in one place (LVL-1, Alex's table, 2026-10-18). It replaced
+ * rounding (grade + dial) / 2, which gave kindergarten's "Just right" 1st-grade
+ * content. Every game reads it through tierFor, Luna's Pick included (it
+ * rolls a dial, then reads the table like any game), and so does the voice
+ * warm-up (warmup.ts, on "Just right").
+ */
+export const DIFFICULTY_TABLE: Record<GradeLevel, Record<Difficulty, Difficulty>> = {
+  //            Warm up, Just right, Tricky
+  kindergarten: { 1: 1, 2: 1, 3: 2 },
+  grade1: { 1: 1, 2: 2, 3: 3 },
+  grade2: { 1: 2, 2: 3, 3: 3 }
+};
+
+/** The tier a grade and the dial give: DIFFICULTY_TABLE. */
 export function tierFor(grade: GradeLevel, difficulty: Difficulty): Difficulty {
-  const base = grade === 'kindergarten' ? 1 : grade === 'grade1' ? 2 : 3;
-  const shifted = Math.round((base + difficulty) / 2);
-  return Math.min(3, Math.max(1, shifted)) as Difficulty;
+  return DIFFICULTY_TABLE[grade]?.[difficulty] ?? 1;
 }
 
 /** Words at or below the given tier, so easier content never disappears. */
