@@ -1,7 +1,7 @@
 # LVL — Difficulty (Phase 4)
 
 ### LVL-3 · Adaptive difficulty from skill mastery
-Story · P2 · L · needs: PRG-1
+Story · P2 · L · needs: —
 - **Why:** `skillMastery` is recorded but never read.
 - **How:** track accuracy per skill, then nudge the starting tier up or down. If this doesn't happen, remove `skillMastery`.
 

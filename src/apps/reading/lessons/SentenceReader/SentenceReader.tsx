@@ -19,7 +19,7 @@ export const SentenceReader: React.FC<{ question: SentenceComprehensionQuestion;
   const [active, setActive] = useState<number | null>(null);
 
   const sayPrompt = () => soundManager.speak(question.speechPrompt ?? question.prompt);
-  usePrompt(sayPrompt);
+  usePrompt(sayPrompt, api);
 
   const words = question.sentence.split(' ');
   const keys = new Set((question.highlightWords ?? []).map(w => w.toLowerCase()));

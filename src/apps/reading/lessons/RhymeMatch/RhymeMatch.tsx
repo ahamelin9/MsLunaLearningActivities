@@ -17,7 +17,7 @@ export const RhymeMatch: React.FC<{ question: RhymeMatchQuestion; api: GameApi }
   const { solved, wrongId, revealed, choose } = useAnswer(api, question.hint);
 
   const sayPrompt = () => soundManager.speak(question.speechPrompt ?? question.prompt);
-  usePrompt(sayPrompt);
+  usePrompt(sayPrompt, api);
 
   return (
     <div className={kit.lesson}>

@@ -48,6 +48,8 @@ function buildRound(tier: 1 | 2 | 3): Round {
 const WORD_READ_MS = 1500;
 
 const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
+  // whether this round has an answer yet: its opening question waits for none (BUG-28)
+  const { answered } = api;
   const [slots, setSlots] = useState<(Tile | null)[]>(() => round.words.map(() => null));
   const [readingIndex, setReadingIndex] = useState(-1);
   const [solved, setSolved] = useState(false);
@@ -65,10 +67,11 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
 
   useEffect(() => {
     const t = window.setTimeout(() => {
-      pronunciation.speakText('Put the words in order to make a sentence.');
+      // not once the round has an answer: it would cut it off (BUG-28)
+      if (!answered()) pronunciation.speakText('Put the words in order to make a sentence.');
     }, 500);
     return () => window.clearTimeout(t);
-  }, []);
+  }, [answered]);
 
   const readAloud = (words: string[], onDone?: () => void) => {
     let i = 0;

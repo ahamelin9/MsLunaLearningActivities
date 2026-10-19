@@ -206,6 +206,13 @@ solved) and `read-to-me`; Bubble Sounds' bubbles by
 Prove the check can fail: switch the fix off for a moment (for example, set
 its constant to something huge), rerun, and watch it go ❌, then put the fix
 back. A check that passes either way proves nothing. OPS-6 did this.
+To swap several files back to the commit for one run, keep copies, `git show
+HEAD:<file> > <file>`, run, copy back and `cmp` each. **Pitfall, zsh:** the
+shell here is zsh, which doesn't split `$FILES` into words: a loop over it
+runs once on the whole string, every `cp` fails, and the check quietly runs
+on the new code (PRG-1, 2026-10-19). Use an array,
+`files=(a b c); for f in "${files[@]}"`, and confirm the swap before
+trusting a pass.
 
 To check the app still works offline (fonts and all, as on a classroom iPad
 with no Wi-Fi), run `offline-check.mjs` from this folder (DES-4): it blocks

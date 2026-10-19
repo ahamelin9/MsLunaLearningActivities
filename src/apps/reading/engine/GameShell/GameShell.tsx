@@ -8,6 +8,7 @@ import { lessonStates } from '../lessons';
 import { gameMilestones, lessonMilestones, milestoneId } from '../milestones';
 import { nextSticker, type Sticker } from '../stickers';
 import { starsFor } from '../stars';
+import { estimateMinutes } from '../times';
 import { soundManager } from '@/utils/audio';
 import { pronunciation, type SpeechPart } from '@/utils/pronunciation';
 import { warmGameIntro } from '../warmup';
@@ -37,6 +38,11 @@ interface GameShellProps {
   lessonNumber?: number;
   /** a lesson's grade's lessons, in order: its done screen shows the bar moving on */
   lessons?: AnyGameDef[];
+  /**
+   * The lesson up next, left part-way (PRG-8): its first start picks up after
+   * the rounds already won; "Again" and "Play again" start from round 1
+   */
+  resume?: { won: number; clean: number };
 }
 
 /**
@@ -71,7 +77,8 @@ export const GameShell: React.FC<GameShellProps> = ({
   autoStart = false,
   startDifficulty = 2,
   lessonNumber,
-  lessons
+  lessons,
+  resume
 }) => {
   const [phase, setPhase] = useState<Phase>(autoStart ? 'play' : 'intro');
   const [difficulty, setDifficulty] = useState<Difficulty>(startDifficulty);
@@ -95,11 +102,46 @@ export const GameShell: React.FC<GameShellProps> = ({
   );
 
   const timers = useRef<number[]>([]);
-  const [award, setAward] = useState<{ sticker: Sticker | null; stars: number; points: number; firstTry: number } | null>(null);
+  const [award, setAward] = useState<{
+    sticker: Sticker | null;
+    stars: number;
+    points: number;
+    firstTry: number;
+    /** how long it took, on screen (PRG-6), and "about N min" from before this play */
+    seconds: number;
+    estimate: number;
+  } | null>(null);
+
+  // the time a play takes, counted only while the app is on screen (PRG-6):
+  // it pauses while the tab is hidden or the iPad sleeps
+  const clock = useRef<{ total: number; since: number | null }>({ total: 0, since: null });
+  useEffect(() => {
+    if (phase !== 'play') return;
+    clock.current = { total: 0, since: document.hidden ? null : Date.now() };
+    const onVisibility = () => {
+      const c = clock.current;
+      if (document.hidden && c.since !== null) {
+        c.total += Date.now() - c.since;
+        c.since = null;
+      } else if (!document.hidden && c.since === null) {
+        c.since = Date.now();
+      }
+    };
+    document.addEventListener('visibilitychange', onVisibility);
+    return () => document.removeEventListener('visibilitychange', onVisibility);
+  }, [phase]);
   // a big milestone's visit on the done screen: the moon's line (DES-17)
   const [moon, setMoon] = useState<string | null>(null);
   const wonRef = useRef(0);
   const cleanRef = useRef(0);
+  // this round has had an answer (BUG-28): its opening question then stays quiet
+  const answeredRef = useRef(false);
+  // stable, so a game's opening effect can depend on it without re-running
+  const answered = useCallback(() => answeredRef.current, []);
+  // a part-way lesson's place, used by its first start only (PRG-8)
+  const resumeRef = useRef(
+    game.lesson && resume && resume.won > 0 && resume.won < game.roundsPerPlay ? resume : undefined
+  );
   const recorded = useRef(false);
 
   const later = useCallback((fn: () => void, ms: number) => {
@@ -148,19 +190,25 @@ export const GameShell: React.FC<GameShellProps> = ({
     soundManager.playPop();
     setDifficulty(level);
     setRounds(game.makeRounds({ grade, difficulty: level, count: game.roundsPerPlay }));
-    setRoundIndex(0);
+    answeredRef.current = false;
+    // a lesson left part-way picks up where it was, once (PRG-8)
+    const from = resumeRef.current;
+    resumeRef.current = undefined;
+    setRoundIndex(from?.won ?? 0);
     setAttempts(0);
     setHintLevel(0);
     setHint(null);
-    setRoundsWon(0);
+    setRoundsWon(from?.won ?? 0);
     setDoneBefore(progress.completedLessons);
     setWinStreak(0);
     setPetalFalls(0);
-    wonRef.current = 0;
-    cleanRef.current = 0;
+    wonRef.current = from?.won ?? 0;
+    cleanRef.current = from?.clean ?? 0;
     recorded.current = false;
     setAward(null);
     setMoon(null);
+    // a fresh play, timed from here (also "Again" mid-play)
+    clock.current = { total: 0, since: document.hidden ? null : Date.now() };
     setPhase('play');
   };
 
@@ -174,7 +222,12 @@ export const GameShell: React.FC<GameShellProps> = ({
       // Work the reward out here, while the counters are settled, rather
       // than during a render pass.
       const perfect = cleanRef.current === game.roundsPerPlay;
+      const c = clock.current;
+      const ms = c.total + (c.since !== null ? Date.now() - c.since : 0);
+      clock.current = { total: ms, since: null };
       setAward({
+        seconds: Math.round(ms / 1000),
+        estimate: estimateMinutes(game, progress.times?.[game.id]),
         sticker: nextSticker(progress.stickers, game.sticker),
         // 1–3 by how it went, the same rule for games and lessons (PRG-1)
         stars: starsFor(cleanRef.current, game.roundsPerPlay),
@@ -183,9 +236,15 @@ export const GameShell: React.FC<GameShellProps> = ({
       });
       setPhase('reward');
     } else {
+      // the lesson up next remembers how far it got (PRG-8); a game, or a
+      // lesson already done, starts from round 1 every time
+      if (game.lesson && !progress.completedLessons.includes(game.lesson.id)) {
+        storageService.setPartway(game.lesson.id, wonRef.current, cleanRef.current);
+      }
+      answeredRef.current = false;
       setRoundIndex(roundIndex + 1);
     }
-  }, [game.lesson, game.roundsPerPlay, game.sticker, progress.stickers, roundIndex]);
+  }, [game, progress.completedLessons, progress.stickers, progress.times, roundIndex]);
 
   // the words Luna's line must not have (BUG-27): a round's heard-only word
   const hiddenAt = useCallback(
@@ -309,18 +368,21 @@ export const GameShell: React.FC<GameShellProps> = ({
       lunaLine?: string;
       delay?: number;
       reveal?: () => void;
-    }) =>
+    }) => {
+      answeredRef.current = true;
       sayThen(opts.say, opts.correct ? ANSWER_WATCHDOG_RIGHT_MS : ANSWER_WATCHDOG_WRONG_MS, () =>
         opts.correct
           ? handleWin({ lunaLine: opts.lunaLine, delay: opts.delay })
           : handleMiss({ lunaLine: opts.lunaLine, hint: opts.hint, reveal: opts.reveal })
-      ),
+      );
+    },
     [sayThen, handleWin, handleMiss]
   );
 
   // a small good beat; its `say` (the word found) is said whole first (FB-1)
   const handleTick = useCallback(
     (opts?: { lunaLine?: string; say?: SpeechPart[] }) => {
+      answeredRef.current = true;
       soundManager.playLetterSnap();
       sayThen(opts?.say, ANSWER_WATCHDOG_WRONG_MS, () => {
         if (opts?.lunaLine) speak(opts.lunaLine, 'happy');
@@ -340,11 +402,12 @@ export const GameShell: React.FC<GameShellProps> = ({
       attempts,
       hintLevel,
       locked: flash === 'win' || answering,
+      answered,
       answer: handleAnswer,
       tick: handleTick,
       say: (text: string, m: LunaMood = 'happy') => speak(text, m)
     }),
-    [ctx, attempts, hintLevel, flash, answering, handleAnswer, handleTick, speak]
+    [ctx, attempts, hintLevel, flash, answering, answered, handleAnswer, handleTick, speak]
   );
 
   // The done screen's side effects: save progress, the fanfare, Luna's
@@ -356,6 +419,9 @@ export const GameShell: React.FC<GameShellProps> = ({
     // Luna's closing line, and the sticker's after it
     const closing = () =>
       speak(lunaSay('finish', game.id).text, 'cheer', award.sticker ? [{ text: award.sticker.line }] : []);
+
+    // how long it took, and today's minutes with it (PRG-6)
+    storageService.recordTime(game.id, award.seconds);
 
     let reached: Milestone[];
     if (game.lesson) {

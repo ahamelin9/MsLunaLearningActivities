@@ -89,6 +89,8 @@ export const ReadingApp: React.FC<ReadingAppProps> = ({ progress, onReturnToHome
         // the next one's index is this lesson's number on the path
         lessonNumber={game.lesson ? next : undefined}
         lessons={game.lesson ? lessons : undefined}
+        // the lesson up next, left part-way, picks up where it was (PRG-8)
+        resume={game.lesson && !progress.completedLessons.includes(game.lesson.id) ? progress.partway?.[game.lesson.id] : undefined}
         onExit={() => {
           const now = lessonStates(lessons, progress.completedLessons);
           const i = now.findIndex((state, n) => state !== 'locked' && statesBefore.current[n] === 'locked');

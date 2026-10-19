@@ -5,6 +5,7 @@ import { soundManager } from '@/utils/audio';
 import { pronunciation } from '@/utils/pronunciation';
 import { afterMotion } from '@/utils/motion';
 import { Chip, ChunkyButton, Icon, Luna, MilestoneMoon, PaperCard, Petals, ProgressBar, StarRow } from '@/components/kit';
+import { minutesOf } from '@/utils/storage';
 import styles from './DoneScreen.module.scss';
 
 /** A finished lesson's place on the path, as the result is saved. */
@@ -19,7 +20,7 @@ export interface LessonPath {
 interface DoneScreenProps {
   game: AnyGameDef;
   /** `firstTry`: the rounds answered right the first time, which the stars count (PRG-1) */
-  award: { sticker: Sticker | null; stars: number; points: number; firstTry: number } | null;
+  award: { sticker: Sticker | null; stars: number; points: number; firstTry: number; seconds: number; estimate: number } | null;
   /** a lesson's bar and the lesson it opened; left out for a game */
   path?: LessonPath;
   onPlayAgain: () => void;
@@ -150,6 +151,21 @@ export const DoneScreen: React.FC<DoneScreenProps> = ({
 
         {/* ---- the path, the reward, what next ---- */}
         <div className={styles.next}>
+          {/* how long it took, beside "about N min" from before (PRG-6, the Done board) */}
+          {award && (
+            <section className={styles.lessons} data-shot="done-time">
+              <h3 className={styles.label}>Time</h3>
+              <span className={styles.times}>
+                <Chip variant="took" icon="clock">
+                  You took {minutesOf(award.seconds)} {minutesOf(award.seconds) === 1 ? 'minute' : 'minutes'}
+                </Chip>
+                <Chip variant="time">
+                  this {game.lesson ? 'lesson' : 'game'} is about {award.estimate} min
+                </Chip>
+              </span>
+            </section>
+          )}
+
           {path && (
             <section className={styles.lessons}>
               <h3 className={styles.label}>Your lessons</h3>

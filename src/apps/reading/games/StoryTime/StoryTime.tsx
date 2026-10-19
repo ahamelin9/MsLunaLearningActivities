@@ -33,6 +33,8 @@ function buildRound(story: MiniStory): Round {
 const QUESTION_AFTER_FOUND_MS = 3400;
 
 const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
+  // whether this round has an answer yet: its opening question waits for none (BUG-28)
+  const { answered: roundAnswered } = api;
   const [revealed, setRevealed] = useState(1);
   const [phase, setPhase] = useState<'read' | 'hunt' | 'question'>('read');
   const [foundWord, setFoundWord] = useState(false);
@@ -61,10 +63,12 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
   // way "Next line" reads every line after it.
   useEffect(() => {
     const t = window.setTimeout(() => {
+      // not once the round has an answer: it would cut it off (BUG-28)
+      if (roundAnswered()) return;
       pronunciation.speakSequence(readAlong ? [{ text: story.title }, { text: story.lines[0] }] : [{ text: story.title }]);
     }, 500);
     return () => window.clearTimeout(t);
-  }, [story, readAlong]);
+  }, [story, readAlong, roundAnswered]);
 
   const readLine = (index: number) => {
     soundManager.playLetterTap();
@@ -269,6 +273,8 @@ export const storyTime: GameDef<Round> = {
   skill: 'reading',
   mission: 'Snuggle in. This one is short, I promise.',
   roundsPerPlay: 2,
+  // a story read line by line, a word hunt and a question (PRG-6's first guess)
+  roundSeconds: 90,
   shape: 'book',
   sticker: 'book',
   makeRounds: ({ grade, difficulty, count }) => {

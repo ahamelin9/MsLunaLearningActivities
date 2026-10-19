@@ -74,6 +74,8 @@ function makeBubble(round: Round, lane: number, born: number, isTarget: boolean)
 }
 
 const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
+  // whether this round has an answer yet: its opening question waits for none (BUG-28)
+  const { answered } = api;
   const [bubbles, setBubbles] = useState<Bubble[]>([]);
   const [popped, setPopped] = useState(0);
   // "show me" (FB-2): the bubbles that make the sound are pointed at from the third miss
@@ -90,9 +92,10 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
   }, [round.letter]);
 
   useEffect(() => {
-    const t = window.setTimeout(sayTarget, 500);
+    // not once the round has an answer: it would cut it off (BUG-28)
+    const t = window.setTimeout(() => !answered() && sayTarget(), 500);
     return () => window.clearTimeout(t);
-  }, [sayTarget]);
+  }, [sayTarget, answered]);
 
   // The float loop (GAME-3): bubbles rise by a transform written straight to
   // their element each frame, so React only hears of a bubble when it comes,

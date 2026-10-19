@@ -76,6 +76,17 @@ Task · P2 · S · needs: —
   - ListenCue uses the shared arch, and its shots don't change;
   - `components/kit` is still at zero.
 
+### DES-27 · Our own pictures instead of emoji
+Story · P2 · L · needs: — · split into batches before starting
+- **Why:** Alex (2026-10-19): an emoji is drawn by each device's own font, so the app's pictures look like Apple's on the iPads, Google's on a Chromebook and Microsoft's on Windows, in different styles and sometimes colours (a "blue cap" story only matches Apple's 🧢). Apple's emoji can't be shipped to other devices (Apple's license; the repo is public). His call: "make our own emoji system that matches the look and feel of the current app", as Luna, the moon, the cookies and the squishies already are.
+- **How:**
+  - A kit `Picture` component: a picture by name (`<Picture name="cap" />`), drawn as an SVG in the illustration style (`_illustration.scss` colours, the `line` outline, soft and round like the squishies), in light and dark. Until a name is drawn it shows the emoji, so screens move over one picture at a time.
+  - Every picture the app shows goes through it: the word bank, lessons' options, Treasure Path's passages, Story Corner's stories, the game tiles (about 200 emoji in `src` today, fewer once the same ones are counted once).
+  - Batches, most-seen first: the word bank's 100 words (every game draws on them), then lessons, then passages and stories. Each batch is its own ticket, and Alex (and the teacher) OK a sample sheet before the batch is drawn.
+  - The content checks learn the names: one picture per word (CNT-4's rule) and each story's picture matching it carry over.
+  - Stopgap if wanted before then: bundle one free emoji set (Microsoft's Fluent Emoji, MIT, the softest style and closest to Apple's; or Google's Noto, OFL), trimmed to the pictures used, so every device matches. Alex to pick, or skip it.
+- **Complete when:** no screen shows a system emoji; every picture is a kit `Picture` that looks the same on an iPad, a Chromebook and Windows (shots from Chrome and Safari match); the Kit page shows them all in light and dark; the teacher has OKed the look.
+
 ### DES-16 · Light and dark mode
 Story · P1 · M · needs: —
 - **Blocked (2026-10-18): waits only for Alex's dark check on the real iPad.** Built, checked and committed (`theme-check.mjs` 22 of 22, lint, shots, the layout audit at K; sheet `screenshots/review/des16-light-and-dark.png`); Alex OKed the rest, and the choice now reads "Match the system". Once he's seen every screen in dark on the iPad, it closes out.

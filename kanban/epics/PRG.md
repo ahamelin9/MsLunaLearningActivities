@@ -1,13 +1,5 @@
 # PRG — Progress & rewards (Phase 7)
 
-### PRG-1 · Stars reflect performance
-Story · P1 · M
-- **Why:** today stars equal the number of rounds (Feed Luna 5–6, Muddled Cards 2–3) whatever the performance, and lessons can be replayed for the same stars.
-- **How:** award 1–3 stars based on clean rounds, on the same scale for games and lessons. Replaying keeps your best result instead of adding more.
-- **Complete when:** every game and lesson earns 1–3 stars by the same rule, and replaying never adds stars beyond your best.
-- **Decided (Alex, 2026-10-19):** the rule as proposed: 3 stars when every round is right the first time, 2 when at least half are, 1 for finishing (`engine/stars.ts`). With it, the done screen's "4 of 4 solved" becomes "N of 4 first try", and the 50-star trophy comes down to 30 (the most a child can hold is now 60). Time counting toward stars is PRG-10, after PRG-6 measures it.
-- **Blocked (2026-10-19): built and checked; waits for Alex's OK on the sheet.** `starsFor(clean, rounds)` in `engine/stars.ts` gives every game and lesson its stars; the save keeps each one's best (`bestStars`) and a play adds only the stars above it; a save from before counts whatever it finished as a best of 3, so no child loses a star. The done screen says "N of M first try"; Super Star Champion is at 30. `stars-check.mjs` (know-how) plays Lesson 1 three ways and Letter Cookies two, plus an old save: 3/2/1 stars as the rule says, the total never rising on a replay below the best; on the commit before, every play showed 3 and the total grew each time. Moon, perch and lesson-order checks pass; lint, build; `ui:shots`: the done screen's stars and line, and the trophy's text. Sheet: `screenshots/review/prg1-stars.png`.
-
 ### PRG-2 · Points: remove or give them a meaning
 Story · P2 · S
 - **Why:** points are shown next to stars but mean nothing to a child.
@@ -19,6 +11,7 @@ Task · P2 · S
 - **How:** check every achievement when progress is saved, and add a "new" state that clears the trophy dot (BUG-13).
 
 - **Complete when:** achievements are checked only in `utils/storage.ts`, `TrophyModal` only reads them, and BUG-13 is closed.
+- **Blocked (2026-10-19): built and checked; waits for Alex's OK, and his call on BUG-13.** `withEarned` in `utils/storage.ts` adds every achievement whose rule in `data/achievements.ts` is met, on every save and on load; the hard-coded list is gone, and with it two slips: "First Word Wonder" unlocked from a game, and Super Star still at 50 after PRG-1 moved it to 30. The Trophy room only reads `unlockedAchievements`. `achievements-check.mjs` (know-how) passes, and fails on the commit before (5 of 7). No screen changed (`ui:shots --diff` 0). BUG-13's dot no longer exists (the Trophy room opens from the library's "My trophies" since DES-21, with no dot), so it's Alex's call: close BUG-13, or add a "new" dot to "My trophies".
 
 ### PRG-4 · Secret platinum trophy for a full squishy shelf
 Story · P2 · S · needs: PRG-3, PRG-5
@@ -47,6 +40,11 @@ Story · P1 · M · needs: —
   - Old saves keep their count: each sticker id maps to a squishy, so no child loses anything. The saved field can stay `stickers`.
   - Lessons and games keep their signature reward (`SIGNATURE_STICKER` in `engine/lessons.ts`, `nextSticker` in `engine/stickers.ts`).
   - **Built from the kit (DES-7c):** `Squishy`, `SquishyDots` and the Chip's `rare`/`super-rare` tags with `shimmer`. The kit draws eight kinds in the seven palette colours that have outlines (oat, caramel, toffee, cream; blush, butter; honey). Still to add here: outline colours for cocoa, sage, sky and lilac (Alex OKs them on the Kit page), the super-rare swirl, more kinds (dumpling…), and the small press under reduced motion, where the kit's squish is simply off.
+- **Blocked (2026-10-19): read against the code and the boards; waits for Alex on a split and four calls before it's built.** It's bigger than M, and a few of its choices are his (and the teacher's). Proposal, a recommendation each:
+  1. **Split:** PRG-5a now, the collection, the shelf page (R2Squishies), the library's Squishy Shelf card (R2Library), the done screen, the odds and old saves, with the 8 kinds and 7 colours the kit draws today; PRG-5b later, the board's other 10 kinds, the 4 colours still without outlines (cocoa, sage, sky, lilac) and the super-rare swirl, as artwork for him and the teacher to OK first.
+  2. **Colours per kind:** each kind comes in 3, like the board's 3 dots: its own usual colour, one rare tint and the super-rare one (honey, until 5b's swirl). 24 to collect at first.
+  3. **The count:** kinds found out of all kinds ("5 of 8" now, "of 18" after 5b), as on the board's pill and the library card.
+  4. **Old stickers:** each of the 18 becomes a squishy, the usual colours first, then rare ones, so a child's count doesn't drop. Odds as the ticket proposes: 1 in 8 rare, 1 in 40 super rare.
 - **Complete when:**
   - no emoji appears on the shelf, the reward screen or the home screen;
   - finishing a lesson or game puts a squishy on the shelf;
@@ -61,7 +59,7 @@ Story · P1 · S · needs: PRG-5
 - **Complete when:** a game's done screen shows the shelf on the right at all four sizes, light and dark, with no empty half; a lesson's still shows its bar; checked in `ui:shots` and against the Done board.
 
 ### PRG-10 · Time counts toward stars
-Story · P2 · S · needs: PRG-1, PRG-6
+Story · P2 · S · needs: PRG-6
 - **Why:** Alex (2026-10-19): on top of PRG-1's first-try rule, "maybe also we introduce some kind of timing", based on the time tags each lesson shows (PRG-6), and the Play Shelf's too, adjusted as plays come in.
 - **How:** once PRG-6 shows an estimate on each lesson and game, let a play's time count toward its stars, in `engine/stars.ts` with the first-try rule. Proposal to confirm with Alex: time never costs a child a star they earned by reading well (slow, careful reading is the goal for ESL K–2), so it lifts instead: a play well inside its estimate can earn the next star up, or a 3-star play needs to finish within about twice the estimate. Use real averages once a few plays are saved, as PRG-6 does.
 - **Complete when:** the rule Alex picks is in `engine/stars.ts`, a check plays fast and slow runs and gets the stars it says, and the done screen says what earned them in kid words.
@@ -82,6 +80,7 @@ Story · P1 · M · needs: —
   - after a lesson, the done screen shows the minutes it took, and the hub's "Today" total goes up by the same amount;
   - hiding the tab for a minute mid-lesson doesn't add that minute;
   - the times survive a reload, and older saves load without errors.
+- **Blocked (2026-10-19): built and checked; waits for Alex's OK on the look.** The shell times each play while the app is on screen (it pauses on `visibilitychange`); the save keeps each lesson's and game's last, best, total and plays (`times`) and today's minutes (`today`, the iPad's own day). `engine/times.ts` estimates "about N min": rounds × a typical round (60 s a lesson round, 40 s a game's, or a game's own `roundSeconds`: Story Corner 90, Muddled Cards 75, Treasure Path 60), then the average of its plays once there are 3. The library: "took N min" on a done lesson, "about N min" on the rest and, as Alex asked, on every game tile (kit Tile's new `minutes`, on its Kit page, with a `kit-check.mjs` line); a Today panel between the Sticker Tin and Luna's Pick ("0 min reading · 0 of 6 lessons done"; on a portrait iPad a slim row of its own). The done screen: "You took N minutes" beside "this lesson is about M min", as on the Done board; today adds the same rounded minutes, so they always agree. `time-check.mjs` (know-how) moves the page's clock and hides the tab: all its points pass; with the pause switched off the hidden minute counts, and on the commit before there are no times at all.
 
 ### PRG-8 · Pick up a lesson where you left off
 Story · P1 · M · needs: —
@@ -97,4 +96,5 @@ Story · P1 · M · needs: —
   - finishing it clears the bar and marks it done;
   - games and done lessons always start at round 1;
   - it survives a reload, and older saves load without errors.
+- **Blocked (2026-10-19): built and checked; waits for Alex's OK.** The save keeps `partway` per lesson (rounds won and how many first time, so a resumed lesson can still earn 3 stars), set as each round of the lesson up next is won and cleared when it's finished. The shell's first start of that lesson picks up after them (`resume`, used once: "Again" and "Play again" start on round 1); the up-next LessonCard shows the kit's thin rounds bar. `partway-check.mjs` (know-how): leave after 2 rounds, the bar shows 2 and it reopens on round 3, after a reload too; finishing gives 3 stars and clears it; "Play again", the done lesson and a game start on round 1; an older save loads clean. On the commit before, leaving restarted the lesson. Stars, time and lesson-order checks still pass; lint; `ui:shots --diff` 0 (a fresh save has nothing part-way). Note for Alex: a lesson left part-way doesn't add its minutes to Today; PRG-6 saves time when a play finishes. Sheet: `screenshots/review/prg8-partway.png`.
 

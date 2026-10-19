@@ -18,7 +18,7 @@ export const LetterHunter: React.FC<{ question: FindLetterQuestion; api: GameApi
     if (question.speechPrompt) soundManager.speak(question.speechPrompt);
     else pronunciation.speakSequence([{ text: 'Find the letter' }, { name: question.targetLetter }]);
   };
-  usePrompt(sayPrompt);
+  usePrompt(sayPrompt, api);
 
   return (
     <div className={kit.lesson}>

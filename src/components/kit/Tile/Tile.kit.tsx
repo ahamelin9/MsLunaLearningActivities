@@ -32,6 +32,14 @@ export default function TileKit() {
           <Tile name="Story Corner" picture={<Icon name="book" size={32} />} data-state="pressed" style={{ flex: 1 }} />
         </Specimen>
       </Specimens>
+      <Specimens title="with a time: a game's &quot;about N min&quot; (PRG-6)">
+        <Specimen label="minutes={4}" wide>
+          <Tile name="Bubble Sounds" tint={2} minutes={4} picture={<Icon name="ear" size={32} />} style={{ flex: 1 }} />
+        </Specimen>
+        <Specimen label="no minutes: none" wide>
+          <Tile name="Bubble Sounds" tint={2} picture={<Icon name="ear" size={32} />} style={{ flex: 1 }} />
+        </Specimen>
+      </Specimens>
       <Specimens title="a pick-one set: the picked one is aria-pressed (DES-9c)">
         {(['Kindergarten', '1st Grade', '2nd Grade'] as const).map((name, i) => (
           <Specimen key={name} label={i === 1 ? 'picked' : 'not picked'} wide>

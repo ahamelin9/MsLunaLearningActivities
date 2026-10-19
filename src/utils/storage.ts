@@ -3,6 +3,7 @@ import type { GradeLevel } from '../types/reading';
 import type { UserProgress, UserSettings } from '../types/user';
 import { soundManager } from './audio';
 import { DEFAULT_VOICE_ID, pronunciation } from './pronunciation';
+import { ACHIEVEMENTS } from '../data/achievements';
 
 const STORAGE_KEY = 'ms_luna_learning_progress_v1';
 
@@ -37,8 +38,25 @@ export const DEFAULT_PROGRESS: UserProgress = {
   gamePlays: {},
   gameDifficulty: {},
   bestStars: {},
+  times: {},
+  partway: {},
+  today: { day: '', minutes: 0 },
   settings: DEFAULT_SETTINGS
 };
+
+/**
+ * Every achievement worked out in one place (PRG-3), from its own rule in
+ * `data/achievements.ts`: each one met and not yet unlocked is added. Run on
+ * every save and on load, so an older save gets what it has earned; the
+ * Trophy room only reads `unlockedAchievements`.
+ */
+function withEarned(progress: UserProgress): UserProgress {
+  const earned = ACHIEVEMENTS.filter(a => !progress.unlockedAchievements.includes(a.id) && a.requirement(progress)).map(a => a.id);
+  return earned.length ? { ...progress, unlockedAchievements: [...progress.unlockedAchievements, ...earned] } : progress;
+}
+
+/** A time in whole minutes, as a child sees it: never under one (PRG-6). */
+export const minutesOf = (seconds: number): number => Math.max(1, Math.round(seconds / 60));
 
 /**
  * A save from before PRG-1 has no best stars, and its stars were paid per
@@ -75,7 +93,8 @@ class StorageService {
         ...DEFAULT_SETTINGS,
         ...savedSettings
       };
-      return {
+      // what an older save has already earned, unlocked now (PRG-3)
+      return withEarned({
         ...DEFAULT_PROGRESS,
         ...parsed,
         selectedGrade: parsed.selectedGrade || null,
@@ -83,8 +102,13 @@ class StorageService {
         gamePlays: parsed.gamePlays && typeof parsed.gamePlays === 'object' ? parsed.gamePlays : {},
         gameDifficulty: parsed.gameDifficulty && typeof parsed.gameDifficulty === 'object' ? parsed.gameDifficulty : {},
         bestStars: bestStarsOf(parsed),
+        // an older save has no times yet (PRG-6)
+        times: parsed.times && typeof parsed.times === 'object' ? parsed.times : {},
+        // an older save has nothing part-way (PRG-8)
+        partway: parsed.partway && typeof parsed.partway === 'object' ? parsed.partway : {},
+        today: parsed.today && typeof parsed.today.day === 'string' ? parsed.today : { day: '', minutes: 0 },
         settings: loadedSettings
-      };
+      });
     } catch (e) {
       console.error('Failed to load user progress:', e);
       return { ...DEFAULT_PROGRESS };
@@ -92,6 +116,7 @@ class StorageService {
   }
 
   private persist() {
+    this.progress = withEarned(this.progress);
     if (typeof window === 'undefined') return;
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(this.progress));
@@ -160,6 +185,7 @@ class StorageService {
     /** lessons run in the game shell, so finishing one can peel a sticker too */
     stickerId?: string | null
   ): { isFirstCompletion: boolean; newAchievements: string[] } {
+    const unlockedBefore = this.progress.unlockedAchievements;
     const isFirstCompletion = !this.progress.completedLessons.includes(lessonId);
 
     const updatedCompleted = isFirstCompletion
@@ -178,10 +204,6 @@ class StorageService {
     const totalStars = this.progress.totalStars + gain;
     const totalPoints = this.progress.totalPoints + pointsEarned;
 
-    const { updatedAchievements, newAchievements } = this.checkAchievements(
-      updatedCompleted.length,
-      totalStars
-    );
 
     const stickers = stickerId && !this.progress.stickers.includes(stickerId)
       ? [...this.progress.stickers, stickerId]
@@ -195,13 +217,14 @@ class StorageService {
       totalPoints,
       skillMastery: updatedMastery,
       bestStars,
+      // finished: nothing part-way any more (PRG-8)
+      partway: Object.fromEntries(Object.entries(this.progress.partway).filter(([id]) => id !== lessonId)),
       streakDays: streak,
-      lastPlayedDate: today,
-      unlockedAchievements: updatedAchievements
+      lastPlayedDate: today
     };
 
     this.persist();
-    return { isFirstCompletion, newAchievements };
+    return { isFirstCompletion, newAchievements: this.progress.unlockedAchievements.filter(id => !unlockedBefore.includes(id)) };
   }
 
   /** What a play's stars add: only those above this game's or lesson's best (PRG-1). */
@@ -234,28 +257,6 @@ class StorageService {
     return { streak, today };
   }
 
-  private checkAchievements(
-    completedCount: number,
-    totalStars: number
-  ): { updatedAchievements: string[]; newAchievements: string[] } {
-    const updatedAchievements = [...this.progress.unlockedAchievements];
-    const newAchievements: string[] = [];
-
-    const unlock = (id: string, condition: boolean) => {
-      if (condition && !updatedAchievements.includes(id)) {
-        updatedAchievements.push(id);
-        newAchievements.push(id);
-      }
-    };
-
-    unlock('first_step', completedCount >= 1);
-    unlock('star_collector', totalStars >= 10);
-    unlock('super_star', totalStars >= 50);
-    unlock('bookworm', completedCount >= 5);
-
-    return { updatedAchievements, newAchievements };
-  }
-
   /**
    * Records a finished mini-game: stars, points, play count and any
    * sticker peeled off Luna's sheet.
@@ -267,6 +268,7 @@ class StorageService {
     stickerId?: string | null;
   }): { newAchievements: string[] } {
     const { gameId, starsEarned, pointsEarned, stickerId } = opts;
+    const unlockedBefore = this.progress.unlockedAchievements;
     const { streak, today } = this.computeStreak();
 
     const { gain, bestStars } = this.starsAbove(gameId, starsEarned);
@@ -282,12 +284,6 @@ class StorageService {
       [gameId]: (this.progress.gamePlays[gameId] || 0) + 1
     };
 
-    const playedCount = Object.values(gamePlays).reduce((sum, n) => sum + n, 0);
-    const { updatedAchievements, newAchievements } = this.checkAchievements(
-      this.progress.completedLessons.length + playedCount,
-      totalStars
-    );
-
     this.progress = {
       ...this.progress,
       totalStars,
@@ -296,12 +292,46 @@ class StorageService {
       gamePlays,
       bestStars,
       streakDays: streak,
-      lastPlayedDate: today,
-      unlockedAchievements: updatedAchievements
+      lastPlayedDate: today
     };
 
     this.persist();
-    return { newAchievements };
+    return { newAchievements: this.progress.unlockedAchievements.filter(id => !unlockedBefore.includes(id)) };
+  }
+
+  /**
+   * Saves how long a play of a lesson or game took (PRG-6), and adds its
+   * minutes, as the done screen shows them, to today's.
+   */
+  public recordTime(id: string, seconds: number) {
+    const was = this.progress.times[id];
+    const day = localDay(new Date());
+    const today = this.progress.today.day === day ? this.progress.today.minutes : 0;
+    this.progress = {
+      ...this.progress,
+      times: {
+        ...this.progress.times,
+        [id]: {
+          last: seconds,
+          best: was ? Math.min(was.best, seconds) : seconds,
+          plays: (was?.plays ?? 0) + 1,
+          total: (was?.total ?? 0) + seconds
+        }
+      },
+      today: { day, minutes: today + minutesOf(seconds) }
+    };
+    this.persist();
+  }
+
+  /** Saves how far into the lesson up next a child is (PRG-8): its rounds won, and how many first time. */
+  public setPartway(lessonId: string, won: number, clean: number) {
+    this.progress = { ...this.progress, partway: { ...this.progress.partway, [lessonId]: { won, clean } } };
+    this.persist();
+  }
+
+  /** The minutes read today, on the iPad's own day (PRG-6). */
+  public todayMinutes(): number {
+    return this.progress.today.day === localDay(new Date()) ? this.progress.today.minutes : 0;
   }
 
   /** Remembers the dial picked on a game's start screen (LVL-2). */

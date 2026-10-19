@@ -28,7 +28,7 @@ export const StoryReader: React.FC<{ question: StoryReadQuestion; api: GameApi }
   const [activeLine, setActiveLine] = useState<number | null>(null);
   const [activeWord, setActiveWord] = useState<string | null>(null);
 
-  usePrompt(() => soundManager.speak(question.speechPrompt ?? question.prompt));
+  usePrompt(() => soundManager.speak(question.speechPrompt ?? question.prompt), api);
 
   const readLine = (index: number) => {
     soundManager.playLetterTap();

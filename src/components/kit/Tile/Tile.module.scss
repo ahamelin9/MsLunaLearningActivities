@@ -49,7 +49,15 @@
   color: var(--tile-picture-ink);
 }
 
-.name {
+// the name, and under it a game's time when it has one (PRG-6)
+.words {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-2);
   padding: var(--space-3) var(--space-4);
+}
+
+.name {
   font: var(--text-label);
 }

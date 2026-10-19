@@ -15,7 +15,7 @@ export const ReadAndMatch: React.FC<{ question: ReadAndMatchQuestion; api: GameA
 
   // the word is the child's to read: Luna never says it until it is found
   const sayPrompt = () => soundManager.speak(question.speechPrompt ?? 'Read the word, then find its picture.');
-  usePrompt(sayPrompt);
+  usePrompt(sayPrompt, api);
 
   return (
     <div className={kit.lesson}>

@@ -123,6 +123,19 @@ ok('a Tile shows the focus ring when tabbed to', tileRing === 'solid 3px', tileR
 // 5. Tile pressed state and the Icon's label rule
 ok('icons without a label are hidden from screen readers', await page.evaluate(() => [...document.querySelectorAll('svg[viewBox="0 0 24 24"]')].every(s => s.getAttribute('aria-hidden') === 'true' || s.getAttribute('aria-label'))));
 ok('every kit Tile carries data-shot="tile-title"', await page.evaluate(() => [...document.querySelectorAll('button[data-tint]')].every(t => t.querySelector('[data-shot="tile-title"]'))));
+// PRG-6: a Tile given minutes shows "about N min" under its name, below the
+// name and inside the tile; one without shows none
+const tileTimes = await page.evaluate(() => {
+  const tiles = [...document.querySelectorAll('button[data-tint]')].filter(t => t.textContent.includes('Bubble Sounds'));
+  return tiles.map(t => {
+    const name = t.querySelector('[data-shot="tile-title"]').getBoundingClientRect();
+    const chip = [...t.querySelectorAll('span')].find(s => /^about \d+ min$/.test(s.textContent.trim()) && s.children.length > 0);
+    const box = t.getBoundingClientRect();
+    const c = chip?.getBoundingClientRect();
+    return { time: chip?.textContent.trim() ?? null, below: c ? c.top >= name.bottom - 1 && c.bottom <= box.bottom + 1 : null };
+  });
+});
+ok('a Tile with minutes shows "about 4 min" under its name; without, no time', tileTimes.some(t => t.time === 'about 4 min' && t.below) && tileTimes.some(t => t.time === null), JSON.stringify(tileTimes));
 
 // ── DES-7b ────────────────────────────────────────────────────────────────
 const sleep = ms => new Promise(r => setTimeout(r, ms));

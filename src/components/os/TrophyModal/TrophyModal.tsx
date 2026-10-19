@@ -47,7 +47,8 @@ export const TrophyModal: React.FC<TrophyModalProps> = ({ isOpen, progress, onCl
       <h3 className={styles.heading}>Badges</h3>
       <ul className={styles.badges}>
         {ACHIEVEMENTS.map(badge => {
-          const won = progress.unlockedAchievements.includes(badge.id) || badge.requirement(progress);
+          // worked out when progress is saved (PRG-3): the room only reads it
+          const won = progress.unlockedAchievements.includes(badge.id);
           return (
             <li key={badge.id} className={styles.badge} data-state={won ? 'won' : 'locked'}>
               <span className={styles.badgePicture} aria-hidden="true">

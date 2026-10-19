@@ -24,7 +24,7 @@ export const SightWordReader: React.FC<{ question: SightWordReaderQuestion; api:
     if (question.speechPrompt) soundManager.speak(question.speechPrompt);
     else pronunciation.speakSequence([{ text: 'Find the word' }, { word: question.word }]);
   };
-  usePrompt(sayPrompt);
+  usePrompt(sayPrompt, api);
 
   // the example sentence is the reward once the word is found, the word in it marked
   const sentence = question.exampleSentence.split(/\s+/).map((token, i) => ({

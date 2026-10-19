@@ -16,7 +16,7 @@ export const BlendAndRead: React.FC<{ question: BlendAndReadQuestion; api: GameA
   const [active, setActive] = useState<number | null>(null);
 
   const sayPrompt = () => soundManager.speak(question.speechPrompt ?? 'Blend the sounds to read the word!');
-  usePrompt(sayPrompt);
+  usePrompt(sayPrompt, api);
 
   const playSound = (index: number) => {
     soundManager.playLetterTap();

@@ -9,10 +9,13 @@ import { afterMotion } from '@/utils/motion';
 import type { GameApi } from '../../engine/types';
 import type { SpeechPart } from '@/utils/pronunciation';
 
-/** Says the question's prompt once, a moment after it appears. */
-export function usePrompt(say: () => void) {
+/**
+ * Says the question's prompt once, a moment after it appears, unless the
+ * child has already answered: it would cut their answer off (BUG-28).
+ */
+export function usePrompt(say: () => void, api: GameApi) {
   useEffect(() => {
-    const id = window.setTimeout(say, 450);
+    const id = window.setTimeout(() => !api.answered() && say(), 450);
     return () => window.clearTimeout(id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

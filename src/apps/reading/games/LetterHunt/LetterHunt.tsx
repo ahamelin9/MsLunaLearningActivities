@@ -139,7 +139,8 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
   };
 
   useEffect(() => {
-    const t = window.setTimeout(announce, 600);
+    // not once the round has an answer: it would cut it off (BUG-28)
+    const t = window.setTimeout(() => !api.answered() && announce(), 600);
     return () => window.clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

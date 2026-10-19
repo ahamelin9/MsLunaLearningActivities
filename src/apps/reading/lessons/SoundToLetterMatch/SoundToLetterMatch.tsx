@@ -21,7 +21,7 @@ export const SoundToLetterMatch: React.FC<{ question: SoundToLetterQuestion; api
     if (question.speechPrompt) soundManager.speak(question.speechPrompt);
     else pronunciation.speakSequence([{ text: 'What letter makes the sound' }, { sound: question.targetLetter }]);
   };
-  usePrompt(sayPrompt);
+  usePrompt(sayPrompt, api);
 
   return (
     <div className={kit.lesson}>

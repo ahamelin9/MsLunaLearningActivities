@@ -20,6 +20,11 @@
   display: flex;
   align-items: center;
   gap: var(--space-4);
+
+  // on a portrait iPad Today drops to a slim row of its own (PRG-6)
+  @include bp(narrow) {
+    flex-wrap: wrap;
+  }
 }
 
 // Luna, and beside her head the button that mutes and unmutes her: where the
@@ -31,10 +36,50 @@
   gap: var(--space-1);
 }
 
-// the Squishy Shelf's place until PRG-5, stretching over Today's until PRG-6
+// the Squishy Shelf's place until PRG-5
 .tin {
   flex: 1;
   min-width: 0;
+}
+
+// today's reading (PRG-6): the minutes, and the grade's lessons done
+.today {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+
+  @include bp(narrow) {
+    order: 1;
+    flex: 1 0 100%;
+    flex-direction: row;
+    align-items: center;
+    gap: var(--space-4);
+  }
+}
+
+.today-label {
+  font: var(--text-tag);
+  letter-spacing: var(--tracking-tag);
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+.today-minutes {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font: var(--text-label);
+
+  strong {
+    font: var(--text-display-m);
+  }
+}
+
+.today-lessons {
+  font: var(--text-label-small);
+  font-weight: 400;
+  color: var(--ink-soft);
 }
 
 .tin-inside {

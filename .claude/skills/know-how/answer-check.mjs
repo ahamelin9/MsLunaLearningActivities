@@ -2,7 +2,12 @@
 // The one answer path (FB-1, BUG-1): does every game's own line (the choice,
 // "That is G", a sentence read back) play in full before Luna reacts?
 //
-//   node .claude/skills/know-how/answer-check.mjs [port=5199] [grade=0] [--only <title words>]
+//   node .claude/skills/know-how/answer-check.mjs [port=5199] [grade=0] [--only <title words>] [--quick]
+//
+// With --quick (BUG-28) it taps as soon as each round's pieces are there,
+// within a few hundred ms of the round starting and before the game's own
+// opening question (said on a 450–600 ms timer), for three rounds a game:
+// the question must not cut the answer off.
 //
 // Needs Vite running on the port. In a muted Chrome, for each of the 8 games
 // it taps the stage's pieces in turn (Words Off the Page in the round's own
@@ -29,6 +34,7 @@ const ok = (name, pass, detail = '') => { results.push(pass); console.log(`${pas
 // found on the shelf by a part of each title (What’s Missing? has a curly apostrophe)
 const ALL = ['Letter Jar', 'Bubble Sounds', 'Letter Cookies', 'Muddled Cards', 'Words Off the Page', 'Missing', 'Treasure Path', 'Story Corner'];
 const only = process.argv.indexOf('--only');
+const quick = process.argv.includes('--quick');
 const GAMES = only === -1 ? ALL : ALL.filter(t => t.includes(process.argv[only + 1]));
 
 const browser = await puppeteer.launch({
@@ -93,7 +99,7 @@ async function open(title) {
   await page.waitForSelector(at('play'));
   await page.click(at('play'));
   await page.waitForSelector(at('stage'));
-  await wait(2500);
+  if (!quick) await wait(2500);
   return page;
 }
 
@@ -132,9 +138,23 @@ for (const title of GAMES) {
   let k = 0;
   const rounds = () => page.evaluate(() => document.querySelector('[data-shot="round-pips"]')?.getAttribute('aria-label'));
   const first = await rounds();
+  let changes = 0;
   while (Date.now() < deadline && !(await page.$(at('shell-reward')))) {
     const seen = await page.evaluate(() => window.__answers.length);
-    if ((await rounds()) !== first && seen >= 2) break;
+    if (quick ? changes >= 3 : (await rounds()) !== first && seen >= 2) break;
+    if (quick && title !== 'Words Off the Page') {
+      // tap the moment the round's pieces are there, then wait for the next round
+      const now = await rounds();
+      await page.waitForSelector(PIECES, { timeout: 10000 }).catch(() => {});
+      const pieces = await page.$$(PIECES);
+      if (pieces.length) await pieces[k % pieces.length].click().catch(() => {});
+      k += 1;
+      await wait(100);
+      await settle(page);
+      for (let t = 0; t < 75 && (await rounds()) === now && !(await page.$(at('shell-reward'))); t++) await wait(40);
+      if ((await rounds()) !== now) changes += 1;
+      continue;
+    }
     if (title === 'Words Off the Page') {
       await buildRight(page);
       await settle(page);

@@ -78,6 +78,8 @@ function buildRound(tier: 1 | 2 | 3): Round {
 }
 
 const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
+  // whether this round has an answer yet: its opening question waits for none (BUG-28)
+  const { answered } = api;
   const [flipped, setFlipped] = useState<string[]>([]);
   const [matched, setMatched] = useState<string[]>([]);
   const [wobble, setWobble] = useState<string[]>([]);
@@ -89,6 +91,8 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
 
   useEffect(() => {
     const t = window.setTimeout(() => {
+      // not once the round has an answer: it would cut it off (BUG-28)
+      if (answered()) return;
       pronunciation.speakText(
         round.kind === 'case'
           ? 'Find the big letter and its little partner.'
@@ -96,7 +100,7 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
       );
     }, 500);
     return () => window.clearTimeout(t);
-  }, [round.kind]);
+  }, [round.kind, answered]);
 
   const flip = (card: Card) => {
     if (api.locked || busy.current) return;
@@ -224,6 +228,8 @@ export const memoryMatch: GameDef<Round> = {
   skill: 'vocabulary',
   mission: 'I dropped my card box. Find the pairs before I panic!',
   roundsPerPlay: 2,
+  // a whole board of pairs a round (PRG-6's first guess)
+  roundSeconds: 75,
   shape: 'cards',
   sticker: 'cards',
   makeRounds: ({ grade, difficulty, count }) => {

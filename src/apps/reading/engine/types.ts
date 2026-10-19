@@ -24,6 +24,12 @@ export interface GameApi {
   /** the round is over, or an answer is being said; ignore further input */
   locked: boolean;
   /**
+   * Whether this round has had an answer yet (BUG-28). A round's opening
+   * question, said on a timer, doesn't play once it has, so it never cuts off
+   * a quick child's answer.
+   */
+  answered: () => boolean;
+  /**
    * The one way to answer (FB-1): the shell says `say` (the choice, a
    * read-back), waits for it to end, then reacts, so Luna never cuts the
    * game's own line off. A watchdog settles it if the speech never reports
@@ -80,6 +86,12 @@ export interface GameDef<TRound = never> {
   /** Luna's line on the start screen */
   mission: string;
   roundsPerPlay: number;
+  /**
+   * A first guess at one round in seconds, for "about N min" before real
+   * plays are timed (PRG-6), when this game's rounds run long; else
+   * `engine/times.ts`' typical round
+   */
+  roundSeconds?: number;
   shape: GameShape;
   /**
    * The game draws Luna on its own stage (Feed Luna), so the shell's perch

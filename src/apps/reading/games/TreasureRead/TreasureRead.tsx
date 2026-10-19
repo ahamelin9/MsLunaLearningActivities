@@ -73,6 +73,8 @@ function buildRound(passage: PassageItem, kind: Round['kind']): Round {
 }
 
 const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
+  // whether this round has an answer yet: its opening question waits for none (BUG-28)
+  const { answered } = api;
   const [solved, setSolved] = useState(false);
   const [wrong, setWrong] = useState<string | null>(null);
   // "show me" (FB-2): the right stone glows from the third miss
@@ -87,6 +89,8 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
 
   useEffect(() => {
     const t = window.setTimeout(() => {
+      // not once the round has an answer: it would cut it off (BUG-28)
+      if (answered()) return;
       if (round.kind === 'truefalse' && readAlong) {
         pronunciation.speakSequence(round.readBefore);
       } else if (round.kind === 'truefalse') {
@@ -96,7 +100,7 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
       }
     }, 600);
     return () => window.clearTimeout(t);
-  }, [round, readAlong]);
+  }, [round, readAlong, answered]);
 
   const readToMe = () => pronunciation.speakSequence(solved ? round.readAfter : round.readBefore);
 
@@ -217,6 +221,8 @@ export const treasureRead: GameDef<Round> = {
   skill: 'reading',
   mission: 'Read every stone carefully or we will never reach the treasure!',
   roundsPerPlay: 5,
+  // a passage to read each stone (PRG-6's first guess)
+  roundSeconds: 60,
   shape: 'map',
   sticker: 'chest',
   // Passages are written per grade, so the grade picks them; the dial doesn't

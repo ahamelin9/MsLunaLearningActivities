@@ -3,12 +3,13 @@ import type { GradeLevel } from '@/types/reading';
 import type { UserProgress } from '@/types/user';
 import type { AnyGameDef } from '../../engine/types';
 import { GAMES } from '../../games';
-import { ChunkyButton, LessonCard, Luna, PaperCard, ProgressBar, Tile } from '@/components/kit';
+import { ChunkyButton, Icon, LessonCard, Luna, PaperCard, ProgressBar, Tile } from '@/components/kit';
 import { greeting, lunaSay, type LunaLine, type LunaMood } from '../../engine/luna';
 import { STICKERS, stickerById } from '../../engine/stickers';
 import { soundManager } from '@/utils/audio';
 import { pronunciation } from '@/utils/pronunciation';
-import { storageService } from '@/utils/storage';
+import { minutesOf, storageService } from '@/utils/storage';
+import { estimateMinutes } from '../../engine/times';
 import { warmReadingVoice } from '../../engine/warmup';
 import { FINISH_FIRST, lessonStates } from '../../engine/lessons';
 import { GAME_TINTS, GamePicture } from '../../games/shared/GamePicture/GamePicture';
@@ -89,6 +90,16 @@ export const Hub: React.FC<HubProps> = ({
     setMood('happy');
     pronunciation.speakSequence([line]);
   };
+
+  // times (PRG-6): "took N min" on a lesson done (its last play), "about N
+  // min" on the rest and on every game; a lesson done before times were
+  // kept shows none
+  const timeOf = (game: AnyGameDef, done: boolean) => {
+    const times = progress.times?.[game.id];
+    if (done) return times ? minutesOf(times.last) : undefined;
+    return estimateMinutes(game, times);
+  };
+  const lessonsDone = states.filter(s => s === 'done').length;
 
   const voiceOn = progress.settings.speechEnabled;
   const owned = STICKERS.filter(s => progress.stickers.includes(s.id));
@@ -174,6 +185,20 @@ export const Hub: React.FC<HubProps> = ({
           </div>
         </PaperCard>
 
+        {/* today's reading, as on the Library board (PRG-6) */}
+        <PaperCard className={styles.today} data-shot="hub-today">
+          <span className={styles.todayLabel}>Today</span>
+          <span className={styles.todayMinutes}>
+            <Icon name="clock" size={24} />
+            <strong>{storageService.todayMinutes()}</strong> min reading
+          </span>
+          {lessons.length > 0 && (
+            <span className={styles.todayLessons}>
+              {lessonsDone} of {lessons.length} lessons done
+            </span>
+          )}
+        </PaperCard>
+
         <ChunkyButton
           variant="accent"
           size={64}
@@ -197,7 +222,7 @@ export const Hub: React.FC<HubProps> = ({
         <section className={styles.lessons}>
           <div className={styles.lessonsHead}>
             <h2 className={styles.heading}>Luna’s Lessons</h2>
-            <ProgressBar done={states.filter(s => s === 'done').length} total={lessons.length} className={styles.lessonsBar} />
+            <ProgressBar done={lessonsDone} total={lessons.length} className={styles.lessonsBar} />
           </div>
           <div className={styles.lessonCards}>
             {lessons.map((lesson, i) => (
@@ -206,6 +231,13 @@ export const Hub: React.FC<HubProps> = ({
                 number={i + 1}
                 title={lesson.title}
                 state={states[i]}
+                minutes={timeOf(lesson, states[i] === 'done')}
+                // up next and started: the thin rounds bar (PRG-8)
+                rounds={
+                  states[i] === 'next' && progress.partway?.[lesson.id]
+                    ? { done: progress.partway[lesson.id].won, total: lesson.roundsPerPlay }
+                    : undefined
+                }
                 opened={lesson.id === opened}
                 data-shot="lesson-tile"
                 onClick={() => (states[i] === 'locked' ? finishFirst() : startGame(lesson))}
@@ -227,6 +259,7 @@ export const Hub: React.FC<HubProps> = ({
               name={game.title}
               tint={GAME_TINTS[game.shape]}
               picture={<GamePicture shape={game.shape} />}
+              minutes={timeOf(game, false)}
               data-shot="game-tile"
               onClick={() => startGame(game)}
             />
