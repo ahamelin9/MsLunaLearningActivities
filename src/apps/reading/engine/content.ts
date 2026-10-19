@@ -757,20 +757,57 @@ export interface MiniStory {
   answers: { text: string; correct: boolean }[];
 }
 
+/**
+ * Story Corner's stories (GAME-2): three per tier at least, the child reads
+ * them first. A right answer says what the story means in other words, or
+ * takes one small step of thinking: it never repeats three words in a row
+ * from a line, so it can't be found by matching (`story-check.mjs`, run by
+ * voice:audit). Each picture matches its story. A baseline: more stories are
+ * added here, and the checks cover them.
+ */
 export const MINI_STORIES: MiniStory[] = [
+  // ---- tier 1 ----
   {
     id: 'story-lost-sock',
     title: 'The Lost Sock',
     emoji: '🧦',
     tier: 1,
-    lines: ['Luna lost one red sock.', 'It was under the bed!', 'Now her feet are warm.'],
-    question: 'Where was the sock?',
+    // "one sock", not "one red sock": the picture is a pair, not red (GAME-2)
+    lines: ['Luna lost one sock.', 'It was under the bed!', 'Now her feet are warm.'],
+    question: 'Why are Luna’s feet warm now?',
     answers: [
-      { text: 'Under the bed', correct: true },
-      { text: 'In the tree', correct: false },
-      { text: 'On the bus', correct: false }
+      { text: 'She found her sock', correct: true },
+      { text: 'She lost her hat', correct: false },
+      { text: 'She got wet in the rain', correct: false }
     ]
   },
+  {
+    id: 'story-blue-cap',
+    title: 'Pip’s Blue Cap',
+    emoji: '🧢',
+    tier: 1,
+    lines: ['Pip has a blue cap.', 'The wind took it up, up, up!', 'Luna flew and got it back.'],
+    question: 'How did Pip get his cap back?',
+    answers: [
+      { text: 'Luna brought it to him', correct: true },
+      { text: 'The wind gave it back', correct: false },
+      { text: 'He got a new cap', correct: false }
+    ]
+  },
+  {
+    id: 'story-frog-log',
+    title: 'The Frog on the Log',
+    emoji: '🐸',
+    tier: 1,
+    lines: ['Luna saw a frog on a log.', 'The frog saw a bug.', 'Hop! The frog got the bug.'],
+    question: 'What did the frog do?',
+    answers: [
+      { text: 'It caught a bug', correct: true },
+      { text: 'It fell in the pond', correct: false },
+      { text: 'It went to sleep', correct: false }
+    ]
+  },
+  // ---- tier 2 ----
   {
     id: 'story-moon-snack',
     title: 'A Snack on the Moon',
@@ -781,13 +818,48 @@ export const MINI_STORIES: MiniStory[] = [
       'She packed cheese and a warm bun.',
       'A little star shared her snack.'
     ],
-    question: 'What did Luna pack?',
+    question: 'What did Luna do with her snack?',
     answers: [
-      { text: 'Cheese and a bun', correct: true },
-      { text: 'A rock and a sock', correct: false },
-      { text: 'Books and a broom', correct: false }
+      { text: 'She gave some to a star', correct: true },
+      { text: 'She dropped it on the moon', correct: false },
+      { text: 'She ate it at home', correct: false }
     ]
   },
+  {
+    id: 'story-pip-garden',
+    title: 'Pip’s Garden',
+    emoji: '🥕',
+    tier: 2,
+    lines: [
+      'Pip planted three seeds in the garden.',
+      'Every day, Luna helped him water them.',
+      'Soon, three little carrots popped up!'
+    ],
+    question: 'What did Luna do each day?',
+    answers: [
+      { text: 'She gave the seeds water', correct: true },
+      { text: 'She picked the carrots', correct: false },
+      { text: 'She sang to the moon', correct: false }
+    ]
+  },
+  {
+    id: 'story-paper-kite',
+    title: 'The Paper Kite',
+    emoji: '🪁',
+    tier: 2,
+    lines: [
+      'Pip made a kite out of paper.',
+      'The wind lifted it high above the tree.',
+      'Luna flew up and waved to the kite.'
+    ],
+    question: 'Where did the kite go?',
+    answers: [
+      { text: 'Up in the sky', correct: true },
+      { text: 'Into the pond', correct: false },
+      { text: 'Under the bed', correct: false }
+    ]
+  },
+  // ---- tier 3 ----
   {
     id: 'story-rain-day',
     title: 'The Rainy Day Plan',
@@ -800,11 +872,45 @@ export const MINI_STORIES: MiniStory[] = [
       'Luna could not fly outside, so she spent the morning reading three books.',
       'When the sun came back, a bright rainbow stretched over the tree.'
     ],
-    question: 'What did Luna do while it rained?',
+    question: 'Why did Luna stay inside?',
     answers: [
-      { text: 'She was reading books', correct: true },
-      { text: 'She was flying to the beach', correct: false },
-      { text: 'She was painting the window', correct: false }
+      { text: 'Because it was raining', correct: true },
+      { text: 'Because she was sick', correct: false },
+      { text: 'Because Pip came to visit', correct: false }
+    ]
+  },
+  {
+    id: 'story-plain-cake',
+    title: 'The Plain Cake',
+    emoji: '🎂',
+    tier: 3,
+    lines: [
+      'Pip wanted to bake a cake for Luna’s birthday.',
+      'He forgot the sugar, so the cake tasted plain.',
+      'Luna smiled and said it was the best cake ever, because Pip made it.'
+    ],
+    question: 'Why did Luna love the cake?',
+    answers: [
+      { text: 'Her friend baked it for her', correct: true },
+      { text: 'It was very sweet', correct: false },
+      { text: 'It had lots of fruit', correct: false }
+    ]
+  },
+  {
+    id: 'story-snowy-morning',
+    title: 'The Snowy Morning',
+    emoji: '⛄',
+    tier: 3,
+    lines: [
+      'When Luna woke up, the whole garden was white.',
+      'She and Pip rolled three big balls of snow and stacked them up.',
+      'They gave their snowman a carrot nose and a warm scarf.'
+    ],
+    question: 'Why was the garden white?',
+    answers: [
+      { text: 'Snow fell during the night', correct: true },
+      { text: 'Pip painted it', correct: false },
+      { text: 'White flowers grew there', correct: false }
     ]
   }
 ];

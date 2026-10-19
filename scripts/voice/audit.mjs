@@ -341,10 +341,12 @@ if (!broken.size) {
 // The content rules run here, so a bad item can't come back unnoticed: the
 // wrong-answer rules and every blank's also-fits list (distractor-check), the
 // passages' rules, a claim never copying its passage among them
-// (passage-check), and one picture per word (CNT-3's mismatches).
+// (passage-check), Story Corner's stories, an answer never copying its story
+// and no story twice in a play among them (story-check, GAME-2), and one
+// picture per word (CNT-3's mismatches).
 console.log('• checking the content');
 const KNOW_HOW = join(root, '.claude/skills/know-how');
-for (const check of ['distractor-check.mjs', 'passage-check.mjs']) {
+for (const check of ['distractor-check.mjs', 'passage-check.mjs', 'story-check.mjs']) {
   try {
     const out = execFileSync(process.execPath, [join(KNOW_HOW, check)], { cwd: root, encoding: 'utf8' });
     console.log(`  ✓ ${check}: ${out.trim().split('\n').at(-1).replace(/^✅\s*/, '')}`);

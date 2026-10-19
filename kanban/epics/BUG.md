@@ -1,7 +1,8 @@
 # BUG — Bugs
 
 ### BUG-25 · The milestone moon never shows in Alex's app
-P1 · S · needs: — · likely, from Alex's shots (2026-10-18), not yet reproduced
+P1 · S · needs: PRG-1 (the new rule counts stars) · likely, from Alex's shots (2026-10-18), not yet reproduced
+- **Decided (Alex, 2026-10-19): a rule you can predict and test.** She visits when: (1) a lesson is finished with 3 stars, every time (PRG-1's stars, so it waits for them); (2) a game gets 3 stars for the first time; (3) the big moments stay as they are, once each with their own line: the first lesson ever, and every lesson in a grade done. This replaces "half the grade's lessons", and replaces step 2 below; `moon-check.mjs` covers each case.
 - **What Alex saw:** on his 5173, no moon on the done screen after Lesson 5 (5 of 6 done), nor after replaying Lesson 1.
 - **Likely cause:** working as DES-17 built it, which may be the wrong rule. She comes only when a lesson *crosses* a milestone (the first lesson ever, half the grade's lessons, all of them), and each is claimed once in the save. His save had passed "first" and "half" before the moon existed, and a replay crosses nothing, so her only visit left is finishing Lesson 6. `moon-check.mjs` passes on a fresh save, so check that first; if the moon doesn't come on a fresh save in his browser either, it's a real bug (a stale tab, or the visit itself).
 - **Alex (2026-10-19):** "I do see moon", so she does visit; but he'd like a rule that's more consistent and easier to test ("comes in certain games, comes in lessons…"). So this is now about the rule, step 2 below: proposal in `screenshots/review/HANDOVER.md`, his pick first.
@@ -10,11 +11,13 @@ P1 · S · needs: — · likely, from Alex's shots (2026-10-18), not yet reprodu
   2. If she does: decide with Alex whether a save already past a milestone should still get its visit (for example, the next lesson finished brings the biggest milestone not yet claimed), and change `milestoneReached` in `engine/milestones.ts`.
   3. If she doesn't: find out why with `moon-check.mjs`'s frame sampling in his setup.
 - **Complete when:** on Alex's iPad or browser, the moon visits at the milestones he agrees on, from a fresh save and from his current one, and `moon-check.mjs` passes.
+- **Blocked (2026-10-19): built and checked; waits for Alex to try it in his browser.** `engine/milestones.ts` now lists the moments a play reaches, biggest first (`lessonMilestones`: all done, first ever, 3 stars; `gameMilestones`: 3 stars), and the shell takes the first not already claimed: "all" and "first" once, a game's 3 stars once per game, a lesson's 3 stars every time. "Halfway" and its lines are gone; six new lines (3 stars in a lesson, a game's first 3 stars) are rendered. `moon-check.mjs` plays each case for real (answers read from React) and passes 5 runs in a row, 3 with reduced motion; on the commit before, the 3-star cases fail. It now samples the moon on a timer and a DOM observer as well as frames: frames alone missed a visit now and then under reduced motion. Lint, build, `ui:shots --diff` 0 of 104.
 
 ### BUG-9 · Story Corner K warm-up plays one story twice
 P2 · S
 - **Cause:** tier 1 has only one story. Resolved properly by GAME-2.
 - **Complete when:** no story repeats within one play of Story Corner, at any grade or difficulty.
+- **Blocked (2026-10-19): fixed by GAME-2; closes with it.** Three stories per tier now; `story-check.mjs` builds 300 plays per grade and dial and finds no story twice (on the commit before, K's one story came twice).
 
 ### BUG-13 · Trophy dot never clears
 P2 · S

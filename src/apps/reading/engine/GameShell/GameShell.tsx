@@ -3,9 +3,9 @@ import type { GradeLevel } from '@/types/reading';
 import type { UserProgress } from '@/types/user';
 import type { AnyGameDef, GameApi, GameContext } from '../types';
 import type { Difficulty } from '../content';
-import { lunaSay, moonSay, type LunaMood } from '../luna';
+import { lunaSay, moonSay, type LunaMood, type Milestone } from '../luna';
 import { lessonStates } from '../lessons';
-import { milestoneId, milestoneReached } from '../milestones';
+import { gameMilestones, lessonMilestones, milestoneId } from '../milestones';
 import { nextSticker, type Sticker } from '../stickers';
 import { starsFor } from '../stars';
 import { soundManager } from '@/utils/audio';
@@ -95,7 +95,7 @@ export const GameShell: React.FC<GameShellProps> = ({
   );
 
   const timers = useRef<number[]>([]);
-  const [award, setAward] = useState<{ sticker: Sticker | null; stars: number; points: number } | null>(null);
+  const [award, setAward] = useState<{ sticker: Sticker | null; stars: number; points: number; firstTry: number } | null>(null);
   // a big milestone's visit on the done screen: the moon's line (DES-17)
   const [moon, setMoon] = useState<string | null>(null);
   const wonRef = useRef(0);
@@ -178,6 +178,7 @@ export const GameShell: React.FC<GameShellProps> = ({
         sticker: nextSticker(progress.stickers, game.sticker),
         // 1–3 by how it went, the same rule for games and lessons (PRG-1)
         stars: starsFor(cleanRef.current, game.roundsPerPlay),
+        firstTry: cleanRef.current,
         points: game.lesson?.points ?? wonRef.current * 15 + (perfect ? 25 : 0)
       });
       setPhase('reward');
@@ -356,6 +357,7 @@ export const GameShell: React.FC<GameShellProps> = ({
     const closing = () =>
       speak(lunaSay('finish', game.id).text, 'cheer', award.sticker ? [{ text: award.sticker.line }] : []);
 
+    let reached: Milestone[];
     if (game.lesson) {
       storageService.recordLessonCompletion(
         game.lesson.id,
@@ -364,17 +366,9 @@ export const GameShell: React.FC<GameShellProps> = ({
         game.lesson.skillId,
         award.sticker?.id ?? null
       );
-      // a big milestone brings the moon, once per child; while she's here
-      // only she talks, and Luna says her line once she's gone (DES-17)
-      const reached = lessons?.length
-        ? milestoneReached(lessons, doneBefore, storageService.getProgress().completedLessons)
-        : null;
-      if (reached && storageService.claimOnce(milestoneId(reached, grade))) {
-        soundManager.playFanfare();
-        const line = moonSay(reached);
-        later(() => setMoon(line), 0);
-        return;
-      }
+      reached = lessons?.length
+        ? lessonMilestones(lessons, doneBefore, storageService.getProgress().completedLessons, award.stars)
+        : [];
     } else {
       storageService.recordGameCompletion({
         gameId: game.id,
@@ -382,6 +376,21 @@ export const GameShell: React.FC<GameShellProps> = ({
         pointsEarned: award.points,
         stickerId: award.sticker?.id ?? null
       });
+      reached = gameMilestones(award.stars);
+    }
+
+    // the moon visits for the biggest moment this play reached that isn't
+    // claimed yet (BUG-25); while she's here only she talks, and Luna says her
+    // line once she's gone (DES-17)
+    const visit = reached.find(m => {
+      const once = milestoneId(m, grade, game.id);
+      return once === null || storageService.claimOnce(once);
+    });
+    if (visit) {
+      soundManager.playFanfare();
+      const line = moonSay(visit);
+      later(() => setMoon(line), 0);
+      return;
     }
 
     soundManager.playFanfare();
@@ -434,7 +443,6 @@ export const GameShell: React.FC<GameShellProps> = ({
         <DoneScreen
           game={game}
           award={award}
-          roundsWon={roundsWon}
           path={path}
           onPlayAgain={() => startPlay(difficulty)}
           onPlayAnother={onPlayAnother}

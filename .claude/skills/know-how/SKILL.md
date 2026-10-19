@@ -392,21 +392,30 @@ Pitfalls that cost time:
   the first paint) and `src/utils/theme.ts` (after) both turn the saved choice
   into a mode. Change one, change the other.
 
-## Does the milestone moon visit when she should? (DES-17)
+## Does the milestone moon visit when she should? (DES-17, BUG-25)
 
-*2026-10-18 · DES-17*
+*2026-10-18 · DES-17; rule changed 2026-10-19 · BUG-25*
 
-- **Symptom:** you need to know the moon comes for the first lesson ever,
-  half a grade and a whole grade, once each, never after an ordinary lesson;
-  that only she talks while she's there; and that she leaves by herself.
+- **Symptom:** you need to know the moon comes when the rule says (Alex's,
+  BUG-25: all of a grade's lessons and the first lesson ever, once each; a
+  lesson with 3 stars, every time; a game's first 3 stars, once per game),
+  never otherwise; that only she talks while she's there; and that she
+  leaves by herself.
 - **Fix:** with Vite on 5199, `node .claude/skills/know-how/moon-check.mjs 5199`
-  (and `--reduced-motion`). It plays kindergarten's lessons through for real,
-  setting `completedLessons` in the save to reach half and all quickly, and
-  samples every frame while `[data-shot="moon-visit"]` is on screen: the done
+  (and `--reduced-motion`). It plays for real, answering each round right the
+  first time or after one miss (the answer read from React: a lesson's
+  `question.options`, `isCorrect` or Rhyme Matcher's `isRhyme`; Letter
+  Cookies' `round.answer`), sets `completedLessons` in the save to reach the
+  last lesson quickly, and watches `[data-shot="moon-visit"]`: the done
   screen's Luna (`data-shot="done-luna"`) must never be `talking`, and the
-  moon's mouth must be. The milestone rule is `engine/milestones.ts`; each
-  visit is claimed once in `unlockedAchievements` (`moon-first-lesson`,
-  `moon-half-<grade>`, `moon-all-<grade>`), so clear those to see her again.
+  moon's mouth must be. The rule is `engine/milestones.ts`; once-only visits
+  are claimed in `unlockedAchievements` (`moon-first-lesson`,
+  `moon-all-<grade>`, `moon-3-stars-<gameId>`), so clear those to see her
+  again.
+- **Pitfall, frames alone miss her:** sampling only on
+  `requestAnimationFrame` missed a visit now and then under reduced motion
+  (her line was said, the check never saw her). It samples on a 40 ms timer
+  and a MutationObserver too.
 - **Pitfall, a fresh save:** opening Reading on a fresh save lands on Grade
   Select, not the library. Click a grade card before waiting for `hub`.
 - **Pitfall, `ui:shots`:** its run finishes Lesson 1 on a fresh save, so its

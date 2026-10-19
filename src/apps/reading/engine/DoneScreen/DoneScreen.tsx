@@ -18,8 +18,8 @@ export interface LessonPath {
 
 interface DoneScreenProps {
   game: AnyGameDef;
-  award: { sticker: Sticker | null; stars: number; points: number } | null;
-  roundsWon: number;
+  /** `firstTry`: the rounds answered right the first time, which the stars count (PRG-1) */
+  award: { sticker: Sticker | null; stars: number; points: number; firstTry: number } | null;
   /** a lesson's bar and the lesson it opened; left out for a game */
   path?: LessonPath;
   onPlayAgain: () => void;
@@ -103,7 +103,6 @@ function MoonVisit({ line, onGone }: { line: string; onGone: () => void }) {
 export const DoneScreen: React.FC<DoneScreenProps> = ({
   game,
   award,
-  roundsWon,
   path,
   onPlayAgain,
   onPlayAnother,
@@ -141,7 +140,7 @@ export const DoneScreen: React.FC<DoneScreenProps> = ({
           </div>
           <StarRow earned={stars} animate />
           <p className={styles.solved}>
-            {roundsWon} of {game.roundsPerPlay} solved
+            {award?.firstTry ?? 0} of {game.roundsPerPlay} first try
           </p>
           {/* while the moon visits, only she talks: Luna watches, beak still (DES-17) */}
           <span className={styles.luna} data-shot="done-luna">

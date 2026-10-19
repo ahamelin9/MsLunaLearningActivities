@@ -147,10 +147,10 @@ export const PER_GAME: Record<string, Partial<Bank>> = {
 
 /**
  * The milestone moon's lines (DES-17): she visits the done screen for a big
- * milestone and says one of these, in the same voice. Short and warm, "good
- * job" as on her board. Her look is always cheer.
+ * moment (engine/milestones.ts) and says one of these, in the same voice.
+ * Short and warm, "good job" as on her board. Her look is always cheer.
  */
-export type Milestone = 'first' | 'half' | 'all';
+export type Milestone = 'first' | 'all' | 'perfectLesson' | 'perfectGame';
 
 export const MOON: Record<Milestone, { text: string }[]> = {
   // the first lesson a child ever finishes
@@ -159,17 +159,23 @@ export const MOON: Record<Milestone, { text: string }[]> = {
     { text: 'Hello from the moon! Your first lesson is done.' },
     { text: 'I saw you from the sky. Your first lesson! Good job!' }
   ],
-  // half of a grade's lessons done
-  half: [
-    { text: 'Good job! Half of your lessons are done!' },
-    { text: 'You are halfway there! I came down to say good job.' },
-    { text: 'Look at you go! Half of your lessons, all done!' }
-  ],
   // all of a grade's lessons done
   all: [
     { text: 'Good job! You finished every lesson!' },
     { text: 'All of your lessons are done! The whole sky is proud of you.' },
     { text: 'Every lesson, all done! I came down from the sky to see you.' }
+  ],
+  // a lesson with 3 stars, every time (BUG-25)
+  perfectLesson: [
+    { text: 'Three stars! I came down from the sky to see.' },
+    { text: 'Every round, first try! Good job!' },
+    { text: 'Hello from the moon! Three shining stars!' }
+  ],
+  // a game's first 3 stars (BUG-25)
+  perfectGame: [
+    { text: 'Three stars in this game! Good job!' },
+    { text: 'I saw that from the sky! Three stars!' },
+    { text: 'Hello from the moon! Your first three stars here!' }
   ]
 };
 

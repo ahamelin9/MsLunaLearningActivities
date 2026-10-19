@@ -72,7 +72,7 @@ be pulled into Phase 1 for a break from styling.
 
 ### Now / Next
 
-- **Now:** PRG-1, stars that follow how a play went (built; Alex to settle the rule). Done 2026-10-19: OPS-9, GAME-1c, GAME-4, GAME-6, GAME-7, CUR-1, CUR-3, BUG-10, BUG-12, BUG-26, BUG-27. Waiting on Alex: GAME-2 (OK one sample story per tier), CNT-3 (a few pictures), CNT-2 (OK a split), BUG-25 (when the moon visits: a rule he can test), DES-16 (his dark check on the iPad); DES-26 needs his OK before it starts (a primitive change).
+- **Now:** built and waiting for Alex's OK (2026-10-19): PRG-1 (stars), BUG-25 (the moon's new rule, to try in his browser), GAME-2 and BUG-9 (nine stories). Done 2026-10-19: OPS-9, GAME-1c, GAME-4, GAME-6, GAME-7, CUR-1, CUR-3, BUG-10, BUG-12, BUG-26, BUG-27. Also waiting on Alex: CNT-3 (a few pictures), CNT-2 (OK a split), DES-16 (his dark check on the iPad); DES-26 needs his OK before it starts (a primitive change).
 - **Next:** Phase 7: PRG-5 (squishies), PRG-6, PRG-8, PRG-3 (with BUG-13); BUG-28 and OPS-13 any time; GAME-5 waits on CNT-2. PRG-9 (a game's done screen shows the squishy shelf) waits on PRG-5. OPS-12 (an "away mode" skill) and OPS-11 (a first cloud session) are small housekeeping for when Alex wants them.
 
 ## Epics
@@ -98,9 +98,9 @@ In board order. A new epic gets its file in `epics/` first, then a link here
 | DES-16 | Light and dark mode | Story | P1 | M | Blocked |
 | DES-26 | Make the arch radius work at any size | Task | P2 | S | Todo |
 | **BUG** | **Bugs** | | | | |
-| BUG-25 | The milestone moon never shows in Alex's app | Bug | P1 | S | Todo |
+| BUG-25 | The milestone moon never shows in Alex's app | Bug | P1 | S | Blocked |
 | BUG-28 | A tap in a round's first half-second is cut off by its question | Bug | P2 | S | Todo |
-| BUG-9 | Story Corner K warm-up plays one story twice | Bug | P2 | S | Todo |
+| BUG-9 | Story Corner K warm-up plays one story twice | Bug | P2 | S | Blocked |
 | BUG-13 | Trophy dot never clears | Bug | P2 | S | Todo |
 | **LVL** | **Difficulty** | Epic | **P0** | | |
 | LVL-3 | Adaptive difficulty from skill mastery | Story | P2 | L | Todo |
@@ -114,10 +114,11 @@ In board order. A new epic gets its file in `epics/` first, then a link here
 | CUR-4 | Expand the curriculum per grade | Story | P1 | L | Todo |
 | CUR-5 | Merge the two K blending lessons | Story | P2 | S | Todo |
 | **PRG** | **Progress & rewards** | Epic | **P1** | | |
-| PRG-1 | Stars reflect performance | Story | P1 | M | In progress |
+| PRG-1 | Stars reflect performance | Story | P1 | M | Blocked |
 | PRG-5 | Squishies instead of the sticker tin | Story | P1 | M | Todo |
 | PRG-9 | A game's done screen shows the squishy shelf | Story | P1 | S | Todo |
 | PRG-6 | Time per lesson: know it before, see it after | Story | P1 | M | Todo |
+| PRG-10 | Time counts toward stars | Story | P2 | S | Todo |
 | PRG-8 | Pick up a lesson where you left off | Story | P1 | M | Todo |
 | PRG-2 | Points: remove or give them a meaning | Story | P2 | S | Todo |
 | PRG-3 | Achievements worked out in one place | Task | P2 | S | Todo |

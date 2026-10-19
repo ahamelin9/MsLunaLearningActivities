@@ -20,10 +20,11 @@ export const ACHIEVEMENTS: Achievement[] = [
   {
     id: 'super_star',
     title: 'Super Star Champion',
-    description: 'Collected 50 golden stars across your learning adventure!',
+    description: 'Collected 30 golden stars across your learning adventure!',
     iconEmoji: '🌟',
     category: 'stars',
-    requirement: p => p.totalStars >= 50
+    // 30 since stars count a game's or lesson's best only, 60 at most (PRG-1)
+    requirement: p => p.totalStars >= 30
   },
   {
     id: 'bookworm',

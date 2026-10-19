@@ -12,8 +12,8 @@
 //   - Lesson 1 again, a miss in every round: 1 star, the total still put;
 //   - Letter Cookies with a miss in every round: 1 star, the total up by 1;
 //   - Letter Cookies again with none: 3 stars, the total up by 2 more.
-// The done screen's stars ("N of 3 stars") and the saved total are read each
-// time. It fails on the commit before PRG-1, where a lesson paid its fixed 3
+// The done screen's stars ("N of 3 stars"), the line under them ("3 of 4
+// first try") and the saved total are read each time. It fails on the commit before PRG-1, where a lesson paid its fixed 3
 // (5 for the story) and a game one star a round won, however it went, every
 // time it was played.
 
@@ -36,7 +36,12 @@ await page.reload({ waitUntil: 'networkidle0' });
 
 const shown = sel => page.evaluate(s => Boolean(document.querySelector(s)), sel);
 const total = () => page.evaluate(() => JSON.parse(localStorage.getItem('ms_luna_learning_progress_v1') ?? '{}').totalStars ?? 0);
-const starsShown = () => page.evaluate(() => document.querySelector('[aria-label$="of 3 stars"]')?.getAttribute('aria-label') ?? 'none');
+// the stars, and the line under them ("3 of 4 first try")
+const starsShown = () => page.evaluate(() => {
+  const stars = document.querySelector('[aria-label$="of 3 stars"]')?.getAttribute('aria-label') ?? 'none';
+  const line = document.querySelector('[data-shot="shell-reward"]')?.textContent.match(/\d+ of \d+ first try/)?.[0] ?? 'no first-try line';
+  return `${stars}, ${line}`;
+});
 const round = () => page.evaluate(() => document.querySelector('[data-shot="round-pips"]')?.getAttribute('aria-label') ?? null);
 
 // the rule itself, as the app has it
@@ -144,23 +149,23 @@ async function cookiesPlay(misses) {
 const t0 = await total();
 const clean = await lessonPlay(() => 0);
 const t1 = await total();
-ok('Lesson 1, every round right first time: 3 stars', clean === '3 of 3 stars' && t1 - t0 === 3, `${clean}; total ${t0} → ${t1}`);
+ok('Lesson 1, every round right first time: 3 stars', clean === '3 of 3 stars, 4 of 4 first try' && t1 - t0 === 3, `${clean}; total ${t0} → ${t1}`);
 
 const oneMiss = await lessonPlay(r => (r === 0 ? 1 : 0));
 const t2 = await total();
-ok('Lesson 1 again, one round missed: 2 stars, and no more in the total', oneMiss === '2 of 3 stars' && t2 === t1, `${oneMiss}; total ${t1} → ${t2}`);
+ok('Lesson 1 again, one round missed: 2 stars, and no more in the total', oneMiss === '2 of 3 stars, 3 of 4 first try' && t2 === t1, `${oneMiss}; total ${t1} → ${t2}`);
 
 const allMissed = await lessonPlay(() => 1);
 const t3 = await total();
-ok('Lesson 1 again, a miss every round: 1 star, the total still put', allMissed === '1 of 3 stars' && t3 === t1, `${allMissed}; total ${t2} → ${t3}`);
+ok('Lesson 1 again, a miss every round: 1 star, the total still put', allMissed === '1 of 3 stars, 0 of 4 first try' && t3 === t1, `${allMissed}; total ${t2} → ${t3}`);
 
 const gameMissy = await cookiesPlay(true);
 const t4 = await total();
-ok('Letter Cookies, a miss every round: 1 star, the total up by 1', gameMissy === '1 of 3 stars' && t4 - t3 === 1, `${gameMissy}; total ${t3} → ${t4}`);
+ok('Letter Cookies, a miss every round: 1 star, the total up by 1', gameMissy.startsWith('1 of 3 stars, 0 of ') && t4 - t3 === 1, `${gameMissy}; total ${t3} → ${t4}`);
 
 const gameClean = await cookiesPlay(false);
 const t5 = await total();
-ok('Letter Cookies again, no misses: 3 stars, the total up by 2 more', gameClean === '3 of 3 stars' && t5 - t4 === 2, `${gameClean}; total ${t4} → ${t5}`);
+ok('Letter Cookies again, no misses: 3 stars, the total up by 2 more', /^3 of 3 stars, (\d+) of \1 first try$/.test(gameClean) && t5 - t4 === 2, `${gameClean}; total ${t4} → ${t5}`);
 
 // a save from before PRG-1: no best stars, its stars paid per round
 await page.evaluate(async () => {

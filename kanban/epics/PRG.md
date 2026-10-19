@@ -5,6 +5,8 @@ Story · P1 · M
 - **Why:** today stars equal the number of rounds (Feed Luna 5–6, Muddled Cards 2–3) whatever the performance, and lessons can be replayed for the same stars.
 - **How:** award 1–3 stars based on clean rounds, on the same scale for games and lessons. Replaying keeps your best result instead of adding more.
 - **Complete when:** every game and lesson earns 1–3 stars by the same rule, and replaying never adds stars beyond your best.
+- **Decided (Alex, 2026-10-19):** the rule as proposed: 3 stars when every round is right the first time, 2 when at least half are, 1 for finishing (`engine/stars.ts`). With it, the done screen's "4 of 4 solved" becomes "N of 4 first try", and the 50-star trophy comes down to 30 (the most a child can hold is now 60). Time counting toward stars is PRG-10, after PRG-6 measures it.
+- **Blocked (2026-10-19): built and checked; waits for Alex's OK on the sheet.** `starsFor(clean, rounds)` in `engine/stars.ts` gives every game and lesson its stars; the save keeps each one's best (`bestStars`) and a play adds only the stars above it; a save from before counts whatever it finished as a best of 3, so no child loses a star. The done screen says "N of M first try"; Super Star Champion is at 30. `stars-check.mjs` (know-how) plays Lesson 1 three ways and Letter Cookies two, plus an old save: 3/2/1 stars as the rule says, the total never rising on a replay below the best; on the commit before, every play showed 3 and the total grew each time. Moon, perch and lesson-order checks pass; lint, build; `ui:shots`: the done screen's stars and line, and the trophy's text. Sheet: `screenshots/review/prg1-stars.png`.
 
 ### PRG-2 · Points: remove or give them a meaning
 Story · P2 · S
@@ -58,6 +60,12 @@ Story · P1 · S · needs: PRG-5
 - **How:** on a game's done screen, the right side shows the child's squishy shelf (PRG-5's), with the squishy just won picked out when there is one; a lesson keeps its bar above it. Until PRG-5 lands nothing changes here.
 - **Complete when:** a game's done screen shows the shelf on the right at all four sizes, light and dark, with no empty half; a lesson's still shows its bar; checked in `ui:shots` and against the Done board.
 
+### PRG-10 · Time counts toward stars
+Story · P2 · S · needs: PRG-1, PRG-6
+- **Why:** Alex (2026-10-19): on top of PRG-1's first-try rule, "maybe also we introduce some kind of timing", based on the time tags each lesson shows (PRG-6), and the Play Shelf's too, adjusted as plays come in.
+- **How:** once PRG-6 shows an estimate on each lesson and game, let a play's time count toward its stars, in `engine/stars.ts` with the first-try rule. Proposal to confirm with Alex: time never costs a child a star they earned by reading well (slow, careful reading is the goal for ESL K–2), so it lifts instead: a play well inside its estimate can earn the next star up, or a 3-star play needs to finish within about twice the estimate. Use real averages once a few plays are saved, as PRG-6 does.
+- **Complete when:** the rule Alex picks is in `engine/stars.ts`, a check plays fast and slow runs and gets the stars it says, and the done screen says what earned them in kid words.
+
 ### PRG-6 · Time per lesson: know it before, see it after
 Story · P1 · M · needs: —
 - **Why:** the teacher wants to know how long a lesson takes before starting, and to see how much time and progress a child took (2026-10-09).
@@ -68,6 +76,7 @@ Story · P1 · M · needs: —
   - **The cards (from DES-13, 2026-10-12):** the library's LessonCards ship with no time, since nothing measured one (the kit's `minutes` is optional). This ticket passes them: "took N min" on a done lesson, "about N min" on the rest.
   - **On the hub:** a "Today" line: minutes read today and lessons done (e.g. "12 min today · 3 of 6 done"). The Library board shows it as a "Today" panel in the welcome row, between the Squishy Shelf card and Luna's Pick; since DES-21 the Sticker Tin card stretches over that space until this panel comes.
   - Saved per lesson: last time, best time and number of plays, in `utils/storage.ts`.
+  - **The Play Shelf too (Alex, 2026-10-19):** each game's tile shows its estimate the same way ("about N min"), so PRG-10 can count time for games as well as lessons.
 - **Complete when:**
   - every lesson card shows an estimate in minutes;
   - after a lesson, the done screen shows the minutes it took, and the hub's "Today" total goes up by the same amount;

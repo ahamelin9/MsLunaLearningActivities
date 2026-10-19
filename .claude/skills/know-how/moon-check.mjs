@@ -1,21 +1,25 @@
 #!/usr/bin/env node
-// The milestone moon (DES-17): does she visit for the big milestones only,
-// once each, and talk alone while she's there?
+// The milestone moon (DES-17, the rule from BUG-25): does she visit when the
+// rule says, and only then, and talk alone while she's there?
 //
 //   node .claude/skills/know-how/moon-check.mjs [port=5199] [--reduced-motion]
 //
 // Needs Vite running on the port. In a muted Chrome, at kindergarten, playing
-// each lesson through for real, it checks:
-//   - the first lesson ever finished brings the moon, saying a "first" line;
-//   - replaying it doesn't (an ordinary lesson);
-//   - finishing the lesson that makes half the grade's lessons done brings
-//     her, with a "half" line, and the last one, with an "all" line;
-//   - replaying the last one doesn't (each milestone comes once per child);
+// for real (each round answered right first time, or after one miss, the
+// answer read from React), it checks:
+//   - the first lesson ever brings her with a "first" line, even with a miss;
+//   - replaying it with a miss: no moon;
+//   - replaying it with every round right first time (3 stars): she comes,
+//     with a "3 stars" line, and again the next time (every time);
+//   - the last lesson brings her with an "all" line; replaying it with a
+//     miss: no moon (each once);
+//   - Letter Cookies with misses: no moon; its first 3 stars: a "3 stars in
+//     a game" line; 3 stars again: no moon (once per game);
 //   - while she's there, the done screen's Luna never moves her beak, and the
 //     moon's mouth moves while her clip plays; she leaves by herself;
 //   - with --reduced-motion, she appears and leaves without gliding;
 //   - nothing falls back to the browser voice (her clips are rendered).
-// It fails on the commit before DES-17, which had no moon.
+// It fails on the commit before BUG-25 (no visit for 3 stars or for a game).
 
 import puppeteer from 'puppeteer-core';
 import { chromePath } from '../../../scripts/chrome-path.cjs';
@@ -42,7 +46,7 @@ await page.evaluateOnNewDocument(() => {
   // what happened while the moon was on screen: Luna's beak, the moon's mouth,
   // how she arrived, sampled on every frame
   window.__visit = { seen: false, lunaTalked: false, moonTalked: false, glide: new Set() };
-  const look = () => {
+  const look = fromTimer => {
     const visit = document.querySelector('[data-shot="moon-visit"]');
     if (visit) {
       window.__visit.seen = true;
@@ -50,9 +54,14 @@ await page.evaluateOnNewDocument(() => {
       if (document.querySelector('[data-shot="done-luna"] [data-state~="talking"]')) window.__visit.lunaTalked = true;
       if (visit.querySelector('[data-state~="talking"]')) window.__visit.moonTalked = true;
     }
-    requestAnimationFrame(look);
+    if (fromTimer !== true) requestAnimationFrame(look);
   };
   requestAnimationFrame(look);
+  // frames can be skipped in a headless tab: a steady timer and a DOM
+  // observer as well, so a short visit is never missed (BUG-25)
+  setInterval(() => document.body && look.call(null, true), 40);
+  new MutationObserver(() => { if (document.querySelector('[data-shot="moon-visit"]')) window.__visit.seen = true; })
+    .observe(document, { childList: true, subtree: true });
 });
 
 const shown = sel => page.evaluate(s => !!document.querySelector(s), sel);
@@ -90,39 +99,60 @@ const toHome = async () => {
   await page.goto(`http://localhost:${port}/`, { waitUntil: 'networkidle0' });
 };
 
-/** Plays lesson card i through to its done screen, trying each choice in turn. */
-async function playLesson(i) {
-  await (await page.$$(at('lesson-tile')))[i].click();
-  await page.waitForSelector(at('shell-intro'));
-  await page.click(at('play'));
-  await page.waitForSelector(at('shell-play'));
+/** taps each round's right answer, after one wrong one when `miss` (the answer read from React) */
+async function playRounds(miss, pieces) {
   const round = () => page.evaluate(() => document.querySelector('[data-shot="round-pips"]')?.getAttribute('aria-label') ?? null);
-  for (let guard = 0; guard < 40; guard++) {
-    if (await shown(at('shell-reward'))) return true;
+  for (let guard = 0; guard < 12 && !(await shown(at('shell-reward'))); guard++) {
+    await page.waitForSelector(pieces, { timeout: 15000 });
+    await wait(1200);
     const now = await round();
-    const count = (await page.$$(at('lesson-choice'))).length;
-    let moved = false;
-    for (let c = 0; c < count && !moved; c++) {
-      const choice = (await page.$$(at('lesson-choice')))[c];
-      if (!choice) break;
-      await choice.click().catch(() => {});
-      for (let t = 0; t < 40 && !moved; t++) {
-        await wait(200);
-        moved = (await shown(`${at('win-garden')}, ${at('shell-reward')}`)) || (await round()) !== now;
+    const c = await page.evaluate(sel => {
+      const el = document.querySelector(sel);
+      const key = Object.keys(el).find(k => k.startsWith('__reactFiber'));
+      for (let f = el[key]; f; f = f.return) {
+        const p = f.memoizedProps;
+        // Letter Cookies: the round's answer
+        if (p?.round?.answer) return { right: [`letter ${p.round.answer}`], wrong: p.round.options.filter(o => o !== p.round.answer).map(o => `letter ${o}`) };
+        // a lesson: its options (Rhyme Matcher marks them isRhyme)
+        const list = p?.question?.options;
+        if (Array.isArray(list)) {
+          const label = o => (o.letter ? `letter ${o.letter}` : o.text ?? o.word);
+          const good = o => o.isCorrect ?? o.isRhyme;
+          return { right: list.filter(good).map(label), wrong: list.filter(o => !good(o)).map(label) };
+        }
       }
-    }
-    for (let t = 0; t < 60 && !(await shown(at('shell-reward'))) && (await round()) === now; t++) await wait(200);
+      return null;
+    }, pieces);
+    const tap = label => page.evaluate((sel, l) => {
+      const el = [...document.querySelectorAll(sel)].find(e => (e.getAttribute('aria-label') ?? e.textContent).trim() === l);
+      el?.click();
+    }, pieces, label);
+    if (miss) { await tap(c.wrong[0]); await wait(2600); }
+    await tap(c.right[0]);
+    for (let t = 0; t < 80 && !(await shown(at('shell-reward'))) && (await round()) === now; t++) await wait(200);
   }
   return shown(at('shell-reward'));
 }
 
-/** The done screen's visit, if any: what was said, and how she came and went. */
-async function visitAfter(i) {
+async function openTile(kind, n, title) {
+  const tiles = await page.$$(at(kind));
+  let tile = tiles[n];
+  if (title) for (const t of tiles) if ((await t.evaluate(e => e.textContent)).includes(title)) tile = t;
+  await tile.click();
+  await page.waitForSelector(at('shell-intro'));
+  await page.click(at('play'));
+  await page.waitForSelector(at('shell-play'));
+}
+
+/** Plays lesson card i, or a game by title, and reports the done screen's visit, if any. */
+async function visitAfter(i, miss, game) {
   await page.evaluate(() => {
     window.__said = [];
     window.__visit = { seen: false, lunaTalked: false, moonTalked: false, glide: new Set() };
   });
-  const done = await playLesson(i);
+  if (game) await openTile('game-tile', 0, game);
+  else await openTile('lesson-tile', i);
+  const done = await playRounds(miss, game ? at('cookie') : at('lesson-choice'));
   // she arrives as the screen settles, talks, and leaves; give it all time
   let gone = false;
   for (let t = 0; t < 60; t++) {
@@ -139,6 +169,7 @@ const backToLibrary = async () => {
   await page.click(at('shell-back'));
   await page.waitForSelector(at('hub'));
   await wait(600);
+  await hook();
 };
 
 console.log(reduced ? '(reduced motion)' : '(full motion)');
@@ -156,12 +187,11 @@ await wait(800);
 
 const MOON = await moonLines();
 const ids = await lessonIds();
-const half = Math.ceil(ids.length / 2);
-const among = (said, lines) => said.some(s => lines.some(l => l.text === s));
+const among = (said, lines) => said.some(s => (lines ?? []).some(l => l.text === s));
 
-// ---- the first lesson ever ----
-let v = await visitAfter(0);
-ok('Lesson 1, the first ever: the done screen shows', v.done);
+// ---- the first lesson ever, with a miss ----
+let v = await visitAfter(0, true);
+ok('Lesson 1, the first ever (with a miss): the done screen shows', v.done);
 ok('… the moon visits', v.seen);
 ok('… saying a "first lesson" line', among(v.said, MOON.first), v.said.join(' | '));
 ok('… Luna\'s beak stays still while the moon is there', v.seen && !v.lunaTalked);
@@ -169,33 +199,40 @@ ok('… the moon\'s mouth moves while her clip plays', v.moonTalked);
 ok('… and she leaves by herself', v.gone);
 ok(reduced ? '… appearing without gliding' : '… gliding in', reduced ? v.glide.every(n => n === 'none') : v.glide.some(n => n !== 'none'), v.glide.join(', '));
 
-// ---- replaying it: an ordinary lesson ----
+// ---- replaying it with a miss: an ordinary lesson ----
 await backToLibrary();
-await hook();
-v = await visitAfter(0);
-ok('replaying Lesson 1: no moon', v.done && !v.seen);
+v = await visitAfter(0, true);
+ok('replaying Lesson 1 with a miss: no moon', v.done && !v.seen);
 
-// ---- half the grade's lessons ----
-await toHome();
-await setDone(ids.slice(0, half - 1));
-await toHome();
-await intoLibrary();
-v = await visitAfter(half - 1);
-ok(`Lesson ${half}, half of ${ids.length}: the moon visits with a "half" line`, v.seen && among(v.said, MOON.half), v.said.join(' | '));
+// ---- 3 stars: every time ----
+await backToLibrary();
+v = await visitAfter(0, false);
+ok('replaying Lesson 1 with every round right first time: she comes with a "3 stars" line', v.seen && among(v.said, MOON.perfectLesson), v.said.join(' | '));
+await backToLibrary();
+v = await visitAfter(0, false);
+ok('… and again the next time (3 stars brings her every time)', v.seen && among(v.said, MOON.perfectLesson), v.said.join(' | '));
 
-// ---- all of them ----
+// ---- all of them, then once ----
 await toHome();
 await setDone(ids.slice(0, ids.length - 1));
 await toHome();
 await intoLibrary();
-v = await visitAfter(ids.length - 1);
-ok(`Lesson ${ids.length}, the last: the moon visits with an "all" line`, v.seen && among(v.said, MOON.all), v.said.join(' | '));
-
-// ---- each once ----
+v = await visitAfter(ids.length - 1, true);
+ok(`Lesson ${ids.length}, the last (with a miss): the moon visits with an "all" line`, v.seen && among(v.said, MOON.all), v.said.join(' | '));
 await backToLibrary();
-await hook();
-v = await visitAfter(ids.length - 1);
-ok('replaying the last lesson: no moon (she came once)', v.done && !v.seen);
+v = await visitAfter(ids.length - 1, true);
+ok('replaying the last lesson with a miss: no moon (she came once)', v.done && !v.seen);
+
+// ---- a game: its first 3 stars, once ----
+await backToLibrary();
+v = await visitAfter(0, true, 'Letter Cookies');
+ok('Letter Cookies with misses: no moon', v.done && !v.seen, v.said.filter(s => Object.values(MOON).flat().some(l => l.text === s)).join(' | '));
+await backToLibrary();
+v = await visitAfter(0, false, 'Letter Cookies');
+ok('Letter Cookies, its first 3 stars: she comes with a "3 stars in a game" line', v.seen && among(v.said, MOON.perfectGame), v.said.join(' | '));
+await backToLibrary();
+v = await visitAfter(0, false, 'Letter Cookies');
+ok('Letter Cookies, 3 stars again: no moon (once per game)', v.done && !v.seen);
 
 const robot = await page.evaluate(() => window.__browserSpoke.slice());
 ok('nothing fell back to the browser voice', robot.length === 0, robot.join(' | '));
