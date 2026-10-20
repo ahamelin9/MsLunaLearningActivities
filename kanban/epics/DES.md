@@ -67,17 +67,6 @@ them in.
 - **P0 bugs** can still be pulled in between tickets for a break from styling.
 
 
-### DES-26 · Make the arch radius work at any size
-Task · P2 · S · needs: —
-- **Why:** `--radius-arch` is `999px 999px 22px 22px`. When the corners add up to more than the box, the browser shrinks all four in proportion, so the bottom corners come out about 2px, not the 22px `foundations.md` describes (the round 2 board's "?" cue has the same flaw). Found in DES-7b: ListenCue works round it with its own arch, built from its width.
-- **OKed (Alex, 2026-10-19)** to start: kit only, no visible change expected.
-- **How:** a primitive change, so Alex OKs it first (ladder step 4). Give the arch a form that keeps a half-circle top and card corners at any width: for example a `arch($width)` mixin beside `bp()`, or container units. Then ListenCue reads it again instead of its own `--cue-radius`.
-- **Complete when:**
-  - on the Kit page, an arch 192px wide and one 400px wide both show a half-circle top and 22px bottom corners, in light and dark;
-  - ListenCue uses the shared arch, and its shots don't change;
-  - `components/kit` is still at zero.
-- **Where it stands (2026-10-19):** built; **Blocked: waits for Alex's OK** (review sheet `screenshots/review/des26-arch.png`). The arch is the `arch($width: 100cqi)` mixin beside `bp()` (with `arch-host` for the box it fills), and `--radius-arch` is gone. ListenCue passes its own width; the squishy shelf's cabinet (PRG-5a, the token's only user) reads its container's and now has the board's 22px bottom corners. `kit-check.mjs` hit-tests the Kit page's two arches (fails with the old 999px top). ListenCue's dangling `styles.ear` is OPS-13's.
-
 ### DES-27 · Our own pictures instead of emoji
 Story · P2 · L · needs: — · split into batches before starting
 - **Why:** Alex (2026-10-19): an emoji is drawn by each device's own font, so the app's pictures look like Apple's on the iPads, Google's on a Chromebook and Microsoft's on Windows, in different styles and sometimes colours (a "blue cap" story only matches Apple's 🧢). Apple's emoji can't be shipped to other devices (Apple's license; the repo is public). His call: "make our own emoji system that matches the look and feel of the current app", as Luna, the moon, the cookies and the squishies already are.

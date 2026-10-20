@@ -13,12 +13,3 @@ Story · P1 · M · needs: —
   4. Spelling: lessons say "Cat", the bank "cat". **Pick: the bank's lower case everywhere**, as the games already show; a lesson's caption appears only once solved.
   5. Sentence answers ("Green frog hopping 🐸") are phrases, not words. **Pick: keep the phrase, take the picture from the bank** (`word: 'frog'`).
   6. Sight-word choices (she, then, lake…) have no picture. **Pick: they stay plain text**, not bank words.
-
-### CNT-3 · Content QA pass
-Task · P1 · S
-- **Mismatched pictures:** 😴 for "the little cat", 🛋️ for "table", 🧹 for "mop", 🏃 for "run".
-- **True/false:** some claims copy the sentence word for word.
-- **Complete when:** every listed item is fixed, and a fresh read-through of `content.ts` and `readingCurriculum.ts` finds no ambiguous item or mismatched picture.
-- **Decided (Alex, 2026-10-19):** drop "ham" from the bank (the "am" family keeps jam), and add a distractor rule that "jet" and "plane", and "pup" and "dog", never share a screen. The other stand-ins (igloo 🛖, bun 🍞, jam 🍓, mug ☕) stay until DES-27 draws our own pictures; the truck goes with CNT-2.
-- **Done before (2026-10-18):** "The little cat is sleeping" and "…under the table" show the cat 🐱; "mop" became monkey 🐒; "RUN 🏃" stays; the true/false copies are only in the old sentence bank no game reads (OPS-7 removes it).
-- **Where it stands (2026-10-19):** built; **Blocked: waits for Alex's OK.** "ham" is out of the bank (99 words). `LOOK_ALIKE` in `engine/distractors.ts` (jet/plane, pup/dog) is a rule in `ruleBreaks`, and `distinctByEmoji` skips a look-alike, so Memory Match and What's Missing never deal both. `distractor-check.mjs` found 84 such screens before the fix and none after, and has two planted cases. The fresh read-through found one mismatch, fixed: "football" was ⚽ (a soccer ball in American English), now 🏈. Two more weak pictures join the stand-ins for DES-27: seed 🌱 (a sprout) and doll 🪆 (a nesting doll); no emoji draws either better.
