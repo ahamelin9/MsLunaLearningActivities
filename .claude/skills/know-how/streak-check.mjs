@@ -46,7 +46,7 @@ const streakAfter = times => page.evaluate(async list => {
   for (const t of list) {
     // New York is UTC-4 in October
     window.__now = new Date(`${t}:00-04:00`).getTime();
-    storageService.recordGameCompletion({ gameId: 'letter-jar', starsEarned: 1, pointsEarned: 10 });
+    storageService.recordGameCompletion({ gameId: 'letter-jar', starsEarned: 1 });
     out.push(storageService.getProgress().streakDays);
   }
   window.__now = null;

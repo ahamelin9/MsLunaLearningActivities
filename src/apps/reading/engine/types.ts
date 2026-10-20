@@ -98,7 +98,7 @@ export interface GameDef<TRound = never> {
    * shows her line without its owl: one Luna per screen (DES-12).
    */
   ownLuna?: boolean;
-  /** signature sticker unlocked the first time this game is finished */
+  /** its signature reward: the squishy kind it brings first (SIGNATURE_KIND in squishies.ts, PRG-5a) */
   sticker: string;
   /** built once per play so rounds never repeat within a session */
   makeRounds: (opts: { grade: GradeLevel; difficulty: Difficulty; count: number }) => TRound[];
@@ -112,11 +112,10 @@ export interface GameDef<TRound = never> {
   /**
    * Set when this is one of the curriculum's guided lessons rather than a
    * game (see engine/lessons.tsx). Its rounds are the lesson's fixed
-   * questions, so there is no difficulty to choose; it earns the lesson's own
-   * points, stars by the same rule as a game (PRG-1), and finishing it marks
-   * the lesson done.
+   * questions, so there is no difficulty to choose; it earns stars by the
+   * same rule as a game (PRG-1), and finishing it marks the lesson done.
    */
-  lesson?: { id: string; skillId: string; points: number };
+  lesson?: { id: string; skillId: string };
 }
 
 /** Registry entry with the round type erased. */
@@ -129,5 +128,4 @@ export interface GameResult {
   totalRounds: number;
   perfect: boolean;
   starsEarned: number;
-  pointsEarned: number;
 }

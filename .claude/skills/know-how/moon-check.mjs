@@ -174,9 +174,17 @@ const backToLibrary = async () => {
 
 console.log(reduced ? '(reduced motion)' : '(full motion)');
 await toHome();
-await page.evaluate(() => localStorage.clear());
+// a fresh save, but with the squishy shelf already full: the plays below
+// would otherwise fill it, and filling it is a bigger moment (PRG-4's, in
+// trophy-check.mjs) that takes the moon's visit
+await page.evaluate(() => {
+  localStorage.clear();
+  localStorage.setItem('ms_luna_learning_progress_v1', JSON.stringify({
+    stickers: ['ball:oat', 'cat:caramel', 'bunny:cream', 'bear:toffee', 'butter:cream', 'peach:oat', 'cloud:cream', 'moon:oat']
+  }));
+});
 await toHome();
-// a fresh save asks for the grade first: kindergarten
+// a save with no grade asks for the grade first: kindergarten
 await page.waitForSelector(at('open-reading'));
 await page.click(at('open-reading'));
 await page.waitForSelector(at('grade-card'));

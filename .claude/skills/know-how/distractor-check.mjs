@@ -59,6 +59,9 @@ const planted = [
   ['answer twice', { target: { text: 'B' }, wrong: [{ text: 'b' }], letterBy: 'name' }],
   ['on screen', { target: { text: 'cat' }, wrong: [{ text: 'dog' }], onScreen: [{ text: 'dog' }] }],
   ['same picture twice', { target: { text: 'dog', picture: '🐶' }, wrong: [{ text: 'pup', picture: '🐶' }] }],
+  // CNT-3: different words, pictures a child can't tell apart
+  ['look alike', { target: { text: 'jet', picture: '🛩️' }, wrong: [{ text: 'Plane', picture: '✈️' }] }],
+  ['look alike', { target: { text: 'cat' }, wrong: [{ text: 'pup' }], onScreen: [{ text: 'dog' }] }],
   ['first-letter giveaway', { target: { text: 'Boat' }, wrong: [{ text: 'Car' }, { text: 'Plane' }], targetKnown: true }],
   ['also fits', { target: { text: 'hot' }, wrong: [{ text: 'Warm' }], blank: { alsoFits: ['warm', 'bright'] } }],
   ['no list', { target: { text: 'hot' }, wrong: [{ text: 'cold' }], blank: {} }]

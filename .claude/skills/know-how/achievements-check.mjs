@@ -9,8 +9,10 @@
 //   - a game finished, no lesson: "First Word Wonder" (a lesson's) stays locked;
 //     a lesson finished: it unlocks;
 //   - Super Star Champion at 30 stars, not at 27 (PRG-1's 30, not the old 50);
-//   - "Phonics Explorer" (100 points) unlocks when progress is saved, not only
-//     when the Trophy room opens;
+//   - "Phonics Explorer" unlocks when progress is saved, not only when the
+//     Trophy room opens: since PRG-2 for a lesson that sounds out words
+//     (blend and read), not for another kind, and never for points;
+//   - no points in the save, and an older save's points are dropped (PRG-2);
 //   - a save from before, with 5 lessons done and nothing unlocked, loads
 //     with "First Word Wonder" and "Master Reader";
 //   - the Trophy room works nothing out: no achievement rule is read outside
@@ -40,9 +42,13 @@ const run = steps => page.evaluate(async list => {
   storageService.resetProgress();
   const out = [];
   for (const s of list) {
-    if (s.game) storageService.recordGameCompletion({ gameId: s.game, starsEarned: s.stars ?? 1, pointsEarned: s.points ?? 0 });
-    if (s.lesson) storageService.recordLessonCompletion(s.lesson, s.stars ?? 1, s.points ?? 0, 'k-match-sounds');
-    out.push({ unlocked: storageService.getProgress().unlockedAchievements.slice(), stars: storageService.getProgress().totalStars });
+    if (s.game) storageService.recordGameCompletion({ gameId: s.game, starsEarned: s.stars ?? 1 });
+    if (s.lesson) storageService.recordLessonCompletion(s.lesson, s.stars ?? 1, s.skill ?? 'k-match-sounds');
+    out.push({
+      unlocked: storageService.getProgress().unlockedAchievements.slice(),
+      stars: storageService.getProgress().totalStars,
+      saved: localStorage.getItem('ms_luna_learning_progress_v1')
+    });
   }
   return out;
 }, steps);
@@ -56,8 +62,10 @@ r = await run(Array.from({ length: 10 }, (_, i) => ({ game: `game-${i}`, stars: 
 ok('Super Star Champion not at 27 stars', !r[8].unlocked.includes('super_star'), `${r[8].stars} stars: ${r[8].unlocked.join(', ')}`);
 ok('… and at 30', r[9].unlocked.includes('super_star'), `${r[9].stars} stars`);
 
-r = await run([{ game: 'letter-jar', points: 120 }]);
-ok('"Phonics Explorer" (100 points) unlocks when progress is saved', r[0].unlocked.includes('sound_explorer'), r[0].unlocked.join(', '));
+r = await run([{ game: 'letter-jar' }, { lesson: 'k-lesson-x', skill: 'k-match-sounds' }, { lesson: 'k-bw-animals', skill: 'k-blend-words' }]);
+ok('"Phonics Explorer" stays locked for a game and a lesson that doesn\'t sound out words', !r[1].unlocked.includes('sound_explorer'), r[1].unlocked.join(', '));
+ok('… and unlocks, when progress is saved, for one that does', r[2].unlocked.includes('sound_explorer'), r[2].unlocked.join(', '));
+ok('no points in the save (PRG-2)', r.every(x => !/points/i.test(x.saved)), r.map(x => x.saved.match(/"\w*[Pp]oints":\d+/)?.[0] ?? '-').join(' '));
 
 // an older save: 5 lessons done, nothing unlocked
 await page.evaluate(key => {
@@ -70,6 +78,13 @@ const loaded = await page.evaluate(async () => {
   return storageService.getProgress().unlockedAchievements;
 });
 ok('an older save loads with what it has earned', loaded.includes('first_step') && loaded.includes('bookworm'), loaded.join(', '));
+const kept = await page.evaluate(async key => {
+  const src = performance.getEntriesByType('resource').map(e => e.name).find(n => n.includes('/src/utils/storage.ts')) ?? '/src/utils/storage.ts';
+  const { storageService } = await import(src);
+  storageService.recordGameCompletion({ gameId: 'letter-jar', starsEarned: 1 });
+  return { inMemory: 'totalPoints' in storageService.getProgress(), saved: localStorage.getItem(key) };
+}, KEY);
+ok('… with its points dropped (PRG-2)', !kept.inMemory && !/points/i.test(kept.saved), kept.saved.match(/"\w*[Pp]oints":\d+/)?.[0] ?? 'none');
 
 await browser.close();
 

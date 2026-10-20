@@ -1,10 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react';
 import type { AnyGameDef } from '../types';
-import type { Sticker } from '../stickers';
+import { ODDS, SQUISHY_KINDS, kindsFound, type SquishyAward } from '../squishies';
+import { ShelfRows } from '../ShelfRows/ShelfRows';
+import type { TimeStar } from '../stars';
 import { soundManager } from '@/utils/audio';
 import { pronunciation } from '@/utils/pronunciation';
 import { afterMotion } from '@/utils/motion';
-import { Chip, ChunkyButton, Icon, Luna, MilestoneMoon, PaperCard, Petals, ProgressBar, StarRow } from '@/components/kit';
+import { Chip, ChunkyButton, Icon, Luna, MilestoneMoon, PaperCard, Petals, ProgressBar, Squishy, StarRow } from '@/components/kit';
 import { minutesOf } from '@/utils/storage';
 import styles from './DoneScreen.module.scss';
 
@@ -20,7 +22,7 @@ export interface LessonPath {
 interface DoneScreenProps {
   game: AnyGameDef;
   /** `firstTry`: the rounds answered right the first time, which the stars count (PRG-1) */
-  award: { sticker: Sticker | null; stars: number; points: number; firstTry: number; seconds: number; estimate: number } | null;
+  award: { squishy: SquishyAward | null; stars: number; timeStar: TimeStar; firstTry: number; seconds: number; estimate: number } | null;
   /** a lesson's bar and the lesson it opened; left out for a game */
   path?: LessonPath;
   onPlayAgain: () => void;
@@ -28,6 +30,10 @@ interface DoneScreenProps {
   onPlayAnother?: () => void;
   /** what that button says: "Another game", or "Next lesson" */
   playAnotherLabel: string;
+  /** "See my shelf" (PRG-5a); left out, it isn't shown */
+  onSeeShelf?: () => void;
+  /** the squishies on the shelf, this play's included: a game's done screen shows them (PRG-9) */
+  owned?: string[];
   /** Luna, tapped: her line again */
   onLuna: () => void;
   /** a milestone's visit (DES-17): the moon's line, while she's here */
@@ -92,12 +98,11 @@ function MoonVisit({ line, onGone }: { line: string; onGone: () => void }) {
 /**
  * The screen at the end of a game or lesson (DES-22d), as on the round 2 Done
  * board, from the kit. On the left, the "Lesson done!" mark (tap it to see it
- * pop again), the stars and Luna cheering in the corner; on the right, a
- * lesson's bar moving on and the lesson it opened, the reward (today's
- * sticker, until PRG-5's squishies) and what next. Petals drift down once it
+ * pop again), the stars and Luna cheering in the corner; on the right, how
+ * long it took (PRG-6), a lesson's bar moving on and the lesson it opened, a
+ * new squishy for the shelf (PRG-5a) and what next. Petals drift down once it
  * has arrived, as after a won round (DES-11). For a big milestone the moon
- * visits (DES-17). The times (PRG-6) and "See my
- * shelf" (PRG-5) come with their tickets.
+ * visits (DES-17).
  * GameShell saves the result and has Luna say her line; the header is the
  * shell's.
  */
@@ -108,6 +113,8 @@ export const DoneScreen: React.FC<DoneScreenProps> = ({
   onPlayAgain,
   onPlayAnother,
   playAnotherLabel,
+  onSeeShelf,
+  owned,
   onLuna,
   moon,
   onMoonGone
@@ -115,7 +122,7 @@ export const DoneScreen: React.FC<DoneScreenProps> = ({
   // each tap on the mark pops it again
   const [pops, setPops] = useState(0);
   const stars = Math.max(0, Math.min(3, award?.stars ?? 1)) as 0 | 1 | 2 | 3;
-  const sticker = award?.sticker ?? null;
+  const squishy = award?.squishy ?? null;
 
   return (
     <div className={styles.screen} data-shot="shell-reward">
@@ -143,6 +150,17 @@ export const DoneScreen: React.FC<DoneScreenProps> = ({
           <p className={styles.solved}>
             {award?.firstTry ?? 0} of {game.roundsPerPlay} first try
           </p>
+          {/* what time did to the stars, in kid words (PRG-10) */}
+          {award?.timeStar === 'quick' && (
+            <span data-shot="done-time-star">
+              <Chip variant="took" icon="sparkle">Quick and careful: a star!</Chip>
+            </span>
+          )}
+          {award?.timeStar === 'slow' && (
+            <span data-shot="done-time-star">
+              <Chip variant="time" icon="clock">A very long time: one star less</Chip>
+            </span>
+          )}
           {/* while the moon visits, only she talks: Luna watches, beak still (DES-17) */}
           <span className={styles.luna} data-shot="done-luna">
             <Luna mood="cheer" size={96} onClick={onLuna} label="Hear Ms. Luna again" talking={moon ? false : undefined} />
@@ -178,24 +196,50 @@ export const DoneScreen: React.FC<DoneScreenProps> = ({
             </section>
           )}
 
-          {sticker && (
-            <PaperCard variant="reward" className={styles.reward}>
-              <ChunkyButton
-                variant="icon"
-                size={64}
-                aria-label={sticker.name}
-                onClick={() => {
-                  soundManager.playLetterTap();
-                  soundManager.speak(sticker.line);
-                }}
-              >
-                <span className={styles.sticker}>{sticker.emoji}</span>
-              </ChunkyButton>
+          {/* as on the Done board: the new squishy, drawn, its name, and a
+              rare or super-rare tag that shimmers (PRG-5a) */}
+          {squishy && (
+            <PaperCard variant="reward" className={styles.reward} data-shot="done-squishy">
+              <Squishy
+                kind={squishy.kind}
+                colour={squishy.colour}
+                size={96}
+                label={`${squishy.name}: hear Ms. Luna`}
+                onClick={() => soundManager.speak(squishy.line)}
+              />
               <span className={styles.rewardWords}>
-                <span className={styles.rewardLabel}>New sticker for your tin</span>
-                <strong className={styles.rewardName}>{sticker.name}</strong>
+                <span className={styles.rewardLabel}>New squishy for your shelf</span>
+                <strong className={styles.rewardName}>{squishy.name}</strong>
+                {squishy.rarity !== 'usual' && (
+                  <Chip variant={squishy.rarity} icon="sparkle" shimmer className={styles.rarity}>
+                    {squishy.rarity === 'rare' ? 'Rare colour' : 'Super rare'}: {squishy.colour}!
+                  </Chip>
+                )}
+                <span className={styles.rewardNote}>
+                  {squishy.rarity === 'rare' && `Only about 1 in ${Math.round(1 / ODDS.rare)} squishies comes in a rare colour. `}
+                  {squishy.rarity === 'super-rare' && `Only about 1 in ${Math.round(1 / ODDS.superRare)} squishies comes in super rare ${squishy.colour}. `}
+                  Tap it to squish.
+                </span>
               </span>
             </PaperCard>
+          )}
+
+          {/* a game has no lesson bar, so its right half shows the squishy
+              shelf, with the one just won picked out (PRG-9) */}
+          {!path && owned && (
+            <section className={styles.lessons} data-shot="done-shelf">
+              <h3 className={styles.label}>
+                Your squishy shelf · {kindsFound(owned)} of {SQUISHY_KINDS.length}
+              </h3>
+              <div className={styles.shelf}>
+                <ShelfRows
+                  owned={owned}
+                  size={64}
+                  picked={squishy?.kind}
+                  onTap={(def, found) => soundManager.speak(found ? def.line : def.hint)}
+                />
+              </div>
+            </section>
           )}
 
           <div className={styles.actions}>
@@ -210,6 +254,11 @@ export const DoneScreen: React.FC<DoneScreenProps> = ({
                 onClick={onPlayAnother}
               >
                 {playAnotherLabel}
+              </ChunkyButton>
+            )}
+            {onSeeShelf && (
+              <ChunkyButton variant="quiet" size={64} onClick={onSeeShelf} data-shot="see-shelf">
+                See my shelf
               </ChunkyButton>
             )}
             {/* back to the library is the header's Library (DES-8) */}

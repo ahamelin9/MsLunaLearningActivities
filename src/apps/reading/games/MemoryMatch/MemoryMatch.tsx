@@ -167,7 +167,7 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
   };
 
   return (
-    <GameSurface className={styles.memory}>
+    <GameSurface>
       <StagePrompt>
         {round.kind === 'case' ? 'Big letter + little letter' : 'Picture + word'} — find every pair!
       </StagePrompt>

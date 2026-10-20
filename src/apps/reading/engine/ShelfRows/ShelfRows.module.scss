@@ -1,0 +1,43 @@
+// The squishy shelf's planks (PRG-5a), shared by Luna's Squishy Shelf and a
+// game's done screen (PRG-9): roles and the space scale only; the squishies
+// are the kit's.
+
+.row {
+  display: flex;
+  flex-direction: column;
+}
+
+.kinds {
+  display: flex;
+  justify-content: space-around;
+  align-items: flex-end;
+  gap: var(--space-2);
+}
+
+// one kind: its squishy, its colour dots, and "New" on the latest
+.kind {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.new {
+  position: absolute;
+  top: calc(var(--space-2) * -1);
+  z-index: var(--z-raised);
+}
+
+// a small squishy's head is nearer its top, so "New" sits higher, clear of it
+.kind[data-size='64'] .new {
+  top: calc(var(--space-6) * -1);
+}
+
+.plank {
+  height: var(--space-3);
+  margin-top: var(--space-1);
+  border-radius: var(--radius-tag);
+  background: var(--soil);
+  box-shadow: 0 var(--ledge-small) 0 var(--soil-deep);
+}

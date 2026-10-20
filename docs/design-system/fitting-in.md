@@ -45,9 +45,9 @@ Illustrations have their own path: a new drawn colour goes in
 - **"Bubble Sounds' words move."** The motion rule says words a child reads
   never move. Bubble Sounds is the documented exception
   ([decisions.md](decisions.md)), because the movement is the game.
-- **"The squishy shelf's arch is much wider than the standard arch."** A
-  component token on the shelf with its own radius, made from the arch's parts
-  if possible. If it needs a new radius, that's a primitive (step 4).
+- **"The squishy shelf's arch is much wider than the standard arch."** No
+  token needed since DES-26: the `arch()` mixin rounds any box's top by half
+  its width, so the shelf's cabinet uses it as the "?" cue does.
 
 ## Exception markers
 

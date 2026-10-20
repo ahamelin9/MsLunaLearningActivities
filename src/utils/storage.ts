@@ -4,6 +4,7 @@ import type { UserProgress, UserSettings } from '../types/user';
 import { soundManager } from './audio';
 import { DEFAULT_VOICE_ID, pronunciation } from './pronunciation';
 import { ACHIEVEMENTS } from '../data/achievements';
+import { upgradeStickers } from '../apps/reading/engine/squishies';
 
 const STORAGE_KEY = 'ms_luna_learning_progress_v1';
 
@@ -28,7 +29,6 @@ export const DEFAULT_SETTINGS: UserSettings = {
 export const DEFAULT_PROGRESS: UserProgress = {
   selectedGrade: null,
   totalStars: 0,
-  totalPoints: 0,
   completedLessons: [],
   skillMastery: {},
   streakDays: 1,
@@ -89,6 +89,8 @@ class StorageService {
       // an older save's accent setting is gone: the voice carries its accent (SET-3)
       const { voiceLanguage: _accent, ...savedSettings } = parsed.settings || {};
       void _accent;
+      // and its points: stars carry the meaning (PRG-2)
+      delete parsed.totalPoints;
       const loadedSettings = {
         ...DEFAULT_SETTINGS,
         ...savedSettings
@@ -98,7 +100,8 @@ class StorageService {
         ...DEFAULT_PROGRESS,
         ...parsed,
         selectedGrade: parsed.selectedGrade || null,
-        stickers: Array.isArray(parsed.stickers) ? parsed.stickers : [],
+        // an older save's stickers come back as squishies, as many as before (PRG-5a)
+        stickers: Array.isArray(parsed.stickers) ? upgradeStickers(parsed.stickers) : [],
         gamePlays: parsed.gamePlays && typeof parsed.gamePlays === 'object' ? parsed.gamePlays : {},
         gameDifficulty: parsed.gameDifficulty && typeof parsed.gameDifficulty === 'object' ? parsed.gameDifficulty : {},
         bestStars: bestStarsOf(parsed),
@@ -180,10 +183,9 @@ class StorageService {
   public recordLessonCompletion(
     lessonId: string,
     starsEarned: number,
-    pointsEarned: number,
     skillId: string,
-    /** lessons run in the game shell, so finishing one can peel a sticker too */
-    stickerId?: string | null
+    /** lessons run in the game shell, so finishing one can bring a squishy too (PRG-5a) */
+    squishyId?: string | null
   ): { isFirstCompletion: boolean; newAchievements: string[] } {
     const unlockedBefore = this.progress.unlockedAchievements;
     const isFirstCompletion = !this.progress.completedLessons.includes(lessonId);
@@ -202,19 +204,13 @@ class StorageService {
 
     const { gain, bestStars } = this.starsAbove(lessonId, starsEarned);
     const totalStars = this.progress.totalStars + gain;
-    const totalPoints = this.progress.totalPoints + pointsEarned;
-
-
-    const stickers = stickerId && !this.progress.stickers.includes(stickerId)
-      ? [...this.progress.stickers, stickerId]
-      : this.progress.stickers;
+    const stickers = this.withSquishy(squishyId);
 
     this.progress = {
       ...this.progress,
       completedLessons: updatedCompleted,
       stickers,
       totalStars,
-      totalPoints,
       skillMastery: updatedMastery,
       bestStars,
       // finished: nothing part-way any more (PRG-8)
@@ -257,27 +253,29 @@ class StorageService {
     return { streak, today };
   }
 
+  /** The shelf with a new squishy on it, once ("kind:colour"; PRG-5a). */
+  private withSquishy(squishyId?: string | null): string[] {
+    return squishyId && !this.progress.stickers.includes(squishyId)
+      ? [...this.progress.stickers, squishyId]
+      : this.progress.stickers;
+  }
+
   /**
-   * Records a finished mini-game: stars, points, play count and any
-   * sticker peeled off Luna's sheet.
+   * Records a finished mini-game: stars, play count and any new squishy for
+   * the shelf.
    */
   public recordGameCompletion(opts: {
     gameId: string;
     starsEarned: number;
-    pointsEarned: number;
-    stickerId?: string | null;
+    squishyId?: string | null;
   }): { newAchievements: string[] } {
-    const { gameId, starsEarned, pointsEarned, stickerId } = opts;
+    const { gameId, starsEarned, squishyId } = opts;
     const unlockedBefore = this.progress.unlockedAchievements;
     const { streak, today } = this.computeStreak();
 
     const { gain, bestStars } = this.starsAbove(gameId, starsEarned);
     const totalStars = this.progress.totalStars + gain;
-    const totalPoints = this.progress.totalPoints + pointsEarned;
-
-    const stickers = stickerId && !this.progress.stickers.includes(stickerId)
-      ? [...this.progress.stickers, stickerId]
-      : this.progress.stickers;
+    const stickers = this.withSquishy(squishyId);
 
     const gamePlays = {
       ...this.progress.gamePlays,
@@ -287,7 +285,6 @@ class StorageService {
     this.progress = {
       ...this.progress,
       totalStars,
-      totalPoints,
       stickers,
       gamePlays,
       bestStars,
@@ -301,9 +298,11 @@ class StorageService {
 
   /**
    * Saves how long a play of a lesson or game took (PRG-6), and adds its
-   * minutes, as the done screen shows them, to today's.
+   * minutes, as the done screen shows them, to today's. A lesson picked up
+   * part-way passes the minutes it already added when it was left (PRG-11),
+   * so they aren't counted twice.
    */
-  public recordTime(id: string, seconds: number) {
+  public recordTime(id: string, seconds: number, counted = 0) {
     const was = this.progress.times[id];
     const day = localDay(new Date());
     const today = this.progress.today.day === day ? this.progress.today.minutes : 0;
@@ -318,14 +317,35 @@ class StorageService {
           total: (was?.total ?? 0) + seconds
         }
       },
-      today: { day, minutes: today + minutesOf(seconds) }
+      today: { day, minutes: today + Math.max(0, minutesOf(seconds) - counted) }
     };
     this.persist();
   }
 
-  /** Saves how far into the lesson up next a child is (PRG-8): its rounds won, and how many first time. */
-  public setPartway(lessonId: string, won: number, clean: number) {
-    this.progress = { ...this.progress, partway: { ...this.progress.partway, [lessonId]: { won, clean } } };
+  /**
+   * Saves how far into the lesson up next a child is (PRG-8): its rounds won,
+   * how many first time, and the time it carried in from before (PRG-11).
+   */
+  public setPartway(lessonId: string, won: number, clean: number, carried: { seconds: number; counted: number }) {
+    this.progress = { ...this.progress, partway: { ...this.progress.partway, [lessonId]: { won, clean, ...carried } } };
+    this.persist();
+  }
+
+  /**
+   * A lesson left before its end (PRG-11): its minutes so far join Today.
+   * `seconds` is its whole time so far and `counted` the minutes of it Today
+   * already has. Once a round is won, the lesson up next keeps the time with
+   * its rounds, so finishing it later shows the whole time.
+   */
+  public leaveLesson(lessonId: string, keep: { won: number; clean: number } | null, seconds: number, counted: number) {
+    const minutes = Math.round(seconds / 60);
+    this.progress = {
+      ...this.progress,
+      partway: keep && keep.won > 0
+        ? { ...this.progress.partway, [lessonId]: { ...keep, seconds, counted: minutes } }
+        : this.progress.partway,
+      today: { day: localDay(new Date()), minutes: this.todayMinutes() + Math.max(0, minutes - counted) }
+    };
     this.persist();
   }
 

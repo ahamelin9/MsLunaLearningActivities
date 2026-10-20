@@ -13,6 +13,10 @@
 //     N from 2 minutes plus the real seconds), and the library's Today goes
 //     up by the same N, and Lesson 1's card says "took N min";
 //   - after a reload the card and Today still say so;
+//   - PRG-11: Lesson 2 left after a minute and one round raises Today by 1;
+//     picked up and finished after another minute, the done screen and the
+//     card show the whole time (2 min), and Today has gone up by 2 in all,
+//     not 3;
 //   - a save from before PRG-6 (no times) loads with no page error and the
 //     estimates showing.
 // It fails on the commit before PRG-6, which kept no times.
@@ -74,7 +78,8 @@ await page.evaluate(() => { window.__skip += 60000; });
 await page.evaluate(() => { window.__hidden = false; document.dispatchEvent(new Event('visibilitychange')); });
 
 const round = () => page.evaluate(() => document.querySelector('[data-shot="round-pips"]')?.getAttribute('aria-label') ?? null);
-for (let r = 0; r < 12 && !(await page.$(at('shell-reward'))); r++) {
+/** answers the round on screen right, and waits for the next one (or the done screen) */
+const solveRound = async () => {
   await page.waitForSelector(at('lesson-choice'));
   await wait(800);
   const now = await round();
@@ -92,7 +97,8 @@ for (let r = 0; r < 12 && !(await page.$(at('shell-reward'))); r++) {
   });
   await page.evaluate(l => [...document.querySelectorAll('[data-shot="lesson-choice"]')].find(e => (e.getAttribute('aria-label') ?? e.textContent).trim() === l)?.click(), right);
   for (let t = 0; t < 80 && !(await page.$(at('shell-reward'))) && (await round()) === now; t++) await wait(200);
-}
+};
+for (let r = 0; r < 12 && !(await page.$(at('shell-reward'))); r++) await solveRound();
 await page.waitForSelector(at('done-time'), { timeout: 20000 });
 const realSeconds = (Date.now() - t0) / 1000;
 const took = await page.$eval(at('done-time'), e => Number(e.textContent.match(/You took (\d+) minute/)?.[1] ?? NaN));
@@ -118,6 +124,40 @@ await page.waitForSelector(at('hub'));
 await wait(600);
 ok('after a reload Today and the card still say so', (await today()) === today1 && (await cardTimes())[0] === `took ${took} min`);
 
+// ---- PRG-11: Lesson 2 left part-way, then picked up and finished ----
+const openLesson = async n => {
+  await (await page.$$(at('lesson-tile')))[n].click();
+  await page.waitForSelector(at('play'));
+  await page.click(at('play'));
+  await page.waitForSelector(at('lesson-choice'));
+};
+await openLesson(1);
+let t = Date.now();
+await page.evaluate(() => { window.__skip += 60000; });
+await solveRound();
+const part1 = (Date.now() - t) / 1000;
+await page.click(at('shell-back'));
+await page.waitForSelector(at('hub'));
+await wait(600);
+const today2 = await today();
+ok('a lesson left part-way after a minute raises Today by 1', today2 - today1 === 1, `${today1} → ${today2}`);
+await openLesson(1);
+t = Date.now();
+await page.evaluate(() => { window.__skip += 60000; });
+for (let r = 0; r < 12 && !(await page.$(at('shell-reward'))); r++) await solveRound();
+await page.waitForSelector(at('done-time'), { timeout: 20000 });
+const part2 = (Date.now() - t) / 1000;
+const whole = Math.max(1, Math.round((120 + part1 + part2) / 60));
+const took2 = await page.$eval(at('done-time'), e => Number(e.textContent.match(/You took (\d+) minute/)?.[1] ?? NaN));
+ok('finished later, the done screen shows the whole time', took2 === whole, `took ${took2} min, whole ${whole}`);
+await wait(3500);
+await page.click(at('shell-back'));
+await page.waitForSelector(at('hub'));
+await wait(600);
+const today3 = await today();
+ok('… Today has the whole time once, not the first minute twice', today3 - today1 === whole, `${today1} → ${today2} → ${today3}`);
+ok('… and the card says it took the whole time', (await cardTimes())[1] === `took ${whole} min`, (await cardTimes())[1]);
+
 // ---- a save from before PRG-6 ----
 await page.evaluate(key => {
   const saved = JSON.parse(localStorage.getItem(key));
@@ -131,7 +171,8 @@ await page.click(at('open-reading'));
 await page.waitForSelector(at('hub'));
 await wait(600);
 cards = await cardTimes();
-ok('an older save loads with no error, estimates showing', errors.length === 0 && cards.slice(1).every(c => /^about \d+ min$/.test(c ?? '')), errors.join(' | ') || cards.join(' · '));
+// lessons 1 and 2 are done above, so the estimates are on the rest
+ok('an older save loads with no error, estimates showing', errors.length === 0 && cards.slice(2).every(c => /^about \d+ min$/.test(c ?? '')), errors.join(' | ') || cards.join(' · '));
 
 await browser.close();
 const passed = results.every(Boolean);

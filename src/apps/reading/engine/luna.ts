@@ -58,7 +58,7 @@ export const GENERAL: Bank = {
     { text: 'See? Now you’ll know it forever.', mood: 'happy' }
   ],
   finish: [
-    { text: 'You did the whole thing! Sticker time.', mood: 'cheer' },
+    { text: 'You did the whole thing! I’m so proud of you.', mood: 'cheer' },
     { text: 'Round finished. My feathers are all fluffed up!', mood: 'cheer' },
     { text: 'That was wonderful reading work.', mood: 'happy' }
   ],
@@ -150,9 +150,15 @@ export const PER_GAME: Record<string, Partial<Bank>> = {
  * moment (engine/milestones.ts) and says one of these, in the same voice.
  * Short and warm, "good job" as on her board. Her look is always cheer.
  */
-export type Milestone = 'first' | 'all' | 'perfectLesson' | 'perfectGame';
+export type Milestone = 'fullShelf' | 'first' | 'all' | 'perfectLesson' | 'perfectGame';
 
 export const MOON: Record<Milestone, { text: string }[]> = {
+  // every squishy kind on the shelf (PRG-4)
+  fullShelf: [
+    { text: 'Every squishy is on your shelf! Good job!' },
+    { text: 'Hello from the moon! You found them all!' },
+    { text: 'A full shelf! I came down from the sky to see.' }
+  ],
   // the first lesson a child ever finishes
   first: [
     { text: 'Good job! You finished your very first lesson!' },

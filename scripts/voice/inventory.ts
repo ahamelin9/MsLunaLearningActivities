@@ -33,7 +33,7 @@ import {
 import { READING_CURRICULUM, GRADES } from '../../src/data/readingCurriculum';
 import * as content from '../../src/apps/reading/engine/content';
 import * as luna from '../../src/apps/reading/engine/luna';
-import { STICKERS } from '../../src/apps/reading/engine/stickers';
+import { SHELF_LINES, SQUISHY_KINDS } from '../../src/apps/reading/engine/squishies';
 import { GAMES } from '../../src/apps/reading/games';
 import { lessonsFor } from '../../src/apps/reading/engine/lessons';
 
@@ -385,8 +385,13 @@ export function buildInventory(): Clip[] {
   for (const value of Object.values(luna)) harvest(value);
 
   for (const text of LITERAL_PROMPTS) prose.add(text);
-  // a sticker's line is said when it is won and when it is tapped in the tin
-  for (const sticker of STICKERS) prose.add(sticker.line);
+  // a squishy's line is said when it's won and squeezed on the shelf, and its
+  // clue when one still to find is tapped (PRG-5a); and Luna's shelf lines
+  for (const squishy of SQUISHY_KINDS) {
+    prose.add(squishy.line);
+    prose.add(squishy.hint);
+  }
+  for (const line of Object.values(SHELF_LINES)) prose.add(line);
   // every game and lesson opens with Luna saying its mission
   for (const game of GAMES) prose.add(game.mission);
   for (const grade of GRADES) for (const lesson of lessonsFor(grade.id)) prose.add(lesson.mission);

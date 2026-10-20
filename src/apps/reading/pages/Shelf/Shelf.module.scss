@@ -1,0 +1,91 @@
+// Luna's Squishy Shelf (PRG-5a), as on the round 2 Squishies board: the
+// arched cabinet with its planks on the left, Luna and the colours' key on
+// the right; on a portrait iPad the key goes under the cabinet. Roles and the
+// space scale only; the squishies are the kit's.
+
+@use 'styles/mixins' as *;
+
+.page {
+  flex: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  // the rows keep their own height: on a portrait iPad the key sits right
+  // under the cabinet, not halfway down the screen
+  align-content: start;
+  align-items: start;
+  gap: var(--space-6);
+  padding: var(--space-4) var(--space-6) var(--space-8);
+  color: var(--ink);
+  font-family: var(--font-read);
+
+  @include bp(narrow) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+// the cabinet: an arch on top, planks across. Its box hosts the arch, which
+// rounds the top by half the cabinet's width on card corners (DES-26)
+.cabinet-box {
+  @include arch-host;
+}
+
+.cabinet {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--space-4);
+  @include arch;
+}
+
+// the top of the arch: the "?" for something special (PRG-4)
+.top {
+  align-self: center;
+}
+
+// the planks themselves are ShelfRows' (engine/ShelfRows)
+
+// Luna, and beside her the key to the colours
+.side {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  max-width: calc(var(--space-16) * 5);
+
+  @include bp(narrow) {
+    max-width: none;
+  }
+}
+
+// her line across the top, Luna under it, as on the board
+.luna {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-1);
+}
+
+.legend {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.label {
+  font: var(--text-tag);
+  letter-spacing: var(--tracking-tag);
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+.key {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font: var(--text-label-small);
+  font-weight: 400;
+
+  strong {
+    font-weight: 700;
+    min-width: calc(var(--space-16) + var(--space-6));
+  }
+}

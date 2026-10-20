@@ -16,7 +16,8 @@
  *         the answer, "found it!", the shared pop, and five sparks bursting
  *         out, as on the Round board: DES-22b; none under reduced motion)
  * Tokens: --cue-bg, --cue-border, --cue-border-style, --cue-ink, --cue-motion,
- *         --cue-width, --cue-height, --cue-radius; a spark's --spark and its
+ *         --cue-width, --cue-height (its arch is the arch() mixin from
+ *         its width, DES-26); a spark's --spark and its
  *         way out (--burst-x, --burst-y, --burst-turn)
  * Reads:  --card, --action, --accent-text, --ink-soft, --right, --right-soft,
  *         --right-text, --radius-card, --border-thick, --text-cue,
@@ -81,7 +82,7 @@ export function ListenCue({
           </>
         ) : (
           <>
-            <Icon name="ear" size={40} className={styles.ear} />
+            <Icon name="ear" size={40} />
             {picture ? (
               <span className={styles.picture} aria-hidden="true">{picture}</span>
             ) : (

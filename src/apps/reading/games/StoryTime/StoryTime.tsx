@@ -142,7 +142,7 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
   };
 
   return (
-    <GameSurface className={styles.story}>
+    <GameSurface>
       <div className={styles.book}>
         <div className={styles.spine} aria-hidden="true" />
 

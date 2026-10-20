@@ -5,10 +5,11 @@ import type { AnyGameDef } from './engine/types';
 import type { Difficulty } from './engine/content';
 import { storageService } from '../../utils/storage';
 import { AppHeader } from '@/components/os/AppHeader/AppHeader';
-import { Chip, ChunkyButton } from '@/components/kit';
+import { ChunkyButton } from '@/components/kit';
 import { GRADES } from '@/data/readingCurriculum';
 import { GradeSelect } from './pages/GradeSelect/GradeSelect';
 import { Hub } from './pages/Hub/Hub';
+import { Shelf } from './pages/Shelf/Shelf';
 import { GameShell } from './engine/GameShell/GameShell';
 import { lessonsFor, lessonStates, type LessonState } from './engine/lessons';
 import { surprisePick } from './games';
@@ -18,7 +19,7 @@ interface ReadingAppProps {
   onReturnToHome: () => void;
   /** the header's gear; the grown-up gate comes with SET-1 */
   onOpenSettings: () => void;
-  /** the Sticker Tin's way into the Trophy room (DES-9b, DES-21) */
+  /** the header's stars open the Trophy room (DES-9b; PRG-5a moved it from the library's card) */
   onOpenTrophies: () => void;
   onGradeChange?: (grade: GradeLevel) => void;
 }
@@ -32,6 +33,8 @@ interface ActiveGame {
 export const ReadingApp: React.FC<ReadingAppProps> = ({ progress, onReturnToHome, onOpenSettings, onOpenTrophies, onGradeChange }) => {
   const [activeGame, setActiveGame] = useState<ActiveGame | null>(null);
   const [isChangingGrade, setIsChangingGrade] = useState(false);
+  // Luna's Squishy Shelf (PRG-5a), from the library's card or a done screen
+  const [onShelf, setOnShelf] = useState(false);
   // Luna greets the child only when the library opens from the home screen
   // (DES-21): after Grade Select she has just said "Let's start …!", and back
   // from a game she has been talking all along
@@ -70,6 +73,15 @@ export const ReadingApp: React.FC<ReadingAppProps> = ({ progress, onReturnToHome
   const play = (game: AnyGameDef) =>
     begin({ game, autoStart: false, difficulty: progress.gameDifficulty?.[game.id] ?? 2 });
 
+  // back to the library, where a lesson this one opened pops in (DES-13)
+  const leaveGame = () => {
+    const now = lessonStates(lessons, progress.completedLessons);
+    const i = now.findIndex((state, n) => state !== 'locked' && statesBefore.current[n] === 'locked');
+    setOpened(i >= 0 ? lessons[i].id : null);
+    setGreet(false);
+    setActiveGame(null);
+  };
+
   // View 1: a lesson or a mini-game, both run by the same shell, which has its own header
   if (activeGame && currentGrade) {
     const { game } = activeGame;
@@ -91,12 +103,10 @@ export const ReadingApp: React.FC<ReadingAppProps> = ({ progress, onReturnToHome
         lessons={game.lesson ? lessons : undefined}
         // the lesson up next, left part-way, picks up where it was (PRG-8)
         resume={game.lesson && !progress.completedLessons.includes(game.lesson.id) ? progress.partway?.[game.lesson.id] : undefined}
-        onExit={() => {
-          const now = lessonStates(lessons, progress.completedLessons);
-          const i = now.findIndex((state, n) => state !== 'locked' && statesBefore.current[n] === 'locked');
-          setOpened(i >= 0 ? lessons[i].id : null);
-          setGreet(false);
-          setActiveGame(null);
+        onExit={leaveGame}
+        onSeeShelf={() => {
+          leaveGame();
+          setOnShelf(true);
         }}
         onPlayAnother={
           game.lesson ? (nextLesson ? () => play(nextLesson) : undefined) : () => handleSurprise(game.id)
@@ -117,9 +127,11 @@ export const ReadingApp: React.FC<ReadingAppProps> = ({ progress, onReturnToHome
   );
   const header = (grade?: string) => (
     <AppHeader back="home" onBack={onReturnToHome} title="Luna’s Library" beside={grade && gradeButton(grade)}>
-      <Chip variant="count" icon="star">
+      {/* the stars open the Trophy room, a button like the grade beside the
+          title: the Squishy Shelf card it lived on has no room for it (PRG-5a) */}
+      <ChunkyButton icon="star" aria-label={`My trophies: ${progress.totalStars} stars`} onClick={onOpenTrophies} data-shot="open-trophies">
         {progress.totalStars}
-      </Chip>
+      </ChunkyButton>
       <ChunkyButton variant="icon" icon="gear" aria-label="Grown-ups: settings" data-shot="open-settings" onHold={onOpenSettings} />
     </AppHeader>
   );
@@ -134,7 +146,12 @@ export const ReadingApp: React.FC<ReadingAppProps> = ({ progress, onReturnToHome
     );
   }
 
-  // View 3: Luna's library
+  // View 3: Luna's Squishy Shelf (PRG-5a), with its own header back to the library
+  if (onShelf) {
+    return <Shelf progress={progress} onBack={() => setOnShelf(false)} />;
+  }
+
+  // View 4: Luna's library
   const gradeTitle = (GRADES.find(g => g.id === currentGrade) ?? GRADES[0]).title;
   return (
     <>
@@ -147,7 +164,10 @@ export const ReadingApp: React.FC<ReadingAppProps> = ({ progress, onReturnToHome
         greet={greet}
         onPlayGame={play}
         onSurprise={() => handleSurprise()}
-        onOpenTrophies={onOpenTrophies}
+        onOpenShelf={() => {
+          setGreet(false);
+          setOnShelf(true);
+        }}
       />
     </>
   );

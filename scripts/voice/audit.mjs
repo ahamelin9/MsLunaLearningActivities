@@ -42,7 +42,7 @@ export * as luna from '../src/apps/reading/engine/luna';
 export { LETTER_PHONICS, TEAM_PHONICS } from '../src/utils/phonics';
 export { GAMES } from '../src/apps/reading/games';
 export { lessonsFor } from '../src/apps/reading/engine/lessons';
-export { STICKERS } from '../src/apps/reading/engine/stickers';
+export { SHELF_LINES, SQUISHY_KINDS } from '../src/apps/reading/engine/squishies';
 TS`]);
 bundle(ENTRY, '_audit-entry.mjs');
 
@@ -72,7 +72,7 @@ globalThis.fetch = async url => {
 };
 
 const mod = await import(`${join(tmp, '_audit-entry.mjs')}?v=${Date.now()}`);
-const { pronunciation, content, curriculum, luna, LETTER_PHONICS, TEAM_PHONICS, GAMES, STICKERS, lessonsFor } = mod;
+const { pronunciation, content, curriculum, luna, LETTER_PHONICS, TEAM_PHONICS, GAMES, SHELF_LINES, SQUISHY_KINDS, lessonsFor } = mod;
 
 // --- the one mistake this audit cannot catch by running things ---
 //
@@ -193,17 +193,21 @@ for (const passage of content.PASSAGES ?? []) {
   }
 }
 
-// Stickers: the line on its own (tapped in the tin) and after every finish line
-// (the end of a game), which the shell says as two parts
+// Squishies (PRG-5a): a kind's line on its own (tapped on the shelf, the
+// library card or the done screen) and after every finish line (the end of a
+// game), which the shell says as two parts; its clue, tapped still to find;
+// and Luna's lines on the shelf
 const finishes = new Set(
   [...(luna.GENERAL.finish ?? []), ...Object.values(luna.PER_GAME).flatMap(g => g.finish ?? [])].map(l => l.text)
 );
-for (const sticker of STICKERS) {
-  push(sticker.line, o => pronunciation.speakText(sticker.line, o));
+for (const squishy of SQUISHY_KINDS) {
+  push(squishy.line, o => pronunciation.speakText(squishy.line, o));
+  push(squishy.hint, o => pronunciation.speakText(squishy.hint, o));
   for (const finish of finishes) {
-    push(sticker.line, o => pronunciation.speakSequence([{ text: finish }, { text: sticker.line }], o));
+    push(squishy.line, o => pronunciation.speakSequence([{ text: finish }, { text: squishy.line }], o));
   }
 }
+for (const line of Object.values(SHELF_LINES)) push(line, o => pronunciation.speakText(line, o));
 
 // every game and lesson opens with its mission
 const LESSONS = curriculum.GRADES.flatMap(g => lessonsFor(g.id));

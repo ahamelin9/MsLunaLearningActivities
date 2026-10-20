@@ -609,6 +609,12 @@ async function shootViewport(browser, url, viewport, outDir, reduced = false, th
     await solveLesson(page, drive);
     await until('shell-reward');
     await shot('reward');
+    // the shelf, from the done screen's "See my shelf", with the lesson's
+    // squishy on it (PRG-5a); last, so every earlier shot keeps its number
+    step = 'shelf';
+    await click('see-shelf');
+    await until('shelf');
+    await shot('shelf');
     step = 'reduced motion';
     if (moving.length) throw new Error(`still moving with reduced motion:\n  ${moving.join('\n  ')}`);
   } catch (err) {

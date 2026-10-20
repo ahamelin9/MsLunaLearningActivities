@@ -4,6 +4,7 @@
 starting with punctuation (Alex, 2026-10-09). Proposal to confirm: it's a
 separate app, not a Reading game, because placing marks is a writing skill.
 The alternative is a punctuation game inside Reading, taught as fluency.
+**When (Alex, 2026-10-19):** after Phase 7 (progress and rewards).
 
 ### WRT-1 · Writing app on the home screen
 Story · P1 · M · needs: —

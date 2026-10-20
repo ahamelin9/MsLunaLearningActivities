@@ -25,3 +25,17 @@
     box-shadow: 0 var(--border-hair) 0 $edge;
   }
 }
+
+// The arch, the signature shape (foundations.md, Corners; DES-26): a
+// half-circle top on card corners, at any width. A corner can't read its own
+// box's width, and 999px tops made the browser shrink all four corners
+// together, so the bottom ones came out about 2px. arch($width) rounds the top
+// by half of $width: a width the component knows, or by default its
+// container's (100cqi), so put arch-host on the box it fills.
+@mixin arch-host {
+  container-type: inline-size;
+}
+
+@mixin arch($width: 100cqi) {
+  border-radius: calc(#{$width} / 2) calc(#{$width} / 2) var(--radius-card) var(--radius-card);
+}

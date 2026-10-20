@@ -72,8 +72,8 @@ be pulled into Phase 1 for a break from styling.
 
 ### Now / Next
 
-- **Now:** Phase 7, PRG-5 (squishies) next. Done 2026-10-19: OPS-9, GAME-1c, GAME-2, GAME-4, GAME-6, GAME-7, CUR-1, CUR-3, PRG-1, BUG-9, BUG-10, BUG-12, BUG-25, BUG-26, BUG-27. New: DES-27 (our own pictures instead of emoji, Alex's idea; split before starting). Waiting on Alex: CNT-3 (a few pictures), CNT-2 (OK a split), DES-16 (his dark check on the iPad); DES-26 needs his OK before it starts (a primitive change).
-- **Next:** Phase 7: PRG-5 (squishies), PRG-6, PRG-8, PRG-3 (with BUG-13); BUG-28 and OPS-13 any time; GAME-5 waits on CNT-2. PRG-9 (a game's done screen shows the squishy shelf) waits on PRG-5. OPS-12 (an "away mode" skill) and OPS-11 (a first cloud session) are small housekeeping for when Alex wants them.
+- **Now:** Alex's OK on the twelve built and Blocked (OPS-12, BUG-28, PRG-5a, CNT-3, CUR-5, DES-26, PRG-2, PRG-11, PRG-10, OPS-13, PRG-9, PRG-4; `screenshots/review/HANDOVER.md`). Done 2026-10-19: OPS-9, GAME-1c, GAME-2, GAME-4, GAME-6, GAME-7, CUR-1, CUR-3, PRG-1, PRG-3, PRG-6, PRG-8, DES-16, BUG-9, BUG-10, BUG-12, BUG-25, BUG-26, BUG-27 (and BUG-13 dropped).
+- **Next:** CNT-2 (six calls for Alex on the ticket), then CUR-4 and GAME-5; DES-27's 100 pictures after his notes on the first sample; PRG-5b and Pearl Moon (PRG-4) as an artifact first. The Writing app (WRT) after Phase 7. OPS-11 stays parked.
 
 ## Epics
 
@@ -95,31 +95,28 @@ In board order. A new epic gets its file in `epics/` first, then a link here
 | ID | Title | Type | P | Size | Status |
 |---|---|---|---|---|---|
 | **DES** | **Design system & layout** | Epic | **P0** | | |
-| DES-16 | Light and dark mode | Story | P1 | M | Blocked |
-| DES-26 | Make the arch radius work at any size | Task | P2 | S | Todo |
+| DES-26 | Make the arch radius work at any size | Task | P2 | S | Blocked |
 | DES-27 | Our own pictures instead of emoji | Story | P2 | L | Todo |
 | **BUG** | **Bugs** | | | | |
-| BUG-28 | A tap in a round's first half-second is cut off by its question | Bug | P2 | S | In progress |
-| BUG-13 | Trophy dot never clears | Bug | P2 | S | Todo |
+| BUG-28 | A tap in a round's first half-second is cut off by its question | Bug | P2 | S | Blocked |
 | **LVL** | **Difficulty** | Epic | **P0** | | |
 | LVL-3 | Adaptive difficulty from skill mastery | Story | P2 | L | Todo |
 | **CNT** | **One content model** | Epic | **P1** | | |
-| CNT-2 | Lessons generated from the content bank | Story | P1 | L | Blocked |
+| CNT-2 | Lessons draw their words from the content bank | Story | P1 | M | Todo |
 | CNT-3 | Content QA pass | Task | P1 | S | Blocked |
 | **GAME** | **Games to standard** | Epic | **P1** | | |
 | GAME-5 | Words Off the Page: bigger sentence pool | Story | P2 | S | Todo |
 | **CUR** | **Curriculum** | Epic | **P1** | | |
 | CUR-4 | Expand the curriculum per grade | Story | P1 | L | Todo |
-| CUR-5 | Merge the two K blending lessons | Story | P2 | S | Todo |
+| CUR-5 | Merge the two K blending lessons | Story | P2 | S | Blocked |
 | **PRG** | **Progress & rewards** | Epic | **P1** | | |
-| PRG-5 | Squishies instead of the sticker tin | Story | P1 | M | Blocked |
-| PRG-9 | A game's done screen shows the squishy shelf | Story | P1 | S | Todo |
-| PRG-6 | Time per lesson: know it before, see it after | Story | P1 | M | Blocked |
-| PRG-10 | Time counts toward stars | Story | P2 | S | Todo |
-| PRG-8 | Pick up a lesson where you left off | Story | P1 | M | Blocked |
-| PRG-2 | Points: remove or give them a meaning | Story | P2 | S | Todo |
-| PRG-3 | Achievements worked out in one place | Task | P2 | S | Blocked |
-| PRG-4 | Secret platinum trophy for a full squishy shelf | Story | P2 | S | Todo |
+| PRG-5a | Squishies instead of the sticker tin: the shelf | Story | P1 | M | Blocked |
+| PRG-5b | More squishies: kinds, colours and super-rare looks | Story | P2 | M | Todo |
+| PRG-11 | A lesson left part-way still counts its minutes | Story | P2 | S | Blocked |
+| PRG-9 | A game's done screen shows the squishy shelf | Story | P1 | S | Blocked |
+| PRG-10 | Time counts toward stars | Story | P2 | S | Blocked |
+| PRG-2 | Points: remove or give them a meaning | Story | P2 | S | Blocked |
+| PRG-4 | Secret platinum trophy for a full squishy shelf | Story | P2 | S | Blocked |
 | **WRT** | **Writing & grammar app** | Epic | **P1** | | |
 | WRT-1 | Writing app on the home screen | Story | P1 | M | Todo |
 | WRT-2 | Punctuation game: where does the mark go? | Story | P1 | L | Todo |
@@ -128,6 +125,6 @@ In board order. A new epic gets its file in `epics/` first, then a link here
 | OPS-2 | README and stale copy | Task | P2 | S | Todo |
 | OPS-7 | Drop Treasure Path's leftovers from the sentence bank | Task | P2 | S | Todo |
 | OPS-8 | Retarget the backlog guard check's two stale cases | Task | P2 | S | Todo |
-| OPS-12 | An "away mode" skill | Task | P2 | S | Todo |
-| OPS-13 | Class references that point at nothing | Task | P2 | S | Todo |
+| OPS-12 | An "away mode" skill | Task | P2 | S | Blocked |
+| OPS-13 | Class references that point at nothing | Task | P2 | S | Blocked |
 | OPS-11 | A first cloud session (parked) | Task | P2 | M | Todo |

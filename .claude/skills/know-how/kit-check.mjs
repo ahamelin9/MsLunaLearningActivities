@@ -656,6 +656,33 @@ await sleep(100);
 ok('reduced motion: the moon is still', (await moonAnim(moonTalker)) === 'none', await moonAnim(moonTalker));
 await page.evaluate(() => document.documentElement.removeAttribute('data-reduced-motion'));
 
+// ── the arch at any width (DES-26) ──
+// elementFromPoint follows a box's rounded corners, so a point just inside a
+// corner's square but outside its curve lands on what's behind. With the old
+// 999px tops the bottom corners shrank to ~2px and that point hit the arch.
+for (const mode of ['light', 'dark']) {
+  await page.goto(`http://localhost:5199/?kit&tab=tokens&mode=${mode}`, { waitUntil: 'networkidle0' });
+  const arches = await page.$$eval('[data-shot="kit-arch"]', els => els.map(el => {
+    el.scrollIntoView({ block: 'center' });
+    const r = el.getBoundingClientRect();
+    const hit = (x, y) => document.elementFromPoint(x, y) === el;
+    return {
+      width: Math.round(r.width),
+      // 4px in from each bottom corner: outside a 22px curve, inside a 2px one
+      bottomCornersRound: !hit(r.left + 4, r.bottom - 4) && !hit(r.right - 4, r.bottom - 4),
+      // the middle of the bottom edge and of the top are the arch's own
+      filled: hit(r.left + r.width / 2, r.bottom - 4) && hit(r.left + r.width / 2, r.top + 4),
+      // a half-circle top: 10% in from a top corner is outside it (0.57 of
+      // the width from its centre, against a radius of 0.5)
+      topRound: !hit(r.left + r.width * 0.1, r.top + r.width * 0.1)
+    };
+  }));
+  ok(`${mode}: the Kit page shows the arch at 192 and 400 wide`, arches.map(a => a.width).join(',') === '192,400', arches.map(a => a.width).join(', '));
+  for (const a of arches) {
+    ok(`${mode}: the ${a.width}px arch has a half-circle top and 22px bottom corners`, a.bottomCornersRound && a.filled && a.topRound, JSON.stringify(a));
+  }
+}
+
 await browser.close();
 console.log(results.every(Boolean) ? '\nALL PASS' : '\nSOME FAILED');
 process.exit(results.every(Boolean) ? 0 : 1);

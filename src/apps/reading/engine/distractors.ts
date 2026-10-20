@@ -9,7 +9,9 @@
 //   target itself in the other case;
 // - no wrong choice is something already on screen, so the answer can't be
 //   found by elimination;
-// - no two choices show the same picture;
+// - no two choices show the same picture, and two words whose pictures a
+//   child can't tell apart (LOOK_ALIKE: jet and plane, pup and dog) are never
+//   on one screen;
 // - when the child knows the target word (they read it or heard it), at least
 //   one wrong choice starts with the same letter, so the first letter alone
 //   doesn't give it away;
@@ -41,6 +43,16 @@ export interface ChoiceSet {
 }
 
 const same = (a: string, b: string) => a.trim().toLowerCase() === b.trim().toLowerCase();
+
+/**
+ * Words that are different answers but look like the same thing in a
+ * picture: never on one screen, as a choice or beside them (Alex,
+ * 2026-10-19; CNT-3).
+ */
+export const LOOK_ALIKE: [string, string][] = [
+  ['jet', 'plane'],
+  ['pup', 'dog']
+];
 
 /** C, K and CK all say /k/; W and WH both say /w/. Letters only: a word is never a sound. */
 export function sameSound(a: string, b: string): boolean {
@@ -74,6 +86,11 @@ export function ruleBreaks(set: ChoiceSet): string[] {
   const pictures = [target, ...wrong].map(c => c.picture).filter((p): p is string => !!p);
   const repeated = pictures.filter((p, i) => pictures.indexOf(p) !== i);
   if (repeated.length > 0) breaks.push(`same picture twice: ${[...new Set(repeated)].join(' ')}`);
+
+  const words = [target, ...wrong, ...(set.onScreen ?? [])].map(c => c.text.trim().toLowerCase());
+  for (const [a, b] of LOOK_ALIKE) {
+    if (words.includes(a) && words.includes(b)) breaks.push(`look alike: "${a}" and "${b}" on one screen`);
+  }
 
   if (set.targetKnown && wrong.length > 0 && !wrong.some(w => firstLetter(w.text) === firstLetter(target.text))) {
     breaks.push(`first-letter giveaway: only "${target.text}" starts with ${firstLetter(target.text)}`);
@@ -126,12 +143,18 @@ export const wordChoice = (w: WordItem): Choice => ({ text: w.word, picture: w.e
 /** A letter or a plain word as a choice. */
 export const textChoice = (text: string): Choice => ({ text });
 
-/** `count` items with no picture twice, and none of the pictures in `avoid`. */
+/** The words that look like this one in a picture (LOOK_ALIKE). */
+const lookAlikesOf = (word: string) => LOOK_ALIKE.flatMap(([a, b]) => (a === word ? [b] : b === word ? [a] : []));
+
+/**
+ * `count` items with no picture twice, none of the pictures in `avoid`, and
+ * no two that look alike (CNT-3).
+ */
 export function distinctByEmoji(items: WordItem[], count: number, avoid: string[] = []): WordItem[] {
   const seen = new Set(avoid);
   const out: WordItem[] = [];
   for (const item of shuffle(items)) {
-    if (seen.has(item.emoji)) continue;
+    if (seen.has(item.emoji) || lookAlikesOf(item.word).some(w => out.some(o => o.word === w))) continue;
     seen.add(item.emoji);
     out.push(item);
     if (out.length === count) break;

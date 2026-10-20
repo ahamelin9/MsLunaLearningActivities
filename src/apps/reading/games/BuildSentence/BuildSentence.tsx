@@ -156,7 +156,7 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
   };
 
   return (
-    <GameSurface className={styles.sentence}>
+    <GameSurface>
       <div className={styles.scene}>
         <span className={styles.picture}>{round.sentence.emoji}</span>
         <ChunkyButton

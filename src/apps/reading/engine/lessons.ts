@@ -43,7 +43,7 @@ const LUNA_LINES: Record<string, string> = {
   'g2-storybooks': 'Story time! Read it yourself, then answer my question.'
 };
 
-/** The sticker a kind of lesson is known for; after it, the rest of the tin. */
+/** The reward a kind of lesson is known for: the squishy kind it brings first (SIGNATURE_KIND, PRG-5a). */
 const SIGNATURE_STICKER: Record<string, string> = {
   'k-match-sounds': 'headphones',
   'k-rhyming': 'headphones',
@@ -68,8 +68,7 @@ export function lessonGame(lesson: Lesson, skill: ReadingSkill): GameDef<LessonQ
     hiddenWord: q => (q.type === 'sight-word-reader' ? q.word : undefined),
     lesson: {
       id: lesson.id,
-      skillId: lesson.skillId,
-      points: lesson.questions.length * 20
+      skillId: lesson.skillId
     }
   };
 }

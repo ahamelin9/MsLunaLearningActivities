@@ -4,9 +4,9 @@
 //   - every lesson in the grade done (once per grade);
 //   - the first lesson ever finished (once per child);
 //   - a lesson finished with 3 stars (PRG-1), every time;
-//   - a game's first 3-star play (once per game).
-// "Once" is claimed in the saved achievements (utils/storage.ts). The full
-// squishy shelf is PRG-4's.
+//   - a game's first 3-star play (once per game);
+//   - and, above them all, the play that fills the squishy shelf (once; PRG-4).
+// "Once" is claimed in the saved achievements (utils/storage.ts).
 
 import type { GradeLevel } from '@/types/reading';
 import type { AnyGameDef } from './types';
@@ -15,6 +15,8 @@ import type { Milestone } from './luna';
 /** The achievement that records a once-only visit; null for one that comes every time. */
 export const milestoneId = (milestone: Milestone, grade: GradeLevel, gameId: string): string | null => {
   switch (milestone) {
+    case 'fullShelf':
+      return 'moon-full-shelf';
     case 'first':
       return 'moon-first-lesson';
     case 'all':

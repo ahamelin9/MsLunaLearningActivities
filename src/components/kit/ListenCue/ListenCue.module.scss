@@ -11,9 +11,6 @@
   --cue-motion: var(--motion-glow); // the slow "listen" pulse
   --cue-width: calc(var(--space-16) * 3);
   --cue-height: calc(var(--space-16) * 3 + var(--space-6));
-  // the arch from its own width: a half-circle top on card corners. Not
-  // --radius-arch, whose 999px tops shrink its bottom corners to ~2px (DES-26)
-  --cue-radius: calc(var(--cue-width) / 2) calc(var(--cue-width) / 2) var(--radius-card) var(--radius-card);
 
   display: inline-grid;
 
@@ -34,7 +31,8 @@
   padding-inline: var(--space-4);
   text-align: center;
   border: var(--border-thick) var(--cue-border-style) var(--cue-border);
-  border-radius: var(--cue-radius);
+  // the shared arch, from the cue's own width (DES-26)
+  @include arch(var(--cue-width));
   background: var(--cue-bg);
   color: var(--cue-ink);
   animation: var(--cue-motion);
@@ -71,7 +69,7 @@
 
 // tapped: a halo grows out from the arch and fades, once
 .ripple {
-  border-radius: var(--cue-radius);
+  @include arch(var(--cue-width));
   pointer-events: none;
   animation: var(--motion-glow);
   animation-duration: var(--dur-celebrate);

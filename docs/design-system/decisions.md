@@ -90,7 +90,12 @@ mentioned and what the prototype follows"). A future proposal is marked
 | 2026-10-18 | Light and dark follow the system by default (an inline script before the first paint, then `utils/theme.ts`, with no CSS media block: the design check keeps `@media` to the breakpoint mixin); a grown-up picks Light, Dark or "Match the system" in Settings, and a child turns day into night with the home screen's sun/moon button, which isn't on the board. At night home shows the board's moon and stars | Claude, Alex OK | "the system", not "the iPad": it may be a Chromebook | DES-16 |
 | 2026-10-18 | The milestone moon visits the done screen for the first lesson ever, half a grade and a whole grade, once each, gliding in and out with two new shared animations (`--motion-glide-in`, `--motion-glide-out`) and landing over empty space; Luna stays quiet while she's there | Claude, Alex OK | A visit stays special; nothing she says is cut off, and she covers no words | DES-17 |
 | 2026-10-18 | Feed Luna's cookies are all chocolate chip, the chips in four different spots, kept off the letter | Alex | Variety within one familiar kind; sprinkles, jam and icing read as busy | DES-14 |
+| 2026-10-19 | Times on the library: "about N min" on every lesson card and game tile (the kit Tile's `minutes`), a Today panel between the tin and Luna's Pick that drops to its own slim row on a portrait iPad, and the lesson up next's thin rounds bar | Alex | As on the Library board; the game tiles' times were his ask; the thin bar matches the app's other bars | PRG-6, PRG-8 |
 | 2026-10-19 | Bubble Sounds' bubbles are plain: no shine | Alex | The white highlight vanished on the light bubble and sat as a grey smudge on the letter in dark mode; he wasn't sure it fit | BUG-26 |
+| 2026-10-19 | The arch is the `arch()` mixin (a top rounded by half the box's width, on card corners), and `--radius-arch` is gone: ListenCue passes its own width, the shelf's cabinet reads its container's | Claude, Alex OK | The token's 999px top shrank every corner, so the bottom ones came out about 2px | DES-26 |
+| 2026-10-19 | Squishies replace the sticker tin: the shelf (an arched cabinet, each kind in its rarest colour with its 3 colour dots, a greyed shape or a "?" slot for one still to find), the done screen's "New squishy for your shelf" with a shimmering rarity tag and "See my shelf", and the library's Squishy Shelf card (the count, the latest squishies on a plank, an arrow to the shelf) | Alex, the teacher's squishies | As on the Squishies, Done and Library boards; no emoji in a collectible | PRG-5a |
+| 2026-10-19 | The library card's plank shows as many squishies as fit, newest first (the rest wrap onto a row that's cut off), never squeezed ones | Claude | The welcome row is tight at 1024 wide; a squeezed squishy stops being one | PRG-5a |
+| 2026-10-19 | The Trophy room opens from the header's stars (a ChunkyButton, like the grade beside the title), not from a button on the library card | Claude, waits for Alex's OK | The board's card has no room for "My trophies"; on it the squishies slid under the buttons | PRG-5a |
 | 2026-10-19 | Treasure Path's stone: a PaperCard with the picture and "Read it to me" beside the passage, the question on a flat card under it | Alex | No board showed it; it follows Story Corner's book, and side by side a 50-word passage fits at 1024×768 | GAME-1c |
 | 2026-10-18 | "Show me": from the third miss in a round the answer's piece takes the kit's `revealed` look (a piece with its own drawn fill takes only the dashed accent edge) and Luna says a reveal line | Claude, Alex OK | A stuck child is shown, not looped on the same hint | FB-2 |
 | 2026-10-18 | Every grown-up hold is 1.5 s (`--dur-hold`, was 2 s), and muting Luna in the library is one of them; unmuting stays one tap, and a muted game says "Ms. Luna is resting. Ask a grown-up!" | Alex | Quicker for the teacher; a child can't make a game unplayable with one tap | SET-2 |
@@ -141,9 +146,9 @@ the code can enforce, staying as close to the prototype as the scales allow.
 
 ## Open questions
 
-- [ ] The moon's milestones: does the proposal on DES-17 suit the teacher?
+- [x] The moon's milestones: the first lesson, half and all of a grade, a perfect lesson and a perfect game, once each (Alex, 2026-10-19; BUG-25).
 - [ ] Can a grown-up unlock lessons ahead, behind the gate? Not asked for yet (PRG-7).
-- [ ] Pearl Moon: tease it with a "?" on the shelf, or keep it a total secret? (PRG-4)
-- [ ] Squishy odds (proposal: rare 1 in 8, super rare 1 in 40) (PRG-5)
+- [x] Pearl Moon: a "?" at the top of the shelf teases it (Alex, 2026-10-19; PRG-4).
+- [x] Squishy odds: rare 1 in 8, super rare 1 in 40, in `engine/squishies.ts` (Alex, 2026-10-19; PRG-5a).
 - [ ] Are the soft green for "right" and the soft pink for "try again" OK inside a tan palette? (The teacher approved the boards, which use them.)
 - [ ] Fraunces Soft for titles: confirmed by her approval of the boards, unless she says otherwise.

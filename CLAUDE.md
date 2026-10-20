@@ -15,6 +15,7 @@ on Alex's Mac or in a cloud session (`docs/cloud-sessions.md`).
 | Where a learning, preference or decision goes; the end of a session | the `wrap-up` skill |
 | Whether a request fits the agenda | the `focus` skill |
 | Luna's lines waiting to be rendered on the Mac | the `voice-queue` skill |
+| Working the board on your own ("auto mode", "keep going until the limit") | the `away-mode` skill |
 | Working from a cloud session | `docs/cloud-sessions.md` |
 
 The hooks in `.claude/settings.json` bring in the agenda with every message

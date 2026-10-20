@@ -245,7 +245,7 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
   };
 
   return (
-    <GameSurface className={styles.bubbles}>
+    <GameSurface>
       <div className={styles.header}>
         {/* the sound is only ever heard: written here, it would name the bubble to pop */}
         <ChunkyButton variant="prompt" icon="speaker" onClick={sayTarget} title="Hear the sound again">

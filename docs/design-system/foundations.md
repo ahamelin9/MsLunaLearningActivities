@@ -98,9 +98,13 @@ shows every role with `I l 1 · a g`.
 | `tile` | Buttons, small tiles, icon tiles |
 | `card` | Cards, lesson cards, answer choices, panels |
 | `stage` | The game stage and big panels |
-| `arch` | The ListenCue, arched panels, Luna's window: round top, gentle bottom corners |
+| `arch` | The ListenCue, arched panels, the squishy shelf: a half-circle top on card corners |
 
-In code: `var(--radius-card)` and so on; the arch is `var(--radius-arch)`.
+In code: `var(--radius-card)` and so on. The arch is a shape rather than a
+value, because its top depends on the box's width: `@include arch(<width>)`
+from `styles/mixins`, or `@include arch` on a box that fills a parent given
+`@include arch-host` (DES-26). It keeps 22px bottom corners at any width; a
+fixed `999px` top made the browser shrink all four corners to about 2px.
 
 The arch is the motif: lesson cards, the "?" cue, the squishy shelf, Luna's
 stages. The hand-cut uneven corners of the old reading app retire. The boho

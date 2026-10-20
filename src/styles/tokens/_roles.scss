@@ -151,7 +151,7 @@ $text-pairs: (
   }
   --focus-offset: #{p.$focus-offset};
 
-  // corners: chip, tag, tile, card, stage, arch
+  // corners: chip, tag, tile, card, stage (the arch is the arch() mixin, DES-26)
   @each $name, $radius in p.$radius {
     --radius-#{$name}: #{$radius};
   }

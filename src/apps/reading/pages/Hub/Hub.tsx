@@ -3,9 +3,9 @@ import type { GradeLevel } from '@/types/reading';
 import type { UserProgress } from '@/types/user';
 import type { AnyGameDef } from '../../engine/types';
 import { GAMES } from '../../games';
-import { ChunkyButton, Icon, LessonCard, Luna, PaperCard, ProgressBar, Tile } from '@/components/kit';
+import { ChunkyButton, Icon, LessonCard, Luna, PaperCard, ProgressBar, Squishy, Tile } from '@/components/kit';
 import { greeting, lunaSay, type LunaLine, type LunaMood } from '../../engine/luna';
-import { STICKERS, stickerById } from '../../engine/stickers';
+import { SQUISHY_KINDS, kindDef, kindsFound, parseSquishy } from '../../engine/squishies';
 import { soundManager } from '@/utils/audio';
 import { pronunciation } from '@/utils/pronunciation';
 import { minutesOf, storageService } from '@/utils/storage';
@@ -26,17 +26,17 @@ interface HubProps {
   greet: boolean;
   onPlayGame: (game: AnyGameDef) => void;
   onSurprise: () => void;
-  /** the Sticker Tin leads to the Trophy room (DES-9b; the squishy shelf, PRG-5) */
-  onOpenTrophies: () => void;
+  /** the Squishy Shelf card opens the shelf (PRG-5a) */
+  onOpenShelf: () => void;
 }
 
-/** How many of the latest stickers stand on the Sticker Tin's plank. */
+/** How many of the latest squishies stand on the Squishy Shelf card's plank. */
 const ON_THE_PLANK = 3;
 
 /**
  * Luna's library (DES-21), as on the round 2 Library board: the welcome row
- * (Luna, who says her greeting with no bubble; the Sticker Tin, standing in
- * for the Squishy Shelf until PRG-5; Luna's Pick), the lessons in order on one
+ * (Luna, who says her greeting with no bubble; the Squishy Shelf card, PRG-5a;
+ * Luna's Pick), the lessons in order on one
  * bar (DES-13: done, up next or locked, PRG-7) and the Play Shelf, all from
  * the kit.
  */
@@ -48,7 +48,7 @@ export const Hub: React.FC<HubProps> = ({
   greet,
   onPlayGame,
   onSurprise,
-  onOpenTrophies
+  onOpenShelf
 }) => {
   // her greeting for this visit: said as the library opens from home, and
   // again whenever she's tapped
@@ -102,16 +102,17 @@ export const Hub: React.FC<HubProps> = ({
   const lessonsDone = states.filter(s => s === 'done').length;
 
   const voiceOn = progress.settings.speechEnabled;
-  const owned = STICKERS.filter(s => progress.stickers.includes(s.id));
-  // the latest ones won, newest last, as they were peeled
+  // the latest ones won, newest first: where the card is narrow, the plank
+  // shows only as many as fit, and the newest stays
   const latest = progress.stickers
     .slice(-ON_THE_PLANK)
-    .map(id => stickerById(id))
-    .filter(s => s !== undefined);
+    .reverse()
+    .map(parseSquishy)
+    .filter(s => s !== null);
 
   return (
     <div className={styles.page} data-shot="hub">
-      {/* ---- welcome: Luna, the Sticker Tin and Luna's Pick ---- */}
+      {/* ---- welcome: Luna, the Squishy Shelf and Luna's Pick ---- */}
       <div className={styles.welcome}>
         <span className={styles.luna}>
           <Luna mood={mood} size={108} float onClick={hearAgain} label={`Hear Ms. Luna: ${hello.text}`} />
@@ -145,32 +146,31 @@ export const Hub: React.FC<HubProps> = ({
           )}
         </span>
 
+        {/* the Squishy Shelf, as on the Library board (PRG-5a): the count, the
+            latest three on a plank, and the way to the shelf. The Trophy room
+            opens from the stars in the header */}
         <PaperCard className={styles.tin} data-shot="hub-tin">
           <div className={styles.tinInside}>
             <span className={styles.tinName}>
-              <span className={styles.tinTitle}>Sticker Tin</span>
+              <span className={styles.tinTitle}>Squishy Shelf</span>
               <span className={styles.tinCount}>
                 <strong>
-                  {owned.length} of {STICKERS.length}
+                  {kindsFound(progress.stickers)} of {SQUISHY_KINDS.length}
                 </strong>{' '}
                 found
               </span>
             </span>
 
             <span className={styles.shelf}>
-              <span className={styles.stickers}>
-                {latest.map(sticker => (
-                  <ChunkyButton
-                    key={sticker.id}
-                    variant="icon"
-                    aria-label={sticker.name}
-                    onClick={() => {
-                      soundManager.playLetterTap();
-                      say({ text: sticker.line, mood: 'happy' });
-                    }}
-                  >
-                    <span className={styles.sticker}>{sticker.emoji}</span>
-                  </ChunkyButton>
+              <span className={styles.squishies}>
+                {latest.map(({ kind, colour }) => (
+                  <Squishy
+                    key={`${kind}:${colour}`}
+                    kind={kind}
+                    colour={colour}
+                    size={64}
+                    onClick={() => say({ text: kindDef(kind).line, mood: 'happy' })}
+                  />
                 ))}
                 {Array.from({ length: ON_THE_PLANK - latest.length }, (_, i) => (
                   <span key={i} className={styles.slot} aria-hidden="true" />
@@ -179,9 +179,7 @@ export const Hub: React.FC<HubProps> = ({
               <span className={styles.plank} aria-hidden="true" />
             </span>
 
-            <ChunkyButton icon="trophy" onClick={onOpenTrophies} data-shot="open-trophies">
-              My trophies
-            </ChunkyButton>
+            <ChunkyButton variant="icon" icon="chevron-right" aria-label="Open my squishy shelf" onClick={onOpenShelf} data-shot="open-shelf" />
           </div>
         </PaperCard>
 

@@ -15,7 +15,7 @@
   font-family: var(--font-read);
 }
 
-// ---- the welcome row: Luna, the Sticker Tin, Luna's Pick ----
+// ---- the welcome row: Luna, the Squishy Shelf, Luna's Pick ----
 .welcome {
   display: flex;
   align-items: center;
@@ -36,7 +36,7 @@
   gap: var(--space-1);
 }
 
-// the Squishy Shelf's place until PRG-5
+// the Squishy Shelf card (PRG-5a; named for the tin it replaced, as its data-shot is)
 .tin {
   flex: 1;
   min-width: 0;
@@ -110,7 +110,7 @@
   }
 }
 
-// the latest stickers, standing on a little plank
+// the latest squishies, standing on a little plank
 .shelf {
   flex: 1;
   min-width: 0;
@@ -122,19 +122,25 @@
   }
 }
 
-.stickers {
+// One row, newest first: those that don't fit wrap onto a second row that's
+// cut off, so a narrower card shows fewer, never squeezed ones (PRG-5a). The
+// top padding is room for a squish and a rare one's sparkle.
+.squishies {
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-around;
   align-items: flex-end;
-  gap: var(--space-2);
-  padding: 0 var(--space-2);
+  gap: var(--space-8) var(--space-2);
+  height: calc(var(--space-16) + var(--space-2));
+  padding: var(--space-2) var(--space-2) 0;
+  overflow: hidden;
+
+  > * {
+    flex: none;
+  }
 }
 
-.sticker {
-  font: var(--text-display-m);
-}
-
-// a sticker still to find: an empty spot on the plank
+// room for one still to come: an empty spot on the plank
 .slot {
   width: var(--target-chrome);
   height: var(--target-chrome);
@@ -162,7 +168,7 @@
   text-align: left;
 }
 
-// on a portrait iPad the name alone, so the Sticker Tin keeps its room
+// on a portrait iPad the name alone, so the Squishy Shelf keeps its room
 .pick-sub {
   font: var(--text-label-small);
   font-weight: 400;

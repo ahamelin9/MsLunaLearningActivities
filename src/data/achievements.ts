@@ -1,4 +1,14 @@
 import type { Achievement } from '../types/user';
+import { READING_CURRICULUM } from './readingCurriculum';
+import { SQUISHY_KINDS, kindsFound } from '../apps/reading/engine/squishies';
+
+/** The skills whose lessons sound out words: blend the sounds, find the picture. */
+const SOUNDING_OUT = new Set(
+  Object.values(READING_CURRICULUM)
+    .flat()
+    .filter(skill => skill.lessons.some(lesson => lesson.questions.some(q => q.type === 'blend-and-read')))
+    .map(skill => skill.id)
+);
 
 export const ACHIEVEMENTS: Achievement[] = [
   {
@@ -40,7 +50,9 @@ export const ACHIEVEMENTS: Achievement[] = [
     description: 'Practiced sounding out words with Ms. Luna!',
     iconEmoji: '🦉',
     category: 'skills',
-    requirement: p => p.totalPoints >= 100
+    // a lesson that sounds out words, finished once; it counted 100 points
+    // until points went (PRG-2)
+    requirement: p => Object.entries(p.skillMastery).some(([skill, times]) => SOUNDING_OUT.has(skill) && times > 0)
   },
   {
     id: 'streak_champ',
@@ -49,6 +61,16 @@ export const ACHIEVEMENTS: Achievement[] = [
     iconEmoji: '🔥',
     category: 'streak',
     requirement: p => p.streakDays >= 2
+  },
+  {
+    id: 'full_shelf',
+    title: 'Squishy Champion',
+    description: 'Found every squishy for Luna’s shelf!',
+    iconEmoji: '🏆',
+    category: 'special',
+    // the secret platinum trophy (PRG-4): every kind on the shelf, in any
+    // colour; more kinds (PRG-5b) raise the bar for anyone who hasn't won it
+    hidden: true,
+    requirement: p => kindsFound(p.stickers) >= SQUISHY_KINDS.length
   }
 ];
-

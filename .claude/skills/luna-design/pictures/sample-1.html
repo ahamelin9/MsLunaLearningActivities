@@ -1,0 +1,232 @@
+<title>Ms. Luna's Own Pictures</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&family=Fraunces:opsz,wght,SOFT@9..144,600,100&family=Noto+Color+Emoji&display=swap">
+<style>
+  /* Layout: a reading list of words; each row shows the same picture three ways, the device's emoji, Google's, then ours. */
+  :root {
+    --page: #F5EDE1;      /* oat, the app's page */
+    --card: #FFFBF5;      /* cream, its cards */
+    --well: #F2E6D3;      /* linen, a soft fill */
+    --edge: #E9DCC9;      /* sand, edges */
+    --ink: #3B2A20;       /* cocoa, main text */
+    --quiet: #6E5747;     /* mocha, quiet text */
+    --accent: #9A6B45;    /* toffee, the main button */
+    --accent-soft: #F3E0D6;
+    --ours: #5C6849;      /* olive: "ours" */
+    --display: 'Fraunces', Georgia, serif;
+    --read: 'Andika', system-ui, sans-serif;
+    --apple: system-ui, 'Apple Color Emoji', 'Segoe UI Emoji', sans-serif;
+    --google: 'Noto Color Emoji', 'Apple Color Emoji', sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --page: #1E1813; --card: #2A211B; --well: #352A21; --edge: #433629;
+      --ink: #F4EADC; --quiet: #C9B6A1; --accent: #D9AE7C; --accent-soft: #3F3125; --ours: #A9B88C;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --page: #1E1813; --card: #2A211B; --well: #352A21; --edge: #433629;
+    --ink: #F4EADC; --quiet: #C9B6A1; --accent: #D9AE7C; --accent-soft: #3F3125; --ours: #A9B88C;
+    color-scheme: dark;
+  }
+
+  body {
+    background: var(--page);
+    color: var(--ink);
+    font: 400 17px/1.5 var(--read);
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+    padding-block: 32px 64px;
+  }
+  .wrap { max-width: 1040px; margin: 0 auto; display: flex; flex-direction: column; gap: 28px; }
+  header { display: flex; flex-direction: column; gap: 10px; max-width: 68ch; }
+  .eyebrow { font: 700 12px/1.2 var(--read); letter-spacing: .08em; text-transform: uppercase; color: var(--quiet); }
+  h1 { font: 600 40px/1.1 var(--display); font-variation-settings: 'SOFT' 100; margin: 0; text-wrap: balance; }
+  header p { margin: 0; color: var(--quiet); }
+
+  .key { display: flex; flex-wrap: wrap; gap: 8px 20px; font-size: 14px; color: var(--quiet); }
+  .key b { color: var(--ink); }
+
+  .words { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 480px), 1fr)); gap: 16px; }
+  .word {
+    background: var(--card);
+    border: 2px solid var(--edge);
+    border-radius: 20px;
+    padding: 16px 18px;
+    display: flex; flex-direction: column; gap: 12px;
+    min-width: 0;
+  }
+  .word h2 { margin: 0; font: 700 22px/1.2 var(--read); display: flex; align-items: baseline; gap: 10px; }
+  .word h2 small { font: 400 14px/1.2 var(--read); color: var(--quiet); }
+  .row { display: grid; grid-template-columns: 1fr 1fr auto 1.2fr; align-items: center; gap: 10px; }
+  .tile { display: flex; flex-direction: column; align-items: center; gap: 6px; min-width: 0; }
+  .pic {
+    width: 100%; max-width: 120px; aspect-ratio: 1; border-radius: 16px;
+    background: var(--well); display: grid; place-items: center;
+  }
+  .pic span { font-size: 56px; line-height: 1; }
+  .apple span { font-family: var(--apple); }
+  .google span { font-family: var(--google); }
+  .ours .pic { max-width: 140px; background: var(--accent-soft); outline: 2px solid var(--ours); outline-offset: 2px; }
+  .ours svg { width: 82%; height: 82%; }
+  .tile b { font: 700 12px/1.2 var(--read); letter-spacing: .06em; text-transform: uppercase; color: var(--quiet); }
+  .ours b { color: var(--ours); }
+  .arrow { color: var(--accent); font: 700 28px/1 var(--read); }
+  .note { margin: 0; font-size: 14px; color: var(--quiet); }
+  .note strong { color: var(--ink); }
+
+  @media (max-width: 520px) {
+    .row { grid-template-columns: 1fr 1fr; }
+    .arrow { display: none; }
+    .ours { grid-column: 1 / -1; }
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .ours .pic { transition: transform .2s ease; }
+    .ours .pic:hover { transform: scale(1.04); }
+  }
+</style>
+
+<div class="wrap">
+  <header>
+    <span class="eyebrow">DES-27 · first sample, 12 of the word bank's 100</span>
+    <h1>Ms. Luna's own pictures</h1>
+    <p>Each word as the iPad draws its emoji today, as a Chromebook draws it, and as we'd draw it in the app's own style: its colours, its soft cocoa outline, round and simple like the squishies. Ours look the same on every device. Tell me which to keep, change or redraw; nothing goes into the app until you've OKed it.</p>
+    <div class="key">
+      <span><b>Your device</b>: Apple's emoji on an iPad or Mac</span>
+      <span><b>Google</b>: what a Chromebook shows</span>
+      <span><b>Ours</b>: drawn for Ms. Luna</span>
+    </div>
+  </header>
+
+  <main class="words" id="words"></main>
+</div>
+
+<script>
+  // the app's illustration colours (src/styles/tokens/_illustration.scss and _primitives.scss)
+  const C = {
+    line: '#3B2A20', cream: '#FFF6E8', ivory: '#FFFBF5', oat: '#EFE3D1', linen: '#F2E6D3',
+    caramel: '#D2A878', toffee: '#9A6B45', cocoa: '#8A6446', blush: '#F1C9BC', cheek: '#E2B9A6',
+    rose: '#C8323C', pink: '#EBA9AC', sage: '#A9B391', olive: '#5C6849', sky: '#CADBE4',
+    gold: '#F2CF63', crater: '#F7DE8E', edge: '#C9AE8B'
+  };
+  const g = inner => `<g fill="none" stroke="${C.line}" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">${inner}</g>`;
+  const eyes = (lx, rx, y) => `<ellipse cx="${lx}" cy="${y}" rx="4" ry="5" fill="${C.line}"/><ellipse cx="${rx}" cy="${y}" rx="4" ry="5" fill="${C.line}"/>
+    <circle cx="${lx + 1.5}" cy="${y - 2}" r="1.4" fill="#fff" stroke="none"/><circle cx="${rx + 1.5}" cy="${y - 2}" r="1.4" fill="#fff" stroke="none"/>`;
+  const cheeks = (lx, rx, y) => `<ellipse cx="${lx}" cy="${y}" rx="5" ry="3" fill="${C.cheek}" stroke="none"/><ellipse cx="${rx}" cy="${y}" rx="5" ry="3" fill="${C.cheek}" stroke="none"/>`;
+
+  const DRAW = {
+    cat: g(`
+      <path d="M24 42 L22 14 Q23 10 27 12 L44 27 Z" fill="${C.caramel}"/>
+      <path d="M76 42 L78 14 Q77 10 73 12 L56 27 Z" fill="${C.caramel}"/>
+      <path d="M27 33 L26 19 L37 28 Z" fill="${C.blush}" stroke="none"/>
+      <path d="M73 33 L74 19 L63 28 Z" fill="${C.blush}" stroke="none"/>
+      <ellipse cx="50" cy="57" rx="34" ry="29" fill="${C.caramel}"/>
+      ${eyes(38, 62, 54)}${cheeks(29, 71, 64)}
+      <path d="M47 61 L53 61 L50 64 Z" fill="${C.pink}"/>
+      <path d="M50 64 Q46 69 43 66 M50 64 Q54 69 57 66"/>
+      <path d="M14 58 L26 60 M14 66 L26 65 M86 58 L74 60 M86 66 L74 65" stroke-width="2"/>`),
+    dog: g(`
+      <path d="M28 30 Q12 32 14 56 Q16 68 28 60 Z" fill="${C.toffee}"/>
+      <path d="M72 30 Q88 32 86 56 Q84 68 72 60 Z" fill="${C.toffee}"/>
+      <path d="M50 22 C72 22 78 40 76 58 C74 76 62 84 50 84 C38 84 26 76 24 58 C22 40 28 22 50 22 Z" fill="${C.oat}"/>
+      <path d="M57 37 Q70 34 70 48 Q68 56 60 55 Q54 47 57 37 Z" fill="${C.caramel}" stroke="none"/>
+      ${eyes(40, 62, 49)}${cheeks(31, 69, 62)}
+      <ellipse cx="50" cy="67" rx="13" ry="10" fill="${C.ivory}"/>
+      <ellipse cx="50" cy="62" rx="5" ry="3.5" fill="${C.line}"/>
+      <path d="M50 65 V69 M50 69 Q46 73 43 70 M50 69 Q54 73 57 70"/>
+      <path d="M47 71 Q50 78 53 71" fill="${C.pink}"/>`),
+    frog: g(`
+      <path d="M50 32 C74 32 88 46 86 64 C84 80 68 86 50 86 C32 86 16 80 14 64 C12 46 26 32 50 32 Z" fill="${C.sage}"/>
+      <circle cx="32" cy="32" r="13" fill="${C.sage}"/>
+      <circle cx="68" cy="32" r="13" fill="${C.sage}"/>
+      <circle cx="32" cy="32" r="8" fill="${C.ivory}" stroke-width="2"/>
+      <circle cx="68" cy="32" r="8" fill="${C.ivory}" stroke-width="2"/>
+      <circle cx="33" cy="33" r="4" fill="${C.line}" stroke="none"/>
+      <circle cx="69" cy="33" r="4" fill="${C.line}" stroke="none"/>
+      ${cheeks(24, 76, 62)}
+      <path d="M32 60 Q50 74 68 60"/>`),
+    sun: g(`
+      ${[0, 45, 90, 135, 180, 225, 270, 315].map(a => `<path d="M50 3 Q52 3 57 15 Q50 19 43 15 Q48 3 50 3 Z" fill="${C.gold}" transform="rotate(${a} 50 50)"/>`).join('')}
+      <circle cx="50" cy="50" r="23" fill="${C.gold}"/>
+      <path d="M38 40 Q41 34 47 32" stroke="#fff" stroke-width="4" opacity=".75"/>`),
+    moon: g(`
+      <path d="M62 14 C40 16 26 34 26 52 C26 72 42 88 62 88 C70 88 76 86 82 82 C64 80 50 66 50 48 C50 32 58 20 70 15 C67 14 65 14 62 14 Z" fill="${C.gold}"/>
+      <circle cx="38" cy="46" r="4" fill="${C.crater}" stroke="none"/>
+      <circle cx="44" cy="68" r="3" fill="${C.crater}" stroke="none"/>
+      <circle cx="56" cy="78" r="2.5" fill="${C.crater}" stroke="none"/>`),
+    apple: g(`
+      <path d="M50 34 C40 26 22 28 20 48 C18 68 32 88 44 86 C47 85.5 48 84 50 84 C52 84 53 85.5 56 86 C68 88 82 68 80 48 C78 28 60 26 50 34 Z" fill="${C.rose}"/>
+      <path d="M50 34 Q50 24 54 16" stroke-width="3.5"/>
+      <path d="M54 22 Q66 12 74 18 Q66 28 54 22 Z" fill="${C.sage}"/>
+      <path d="M31 47 Q33 39 39 37" stroke="#fff" stroke-width="4" opacity=".7"/>`),
+    cake: g(`
+      <ellipse cx="50" cy="87" rx="38" ry="6" fill="${C.oat}"/>
+      <rect x="18" y="57" width="64" height="28" rx="6" fill="${C.caramel}"/>
+      <path d="M18 63 Q18 57 24 57 H76 Q82 57 82 63 Q78 69 74 63 Q70 71 64 63 Q58 71 52 63 Q46 71 40 63 Q34 71 28 63 Q22 69 18 63 Z" fill="${C.ivory}"/>
+      <rect x="30" y="37" width="40" height="22" rx="5" fill="${C.blush}"/>
+      <path d="M30 42 Q30 37 35 37 H65 Q70 37 70 42 Q66 47 62 42 Q57 48 52 42 Q47 48 42 42 Q37 48 33 42 Z" fill="${C.ivory}"/>
+      <rect x="47" y="21" width="6" height="16" rx="2" fill="${C.ivory}"/>
+      <path d="M50 8 Q57 15 50 20 Q43 15 50 8 Z" fill="${C.gold}"/>
+      <circle cx="30" cy="75" r="2" fill="${C.rose}" stroke="none"/><circle cx="46" cy="78" r="2" fill="${C.sage}" stroke="none"/><circle cx="62" cy="74" r="2" fill="${C.rose}" stroke="none"/><circle cx="72" cy="79" r="2" fill="${C.sage}" stroke="none"/>`),
+    cup: g(`
+      <rect x="54" y="4" width="7" height="32" rx="3" fill="${C.rose}" transform="rotate(14 57 20)"/>
+      <rect x="24" y="28" width="52" height="11" rx="5" fill="${C.ivory}"/>
+      <path d="M28 39 H72 L66 88 Q65 92 61 92 H39 Q35 92 34 88 Z" fill="${C.blush}"/>
+      <path d="M31 56 H69 L67.6 68 H32.4 Z" fill="${C.ivory}" stroke="none"/>`),
+    tree: g(`
+      <path d="M44 60 H56 L58 90 H42 Z" fill="${C.toffee}"/>
+      <path d="M50 10 C62 10 68 18 68 26 C78 28 84 38 80 48 C86 56 80 70 68 68 C64 76 54 76 50 72 C46 76 36 76 32 68 C20 70 14 56 20 48 C16 38 22 28 32 26 C32 18 38 10 50 10 Z" fill="${C.sage}"/>
+      <circle cx="38" cy="40" r="3.5" fill="${C.rose}" stroke="none"/><circle cx="62" cy="50" r="3.5" fill="${C.rose}" stroke="none"/><circle cx="48" cy="58" r="3.5" fill="${C.rose}" stroke="none"/>`),
+    boat: g(`
+      <path d="M6 82 Q16 76 26 82 Q36 88 46 82 Q56 76 66 82 Q76 88 86 82 Q92 79 94 82 V94 H6 Z" fill="${C.sky}"/>
+      <path d="M18 66 H82 L72 82 H28 Z" fill="${C.toffee}"/>
+      <rect x="47.5" y="12" width="5" height="55" rx="2" fill="${C.toffee}"/>
+      <path d="M53 18 L78 61 H53 Z" fill="${C.cream}"/>
+      <path d="M47 28 L27 61 H47 Z" fill="${C.blush}"/>
+      <path d="M50 14 L61 18 L50 22" fill="${C.rose}"/>`),
+    igloo: g(`
+      <ellipse cx="50" cy="84" rx="44" ry="6" fill="${C.ivory}"/>
+      <path d="M12 82 C12 50 30 30 50 30 C70 30 88 50 88 82 Z" fill="${C.ivory}"/>
+      <path d="M15 66 Q50 54 85 66 M22 50 Q50 40 78 50 M34 37 Q50 31 66 37" stroke="${C.sky}" stroke-width="2.5"/>
+      <path d="M30 64 L29 51 M52 60 L52 48 M70 63 L71 51 M40 47 L40 36 M60 46 L61 35" stroke="${C.sky}" stroke-width="2.5"/>
+      <path d="M36 82 V70 Q36 58 50 58 Q64 58 64 70 V82 Z" fill="${C.sky}"/>
+      <path d="M42 82 V72 Q42 64 50 64 Q58 64 58 72 V82 Z" fill="${C.line}" stroke="none"/>`),
+    mug: g(`
+      <path d="M36 24 Q32 18 36 12 M48 24 Q44 18 48 12 M60 24 Q56 18 60 12" stroke="${C.edge}"/>
+      <path d="M72 44 Q90 44 88 60 Q86 74 70 72" stroke-width="12"/>
+      <path d="M72 44 Q90 44 88 60 Q86 74 70 72" stroke="${C.caramel}" stroke-width="6"/>
+      <path d="M22 30 H74 V78 Q74 88 64 88 H32 Q22 88 22 78 Z" fill="${C.caramel}"/>
+      <ellipse cx="48" cy="30" rx="26" ry="4.5" fill="${C.oat}"/>
+      <path d="M48 70 C40 62 38 56 43 53 C46 51 48 54 48 56 C48 54 50 51 53 53 C58 56 56 62 48 70 Z" fill="${C.blush}"/>`)
+  };
+
+  const WORDS = [
+    { word: 'cat', emoji: '🐱', note: '' },
+    { word: 'dog', emoji: '🐶', note: '' },
+    { word: 'frog', emoji: '🐸', note: '' },
+    { word: 'sun', emoji: '☀️', note: '' },
+    { word: 'moon', emoji: '🌙', note: 'Plain on purpose: the milestone moon is the one with a face and glasses.' },
+    { word: 'apple', emoji: '🍎', note: '' },
+    { word: 'cake', emoji: '🎂', note: '' },
+    { word: 'cup', emoji: '🥤', note: '<strong>Today a soda cup.</strong> Ours keeps the cup with a straw, in our colours.' },
+    { word: 'tree', emoji: '🌳', note: '' },
+    { word: 'boat', emoji: '⛵', note: '' },
+    { word: 'igloo', emoji: '🛖', note: '<strong>Today a hut:</strong> no emoji draws an igloo. Ours is a real one.' },
+    { word: 'mug', emoji: '☕', note: '<strong>Today "hot coffee".</strong> Ours is a mug, steam and all, with nothing in it to name.' }
+  ];
+
+  document.getElementById('words').innerHTML = WORDS.map(w => `
+    <section class="word" id="${w.word}">
+      <h2>${w.word}</h2>
+      <div class="row">
+        <div class="tile apple"><div class="pic"><span aria-label="${w.word}, your device's emoji">${w.emoji}</span></div><b>Your device</b></div>
+        <div class="tile google"><div class="pic"><span aria-label="${w.word}, Google's emoji">${w.emoji}</span></div><b>Google</b></div>
+        <span class="arrow" aria-hidden="true">→</span>
+        <div class="tile ours"><div class="pic"><svg viewBox="0 0 100 100" role="img" aria-label="${w.word}, our drawing">${DRAW[w.word]}</svg></div><b>Ours</b></div>
+      </div>
+      ${w.note ? `<p class="note">${w.note}</p>` : ''}
+    </section>`).join('');
+</script>

@@ -231,6 +231,8 @@ export const READING_CURRICULUM: Record<GradeLevel, ReadingSkill[]> = {
           skillId: 'k-blend-words',
           grade: 'kindergarten',
           title: 'Everyday Words (Sun, Bed, Cup)',
+          // a step up from Pet & Animal Words: four pictures, where that one
+          // has three (Alex, 2026-10-19; CUR-5)
           description: 'Read and blend common everyday objects.',
           icon: '☀️',
           difficulty: 1,
@@ -251,7 +253,8 @@ export const READING_CURRICULUM: Record<GradeLevel, ReadingSkill[]> = {
               options: [
                 { id: 'opt-sun', text: 'Sun', imageEmoji: '☀️', isCorrect: true },
                 { id: 'opt-moon', text: 'Moon', imageEmoji: '🌙', isCorrect: false },
-                { id: 'opt-sock', text: 'Sock', imageEmoji: '🧦', isCorrect: false }
+                { id: 'opt-sock', text: 'Sock', imageEmoji: '🧦', isCorrect: false },
+                { id: 'opt-bug', text: 'Bug', imageEmoji: '🐛', isCorrect: false }
               ]
             },
             {
@@ -269,7 +272,8 @@ export const READING_CURRICULUM: Record<GradeLevel, ReadingSkill[]> = {
               options: [
                 { id: 'opt-bed', text: 'Bed', imageEmoji: '🛏️', isCorrect: true },
                 { id: 'opt-bug', text: 'Bug', imageEmoji: '🐛', isCorrect: false },
-                { id: 'opt-cup', text: 'Cup', imageEmoji: '🥤', isCorrect: false }
+                { id: 'opt-cup', text: 'Cup', imageEmoji: '🥤', isCorrect: false },
+                { id: 'opt-hen', text: 'Hen', imageEmoji: '🐔', isCorrect: false }
               ]
             },
             {
@@ -287,7 +291,8 @@ export const READING_CURRICULUM: Record<GradeLevel, ReadingSkill[]> = {
               options: [
                 { id: 'opt-cup', text: 'Cup', imageEmoji: '🥤', isCorrect: true },
                 { id: 'opt-cap', text: 'Cap', imageEmoji: '🧢', isCorrect: false },
-                { id: 'opt-box', text: 'Box', imageEmoji: '📦', isCorrect: false }
+                { id: 'opt-box', text: 'Box', imageEmoji: '📦', isCorrect: false },
+                { id: 'opt-pup', text: 'Pup', imageEmoji: '🐕', isCorrect: false }
               ]
             }
           ]

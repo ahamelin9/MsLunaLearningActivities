@@ -4,5 +4,6 @@
 Story · P2 · L · needs: —
 - **Why:** `skillMastery` is recorded but never read.
 - **How:** track accuracy per skill, then nudge the starting tier up or down. If this doesn't happen, remove `skillMastery`.
+- **Decided (Alex, 2026-10-19):** keep it for later, low priority; `skillMastery` stays recorded meanwhile.
 
 - **Complete when:** the starting tier moves after a run of strong or weak results in a skill, never by more than one tier at a time. If dropped instead, `skillMastery` is deleted and the Changelog says why.

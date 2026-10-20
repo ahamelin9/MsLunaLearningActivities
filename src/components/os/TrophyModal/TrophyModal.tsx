@@ -13,8 +13,8 @@ interface TrophyModalProps {
 
 /**
  * The Trophy room (DES-9b): a kit Modal with the child's stars, days in a row
- * and lessons done, and the badges, each won or still locked. It opens from
- * the library's sticker tin; PRG-5's squishy shelf takes that over.
+ * and lessons done, and the badges, each won or still locked; a secret one
+ * shows only once it's won (PRG-4). It opens from the header's stars (PRG-5a).
  */
 export const TrophyModal: React.FC<TrophyModalProps> = ({ isOpen, progress, onClose }) => {
   const stats: { icon: IconName; value: number; label: string }[] = [
@@ -49,6 +49,7 @@ export const TrophyModal: React.FC<TrophyModalProps> = ({ isOpen, progress, onCl
         {ACHIEVEMENTS.map(badge => {
           // worked out when progress is saved (PRG-3): the room only reads it
           const won = progress.unlockedAchievements.includes(badge.id);
+          if (badge.hidden && !won) return null;
           return (
             <li key={badge.id} className={styles.badge} data-state={won ? 'won' : 'locked'}>
               <span className={styles.badgePicture} aria-hidden="true">

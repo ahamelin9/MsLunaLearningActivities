@@ -1,13 +1,13 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { GradeLevel } from '@/types/reading';
-import type { UserProgress } from '@/types/user';
+import type { PartWay, UserProgress } from '@/types/user';
 import type { AnyGameDef, GameApi, GameContext } from '../types';
 import type { Difficulty } from '../content';
 import { lunaSay, moonSay, type LunaMood, type Milestone } from '../luna';
 import { lessonStates } from '../lessons';
 import { gameMilestones, lessonMilestones, milestoneId } from '../milestones';
-import { nextSticker, type Sticker } from '../stickers';
-import { starsFor } from '../stars';
+import { SHELF_LINES, SIGNATURE_KIND, SQUISHY_KINDS, kindsFound, nextSquishy, type SquishyAward } from '../squishies';
+import { starsFor, starsWithTime, type TimeStar } from '../stars';
 import { estimateMinutes } from '../times';
 import { soundManager } from '@/utils/audio';
 import { pronunciation, type SpeechPart } from '@/utils/pronunciation';
@@ -40,9 +40,12 @@ interface GameShellProps {
   lessons?: AnyGameDef[];
   /**
    * The lesson up next, left part-way (PRG-8): its first start picks up after
-   * the rounds already won; "Again" and "Play again" start from round 1
+   * the rounds already won, and its time so far counts on (PRG-11); "Again"
+   * and "Play again" start from round 1
    */
-  resume?: { won: number; clean: number };
+  resume?: PartWay;
+  /** the done screen's "See my shelf" (PRG-5a) */
+  onSeeShelf?: () => void;
 }
 
 /**
@@ -57,6 +60,25 @@ const DIFFICULTY_LABELS: { value: Difficulty; label: string }[] = [
   { value: 1, label: 'Warm up' },
   { value: 2, label: 'Just right' },
   { value: 3, label: 'Tricky' }
+];
+
+/**
+ * The squishy a finished play puts on the shelf (PRG-5a): its signature kind
+ * first, the colour by the odds. One already on the shelf brings nothing new.
+ */
+function newSquishy(owned: string[], signature: string): SquishyAward | null {
+  const squishy = nextSquishy(owned, SIGNATURE_KIND[signature]);
+  return owned.includes(squishy.id) ? null : squishy;
+}
+
+/**
+ * What Luna says after her closing line on the done screen: a new squishy's
+ * line, and when it fills the shelf, the secret trophy (PRG-4). Each is its
+ * own pre-rendered part.
+ */
+const closingParts = (award: { squishy: SquishyAward | null; fullShelf: boolean }): SpeechPart[] => [
+  ...(award.squishy ? [{ text: award.squishy.line }] : []),
+  ...(award.fullShelf ? [{ text: SHELF_LINES.full }] : [])
 ];
 
 /**
@@ -78,7 +100,8 @@ export const GameShell: React.FC<GameShellProps> = ({
   startDifficulty = 2,
   lessonNumber,
   lessons,
-  resume
+  resume,
+  onSeeShelf
 }) => {
   const [phase, setPhase] = useState<Phase>(autoStart ? 'play' : 'intro');
   const [difficulty, setDifficulty] = useState<Difficulty>(startDifficulty);
@@ -103,9 +126,12 @@ export const GameShell: React.FC<GameShellProps> = ({
 
   const timers = useRef<number[]>([]);
   const [award, setAward] = useState<{
-    sticker: Sticker | null;
+    squishy: SquishyAward | null;
+    /** this play's squishy put the last kind on the shelf (PRG-4) */
+    fullShelf: boolean;
     stars: number;
-    points: number;
+    /** what time did to the stars (PRG-10) */
+    timeStar: TimeStar;
     firstTry: number;
     /** how long it took, on screen (PRG-6), and "about N min" from before this play */
     seconds: number;
@@ -130,6 +156,14 @@ export const GameShell: React.FC<GameShellProps> = ({
     document.addEventListener('visibilitychange', onVisibility);
     return () => document.removeEventListener('visibilitychange', onVisibility);
   }, [phase]);
+  /** the seconds on screen in this play so far */
+  const playSeconds = () => {
+    const c = clock.current;
+    return Math.round((c.total + (c.since !== null ? Date.now() - c.since : 0)) / 1000);
+  };
+  // a lesson picked up part-way brings its time so far, and the minutes of it
+  // Today already has (PRG-11); a fresh play brings none
+  const carried = useRef({ seconds: 0, counted: 0 });
   // a big milestone's visit on the done screen: the moon's line (DES-17)
   const [moon, setMoon] = useState<string | null>(null);
   const wonRef = useRef(0);
@@ -159,7 +193,7 @@ export const GameShell: React.FC<GameShellProps> = ({
 
   /**
    * Luna's line in the bubble, spoken. `then` follows it aloud without
-   * joining the bubble: a hint, or a sticker's line. Speaking it as its own
+   * joining the bubble: a hint, or a new squishy's line. Speaking it as its own
    * part also means it plays a clip that exists, where the two glued into one
    * string would be a sentence nobody rendered. Her beak follows the clips by
    * itself (the kit's Luna, DES-15).
@@ -204,6 +238,7 @@ export const GameShell: React.FC<GameShellProps> = ({
     setPetalFalls(0);
     wonRef.current = from?.won ?? 0;
     cleanRef.current = from?.clean ?? 0;
+    carried.current = { seconds: from?.seconds ?? 0, counted: from?.counted ?? 0 };
     recorded.current = false;
     setAward(null);
     setMoon(null);
@@ -221,25 +256,32 @@ export const GameShell: React.FC<GameShellProps> = ({
     if (roundIndex + 1 >= game.roundsPerPlay) {
       // Work the reward out here, while the counters are settled, rather
       // than during a render pass.
-      const perfect = cleanRef.current === game.roundsPerPlay;
       const c = clock.current;
       const ms = c.total + (c.since !== null ? Date.now() - c.since : 0);
       clock.current = { total: ms, since: null };
+      // the whole lesson, with any time from before it was left (PRG-11)
+      const seconds = carried.current.seconds + Math.round(ms / 1000);
+      const estimate = estimateMinutes(game, progress.times?.[game.id]);
+      // 1–3 by how it went, the same rule for games and lessons (PRG-1), then
+      // moved a little by the time it took (PRG-10)
+      const { stars, time } = starsWithTime(starsFor(cleanRef.current, game.roundsPerPlay), seconds, estimate);
+      const squishy = newSquishy(progress.stickers, game.sticker);
+      const all = SQUISHY_KINDS.length;
       setAward({
-        seconds: Math.round(ms / 1000),
-        estimate: estimateMinutes(game, progress.times?.[game.id]),
-        sticker: nextSticker(progress.stickers, game.sticker),
-        // 1–3 by how it went, the same rule for games and lessons (PRG-1)
-        stars: starsFor(cleanRef.current, game.roundsPerPlay),
-        firstTry: cleanRef.current,
-        points: game.lesson?.points ?? wonRef.current * 15 + (perfect ? 25 : 0)
+        seconds,
+        estimate,
+        squishy,
+        fullShelf: Boolean(squishy) && kindsFound(progress.stickers) < all && kindsFound([...progress.stickers, squishy!.id]) === all,
+        stars,
+        timeStar: time,
+        firstTry: cleanRef.current
       });
       setPhase('reward');
     } else {
       // the lesson up next remembers how far it got (PRG-8); a game, or a
       // lesson already done, starts from round 1 every time
       if (game.lesson && !progress.completedLessons.includes(game.lesson.id)) {
-        storageService.setPartway(game.lesson.id, wonRef.current, cleanRef.current);
+        storageService.setPartway(game.lesson.id, wonRef.current, cleanRef.current, carried.current);
       }
       answeredRef.current = false;
       setRoundIndex(roundIndex + 1);
@@ -416,21 +458,20 @@ export const GameShell: React.FC<GameShellProps> = ({
     if (phase !== 'reward' || !award || recorded.current) return;
     recorded.current = true;
 
-    // Luna's closing line, and the sticker's after it
-    const closing = () =>
-      speak(lunaSay('finish', game.id).text, 'cheer', award.sticker ? [{ text: award.sticker.line }] : []);
+    // Luna's closing line, and a new squishy's after it
+    const closing = () => speak(lunaSay('finish', game.id).text, 'cheer', closingParts(award));
 
-    // how long it took, and today's minutes with it (PRG-6)
-    storageService.recordTime(game.id, award.seconds);
+    // how long it took, and today's minutes with it (PRG-6), less those a
+    // lesson left part-way already added (PRG-11)
+    storageService.recordTime(game.id, award.seconds, carried.current.counted);
 
     let reached: Milestone[];
     if (game.lesson) {
       storageService.recordLessonCompletion(
         game.lesson.id,
         award.stars,
-        award.points,
         game.lesson.skillId,
-        award.sticker?.id ?? null
+        award.squishy?.id ?? null
       );
       reached = lessons?.length
         ? lessonMilestones(lessons, doneBefore, storageService.getProgress().completedLessons, award.stars)
@@ -439,11 +480,12 @@ export const GameShell: React.FC<GameShellProps> = ({
       storageService.recordGameCompletion({
         gameId: game.id,
         starsEarned: award.stars,
-        pointsEarned: award.points,
-        stickerId: award.sticker?.id ?? null
+        squishyId: award.squishy?.id ?? null
       });
       reached = gameMilestones(award.stars);
     }
+    // filling the shelf beats every other moment (PRG-4)
+    if (award.fullShelf) reached.unshift('fullShelf');
 
     // the moon visits for the biggest moment this play reached that isn't
     // claimed yet (BUG-25); while she's here only she talks, and Luna says her
@@ -465,10 +507,25 @@ export const GameShell: React.FC<GameShellProps> = ({
 
   // the one header (DES-8): back to the library and the game's name; in play,
   // the rounds and Again too, as on the round 2 Round and Done boards
+  // back to the library: a lesson left mid-play still counts its minutes, and
+  // the one up next keeps them with its rounds (PRG-11)
+  const leave = () => {
+    if (phase === 'play' && game.lesson) {
+      const upNext = !progress.completedLessons.includes(game.lesson.id);
+      storageService.leaveLesson(
+        game.lesson.id,
+        upNext ? { won: wonRef.current, clean: cleanRef.current } : null,
+        carried.current.seconds + playSeconds(),
+        carried.current.counted
+      );
+    }
+    onExit();
+  };
+
   const header = (inPlay = false, title = game.title) => (
     <AppHeader
       back="library"
-      onBack={onExit}
+      onBack={leave}
       title={title}
       rounds={inPlay ? { won: roundsWon, current: roundIndex + 1, total: game.roundsPerPlay } : undefined}
     >
@@ -513,6 +570,8 @@ export const GameShell: React.FC<GameShellProps> = ({
           onPlayAgain={() => startPlay(difficulty)}
           onPlayAnother={onPlayAnother}
           playAnotherLabel={playAnotherLabel}
+          onSeeShelf={onSeeShelf}
+          owned={progress.stickers}
           onLuna={() => {
             // while the moon visits, only she talks
             if (!moon) speak(bubble, 'cheer');
@@ -520,7 +579,7 @@ export const GameShell: React.FC<GameShellProps> = ({
           moon={moon}
           onMoonGone={() => {
             setMoon(null);
-            speak(lunaSay('finish', game.id).text, 'cheer', award?.sticker ? [{ text: award.sticker.line }] : []);
+            speak(lunaSay('finish', game.id).text, 'cheer', award ? closingParts(award) : []);
           }}
         />
       </>

@@ -181,6 +181,13 @@ Copy `speech-check.cjs` from this folder and edit its scenario. It already:
     reason. Import the URL the page actually loaded:
     `performance.getEntriesByType('resource').map(e => e.name).find(n => n.includes('/src/utils/pronunciation.ts'))`
     (as `kit-check.mjs` does), or restart Vite.
+  - **Pitfall, a check spoiled by your own edits** (*2026-10-19, BUG-28*):
+    while a check runs against Vite, an edit to any `src` file the app
+    imports hot-reloads it mid-play, and any `.html` saved anywhere in the
+    repo (a review page under `.claude/`, say) reloads the whole page
+    (`vite.log`: "page reload …html"). During a long loop of runs, edit only
+    files the app doesn't import yet, and keep sample pages in the scratchpad
+    until it's done.
 - times every clip by wrapping `AudioBufferSourceNode.prototype.start/stop`,
   each labelled with the line it was fetched for (it wraps `fetchClip` and
   keeps each decoded clip's line; OPS-9).
@@ -194,8 +201,10 @@ lesson's tile has its number too); `[data-shot="play"]`;
 `[data-shot="shell-play"]` / `[data-shot="shell-reward"]`; and
 `[data-shot="round-pips"][aria-label]`, which changes each round. Since DES-8
 the header (`AppHeader`) carries `shell-back` (Library), `round-pips` and
-`app-home` (Home, which leaves the app); the Trophy room opens from the home
-screen only. A game's answers are the stage's Choices,
+`app-home` (Home, which leaves the app); in the library the header's stars
+are `open-trophies` (PRG-5a), the Squishy Shelf card's arrow `open-shelf`
+(the shelf is `shelf`, its count `shelf-count`), and a done screen's new
+squishy `done-squishy` with `see-shelf` beside Play again. A game's answers are the stage's Choices,
 `[data-shot="stage"] button[data-kind]`, right once
 `[data-state~="right"]`. Game pieces: Letter Cookies' `cookie` (its letter
 in `aria-label`, eaten as `right`); Treasure Path's `treasure-passage`,
@@ -501,6 +510,26 @@ Pitfalls that cost time:
   `bubble-check.mjs` measures the share in the real game. Keep the sim's
   lanes (6 at every iPad size) and crossing times in step with the game.
 
+## Testing time: a clock you can move and a tab you can hide (PRG-6)
+
+*2026-10-19 · PRG-6, BUG-12*
+
+- **Symptom:** you need to know a minute counts, or doesn't, without waiting
+  a minute; or that a hidden tab pauses a timer.
+- **Fix:** in `evaluateOnNewDocument`, wrap `Date.now` to add
+  `window.__skip` (the app times plays with `Date.now`), and define
+  `Document.prototype.hidden` / `visibilityState` as getters on
+  `window.__hidden`; to hide, set it and dispatch `visibilitychange` on
+  `document`. For dates (the streak, Today), `page.emulateTimezone()` plus a
+  `Date` subclass whose no-argument constructor reads `window.__now`
+  (`streak-check.mjs`).
+- **Check:** `time-check.mjs` (2 minutes on screen, 1 hidden: it must count
+  2; since PRG-11 also a lesson left after a minute and finished after
+  another: Today +1 on leaving, "took 2 min" and Today +2 in all),
+  `streak-check.mjs`.
+- **Pitfall:** `localDay(new Date())` is unaffected by `__skip`, which only
+  moves `Date.now`; a check that crosses midnight needs the subclass.
+
 ## Settings saves over and over when offline (BUG-10)
 
 *2026-10-19 · BUG-10*
@@ -654,6 +683,14 @@ Pitfalls that cost time:
   takes about two minutes, and fails 9 of 11 on the commit before PRG-7.
 - **Check:** 11 of 11. A grade given more lessons (CUR-4) fails its first
   line until the new "Let's finish Lesson N first!" is added and rendered.
+- **Shots of a lesson past the first** (*2026-10-19, CUR-5*): `ui:shots`
+  plays only Lesson 1. `node .claude/skills/know-how/lesson-shot.mjs <lesson
+  number> <outPrefix> [light|dark] [grade 0|1|2]` marks the grade's lessons
+  done, opens that one and shoots its first round at 1180 and 744 wide.
+  A game's done screen (PRG-9): `game-done-shot.mjs <outPrefix> [light|dark]
+  [kind:colour …]` plays Letter Cookies from a save holding those squishies,
+  shoots its done screen at all four sizes and fails if a button or the shelf
+  runs off screen.
 
 ## Two screenshot runs of the same code don't match
 
@@ -818,6 +855,31 @@ Pitfalls that cost time:
 - **Check:** it passes at every grade today, and fails with GameShell's
   `.shell-stage { min-height }` set to 1400px for a moment.
 
+## A card's row of pictures is squeezed, or slides under its buttons (PRG-5a)
+
+*2026-10-19*
+
+**Symptom:** the library's Squishy Shelf card looked fine with no squishies
+(three empty spots), but with three on it they slid under the arrow and
+"My trophies", and at 1024 wide the buttons overlapped each other. The empty
+spots had shown it already: they were thin dashed bars, squeezed by flex.
+
+**Cause:** a flex row whose middle (`flex: 1; min-width: 0`) holds
+fixed-size pictures. When the buttons beside it take the room, the middle
+shrinks below its pictures' width and they overflow. A fresh save never shows
+it, so `ui:shots` didn't either.
+
+**Fix:** give the card less to hold (the board's card has no trophies
+button; the Trophy room moved to the header's stars), and let the row show
+only what fits: `flex-wrap: wrap`, a row gap bigger than the slack, a fixed
+height of one row and `overflow: hidden`, with each item `flex: none`, newest
+first. Extra pictures wrap onto a row that's cut off, never squeezed.
+
+**Check:** shoot the card with a save that fills it, at 1180, 1024 and 744
+wide: `node .claude/skills/know-how/hub-card-shot.mjs <outPrefix> light
+bear:toffee cat:butter bunny:honey` (Vite on 5199). Look at every size, not
+just the widest.
+
 ## New chrome changed every screen: did the screen under it move?
 
 *2026-10-11 · DES-8*
@@ -849,11 +911,16 @@ Pitfalls that cost time:
   corners add up to more than the box's side, the browser shrinks every corner
   by the same factor, so the 22px comes out about 2px. The round 2 board's "?"
   cue has the same flaw.
-- **Fix:** until DES-26 fixes the token, build the arch from the element's own
-  width: `calc(width / 2) calc(width / 2) var(--radius-card) var(--radius-card)`
-  (ListenCue's `--cue-radius`).
-- **Check:** a close-up with `kit-sections.mjs` in this folder: the bottom
-  corners are as round as a card's.
+- **Fix (DES-26, 2026-10-19):** the token is gone. Use the `arch()` mixin
+  (`styles/_mixins.scss`): `@include arch(var(--my-width))` when the
+  component knows its width (ListenCue), or `@include arch` on a box that
+  fills a parent given `@include arch-host` (container units; the shelf's
+  cabinet). A box with no container host gets the viewport's width and the
+  old flaw back.
+- **Check:** `kit-check.mjs` hit-tests just inside each Kit page arch's bottom
+  corners and top corners (`elementFromPoint` follows the rounded shape):
+  outside the curve at 192 and 400 wide. A close-up with `kit-sections.mjs`
+  shows them too.
 
 ## In the Kit page shots, a right answer looks smaller than it is
 

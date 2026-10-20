@@ -181,7 +181,7 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
   const remaining = round.targetCount - caught.length;
 
   return (
-    <GameSurface className={styles.hunt}>
+    <GameSurface>
       {/* the letter is only ever heard: shown here, the hunt is just matching shapes */}
       <div className={styles.header}>
         <StagePrompt>Catch every letter I say</StagePrompt>

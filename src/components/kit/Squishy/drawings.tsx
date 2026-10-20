@@ -3,6 +3,7 @@
 // that reads the squishy's colour or a fixed `--illo-squishy-*` one.
 
 import type { ReactNode } from 'react';
+import { cx } from '@/utils/cx';
 import styles from './Squishy.module.scss';
 
 const face = (left: [number, number], right: [number, number], mouth: string, r = 3) => (
@@ -94,7 +95,7 @@ export const KINDS = {
     name: 'Little Moon',
     art: <>
       {shadow(26)}
-      <path className={`${styles.body} ${styles.halfScale}`} d={MOON} transform="scale(0.5) rotate(-18 100 110)" />
+      <path className={cx(styles.body, styles.halfScale)} d={MOON} transform="scale(0.5) rotate(-18 100 110)" />
       {face([47, 72], [62, 67], 'M52 77 q4 2.5 8 -1.5', 2.6)}
     </>,
   },

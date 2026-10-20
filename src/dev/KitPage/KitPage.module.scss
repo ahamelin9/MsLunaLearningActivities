@@ -163,6 +163,40 @@
   background: var(--well);
 }
 
+// the arch() mixin at two widths (DES-26): each host is the arch's container
+.arches {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--space-6);
+  margin-top: var(--space-4);
+}
+
+.arch-host {
+  @include arch-host;
+
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+
+  &[data-size='narrow'] {
+    width: calc(var(--space-16) * 3);
+  }
+
+  &[data-size='wide'] {
+    width: calc(var(--space-16) * 6 + var(--space-4));
+  }
+}
+
+.arch {
+  display: block;
+  // a top as tall as half the width, and room below it for the corners
+  height: calc(50cqi + var(--space-16));
+  background: var(--well);
+  border: var(--border-hair) solid var(--edge);
+  @include arch;
+}
+
 .lift {
   border-radius: var(--radius-tile);
 }

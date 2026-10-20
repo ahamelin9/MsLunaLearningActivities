@@ -103,8 +103,8 @@ $radius: (
   tile: 16px,
   card: 22px,
   stage: 30px,
-  // the arch: a round top on gentle card corners
-  arch: $radius-round $radius-round 22px 22px,
+  // the arch is a shape, not a value: the arch() mixin (styles/_mixins.scss,
+  // DES-26) rounds its top by half its width, on card corners
 );
 
 // ── Borders, ledges and the press ──────────────────────────────────────────

@@ -132,6 +132,18 @@ function Tokens() {
                 {names.map(n => <Demo key={n} name={n} value={values[n] ?? ''} group={title} />)}
               </ul>
             )}
+            {/* the arch is a shape, not a token: the arch() mixin at two widths,
+                each a half-circle top on 22px corners (DES-26) */}
+            {title === 'Corners' && (
+              <div className={styles.arches}>
+                {(['narrow', 'wide'] as const).map(size => (
+                  <span key={size} className={styles.archHost} data-size={size}>
+                    <span className={styles.arch} data-shot="kit-arch" />
+                    <span className={styles.name}>arch() · {size === 'narrow' ? '192px' : '400px'}</span>
+                  </span>
+                ))}
+              </div>
+            )}
           </div>
         );
       })}

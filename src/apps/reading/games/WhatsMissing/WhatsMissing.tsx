@@ -87,7 +87,7 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
   const visible = phase === 'guess' && !found ? round.items.filter(i => i.word !== round.missing.word) : round.items;
 
   return (
-    <GameSurface className={styles.missing}>
+    <GameSurface>
       <div className={styles.desk}>
         {/* the curtain slides across while Luna takes something, then off again */}
         <div className={styles.curtain}

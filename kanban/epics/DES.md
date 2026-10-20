@@ -70,11 +70,13 @@ them in.
 ### DES-26 · Make the arch radius work at any size
 Task · P2 · S · needs: —
 - **Why:** `--radius-arch` is `999px 999px 22px 22px`. When the corners add up to more than the box, the browser shrinks all four in proportion, so the bottom corners come out about 2px, not the 22px `foundations.md` describes (the round 2 board's "?" cue has the same flaw). Found in DES-7b: ListenCue works round it with its own arch, built from its width.
+- **OKed (Alex, 2026-10-19)** to start: kit only, no visible change expected.
 - **How:** a primitive change, so Alex OKs it first (ladder step 4). Give the arch a form that keeps a half-circle top and card corners at any width: for example a `arch($width)` mixin beside `bp()`, or container units. Then ListenCue reads it again instead of its own `--cue-radius`.
 - **Complete when:**
   - on the Kit page, an arch 192px wide and one 400px wide both show a half-circle top and 22px bottom corners, in light and dark;
   - ListenCue uses the shared arch, and its shots don't change;
   - `components/kit` is still at zero.
+- **Where it stands (2026-10-19):** built; **Blocked: waits for Alex's OK** (review sheet `screenshots/review/des26-arch.png`). The arch is the `arch($width: 100cqi)` mixin beside `bp()` (with `arch-host` for the box it fills), and `--radius-arch` is gone. ListenCue passes its own width; the squishy shelf's cabinet (PRG-5a, the token's only user) reads its container's and now has the board's 22px bottom corners. `kit-check.mjs` hit-tests the Kit page's two arches (fails with the old 999px top). ListenCue's dangling `styles.ear` is OPS-13's.
 
 ### DES-27 · Our own pictures instead of emoji
 Story · P2 · L · needs: — · split into batches before starting
@@ -84,24 +86,7 @@ Story · P2 · L · needs: — · split into batches before starting
   - Every picture the app shows goes through it: the word bank, lessons' options, Treasure Path's passages, Story Corner's stories, the game tiles (about 200 emoji in `src` today, fewer once the same ones are counted once).
   - Batches, most-seen first: the word bank's 100 words (every game draws on them), then lessons, then passages and stories. Each batch is its own ticket, and Alex (and the teacher) OK a sample sheet before the batch is drawn.
   - The content checks learn the names: one picture per word (CNT-4's rule) and each story's picture matching it carry over.
-  - Stopgap if wanted before then: bundle one free emoji set (Microsoft's Fluent Emoji, MIT, the softest style and closest to Apple's; or Google's Noto, OFL), trimmed to the pictures used, so every device matches. Alex to pick, or skip it.
+  - Stopgap if wanted before then: bundle one free emoji set (Microsoft's Fluent Emoji, MIT, the softest style and closest to Apple's; or Google's Noto, OFL), trimmed to the pictures used, so every device matches. **Skipped (Alex, 2026-10-19).**
+  - **Review first in an artifact (Alex, 2026-10-19):** before anything goes into the app, build each batch as a page he reviews: each picture as Apple's and Google's emoji, an arrow, and our drawing in the design system. Only OKed drawings go into the kit. Start with the word bank's 100 words, after the squishies (PRG-5a).
+- **Where it stands (2026-10-19):** a first sample of 12 (cat, dog, frog, sun, moon, apple, cake, cup, tree, boat, igloo, mug) is up for Alex's review: <https://claude.ai/artifact/TaRumwLfd1KAkqgvSkJiJp>. Each row shows his device's emoji, Google's (Noto Color Emoji from Google Fonts), an arrow and ours, in light and dark. Three show why: today "cup" is a soda cup, "igloo" a hut (no emoji draws an igloo) and "mug" hot coffee. Source: `.claude/skills/luna-design/pictures/sample-1.html` (its drawings are inline SVG in the illustration colours), shots with `shoot.cjs` next to it. Waits for his notes on the style before the 100 are drawn.
 - **Complete when:** no screen shows a system emoji; every picture is a kit `Picture` that looks the same on an iPad, a Chromebook and Windows (shots from Chrome and Safari match); the Kit page shows them all in light and dark; the teacher has OKed the look.
-
-### DES-16 · Light and dark mode
-Story · P1 · M · needs: —
-- **Blocked (2026-10-18): waits only for Alex's dark check on the real iPad.** Built, checked and committed (`theme-check.mjs` 22 of 22, lint, shots, the layout audit at K; sheet `screenshots/review/des16-light-and-dark.png`); Alex OKed the rest, and the choice now reads "Match the system". Once he's seen every screen in dark on the iPad, it closes out.
-- **Why:** Alex wants a real dark mode (2026-10-09), and building the components on role tokens from the start keeps every screen working in both.
-- **How:** the dark roles already exist (DES-3), and the contrast check runs in lint (DES-19). What's left:
-  - **Follow the iPad's light/dark setting by default:** a `prefers-color-scheme: dark` block (`:root:not([data-theme="light"])`) outputs the dark roles. An inline script in `index.html` sets `data-theme` on `<html>` before the first paint, so there's no flash.
-  - **A grown-up's choice:** Light, Dark or "Match the system" in Settings, behind the gate (SET-1). The choice is saved. ("the system", not "the iPad": it may be a Chromebook; Alex, 2026-10-18.)
-  - **A sun/moon button on the home screen (Alex, 2026-10-12):** beside the gear in the status bar, a kit icon button a child can tap to turn day into night (the moon and stars) and back. It's saved like the Settings choice, which still works; the gear stays Settings. The Home board has no such button, so Alex OKs its shots. It comes only here: before every screen is on the roles, dark would show a dark header over light screens.
-  - Every screen uses the roles only. Illustrations (Luna, squishies, flowers) keep their own colours from `_illustration.scss`.
-  - At night the home screen shows a crescent moon in moon gold and twinkling stars instead of the sun (round 2 Home board), using the night scenery from `_illustration.scss`.
-  - With reduced motion (DES-6) the stars don't twinkle.
-- **Complete when:**
-  - with the iPad set to dark, every screen shows the dark set, and switching back shows the light set without a reload;
-  - the contrast check passes in both modes;
-  - the home screen shows the moon and stars in dark mode and the sun in light mode;
-  - the Settings choice overrides the iPad and survives a reload;
-  - tapping the home screen's sun/moon button turns day into night and back, and the choice survives a reload;
-  - every screen is checked in dark on the real iPad (Alex).

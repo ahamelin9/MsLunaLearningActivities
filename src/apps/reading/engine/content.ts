@@ -76,7 +76,7 @@ export const WORDS: WordItem[] = [
   { word: 'yarn', emoji: '🧶', initial: 'y', cat: 'toy', tier: 2 },
   { word: 'zebra', emoji: '🦓', initial: 'z', cat: 'animal', tier: 2 },
   { word: 'jam', emoji: '🍓', initial: 'j', cat: 'food', tier: 1, rime: 'am' },
-  { word: 'ham', emoji: '🍖', initial: 'h', cat: 'food', tier: 1, rime: 'am' },
+  // no "ham": its picture is a meat bone (Alex, 2026-10-19; CNT-3)
   { word: 'duck', emoji: '🦆', initial: 'd', cat: 'animal', tier: 1 },
   { word: 'doll', emoji: '🪆', initial: 'd', cat: 'toy', tier: 1 },
   { word: 'vest', emoji: '🦺', initial: 'v', cat: 'clothes', tier: 2 },
@@ -125,7 +125,8 @@ export const WORDS: WordItem[] = [
   { word: 'sunflower', emoji: '🌻', initial: 's', cat: 'nature', tier: 3 },
   { word: 'butterfly', emoji: '🦋', initial: 'b', cat: 'animal', tier: 3 },
   { word: 'popcorn', emoji: '🍿', initial: 'p', cat: 'food', tier: 3 },
-  { word: 'football', emoji: '⚽', initial: 'f', cat: 'toy', tier: 3 },
+  // American English: a football is 🏈; ⚽ is a soccer ball (CNT-3)
+  { word: 'football', emoji: '🏈', initial: 'f', cat: 'toy', tier: 3 },
   { word: 'toothbrush', emoji: '🪥', initial: 't', cat: 'home', tier: 3 },
   { word: 'pancake', emoji: '🥞', initial: 'p', cat: 'food', tier: 3 }
 ];
