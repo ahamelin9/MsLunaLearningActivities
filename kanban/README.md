@@ -10,7 +10,7 @@ tickets.
 - **`epics/<EPIC>.md`**: one file per epic, with its goal and every ticket's full section (Why / How / Complete when). A ticket never moves files when its status changes.
 - **`CHANGELOG.md`**: finished and dropped tickets. Once a ticket is deleted, its changelog line is its only record.
 
-**Last updated:** 2026-10-18
+**Last updated:** 2026-10-28
 
 ## How to read this
 
@@ -72,14 +72,15 @@ be pulled into Phase 1 for a break from styling.
 
 ### Now / Next
 
-- **Now:** PRG-5b's sample sheet as an artifact, Pearl Moon first (Alex wants to see it before it's built). Done 2026-10-20: OPS-12, BUG-28, OPS-13, DES-26, PRG-11, CUR-5, CNT-3, PRG-5a, PRG-2, PRG-10, PRG-9, PRG-4.
-- **Next:** CNT-2 (six calls for Alex on the ticket), then CUR-4 and GAME-5; DES-27's 100 pictures after his notes on the first sample; the rest of PRG-5b once its sheet is OKed. The Writing app (WRT) after Phase 7. OPS-11 stays parked.
+- **Now:** the VOX epic, ahead of everything (Alex, 2026-10-28): VOX-1 once Alex's picks are in on the Sound Check page, with VOX-4 alongside it.
+- **Next:** VOX-2, then VOX-3. Then PRG-5b's sample sheet as an artifact, Pearl Moon first (Alex wants to see it before it's built); CNT-2 (six calls for Alex on the ticket), then CUR-4 and GAME-5; DES-27's 100 pictures after his notes on the first sample; the rest of PRG-5b once its sheet is OKed. The Writing app (WRT) after Phase 7. OPS-11 stays parked.
 
 ## Epics
 
 In board order. A new epic gets its file in `epics/` first, then a link here
 (the tools only read linked files), then its rows on the board.
 
+- [VOX — Luna's voice: letter sounds and words](epics/VOX.md) · ahead of everything (Alex, 2026-10-28)
 - [DES — Design system & layout](epics/DES.md) · Phase 1
 - [BUG — Bugs](epics/BUG.md) · P0/P1 in Phase 2, P2 anytime
 - [LVL — Difficulty](epics/LVL.md) · Phase 4
@@ -94,6 +95,11 @@ In board order. A new epic gets its file in `epics/` first, then a link here
 
 | ID | Title | Type | P | Size | Status |
 |---|---|---|---|---|---|
+| **VOX** | **Luna's voice: letter sounds and words** | Epic | **P0** | | |
+| VOX-1 | Letter sounds retuned by ear | Story | P0 | M | Todo |
+| VOX-2 | Words said alone end cleanly | Story | P1 | S | Todo |
+| VOX-4 | A sound check that can fail | Task | P1 | S | Todo |
+| VOX-3 | Words and lines in Kokoro's own phoneme spelling, as far as it helps | Story | P2 | M | Todo |
 | **DES** | **Design system & layout** | Epic | **P0** | | |
 | DES-27 | Our own pictures instead of emoji | Story | P2 | L | Todo |
 | **BUG** | **Bugs** | | | | |

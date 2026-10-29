@@ -117,6 +117,26 @@ build, or a tool that misbehaved. Skip routine fixes.
   To measure a pause, use the timed browser check (below): the gap between
   one clip's end and the next one's start.
 
+## A letter sound sounds wrong ("buh", "TV static", robotic)
+
+*2026-10-28 · VOX-1*
+
+- **Symptom:** a phonics sound has an "uh" after it, sounds like static or a
+  robot, starts with a breath ("h-ee"), or a blend loses its second sound.
+- **Cause:** how `scripts/voice/phonemes.mjs` makes it. Round 1's hisses were
+  synthetic noise shaped like her hiss (`resynthNoise`): "TV static". Held
+  vowels and hums stretched by PSOLA at a flat pitch sound robotic. Vowels cut
+  from "he", "high" or "core" keep the h or k breath in front. Kokoro
+  devoices L, R and W after K, P, T and F, so a blend cut from a word has no
+  voiced second sound to hold.
+- **Fix:** see the VOX tickets for what Alex picked, and
+  `voice-audit/README.md` in this folder for the tools: her real hiss held by
+  grains, vowels said slowly, `human: true` for a natural wobble, a blend's
+  second sound held (`holdSecond`, `noVowel`) or joined, and `edgetrim.py` for
+  a word's stray edges.
+- **Check:** your ear first (the Sound Check page; a machine ear can't judge
+  vowels or held sounds), then `voice-audit/score.py` for the consonants.
+
 ## Two voices at once, or a line cut off
 
 *2026-10-09 · BUG-19 (and BUG-1)*

@@ -1,0 +1,348 @@
+<title>Luna's Sound Check</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&family=Fraunces:opsz,wght,SOFT@9..144,500..700,100&display=swap">
+<style>
+/* Layout: one reading column; a sticky tab bar over a stack of listening cards, one per sound or pair. */
+:root {
+  --page: #F5EDE1; --card: #FFFBF5; --edge: #E9DCC9; --plank: #D9C4A6;
+  --button: #9A6B45; --button-ink: #FFFBF5; --accent-ink: #6B4C35;
+  --ink: #3B2A20; --quiet: #6E5747; --right: #5C6849; --right-mist: #E7EADF;
+  --again: #9A5A44; --again-mist: #F3E0D6; --star: #C4996A; --shade: rgba(59,42,32,.08);
+  --font-display: 'Fraunces', Georgia, serif; --font-read: 'Andika', system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --page: #1E1813; --card: #2A211B; --edge: #433629; --plank: #5A4636;
+  --button: #D9AE7C; --button-ink: #1E1813; --accent-ink: #E6C49A;
+  --ink: #F4EADC; --quiet: #C9B6A1; --right: #A9B88C; --right-mist: #2F3527;
+  --again: #D79C86; --again-mist: #46302A; --star: #D9AE7C; --shade: rgba(0,0,0,.3); color-scheme: dark } }
+:root[data-theme="dark"] {
+  --page: #1E1813; --card: #2A211B; --edge: #433629; --plank: #5A4636;
+  --button: #D9AE7C; --button-ink: #1E1813; --accent-ink: #E6C49A;
+  --ink: #F4EADC; --quiet: #C9B6A1; --right: #A9B88C; --right-mist: #2F3527;
+  --again: #D79C86; --again-mist: #46302A; --star: #D9AE7C; --shade: rgba(0,0,0,.3); color-scheme: dark }
+
+* { box-sizing: border-box }
+body { background: var(--page); color: var(--ink); font: 400 16px/1.55 var(--font-read); }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--page) }
+.wrap { max-width: 860px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 28px 64px }
+h1, h2, h3 { font-family: var(--font-display); font-variation-settings: 'SOFT' 100; text-wrap: balance; margin: 0 }
+h1 { font-size: clamp(30px, 5vw, 40px); font-weight: 650; line-height: 1.1 }
+h2 { font-size: 24px; font-weight: 600; line-height: 1.2 }
+h3 { font-size: 20px; font-weight: 600 }
+p { margin: 0 }
+.eyebrow { font-size: 13px; letter-spacing: .08em; text-transform: uppercase; color: var(--quiet) }
+.lede { font-size: 18px; max-width: 64ch; color: var(--ink) }
+header { display: grid; gap: 12px; padding-bottom: 20px }
+
+.findings { display: grid; gap: 10px; margin: 8px 0 28px; padding: 0; list-style: none }
+.findings li { display: grid; grid-template-columns: 4.6em 1fr; gap: 12px; align-items: baseline; padding: 12px 14px; background: var(--card); border: 1px solid var(--edge); border-radius: 14px }
+.findings b { font-family: var(--font-display); font-size: 22px; color: var(--accent-ink); font-variant-numeric: tabular-nums }
+.verdict { padding: 16px 18px; border-radius: 16px; background: var(--right-mist); border: 1px solid var(--edge); display: grid; gap: 6px; margin-bottom: 28px }
+
+.tabs { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--page); display: flex; gap: 8px; flex-wrap: wrap; padding: 10px 0; border-bottom: 1px solid var(--edge); margin-bottom: 16px }
+.tab { font: 700 15px/1 var(--font-read); color: var(--ink); background: var(--card); border: 1px solid var(--edge); border-radius: 999px; padding: 10px 14px; cursor: pointer; display: inline-flex; gap: 8px; align-items: center }
+.tab[aria-selected="true"] { background: var(--button); color: var(--button-ink); border-color: var(--button) }
+.tab .count { font-weight: 400; opacity: .85; font-variant-numeric: tabular-nums }
+.status { margin-left: auto; font-size: 13px; color: var(--quiet); align-self: center }
+
+.how { color: var(--quiet); font-size: 15px; margin-bottom: 14px; max-width: 70ch }
+.group { display: grid; gap: 12px; margin-bottom: 26px }
+.group > h3 { margin-top: 6px }
+.card { background: var(--card); border: 1px solid var(--edge); border-radius: 18px; padding: 14px 16px; display: grid; gap: 10px }
+.card[data-done="true"] { border-color: var(--right) }
+.card-head { display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap }
+.sym { font: 700 22px/1 var(--font-display); color: var(--accent-ink) }
+.letters { color: var(--quiet); font-size: 15px }
+.machine { font-size: 13.5px; color: var(--quiet) }
+.machine em { font-style: normal; color: var(--again) }
+.takes { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 230px), 1fr)); gap: 8px }
+.take { display: grid; grid-template-columns: auto 1fr auto; gap: 8px; align-items: center; padding: 8px; border: 1px solid var(--edge); border-radius: 14px; background: var(--page); min-width: 0 }
+.take[data-picked="true"] { border-color: var(--right); background: var(--right-mist) }
+.take .label { font-size: 14px; line-height: 1.3; min-width: 0 }
+.take .label small { display: block; color: var(--quiet); font-size: 12.5px }
+.play { width: 44px; height: 44px; border-radius: 50%; border: 0; background: var(--button); color: var(--button-ink); cursor: pointer; display: grid; place-items: center; flex: none }
+.play svg { width: 18px; height: 18px }
+.play[data-playing="true"] { outline: 3px solid var(--star); outline-offset: 2px }
+.pick { font: 700 13px/1 var(--font-read); border: 1px solid var(--plank); background: var(--card); color: var(--ink); border-radius: 999px; padding: 8px 10px; cursor: pointer }
+.take[data-picked="true"] .pick { background: var(--right); border-color: var(--right); color: var(--card) }
+.row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center }
+.chip { font: 700 14px/1 var(--font-read); border: 1px solid var(--plank); background: var(--page); color: var(--ink); border-radius: 999px; padding: 10px 12px; cursor: pointer }
+.chip[aria-pressed="true"] { background: var(--right); border-color: var(--right); color: var(--card) }
+.chip.none[aria-pressed="true"] { background: var(--again); border-color: var(--again) }
+.note { width: 100%; font: 400 15px/1.4 var(--font-read); color: var(--ink); background: var(--page); border: 1px solid var(--edge); border-radius: 12px; padding: 8px 10px; resize: vertical; min-height: 38px }
+.ab { display: grid; grid-template-columns: auto auto 1fr; gap: 10px; align-items: center }
+.ab .word { font: 600 22px/1.2 var(--font-display); min-width: 0; overflow-wrap: anywhere }
+.ab-line { font-size: 17px; min-width: 0 }
+.reveal { font-size: 13.5px; color: var(--quiet) }
+button:focus-visible, .note:focus-visible { outline: 3px solid var(--star); outline-offset: 2px }
+.plan { display: grid; gap: 14px }
+.plan ol { margin: 0; padding-left: 1.3em; display: grid; gap: 8px }
+.plan table { border-collapse: collapse; width: 100%; font-size: 15px }
+.plan td, .plan th { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--edge); vertical-align: top }
+.plan th { font-size: 12.5px; letter-spacing: .06em; text-transform: uppercase; color: var(--quiet) }
+.scroll { overflow-x: auto }
+code, .ipa { font-family: var(--font-read); background: var(--page); border: 1px solid var(--edge); border-radius: 6px; padding: 0 5px }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important } }
+@media (max-width: 520px) { .findings li { grid-template-columns: 1fr; gap: 2px } .ab { grid-template-columns: auto auto; } .ab .word, .ab-line { grid-column: 1 / -1 } }
+</style>
+
+<div class="wrap">
+  <header>
+    <span class="eyebrow">Ms. Luna's Learning Pad · voice audit · 28 October 2026</span>
+    <h1>Luna's Sound Check</h1>
+    <p class="lede">Every letter sound, letter name and word Luna says, measured with a speech recognizer and a formant tracker, with fixes to listen to side by side. Your ear makes the final call, so each pick you make here is saved for Claude to build from.</p>
+  </header>
+
+  <div class="verdict">
+    <h2>Keep the voice, retune the letter sounds</h2>
+    <p>Luna's voice model (Kokoro) is still the right one: it is one of very few good voices that can be handed exact sounds, which phonics needs. Most of what's wrong is in how we make the letter sounds. Many are cut from the wrong part of a word, or held the wrong way. Words are mostly fine, except for a little extra vowel at the edges of some short words.</p>
+  </div>
+
+  <ul class="findings" id="findings"></ul>
+
+  <nav class="tabs" role="tablist" aria-label="What to listen to">
+    <button class="tab" role="tab" data-tab="sounds" aria-selected="true">Letter sounds <span class="count" id="c-sounds"></span></button>
+    <button class="tab" role="tab" data-tab="names" aria-selected="false">Letter names <span class="count" id="c-names"></span></button>
+    <button class="tab" role="tab" data-tab="words" aria-selected="false">Words <span class="count" id="c-words"></span></button>
+    <button class="tab" role="tab" data-tab="lines" aria-selected="false">Sentences <span class="count" id="c-lines"></span></button>
+    <button class="tab" role="tab" data-tab="plan" aria-selected="false">The plan</button>
+    <span class="status" id="status" role="status">Loading the clips…</span>
+  </nav>
+
+  <section id="p-sounds" role="tabpanel">
+    <p class="how">For each sound, play the takes and press <b>Best</b> on the one that sounds like a teacher saying it. If none is right, press <b>None are right</b> and say what's off in the note ("too much uh", "sounds like j"). Today's clip comes first. Headphones or the iPad speaker both work; try at least a few on the iPad.</p>
+    <div id="sounds"></div>
+  </section>
+  <section id="p-names" role="tabpanel" hidden>
+    <p class="how">Each letter name, said two ways. The order is shuffled, so you don't know which is today's. Pick the better one; it shows which was which after you choose.</p>
+    <div id="names" class="group"></div>
+  </section>
+  <section id="p-words" role="tabpanel" hidden>
+    <p class="how">Words a child taps, today's and with the phoneme fix, shuffled. Long vowels, R words and J/CH words changed most.</p>
+    <div class="group"><h3>Words with the phoneme fix</h3><div id="words" class="group"></div></div>
+    <div class="group"><h3>Word endings</h3><p class="how">Short words that gain a little sound before or after ("cup-ee", "a-sheep"). One version is today's, the other was rendered with a full stop after the word.</p><div id="endings" class="group"></div></div>
+  </section>
+  <section id="p-lines" role="tabpanel" hidden>
+    <p class="how">Some of Luna's lines, today's and with the phoneme fix, shuffled. Listen for "her", "bird", "a…", the long vowels, and how she says "Ms."</p>
+    <div id="lines" class="group"></div>
+  </section>
+  <section id="p-plan" role="tabpanel" hidden>
+    <div class="plan" id="plan"></div>
+  </section>
+</div>
+
+<script>
+const META = /*META*/null;
+const FINDINGS = /*FINDINGS*/null;
+const PLAN_HTML = /*PLAN*/'';
+
+const PLAY = '<svg viewBox="0 0 20 20" aria-hidden="true"><path fill="currentColor" d="M5 3.5v13a1 1 0 0 0 1.5.86l11-6.5a1 1 0 0 0 0-1.72l-11-6.5A1 1 0 0 0 5 3.5z"/></svg>';
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+// ---------- what each sound is, for a teacher
+const SOUND_INFO = {
+  a: ['/ă/', 'A, as in apple'], e: ['/ĕ/', 'E, as in egg'], i: ['/ĭ/', 'I, as in igloo'], o: ['/ŏ/', 'O, as in ox'], u: ['/ŭ/', 'U, as in umbrella'],
+  ay: ['/ā/', 'A as in cake · AI · AY'], ee: ['/ē/', 'E as in tree · EE · EA'], eye: ['/ī/', 'I as in kite · IE · IGH'], oh: ['/ō/', 'O as in bone · OA · OW'],
+  oo: ['/oo/', 'OO · UE, as in moon'], you: ['/ū/', 'U as in unicorn'], ar: ['/ar/', 'AR, as in star'], or: ['/or/', 'OR, as in fork'], er: ['/er/', 'ER · IR · UR, as in her'],
+  b: ['/b/', 'B, as in bug'], d: ['/d/', 'D, as in duck'], g: ['/g/', 'G, as in gift'], p: ['/p/', 'P, as in pig'], t: ['/t/', 'T, as in tent'], k: ['/k/', 'C · K · CK, as in cat'],
+  h: ['/h/', 'H, as in hat'], j: ['/j/', 'J · G as in giraffe'], w: ['/w/', 'W · WH, as in web'], y: ['/y/', 'Y, as in yarn'],
+  m: ['/m/', 'M, as in moon'], n: ['/n/', 'N, as in nest'], l: ['/l/', 'L, as in leaf'], r: ['/r/', 'R, as in ring'],
+  s: ['/s/', 'S · C as in city'], f: ['/f/', 'F, as in fox'], v: ['/v/', 'V, as in van'], z: ['/z/', 'Z, as in zebra'],
+  sh: ['/sh/', 'SH, as in ship'], ch: ['/ch/', 'CH, as in chick'], th: ['/th/', 'TH, as in thumb'], dh: ['/th/ voiced', 'TH, as in this'],
+  ng: ['/ng/', 'NG, as in ring'], ks: ['/ks/', 'X, as in fox'], kw: ['/kw/', 'Q · QU, as in queen']
+};
+const GROUPS = [
+  ['Short vowels', ['a', 'e', 'i', 'o', 'u']],
+  ['Stops (quick sounds)', ['b', 'd', 'g', 'p', 't', 'k']],
+  ['Held sounds', ['m', 'n', 'l', 'r', 's', 'f', 'v', 'z', 'h']],
+  ['Glides and J', ['w', 'y', 'j']],
+  ['Letter teams', ['sh', 'ch', 'th', 'dh', 'ng', 'ks', 'kw']],
+  ['Long vowels and R vowels', ['ay', 'ee', 'eye', 'oh', 'oo', 'you', 'ar', 'or', 'er']],
+  ['Blends', ['bl', 'br', 'cl', 'cr', 'dr', 'fl', 'fr', 'gl', 'gr', 'pl', 'pr', 'sk', 'sl', 'sm', 'sn', 'sp', 'st', 'sw', 'tr', 'tw']]
+];
+const SPELL = { 'hæt': 'hat', 'pæt': 'pat', 'kæt': 'cat', 'æt': 'at', 'pɛt': 'pet', 'bɛt': 'bet', 'nɛt': 'net', 'ɛɡ': 'egg', 'pɪt': 'pit', 'hɪt': 'hit', 'sɪt': 'sit', 'ɪt': 'it',
+  'pɑt': 'pot', 'dɑt': 'dot', 'ɑn': 'on', 'hʌt': 'hut', 'kʌp': 'cup', 'ʌp': 'up', 'bʌs': 'bus', 'A': 'the letter A', 'dA': 'day', 'mA': 'may', 'i': 'the letter E', 'si': 'see', 'bi': 'bee',
+  'I': 'the letter I', 'mI': 'my', 'bI': 'buy', 'O': 'the letter O', 'ɡO': 'go', 'nO': 'no', 'u': 'oo', 'mun': 'moon', 'zu': 'zoo', 'ju': 'you', 'ɑɹ': 'are', 'kɑɹ': 'car', 'fɑɹ': 'far',
+  'ɔɹ': 'or', 'fɔɹ': 'for', 'mɔɹ': 'more', 'ɜɹ': 'er', 'fɜɹ': 'fur', 'bɜɹd': 'bird', 'bʌɡ': 'bug', 'bɪɡ': 'big', 'dʌk': 'duck', 'dɪɡ': 'dig', 'dɑɡ': 'dog', 'dɛn': 'den', 'ɡʌm': 'gum',
+  'ɡɪft': 'gift', 'pʌp': 'pup', 'pɪɡ': 'pig', 'tʌb': 'tub', 'tɑp': 'top', 'kɪt': 'kit', 'wɛb': 'web', 'lʌk': 'luck', 'lɪp': 'lip', 'ɹʌn': 'run', 'ɹɛd': 'red', 'bɪzi': 'busy', 'ʌvən': 'oven',
+  'kʌf': 'cuff', 'bæθ': 'bath', 'ɪʧ': 'itch', 'bɑks': 'box', 'kwæk': 'quack' };
+const spell = w => { const k = String(w).replace(/[ˈˌ]/g, ''); return SPELL[k] ?? k; };
+function takeLabel(t) {
+  const from = spell(t.from || '');
+  if (t.take === 'current') return ['Today\'s', from ? `from “${from}”` : ''];
+  let m;
+  if ((m = /^([a-z]+?)(\d+)$/.exec(t.take)) && !/^noise/.test(t.take) && !/^cut/.test(t.take)) {
+    const n = +m[2]; return [n <= 20 ? 'Least vowel' : n <= 35 ? 'A little vowel' : 'Some vowel', `from “${from}”, ${n} ms after the burst`];
+  }
+  if ((m = /^noise(\d+)$/.exec(t.take))) return ['More hiss', `hiss +${m[1]} dB over the voice`];
+  if ((m = /^cut(\d+)$/.exec(t.take))) return [m[1] === '100' ? 'Both sounds, short vowel' : 'Both sounds, more vowel', `cut from “${from}”`];
+  if (t.take === 'parts') return ['Built from its two sounds', 'the second one held'];
+  if (/^clear-/.test(t.take)) return ['Clear, from a word start', `from “${from}”, held`];
+  if (t.take === 'busy' || t.take === 'oven') return ['From between vowels', `from “${from}”`];
+  if (t.take === 'louder') return ['Louder', `from “${from}”`];
+  return [`From “${from}”`, t.ms ? `${t.ms} ms` : ''];
+}
+const VOWELISH = new Set(['a', 'e', 'i', 'o', 'u', 'ay', 'ee', 'eye', 'oh', 'oo', 'you', 'ar', 'or', 'er']);
+function machineNote(s, t) {
+  if (VOWELISH.has(s)) return '';
+  const m = t.m; if (!m) return '';
+  const heard = m.heard ? `heard as “${m.heard}”` : 'too short to name';
+  const v = m.extraVowel >= 0.35 ? ` · <em>vowel after it ${Math.round(m.extraVowel * 100)}%</em>` : '';
+  const miss = m.each && m.each.length > 1 && Math.min(...m.each) < 0.2 ? ' · <em>second sound missing</em>' : '';
+  return `Machine ear: ${esc(heard)}${v}${miss}`;
+}
+
+// ---------- audio
+let AUDIO = null;
+const urls = new Map();
+let current = null, currentBtn = null;
+function clip(id) {
+  if (!AUDIO || !AUDIO[id]) return null;
+  if (!urls.has(id)) {
+    const bin = atob(AUDIO[id]); const u8 = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i += 1) u8[i] = bin.charCodeAt(i);
+    urls.set(id, URL.createObjectURL(new Blob([u8], { type: 'audio/mp4' })));
+  }
+  return urls.get(id);
+}
+function play(id, btn) {
+  const url = clip(id); if (!url) return;
+  if (current) { current.pause(); if (currentBtn) currentBtn.dataset.playing = 'false'; }
+  current = new Audio(url); currentBtn = btn; btn.dataset.playing = 'true';
+  const done = () => { btn.dataset.playing = 'false'; };
+  current.onended = done; current.onerror = done; current.play().catch(done);
+}
+document.addEventListener('click', e => { const b = e.target.closest('[data-clip]'); if (b) play(b.dataset.clip, b); });
+
+// ---------- picks: saved for Claude when the page can, else on this device
+const picks = {};
+let db = null, me = null, saveTo = 'device';
+const LOCAL = 'luna-sound-check';
+try { Object.assign(picks, JSON.parse(localStorage.getItem(LOCAL) || '{}')); } catch {}
+const safe = s => String(s).replace(/[^A-Za-z0-9_\-~:@+]/g, '_');
+function setStatus() {
+  const el = document.getElementById('status');
+  el.textContent = saveTo === 'claude' ? 'Your picks are saved for Claude' : 'Picks are saved on this device only';
+}
+const timers = {};
+function save(item) {
+  try { localStorage.setItem(LOCAL, JSON.stringify(picks)); } catch {}
+  if (!db || !me) return;
+  clearTimeout(timers[item]);
+  timers[item] = setTimeout(() => {
+    const p = picks[item] || {};
+    db.doc(`picks/${safe(me)}--${safe(item)}`).set({ item, uid: me, choice: p.choice ?? null, note: p.note ?? '', at: new Date().toISOString() })
+      .catch(() => { saveTo = 'device'; setStatus(); });
+  }, 400);
+}
+
+// ---------- build
+const seedOrder = id => { let h = 0; for (const c of id) h = (h * 31 + c.charCodeAt(0)) >>> 0; return h % 2 === 0; };
+function soundCard(s) {
+  const info = SOUND_INFO[s] || [`/${s}/`, s.toUpperCase()];
+  const data = META.sounds[s]; if (!data) return '';
+  const item = `s:${s}`;
+  const takes = data.takes.map(t => {
+    const [a, b] = takeLabel(t); const note = machineNote(s, t);
+    return `<div class="take" data-take="${esc(t.take)}">
+      <button class="play" data-clip="s:${esc(s)}:${esc(t.take)}" aria-label="Play ${esc(info[0])}, ${esc(a)}">${PLAY}</button>
+      <span class="label">${esc(a)}<small>${esc(b)}</small>${note ? `<small class="machine">${note}</small>` : ''}</span>
+      <button class="pick" data-item="${item}" data-choice="${esc(t.take)}">Best</button></div>`;
+  }).join('');
+  return `<article class="card" data-item="${item}">
+    <div class="card-head"><span class="sym">${esc(info[0])}</span><span class="letters">${esc(info[1])}</span></div>
+    ${VOWELISH.has(s) ? '<p class="machine">The machine ear can\'t judge a vowel on its own. This one is all yours.</p>' : ''}
+    <div class="takes">${takes}</div>
+    <div class="row"><button class="chip none" data-item="${item}" data-choice="none" aria-pressed="false">None are right</button></div>
+    <textarea class="note" id="note-${esc(item)}" data-item="${item}" rows="1" placeholder="What's off? (optional)"></textarea>
+  </article>`;
+}
+function abCard(kind, id, text) {
+  const item = `${kind}:${id}`; const flip = seedOrder(item);
+  const one = flip ? 'B' : 'A', two = flip ? 'A' : 'B';
+  return `<article class="card" data-item="${item}" data-one="${one}">
+    <div class="ab">
+      <button class="play" data-clip="${kind}:${esc(id)}:${one}" aria-label="Play version 1 of ${esc(text)}">${PLAY}</button>
+      <button class="play" data-clip="${kind}:${esc(id)}:${two}" aria-label="Play version 2 of ${esc(text)}">${PLAY}</button>
+      <span class="${kind === 't' ? 'ab-line' : 'word'}">${esc(text)}</span>
+    </div>
+    <div class="row">
+      <button class="chip" data-item="${item}" data-choice="1" aria-pressed="false">1 is better</button>
+      <button class="chip" data-item="${item}" data-choice="same" aria-pressed="false">Same</button>
+      <button class="chip" data-item="${item}" data-choice="2" aria-pressed="false">2 is better</button>
+      <button class="chip none" data-item="${item}" data-choice="both-wrong" aria-pressed="false">Both wrong</button>
+      <span class="reveal" hidden>1 was ${one === 'A' ? 'today\'s' : kind === 'e' ? 'with a full stop' : 'the fix'}, 2 was ${two === 'A' ? 'today\'s' : kind === 'e' ? 'with a full stop' : 'the fix'}</span>
+    </div>
+    <textarea class="note" id="note-${esc(item)}" data-item="${item}" rows="1" placeholder="Note (optional)"></textarea>
+  </article>`;
+}
+const NAME_TEXT = { CH: 'C H', SH: 'S H', TH: 'T H', WH: 'W H', NG: 'N G', CK: 'C K', QU: 'Q U' };
+function build() {
+  document.getElementById('findings').innerHTML = FINDINGS.map(f => `<li><b>${esc(f[0])}</b><span>${f[1]}</span></li>`).join('');
+  document.getElementById('sounds').innerHTML = GROUPS.map(([title, ids]) => `<div class="group"><h3>${esc(title)}</h3>${ids.map(soundCard).join('')}</div>`).join('');
+  const order = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').concat(['SH', 'CH', 'TH', 'WH', 'NG', 'CK', 'QU']);
+  document.getElementById('names').innerHTML = order.filter(n => META.names.includes(n)).map(n => abCard('n', n, NAME_TEXT[n] || n)).join('');
+  document.getElementById('words').innerHTML = META.words.map(w => abCard('w', w, w)).join('');
+  document.getElementById('endings').innerHTML = META.endings.map(w => abCard('e', w, w)).join('');
+  document.getElementById('lines').innerHTML = META.lines.map(l => abCard('t', l.id, l.text)).join('');
+  document.getElementById('plan').innerHTML = PLAN_HTML;
+  for (const [item, p] of Object.entries(picks)) paint(item, p);
+  counts();
+}
+function paint(item, p) {
+  const card = document.querySelector(`.card[data-item="${CSS.escape(item)}"]`); if (!card) return;
+  card.querySelectorAll('.take').forEach(t => { t.dataset.picked = String(p.choice === t.dataset.take); });
+  card.querySelectorAll('.chip').forEach(c => c.setAttribute('aria-pressed', String(p.choice === c.dataset.choice)));
+  const rv = card.querySelector('.reveal'); if (rv) rv.hidden = !p.choice;
+  const note = card.querySelector('.note'); if (note && document.activeElement !== note) note.value = p.note || '';
+  card.dataset.done = String(Boolean(p.choice));
+}
+function counts() {
+  const n = (prefix, total) => `${Object.entries(picks).filter(([k, p]) => k.startsWith(prefix) && p.choice).length}/${total}`;
+  document.getElementById('c-sounds').textContent = n('s:', Object.keys(META.sounds).length);
+  document.getElementById('c-names').textContent = n('n:', META.names.length);
+  document.getElementById('c-words').textContent = `${Object.entries(picks).filter(([k, p]) => (k.startsWith('w:') || k.startsWith('e:')) && p.choice).length}/${META.words.length + META.endings.length}`;
+  document.getElementById('c-lines').textContent = n('t:', META.lines.length);
+}
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-choice]'); if (!b) return;
+  const item = b.dataset.item; const p = picks[item] || (picks[item] = {});
+  p.choice = p.choice === b.dataset.choice ? null : b.dataset.choice;
+  paint(item, p); counts(); save(item);
+});
+document.addEventListener('input', e => {
+  const t = e.target.closest('.note'); if (!t) return;
+  const item = t.dataset.item; const p = picks[item] || (picks[item] = {});
+  p.note = t.value; save(item);
+});
+document.querySelectorAll('.tab').forEach(tab => tab.addEventListener('click', () => {
+  document.querySelectorAll('.tab').forEach(t => t.setAttribute('aria-selected', String(t === tab)));
+  document.querySelectorAll('[role="tabpanel"]').forEach(p => { p.hidden = p.id !== `p-${tab.dataset.tab}`; });
+  try { localStorage.setItem(LOCAL + '-tab', tab.dataset.tab); } catch {}
+}));
+try { const t = localStorage.getItem(LOCAL + '-tab'); if (t) document.querySelector(`.tab[data-tab="${t}"]`)?.click(); } catch {}
+
+build();
+setStatus();
+fetch('audio.json').then(r => r.json()).then(a => { AUDIO = a; setStatus(); }).catch(() => { document.getElementById('status').textContent = 'The clips didn\'t load. Reload the page.'; });
+
+(async () => {
+  try {
+    db = await window.claude?.use?.('db');
+    const user = await window.claude?.use?.('user');
+    me = user ? await user.id() : null;
+    if (!db || !me) return;
+    const snap = await db.collection('picks').where('uid', '==', me).get();
+    for (const d of snap.docs) {
+      const v = d.data(); if (!v || !v.item) continue;
+      picks[v.item] = { ...(picks[v.item] || {}), choice: v.choice ?? null, note: v.note ?? '' };
+      paint(v.item, picks[v.item]);
+    }
+    counts();
+    saveTo = 'claude'; setStatus();
+    // picks made on this device before the store answered go up too
+    for (const item of Object.keys(picks)) if (!snap.docs.some(d => d.data()?.item === item)) save(item);
+  } catch { saveTo = 'device'; setStatus(); }
+})();
+</script>
