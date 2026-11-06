@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import type { GameApi, GameDef } from '../../engine/types';
 import { lettersFor, pick, shuffle, tierFor } from '../../engine/content';
+import { deal } from '../../engine/deck';
 import { pickWrong, textChoice } from '../../engine/distractors';
 import { soundManager } from '@/utils/audio';
 import { pronunciation } from '@/utils/pronunciation';
@@ -47,9 +48,10 @@ const LOOKALIKES: Record<string, string[]> = {
   A: ['H', 'R', 'V']
 };
 
-function buildRound(tier: 1 | 2 | 3): Round {
-  const letters = lettersFor(tier).filter(l => l.letter.length === 1);
-  const target = pick(letters).letter;
+const lettersOf = (tier: 1 | 2 | 3) => lettersFor(tier).filter(l => l.letter.length === 1);
+
+function buildRound(tier: 1 | 2 | 3, target: string): Round {
+  const letters = lettersOf(tier);
   const alsoAccept = tier >= 2 ? target.toLowerCase() : null;
 
   const targetCount = tier === 1 ? 3 : tier === 2 ? 4 : 5;
@@ -249,18 +251,7 @@ export const letterHunt: GameDef<Round> = {
   sticker: 'jar',
   makeRounds: ({ grade, difficulty, count }) => {
     const tier = tierFor(grade, difficulty);
-    const rounds: Round[] = [];
-    const used = new Set<string>();
-    let guard = 0;
-    while (rounds.length < count && guard < 40) {
-      guard++;
-      const r = buildRound(tier);
-      if (used.has(r.target)) continue;
-      used.add(r.target);
-      rounds.push(r);
-    }
-    while (rounds.length < count) rounds.push(buildRound(tier));
-    return rounds;
+    return deal('letter-hunt', lettersOf(tier), count, l => l.letter).map(l => buildRound(tier, l.letter));
   },
   Play
 };

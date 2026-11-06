@@ -53,6 +53,16 @@ await page.click(at('open-reading'));
 await page.waitForSelector(at('grade-card'));
 await (await page.$$(at('grade-card')))[0].click();
 await page.waitForSelector(at('hub'));
+// a lesson is done once it's practiced (CUR-6): Lessons 1 and 2 here are on their last play
+await page.evaluate(async key => {
+  const { lessonsFor } = await import('/src/apps/reading/engine/lessons.ts');
+  const saved = JSON.parse(localStorage.getItem(key));
+  saved.lessonPractice = Object.fromEntries(lessonsFor('kindergarten').slice(0, 2).map(l => [l.lesson.id, { good: 2, plays: 5 }]));
+  localStorage.setItem(key, JSON.stringify(saved));
+}, KEY);
+await page.reload({ waitUntil: 'networkidle0' });
+await page.click(at('open-reading'));
+await page.waitForSelector(at('hub'));
 await wait(600);
 
 const cardTimes = () => page.$$eval('[data-shot="lesson-tile"]', ts => ts.map(t => t.textContent.match(/(about|took) \d+ min/)?.[0] ?? null));

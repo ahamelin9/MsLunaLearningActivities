@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import type { GameApi, GameDef } from '../../engine/types';
-import { lettersFor, sample, shuffle, tierFor, wordsUpTo } from '../../engine/content';
+import { lettersFor, shuffle, tierFor, wordsUpTo, type LetterItem, type WordItem } from '../../engine/content';
+import { deal } from '../../engine/deck';
 import { distinctByEmoji } from '../../engine/distractors';
 import { soundManager } from '@/utils/audio';
 import { pronunciation, type SpeechPart } from '@/utils/pronunciation';
@@ -43,38 +44,62 @@ function cardParts(card: Card): SpeechPart[] {
   return [card.caseLabel === 'big' ? { text: 'big' } : { text: 'little' }, { name: card.label }];
 }
 
-function buildRound(tier: 1 | 2 | 3): Round {
-  const pairCount = tier === 1 ? 4 : tier === 2 ? 5 : 6;
+const pairsAt = (tier: 1 | 2 | 3) => (tier === 1 ? 4 : tier === 2 ? 5 : 6);
 
+/**
+ * A play's boards, each from what hasn't been dealt yet (GAME-8). Dealt whole,
+ * so no letter or word is on two boards of one play either.
+ */
+function buildRounds(tier: 1 | 2 | 3, count: number): Round[] {
+  const pairCount = pairsAt(tier);
   if (tier === 1) {
-    const chosen = sample(lettersFor(1).filter(l => l.letter.length === 1), pairCount);
-    const cards: Card[] = chosen.flatMap(l => [
-      {
-        id: `${l.letter}-up`,
-        pair: l.letter,
-        label: l.letter,
-        kind: 'letter',
-        caseLabel: 'big',
-        ariaLabel: `big ${l.letter}`
-      },
-      {
-        id: `${l.letter}-low`,
-        pair: l.letter,
-        label: l.letter.toLowerCase(),
-        kind: 'letter',
-        caseLabel: 'little',
-        ariaLabel: `little ${l.letter}`
-      }
-    ]);
-    return { kind: 'case', cards: shuffle(cards), pairCount };
+    const letters = deal('memory-match-letters', lettersFor(1).filter(l => l.letter.length === 1), pairCount * count, l => l.letter);
+    return Array.from({ length: count }, (_, i) => letterRound(letters.slice(i * pairCount, (i + 1) * pairCount)));
   }
+  const words = wordsUpTo(tier);
+  const dealt = deal('memory-match-words', words, pairCount * count, w => w.word);
+  const used = new Set<WordItem>();
+  return Array.from({ length: count }, () => {
+    let chosen = distinctByEmoji(dealt.filter(w => !used.has(w)), pairCount);
+    // two words that look alike can't share a board: the deck gives a spare,
+    // so it isn't a word seen last time
+    for (let tries = 0; chosen.length < pairCount && tries < words.length; tries++) {
+      const spare = deal('memory-match-words', words, 1, w => w.word).filter(w => !used.has(w));
+      chosen = distinctByEmoji(spare, pairCount, [], chosen);
+    }
+    chosen.forEach(w => used.add(w));
+    return pictureRound(chosen);
+  });
+}
 
-  const chosen = distinctByEmoji(wordsUpTo(tier), pairCount);
+function letterRound(chosen: LetterItem[]): Round {
+  const cards: Card[] = chosen.flatMap(l => [
+    {
+      id: `${l.letter}-up`,
+      pair: l.letter,
+      label: l.letter,
+      kind: 'letter',
+      caseLabel: 'big',
+      ariaLabel: `big ${l.letter}`
+    },
+    {
+      id: `${l.letter}-low`,
+      pair: l.letter,
+      label: l.letter.toLowerCase(),
+      kind: 'letter',
+      caseLabel: 'little',
+      ariaLabel: `little ${l.letter}`
+    }
+  ]);
+  return { kind: 'case', cards: shuffle(cards), pairCount: chosen.length };
+}
+
+function pictureRound(chosen: WordItem[]): Round {
   const cards: Card[] = chosen.flatMap(w => [
     { id: `${w.word}-pic`, pair: w.word, label: '', emoji: w.emoji, kind: 'word', ariaLabel: w.word },
     { id: `${w.word}-word`, pair: w.word, label: w.word, kind: 'word', ariaLabel: w.word }
   ]);
-  return { kind: 'picture', cards: shuffle(cards), pairCount };
+  return { kind: 'picture', cards: shuffle(cards), pairCount: chosen.length };
 }
 
 const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
@@ -233,8 +258,7 @@ export const memoryMatch: GameDef<Round> = {
   shape: 'cards',
   sticker: 'cards',
   makeRounds: ({ grade, difficulty, count }) => {
-    const tier = tierFor(grade, difficulty);
-    return Array.from({ length: count }, () => buildRound(tier));
+    return buildRounds(tierFor(grade, difficulty), count);
   },
   Play
 };

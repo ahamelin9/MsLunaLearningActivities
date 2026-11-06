@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import type { GameApi, GameDef } from '../../engine/types';
 import { lettersFor, pick, shuffle, tierFor, wordsUpTo, type LetterItem, type WordItem } from '../../engine/content';
+import { deal } from '../../engine/deck';
 import { pickWrong, textChoice } from '../../engine/distractors';
 import { Icon, ListenCue, Luna } from '@/components/kit';
 import { soundManager } from '@/utils/audio';
@@ -28,8 +29,10 @@ interface Round {
   options: string[];
 }
 
-function buildRound(tier: 1 | 2 | 3): Round {
-  const letters = lettersFor(tier).filter(l => l.letter.length === 1);
+const lettersOf = (tier: 1 | 2 | 3) => lettersFor(tier).filter(l => l.letter.length === 1);
+
+function buildRound(tier: 1 | 2 | 3, letter: LetterItem): Round {
+  const letters = lettersOf(tier);
   const modes: Mode[] =
     tier === 1
       ? ['toLower', 'toLower', 'bySound']
@@ -38,7 +41,6 @@ function buildRound(tier: 1 | 2 | 3): Round {
         : ['toUpper', 'bySound', 'byWord'];
 
   const mode = pick(modes);
-  const letter: LetterItem = pick(letters);
   const decoyCount = tier === 1 ? 2 : 3;
   /** wrong cookies: never the same letter, nor one that makes the same sound when sounds are asked for */
   const wrongCookies = (answer: string, cased: (letter: string) => string, letterBy: 'sound' | 'name') =>
@@ -47,9 +49,11 @@ function buildRound(tier: 1 | 2 | 3): Round {
   const upper = (l: string) => l;
 
   if (mode === 'byWord') {
-    const word: WordItem = pick(
-      wordsUpTo(tier).filter(w => w.initial.length === 1 && letters.some(l => l.letter.toLowerCase() === w.initial))
-    );
+    // a word for this round's own letter, so no letter comes twice in a play
+    const initial = letter.letter.toLowerCase();
+    const anyWord = wordsUpTo(tier).filter(w => w.initial.length === 1 && letters.some(l => l.letter.toLowerCase() === w.initial));
+    const forLetter = anyWord.filter(w => w.initial === initial);
+    const [word]: WordItem[] = deal('feed-luna-words', forLetter.length ? forLetter : anyWord, 1, w => w.word);
     const answer = word.initial.toLowerCase();
     // "cat" starts with the sound k makes too, so k can't be a wrong cookie
     const decoys = wrongCookies(answer, lower, 'sound');
@@ -295,7 +299,7 @@ export const feedLuna: GameDef<Round> = {
   sticker: 'cookie',
   makeRounds: ({ grade, difficulty, count }) => {
     const tier = tierFor(grade, difficulty);
-    return Array.from({ length: count }, () => buildRound(tier));
+    return deal('feed-luna', lettersOf(tier), count, l => l.letter).map(letter => buildRound(tier, letter));
   },
   Play
 };

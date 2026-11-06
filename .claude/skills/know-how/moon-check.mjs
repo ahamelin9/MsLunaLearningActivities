@@ -88,6 +88,14 @@ const setDone = ids =>
     saved.completedLessons = list;
     localStorage.setItem(key, JSON.stringify(saved));
   }, KEY, ids);
+// a lesson is done once it's practiced (CUR-6): this puts one on its last play,
+// so whatever the next play's like, it finishes it
+const onLastPlay = id =>
+  page.evaluate((key, lesson) => {
+    const saved = JSON.parse(localStorage.getItem(key));
+    saved.lessonPractice = { ...saved.lessonPractice, [lesson]: { good: 2, plays: 5 } };
+    localStorage.setItem(key, JSON.stringify(saved));
+  }, KEY, id);
 const intoLibrary = async () => {
   await page.waitForSelector(at('open-reading'));
   await page.click(at('open-reading'));
@@ -197,7 +205,10 @@ const MOON = await moonLines();
 const ids = await lessonIds();
 const among = (said, lines) => said.some(s => (lines ?? []).some(l => l.text === s));
 
-// ---- the first lesson ever, with a miss ----
+// ---- the first lesson ever finished, with a miss ----
+await onLastPlay(ids[0]);
+await toHome();
+await intoLibrary();
 let v = await visitAfter(0, true);
 ok('Lesson 1, the first ever (with a miss): the done screen shows', v.done);
 ok('… the moon visits', v.seen);
@@ -223,6 +234,7 @@ ok('… and again the next time (3 stars brings her every time)', v.seen && amon
 // ---- all of them, then once ----
 await toHome();
 await setDone(ids.slice(0, ids.length - 1));
+await onLastPlay(ids.at(-1));
 await toHome();
 await intoLibrary();
 v = await visitAfter(ids.length - 1, true);

@@ -366,14 +366,11 @@ export function buildInventory(): Clip[] {
   harvest(GRADES);
   harvest(content.WORDS, 'word');
   harvest(content.SENTENCES);
-  // SentenceReader and TreasureRead lay these out as tappable words. Named
+  // Words Off the Page lays these out as tappable words. Named
   // explicitly rather than inferred from the field name, because the field is
   // just `text` — the same name a story's answer options use, which are not
   // tapped and would double the word list for nothing.
   for (const item of content.SENTENCES) tappable.add(item.text);
-  // TreasureRead's "Read it to me" asks "what?" in the gap until the round is solved
-  for (const item of content.SENTENCES)
-    for (const part of content.readWithGap(item)) if (part.text) prose.add(part.text);
   // Treasure Path's passages (GAME-1a): `lines` are spoken and tappable,
   // `claim` and a blank's whole `text` are spoken, `decoys` named in a hint
   harvest(content.PASSAGES);

@@ -7,7 +7,7 @@
 //   node .claude/skills/know-how/passage-check.mjs <src-root> # another copy
 //
 // The rules:
-// - 6 passages per grade, of that grade's length in sentences;
+// - at least 18 passages per grade (GAME-9), of that grade's length in sentences;
 // - each passage has at least one true/false and one fill-in-the-blank;
 // - no statement copies 4 or more words in a row from its passage;
 // - every blank has its list of words that also fit (CNT-1b), its key is a
@@ -55,7 +55,7 @@ await build({
 const { PASSAGES, GAMES } = await import(pathToFileURL(join(out, 'bundle.mjs')).href);
 rmSync(out, { recursive: true, force: true });
 
-const PER_GRADE = 6;
+const PER_GRADE = 18;
 const PLAYS = 300;
 const GAP = '_____';
 const LENGTH = { kindergarten: [2, 2], grade1: [3, 3], grade2: [4, 5] };
@@ -211,7 +211,7 @@ const found = [];
 if (!Array.isArray(PASSAGES)) found.push('no PASSAGES in content.ts');
 for (const grade of Object.keys(LENGTH)) {
   const n = (PASSAGES ?? []).filter(p => p.grade === grade).length;
-  if (n !== PER_GRADE) found.push(`${grade}: ${n} passages, wants ${PER_GRADE}`);
+  if (n < PER_GRADE) found.push(`${grade}: ${n} passages, wants ${PER_GRADE}`);
 }
 const ids = (PASSAGES ?? []).map(p => p.id);
 for (const id of new Set(ids.filter((id, i) => ids.indexOf(id) !== i))) found.push(`${id}: id used twice`);

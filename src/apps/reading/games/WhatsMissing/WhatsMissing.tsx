@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import type { GameApi, GameDef } from '../../engine/types';
 import { shuffle, tierFor, wordsUpTo, type WordItem } from '../../engine/content';
+import { deal } from '../../engine/deck';
 import { distinctByEmoji, pickWrong, wordChoice } from '../../engine/distractors';
 import { soundManager } from '@/utils/audio';
 import { pronunciation } from '@/utils/pronunciation';
@@ -20,10 +21,10 @@ interface Round {
   lookSeconds: number;
 }
 
-function buildRound(tier: 1 | 2 | 3): Round {
+function buildRound(tier: 1 | 2 | 3, missing: WordItem): Round {
   const count = tier === 1 ? 4 : tier === 2 ? 5 : 6;
-  const items = distinctByEmoji(wordsUpTo(tier), count);
-  const missing = items[Math.floor(Math.random() * items.length)];
+  // the one that goes missing has its turn (GAME-8); the desk fills in around it
+  const items = shuffle(distinctByEmoji(wordsUpTo(tier), count, [], [missing]));
   // never something still on the desk, or the answer is just "the one I can't see"
   const distractors = pickWrong(missing, wordsUpTo(tier), 2, {
     as: wordChoice,
@@ -163,7 +164,7 @@ export const whatsMissing: GameDef<Round> = {
   sticker: 'lamp',
   makeRounds: ({ grade, difficulty, count }) => {
     const tier = tierFor(grade, difficulty);
-    return Array.from({ length: count }, () => buildRound(tier));
+    return deal('whats-missing', wordsUpTo(tier), count, w => w.word).map(w => buildRound(tier, w));
   },
   Play
 };

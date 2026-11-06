@@ -3,6 +3,7 @@ import type { AnyGameDef } from '../types';
 import { ODDS, SQUISHY_KINDS, kindsFound, type SquishyAward } from '../squishies';
 import { ShelfRows } from '../ShelfRows/ShelfRows';
 import type { TimeStar } from '../stars';
+import { LEARN_RULE, goodPlayNeeds, type PlayOutcome } from '../practice';
 import { soundManager } from '@/utils/audio';
 import { pronunciation } from '@/utils/pronunciation';
 import { afterMotion } from '@/utils/motion';
@@ -22,7 +23,16 @@ export interface LessonPath {
 interface DoneScreenProps {
   game: AnyGameDef;
   /** `firstTry`: the rounds answered right the first time, which the stars count (PRG-1) */
-  award: { squishy: SquishyAward | null; stars: number; timeStar: TimeStar; firstTry: number; seconds: number; estimate: number } | null;
+  award: {
+    squishy: SquishyAward | null;
+    stars: number;
+    timeStar: TimeStar;
+    firstTry: number;
+    seconds: number;
+    estimate: number;
+    /** where a lesson's practice stands, this play included (CUR-6) */
+    practice?: PlayOutcome;
+  } | null;
   /** a lesson's bar and the lesson it opened; left out for a game */
   path?: LessonPath;
   onPlayAgain: () => void;
@@ -95,12 +105,21 @@ function MoonVisit({ line, onGone }: { line: string; onGone: () => void }) {
   );
 }
 
+/** The mark's words: what this play did for a lesson (CUR-6), or a game's. */
+const TITLES = {
+  learned: 'Lesson learned!',
+  movedOn: 'Lesson done!',
+  practice: 'Nice practice!',
+  done: 'Lesson done!'
+} as const;
+
 /**
  * The screen at the end of a game or lesson (DES-22d), as on the round 2 Done
  * board, from the kit. On the left, the "Lesson done!" mark (tap it to see it
  * pop again), the stars and Luna cheering in the corner; on the right, how
- * long it took (PRG-6), a lesson's bar moving on and the lesson it opened, a
- * new squishy for the shelf (PRG-5a) and what next. Petals drift down once it
+ * long it took (PRG-6), a lesson's practice (CUR-6), its bar moving on and the
+ * lesson it opened, a new squishy for the shelf (PRG-5a) and what next, leading
+ * back into practice until it's learned. Petals drift down once it
  * has arrived, as after a won round (DES-11). For a big milestone the moon
  * visits (DES-17).
  * GameShell saves the result and has Luna say her line; the header is the
@@ -123,6 +142,8 @@ export const DoneScreen: React.FC<DoneScreenProps> = ({
   const [pops, setPops] = useState(0);
   const stars = Math.max(0, Math.min(3, award?.stars ?? 1)) as 0 | 1 | 2 | 3;
   const squishy = award?.squishy ?? null;
+  const practice = award?.practice;
+  const practicing = practice?.stage === 'practice';
 
   return (
     <div className={styles.screen} data-shot="shell-reward">
@@ -144,7 +165,7 @@ export const DoneScreen: React.FC<DoneScreenProps> = ({
                 <Icon name="check" size={96} />
               </span>
             </button>
-            <h2 className={styles.title}>{game.lesson ? 'Lesson done!' : 'All done!'}</h2>
+            <h2 className={styles.title}>{practice ? TITLES[practice.stage] : 'All done!'}</h2>
           </div>
           <StarRow earned={stars} animate />
           <p className={styles.solved}>
@@ -184,6 +205,19 @@ export const DoneScreen: React.FC<DoneScreenProps> = ({
             </section>
           )}
 
+          {/* how far along the practice is (CUR-6): gone once it's done */}
+          {practicing && (
+            <section className={styles.lessons} data-shot="done-practice">
+              <h3 className={styles.label}>Practice</h3>
+              <ProgressBar done={practice.goodPlays} total={LEARN_RULE.goodPlays} noun="good plays" />
+              {!practice.good && (
+                <Chip variant="time" icon="sparkle" className={styles.opened}>
+                  A good play is {goodPlayNeeds(game.roundsPerPlay)} of {game.roundsPerPlay} first try
+                </Chip>
+              )}
+            </section>
+          )}
+
           {path && (
             <section className={styles.lessons}>
               <h3 className={styles.label}>Your lessons</h3>
@@ -212,12 +246,12 @@ export const DoneScreen: React.FC<DoneScreenProps> = ({
                 <strong className={styles.rewardName}>{squishy.name}</strong>
                 {squishy.rarity !== 'usual' && (
                   <Chip variant={squishy.rarity} icon="sparkle" shimmer className={styles.rarity}>
-                    {squishy.rarity === 'rare' ? 'Rare colour' : 'Super rare'}: {squishy.colour}!
+                    {squishy.rarity === 'rare' ? `Rare colour: ${squishy.colour}` : `Super rare: ${squishy.look}`}!
                   </Chip>
                 )}
                 <span className={styles.rewardNote}>
                   {squishy.rarity === 'rare' && `Only about 1 in ${Math.round(1 / ODDS.rare)} squishies comes in a rare colour. `}
-                  {squishy.rarity === 'super-rare' && `Only about 1 in ${Math.round(1 / ODDS.superRare)} squishies comes in super rare ${squishy.colour}. `}
+                  {squishy.rarity === 'super-rare' && `Only about 1 in ${Math.round(1 / ODDS.superRare)} squishies comes in a super rare ${squishy.look}. `}
                   Tap it to squish.
                 </span>
               </span>
@@ -243,8 +277,8 @@ export const DoneScreen: React.FC<DoneScreenProps> = ({
           )}
 
           <div className={styles.actions}>
-            <ChunkyButton variant="action" size={64} icon="replay" onClick={onPlayAgain}>
-              Play again
+            <ChunkyButton variant="action" size={64} icon="replay" data-shot="play-again" onClick={onPlayAgain}>
+              {practicing ? 'Practice again' : 'Play again'}
             </ChunkyButton>
             {onPlayAnother && (
               <ChunkyButton

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import type { GradeLevel } from '@/types/reading';
 import type { UserProgress } from '@/types/user';
 import type { AnyGameDef } from '../../engine/types';
@@ -12,6 +12,7 @@ import { minutesOf, storageService } from '@/utils/storage';
 import { estimateMinutes } from '../../engine/times';
 import { warmReadingVoice } from '../../engine/warmup';
 import { FINISH_FIRST, lessonStates } from '../../engine/lessons';
+import { LEARN_RULE } from '../../engine/practice';
 import { GAME_TINTS, GamePicture } from '../../games/shared/GamePicture/GamePicture';
 import styles from './Hub.module.scss';
 
@@ -90,6 +91,14 @@ export const Hub: React.FC<HubProps> = ({
     setMood('happy');
     pronunciation.speakSequence([line]);
   };
+
+  // a late lesson up next can sit below the fold, and it's what the child came for
+  const lessonCards = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const next = lessonCards.current?.children[states.indexOf('next')];
+    if (next && next.getBoundingClientRect().bottom > window.innerHeight) next.scrollIntoView({ block: 'center' });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // times (PRG-6): "took N min" on a lesson done (its last play), "about N
   // min" on the rest and on every game; a lesson done before times were
@@ -222,7 +231,7 @@ export const Hub: React.FC<HubProps> = ({
             <h2 className={styles.heading}>Luna’s Lessons</h2>
             <ProgressBar done={lessonsDone} total={lessons.length} className={styles.lessonsBar} />
           </div>
-          <div className={styles.lessonCards}>
+          <div className={styles.lessonCards} ref={lessonCards}>
             {lessons.map((lesson, i) => (
               <LessonCard
                 key={lesson.id}
@@ -236,6 +245,8 @@ export const Hub: React.FC<HubProps> = ({
                     ? { done: progress.partway[lesson.id].won, total: lesson.roundsPerPlay }
                     : undefined
                 }
+                // how far along its practice is (CUR-6)
+                practice={{ done: progress.lessonPractice?.[lesson.id]?.good ?? 0, goal: LEARN_RULE.goodPlays }}
                 opened={lesson.id === opened}
                 data-shot="lesson-tile"
                 onClick={() => (states[i] === 'locked' ? finishFirst() : startGame(lesson))}

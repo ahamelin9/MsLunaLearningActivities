@@ -6,7 +6,7 @@
 //
 // Needs Vite running on the port. First the rule itself, from the page's own
 // `engine/stars.ts`, at its edges. Then Lesson 1 played three times from a
-// fresh save, each with one miss in round 1 (3 of 4 first try: 2 stars by
+// fresh save, each with one miss in round 1 (4 of 5 first try: 2 stars by
 // PRG-1), with the clock moved on (`window.__skip`, as in time-check.mjs):
 //   - fast (inside its "about N min"): 3 stars, "Quick and careful: a star!";
 //   - normal (past it, under 3 times it): 2 stars, nothing said;
@@ -95,7 +95,7 @@ const play = async (skipMinutes, name) => {
     await wait(800);
     const now = await round();
     const a = await answers();
-    if (r === 0) { await tap(a.wrong); await wait(2500); } // one miss: 3 of 4 first try
+    if (r === 0) { await tap(a.wrong); await wait(2500); } // one miss: 4 of 5 first try
     await tap(a.right);
     for (let t = 0; t < 80 && !(await page.$(at('shell-reward'))) && (await round()) === now; t++) await wait(200);
   }
@@ -116,11 +116,11 @@ const play = async (skipMinutes, name) => {
 };
 
 let d = await play(0, 'fast');
-ok('fast: 3 stars, "Quick and careful: a star!"', d.firstTry === '3 of 4 first try' && d.stars === 3 && d.said === 'Quick and careful: a star!', JSON.stringify(d));
+ok('fast: 3 stars, "Quick and careful: a star!"', d.firstTry === '4 of 5 first try' && d.stars === 3 && d.said === 'Quick and careful: a star!', JSON.stringify(d));
 d = await play(6, 'normal');
-ok('normal: 2 stars, nothing said', d.firstTry === '3 of 4 first try' && d.stars === 2 && d.said === '', JSON.stringify(d));
-d = await play(13, 'slow');
-ok('very slow: 1 star, "A very long time: one star less"', d.firstTry === '3 of 4 first try' && d.stars === 1 && d.said === 'A very long time: one star less', JSON.stringify(d));
+ok('normal: 2 stars, nothing said', d.firstTry === '4 of 5 first try' && d.stars === 2 && d.said === '', JSON.stringify(d));
+d = await play(16, 'slow'); // over 3 times its "about 5 min"
+ok('very slow: 1 star, "A very long time: one star less"', d.firstTry === '4 of 5 first try' && d.stars === 1 && d.said === 'A very long time: one star less', JSON.stringify(d));
 
 await browser.close();
 const passed = results.every(Boolean);

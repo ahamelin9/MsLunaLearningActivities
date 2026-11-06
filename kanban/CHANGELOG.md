@@ -359,3 +359,4 @@ only record of them. One line each: date, ID, title, and `Done` or
 - **2026-10-20** — PRG-10 Time counts toward stars — Done. Inside its "about N min" lifts 2 stars to 3, over 3 times it takes one (never below 1), said in a chip under the stars (`star-time-check.mjs`).
 - **2026-10-20** — PRG-9 A game's done screen shows the squishy shelf — Done. The shelf's planks (`engine/ShelfRows`, shared with the shelf page) fill a game's right half, the new one picked out; side by side on a portrait iPad; lessons keep their bar.
 - **2026-10-20** — PRG-4 Secret platinum trophy for a full squishy shelf — Done, but for Pearl Moon. "Squishy Champion" is a hidden badge; filling the shelf brings the moon once and Luna's trophy line (`trophy-check.mjs`). Pearl Moon moved to PRG-5b, to be reviewed in an artifact first (Alex).
+- **2026-11-06** — CUR-4 Expand the curriculum per grade — Won't do: split in three before starting, CUR-4a Kindergarten, CUR-4b 1st grade, CUR-4c 2nd grade.

@@ -1,16 +1,19 @@
-// Squishy on the Kit page (DES-7c): the eight kinds, the colours (usual, rare,
-// super rare), ghost and "?" slot, the sizes, and the colour dots, on a card
-// as on the shelf. Tap one: a found squishy squishes, the others wobble.
+// Squishy on the Kit page (DES-7c, PRG-5b): the 18 kinds, the colours (usual,
+// rare), the super-rare looks, still and moving, ghost and "?" slot, the sizes,
+// and the colour dots, on a card as on the shelf. Tap one: a found squishy
+// squishes, the others wobble.
 
 import { Specimen, Specimens } from '@/dev/KitPage/Specimen';
 import { Chip } from '../Chip/Chip';
 import { Squishy, SquishyDots, type SquishyColour, type SquishyKind } from './Squishy';
 
 const KINDS: [SquishyKind, SquishyColour][] = [
-  ['ball', 'oat'], ['cat', 'caramel'], ['bunny', 'blush'], ['bear', 'toffee'],
-  ['butter', 'butter'], ['peach', 'blush'], ['cloud', 'cream'], ['moon', 'honey'],
+  ['ball', 'oat'], ['cat', 'caramel'], ['butter', 'cream'], ['peach', 'oat'], ['frog', 'oat'], ['donut', 'caramel'],
+  ['cloud', 'cream'], ['moon', 'oat'], ['bear', 'toffee'], ['bunny', 'cream'], ['mushroom', 'toffee'], ['toast', 'caramel'],
+  ['dumpling', 'cream'], ['acorn', 'caramel'], ['hamster', 'oat'], ['heart', 'cocoa'], ['star', 'cream'], ['penguin', 'cocoa'],
 ];
-const COLOURS: SquishyColour[] = ['oat', 'caramel', 'toffee', 'cream', 'blush', 'butter', 'honey'];
+const COLOURS: SquishyColour[] = ['oat', 'caramel', 'toffee', 'cream', 'cocoa', 'blush', 'butter', 'sage', 'sky', 'lilac'];
+const GHOSTS: SquishyKind[] = ['frog', 'donut', 'mushroom', 'dumpling', 'hamster', 'heart', 'bear', 'moon', 'cloud'];
 
 export default function SquishyKit() {
   return (
@@ -20,15 +23,23 @@ export default function SquishyKit() {
           <Specimen key={kind} label={`${kind} · ${colour}`}><Squishy kind={kind} colour={colour} /></Specimen>
         ))}
       </Specimens>
-      <Specimens title="Colours: usual, rare (a sparkle), super rare (a gold sparkle)" on="card">
+      <Specimens title="Colours: usual, rare (a sparkle)" on="card">
         {COLOURS.map(c => (
           <Specimen key={c} label={c}><Squishy kind="bear" colour={c} /></Specimen>
         ))}
       </Specimens>
+      <Specimens title="Super rare (a gold sparkle): each kind wears one look" on="card">
+        <Specimen label="swirl, moving"><Squishy kind="moon" colour="honey" /></Specimen>
+        <Specimen label="shimmer, moving"><Squishy kind="cloud" colour="honey" /></Specimen>
+        <Specimen label="glow, moving"><Squishy kind="heart" colour="honey" /></Specimen>
+        <Specimen label="swirl, still"><Squishy kind="ball" colour="honey" /></Specimen>
+        <Specimen label="shimmer, still"><Squishy kind="donut" colour="honey" /></Specimen>
+        <Specimen label="glow, still"><Squishy kind="bear" colour="honey" /></Specimen>
+      </Specimens>
       <Specimens title="Not found yet" on="card">
-        <Specimen label="ghost: bear"><Squishy kind="bear" state="ghost" /></Specimen>
-        <Specimen label="ghost: moon"><Squishy kind="moon" state="ghost" /></Specimen>
-        <Specimen label="ghost: cloud"><Squishy kind="cloud" state="ghost" /></Specimen>
+        {GHOSTS.map(kind => (
+          <Specimen key={kind} label={`ghost: ${kind}`}><Squishy kind={kind} state="ghost" /></Specimen>
+        ))}
         <Specimen label="mystery: the ? slot"><Squishy kind="ball" state="mystery" /></Specimen>
       </Specimens>
       <Specimens title="Sizes" on="card">

@@ -2,12 +2,16 @@
 //
 // A lesson used to have a player of its own beside the games: its own look,
 // no Luna, no hints, no stickers. Each lesson is now handed to the same
-// GameShell as a GameDef whose rounds are its fixed questions, so it gets all
-// of that, while finishing it still marks the lesson done (GameDef.lesson).
+// GameShell as a GameDef whose rounds are dealt from its questions, so it gets
+// all of that, while practicing it until it's learned marks the lesson done
+// (GameDef.lesson; CUR-6).
 
 import type { GradeLevel, Lesson, LessonQuestion, QuestionType, ReadingSkill } from '../../../types/reading';
 import { READING_CURRICULUM } from '../../../data/readingCurriculum';
+import { aboutOf } from '../../../data/lessonRounds';
 import { LessonRound } from '../lessons/shared/LessonRound';
+import { dealMissedFirst, noteMissed } from './deck';
+import { ROUNDS_PER_PLAY } from './practice';
 import type { AnyGameDef, GameDef, SkillArea } from './types';
 import type { SpeechPart } from '../../../utils/pronunciation';
 
@@ -40,13 +44,19 @@ const LUNA_LINES: Record<string, string> = {
   'g1-sentences': 'Read the sentence, then find the picture that shows it.',
   'g2-vowel-teams': 'When two vowels go walking, the first one does the talking!',
   'g2-compounds': 'Two little words can join up to make one big word!',
-  'g2-storybooks': 'Story time! Read it yourself, then answer my question.'
+  'g2-storybooks': 'Story time! Read it yourself, then answer my question.',
+  'g1-rhymes': 'Rhyming words end with the same sound. Listen closely!',
+  'g1-sight-words': 'Some words we just know by heart. Let’s find them!',
+  'g1-stories': 'Story time! Read it yourself, then answer my question.',
+  'g2-sight-words': 'Some words we just know by heart. Let’s find them!',
+  'g2-r-vowels': 'When R comes after a vowel, it changes the sound. Let’s read!'
 };
 
 /** The reward a kind of lesson is known for: the squishy kind it brings first (SIGNATURE_KIND, PRG-5a). */
 const SIGNATURE_STICKER: Record<string, string> = {
   'k-match-sounds': 'headphones',
   'k-rhyming': 'headphones',
+  'g1-rhymes': 'headphones',
   'k-letter-hunter': 'magnifier'
 };
 
@@ -59,16 +69,18 @@ export function lessonGame(lesson: Lesson, skill: ReadingSkill): GameDef<LessonQ
     objective: skill.description,
     skill: SKILL_AREA[lesson.questions[0]?.type] ?? 'reading',
     mission: LUNA_LINES[skill.id] ?? lesson.description,
-    roundsPerPlay: lesson.questions.length,
+    roundsPerPlay: Math.min(lesson.perPlay ?? ROUNDS_PER_PLAY, lesson.questions.length),
     shape: 'lesson',
     sticker: SIGNATURE_STICKER[skill.id] ?? 'book',
-    makeRounds: () => lesson.questions,
+    // a replay asks new things, and what was missed comes back first (CUR-6)
+    makeRounds: ({ count }) => dealMissedFirst(lesson.id, lesson.questions, count, q => q.id, aboutOf),
     Play: LessonRound,
     // a sight word is heard, never shown: Luna's lines keep off it (BUG-27)
     hiddenWord: q => (q.type === 'sight-word-reader' ? q.word : undefined),
     lesson: {
       id: lesson.id,
-      skillId: lesson.skillId
+      skillId: lesson.skillId,
+      missed: q => noteMissed(lesson.id, q.id)
     }
   };
 }
@@ -101,14 +113,32 @@ export function lessonStates(lessons: AnyGameDef[], completed: string[]): Lesson
 /**
  * What Luna says when a locked lesson is tapped: N is the lesson up next.
  * Written out whole so each is a rendered clip (speech is never built from a
- * template). Kindergarten's six lessons need 1–5; a grade with more lessons
- * needs its lines added here, and lesson-order-check.mjs (know-how) fails
- * until they are.
+ * template). A grade with more lessons than these needs its lines added here,
+ * and lesson-order-check.mjs (know-how) fails until they are.
  */
 export const FINISH_FIRST: Record<number, SpeechPart> = {
   1: { text: 'Let’s finish Lesson 1 first!' },
   2: { text: 'Let’s finish Lesson 2 first!' },
   3: { text: 'Let’s finish Lesson 3 first!' },
   4: { text: 'Let’s finish Lesson 4 first!' },
-  5: { text: 'Let’s finish Lesson 5 first!' }
+  5: { text: 'Let’s finish Lesson 5 first!' },
+  6: { text: 'Let’s finish Lesson 6 first!' },
+  7: { text: 'Let’s finish Lesson 7 first!' },
+  8: { text: 'Let’s finish Lesson 8 first!' },
+  9: { text: 'Let’s finish Lesson 9 first!' },
+  10: { text: 'Let’s finish Lesson 10 first!' },
+  11: { text: 'Let’s finish Lesson 11 first!' },
+  12: { text: 'Let’s finish Lesson 12 first!' },
+  13: { text: 'Let’s finish Lesson 13 first!' },
+  14: { text: 'Let’s finish Lesson 14 first!' },
+  15: { text: 'Let’s finish Lesson 15 first!' },
+  16: { text: 'Let’s finish Lesson 16 first!' },
+  17: { text: 'Let’s finish Lesson 17 first!' },
+  18: { text: 'Let’s finish Lesson 18 first!' },
+  19: { text: 'Let’s finish Lesson 19 first!' },
+  20: { text: 'Let’s finish Lesson 20 first!' },
+  21: { text: 'Let’s finish Lesson 21 first!' },
+  22: { text: 'Let’s finish Lesson 22 first!' },
+  23: { text: 'Let’s finish Lesson 23 first!' },
+  24: { text: 'Let’s finish Lesson 24 first!' }
 };

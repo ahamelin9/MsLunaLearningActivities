@@ -51,7 +51,50 @@ const same = (a: string, b: string) => a.trim().toLowerCase() === b.trim().toLow
  */
 export const LOOK_ALIKE: [string, string][] = [
   ['jet', 'plane'],
-  ['pup', 'dog']
+  ['pup', 'dog'],
+  ['forest', 'tree'],
+  ['ball', 'football'],
+  // CNT-5's words
+  ['boy', 'kid'],
+  ['girl', 'kid'],
+  ['boy', 'girl'],
+  ['man', 'boy'],
+  ['rat', 'mouse'],
+  ['pot', 'bowl'],
+  ['bag', 'purse'],
+  ['mug', 'tea'],
+  ['tea', 'teapot'],
+  ['car', 'cab'],
+  ['bug', 'ladybug'],
+  ['fish', 'goldfish'],
+  ['ball', 'basketball'],
+  ['ball', 'baseball'],
+  ['flower', 'rose'],
+  ['flower', 'sunflower'],
+  ['rain', 'storm'],
+  ['cloud', 'rain'],
+  ['cloud', 'storm'],
+  ['book', 'notebook'],
+  ['cake', 'cupcake'],
+  ['fork', 'plate'],
+  ['ape', 'monkey'],
+  ['ram', 'sheep'],
+  ['ram', 'goat'],
+  ['ox', 'cow'],
+  ['wolf', 'dog'],
+  ['wolf', 'pup'],
+  ['bear', 'panda'],
+  ['boat', 'ship'],
+  ['seed', 'plant'],
+  ['gift', 'box'],
+  ['king', 'man'],
+  ['snow', 'snowman'],
+  ['daisy', 'flower'],
+  ['daisy', 'sunflower'],
+  ['alarm', 'clock'],
+  ['flashlight', 'light'],
+  ['stoplight', 'light'],
+  ['farmer', 'man']
 ];
 
 /** C, K and CK all say /k/; W and WH both say /w/. Letters only: a word is never a sound. */
@@ -148,12 +191,14 @@ const lookAlikesOf = (word: string) => LOOK_ALIKE.flatMap(([a, b]) => (a === wor
 
 /**
  * `count` items with no picture twice, none of the pictures in `avoid`, and
- * no two that look alike (CNT-3).
+ * no two that look alike (CNT-3). `first` are in already, and the rest fit
+ * round them.
  */
-export function distinctByEmoji(items: WordItem[], count: number, avoid: string[] = []): WordItem[] {
-  const seen = new Set(avoid);
-  const out: WordItem[] = [];
+export function distinctByEmoji(items: WordItem[], count: number, avoid: string[] = [], first: WordItem[] = []): WordItem[] {
+  const seen = new Set([...avoid, ...first.map(item => item.emoji)]);
+  const out: WordItem[] = [...first];
   for (const item of shuffle(items)) {
+    if (out.length >= count) break;
     if (seen.has(item.emoji) || lookAlikesOf(item.word).some(w => out.some(o => o.word === w))) continue;
     seen.add(item.emoji);
     out.push(item);

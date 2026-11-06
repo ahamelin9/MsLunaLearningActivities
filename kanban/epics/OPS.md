@@ -9,24 +9,28 @@ Task · P2 · S
 - `WindowState`
 - Luna's unused `intro` lines, unless FB-2 uses them
 - **Complete when:** every listed item is deleted, and build and lint stay clean.
+- **Built (2026-11-06), waits for Alex's OK:** all gone (`getAppById` already was), with build and lint clean. No caller asked for an `intro` line, so Luna's 8 are gone and their clips prune at the next render.
 
 ### OPS-2 · README and stale copy
 Task · P2 · S
 - The README says ~0.8 MB of audio; it's 21 MB.
 - Grade Select mentions a "dashboard" that doesn't exist.
 - **Complete when:** the README's audio size and layout match the repo, and no screen mentions a dashboard.
+- **Built (2026-11-06), waits for Alex's OK:** the README's layout and lessons match the repo, and no screen mentions a dashboard. Its audio size goes in with the run's last render.
 
 ### OPS-7 · Drop Treasure Path's leftovers from the sentence bank
 Task · P2 · S
 - **Why:** since GAME-1b (2026-10-10) Treasure Path plays passages, so each `SENTENCES` item's `key`, `decoys` and `truth` are no longer used by any game. Words Off the Page only needs `text`, `emoji`, `tier` and `alsoFits`. The voice inventory and `voice:audit` still render and check those old wrong words, true/false claims and "what?" gap reads, clips nobody hears any more. CNT-3's "true/false claims copy the sentence" point goes away with them.
 - **How:** remove the three fields from `SentenceItem` and `SENTENCES` in `engine/content.ts`, the `SENTENCES` parts of the voice inventory and `scripts/voice/audit.mjs` that read them, and the `SENTENCES` entries in `FILL_INS` in `distractor-check.mjs` (narrow `alsoFits` there to the tier 3 extra tile). Then `npm run voice:render`, which prunes the unused clips.
 - **Complete when:** no code reads a sentence's `key`, `decoys` or `truth`; `voice:audit`, `distractor-check.mjs`, build and lint pass; Words Off the Page still plays at every grade.
+- **Built (2026-11-06), waits for Alex's OK:** the three fields are gone from all 50 sentences. `alsoFits` stays only on the 13 tier 3 sentences where an extra tile would make it true.
 
 ### OPS-8 · Retarget the backlog guard check's two stale cases
 Task · P2 · S
 - **Why:** found while closing DES-25 (2026-10-10): `node .claude/skills/backlog/guard-check.mjs "$PWD"` shows 2 cases wrong. "A second In progress" edits a DES-3 row followed by DES-4, but the board now runs DES-3, DES-19; "a ticket losing its Complete when" looks for DES-4's old one-line Complete when, which is now a list. Their edits miss, so the guard never sees them and they show as allowed. The guard itself is fine. (DES-3 closed on 2026-10-11, so its row is gone too; still the same 2 cases.) Since DES-4 closed, a third shows the same way (found in OPS-10, 2026-10-13): "a status that is not allowed" edits DES-4's board row, which is gone.
 - **How:** point both cases at text that's on the board and in `epics/DES.md` today (two rows next to each other; a one-line `- **Complete when:**`), ideally rows less likely to move, and keep the script's note on what to do when a target goes.
 - **Complete when:** the guard check shows all 14 cases as expected.
+- **Built (2026-11-06), waits for Alex's OK:** all 14 as expected. The cases now build their edits from what's on the board, and stop if a target is missing, so they can't go stale this way again.
 
 ### OPS-11 · A first cloud session (parked)
 Task · P2 · M

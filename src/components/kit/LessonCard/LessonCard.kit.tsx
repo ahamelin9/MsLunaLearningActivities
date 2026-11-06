@@ -18,6 +18,8 @@ export default function LessonCardKit() {
         <Specimen label="done"><Column><LessonCard number={1} title="Sounds for M, S, B & T" state="done" minutes={4} /></Column></Specimen>
         <Specimen label="up next"><Column><LessonCard number={2} title="Find A, M, S & B" state="next" minutes={5} /></Column></Specimen>
         <Specimen label="up next, started (2 of 4 rounds)"><Column><LessonCard number={2} title="Find A, M, S & B" state="next" minutes={5} rounds={{ done: 2, total: 4 }} /></Column></Specimen>
+        <Specimen label="up next, practiced (1 of 3 good plays)"><Column><LessonCard number={2} title="Find A, M, S & B" state="next" minutes={5} practice={{ done: 1, goal: 3 }} /></Column></Specimen>
+        <Specimen label="up next, practiced and started"><Column><LessonCard number={2} title="Find A, M, S & B" state="next" minutes={5} rounds={{ done: 2, total: 5 }} practice={{ done: 2, goal: 3 }} /></Column></Specimen>
         <Specimen label="locked (tap it)"><Column><LessonCard number={3} title="Pet & Animal Words" state="locked" minutes={4} /></Column></Specimen>
       </Specimens>
       <Specimens title="No time yet: the library until PRG-6 measures them (DES-13)">

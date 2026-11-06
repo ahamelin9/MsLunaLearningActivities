@@ -1,10 +1,11 @@
-import { useState, useEffect } from 'react';
 import type { GradeLevel } from '../types/reading';
 import type { UserProgress, UserSettings } from '../types/user';
 import { soundManager } from './audio';
 import { DEFAULT_VOICE_ID, pronunciation } from './pronunciation';
 import { ACHIEVEMENTS } from '../data/achievements';
 import { upgradeStickers } from '../apps/reading/engine/squishies';
+import { forgetDecks } from '../apps/reading/engine/deck';
+import { NO_PRACTICE, afterPlay, isLearned } from '../apps/reading/engine/practice';
 
 const STORAGE_KEY = 'ms_luna_learning_progress_v1';
 
@@ -30,6 +31,7 @@ export const DEFAULT_PROGRESS: UserProgress = {
   selectedGrade: null,
   totalStars: 0,
   completedLessons: [],
+  lessonPractice: {},
   skillMastery: {},
   streakDays: 1,
   lastPlayedDate: null,
@@ -109,6 +111,8 @@ class StorageService {
         times: parsed.times && typeof parsed.times === 'object' ? parsed.times : {},
         // an older save has nothing part-way (PRG-8)
         partway: parsed.partway && typeof parsed.partway === 'object' ? parsed.partway : {},
+        // an older save has no practice yet; what it finished stays done (CUR-6)
+        lessonPractice: parsed.lessonPractice && typeof parsed.lessonPractice === 'object' ? parsed.lessonPractice : {},
         today: parsed.today && typeof parsed.today.day === 'string' ? parsed.today : { day: '', minutes: 0 },
         settings: loadedSettings
       });
@@ -185,14 +189,17 @@ class StorageService {
     starsEarned: number,
     skillId: string,
     /** lessons run in the game shell, so finishing one can bring a squishy too (PRG-5a) */
-    squishyId?: string | null
-  ): { isFirstCompletion: boolean; newAchievements: string[] } {
+    squishyId?: string | null,
+    /** a good play counts towards learning it (CUR-6) */
+    goodPlay = true
+  ): { newAchievements: string[] } {
     const unlockedBefore = this.progress.unlockedAchievements;
-    const isFirstCompletion = !this.progress.completedLessons.includes(lessonId);
 
-    const updatedCompleted = isFirstCompletion
-      ? [...this.progress.completedLessons, lessonId]
-      : this.progress.completedLessons;
+    const practice = afterPlay(this.progress.lessonPractice[lessonId] ?? NO_PRACTICE, goodPlay);
+    const updatedCompleted =
+      isLearned(practice) && !this.progress.completedLessons.includes(lessonId)
+        ? [...this.progress.completedLessons, lessonId]
+        : this.progress.completedLessons;
 
     const currentSkillCount = this.progress.skillMastery[skillId] || 0;
     const updatedMastery = {
@@ -209,6 +216,7 @@ class StorageService {
     this.progress = {
       ...this.progress,
       completedLessons: updatedCompleted,
+      lessonPractice: { ...this.progress.lessonPractice, [lessonId]: practice },
       stickers,
       totalStars,
       skillMastery: updatedMastery,
@@ -220,7 +228,7 @@ class StorageService {
     };
 
     this.persist();
-    return { isFirstCompletion, newAchievements: this.progress.unlockedAchievements.filter(id => !unlockedBefore.includes(id)) };
+    return { newAchievements: this.progress.unlockedAchievements.filter(id => !unlockedBefore.includes(id)) };
   }
 
   /** What a play's stars add: only those above this game's or lesson's best (PRG-1). */
@@ -379,6 +387,7 @@ class StorageService {
   }
 
   public resetProgress() {
+    forgetDecks();
     this.progress = {
       ...DEFAULT_PROGRESS,
       settings: { ...this.progress.settings }
@@ -388,19 +397,3 @@ class StorageService {
 }
 
 export const storageService = new StorageService();
-
-/**
- * Custom React Hook for reactive, real-time sync with storageService
- */
-export function useUserProgress(): UserProgress {
-  const [progress, setProgress] = useState<UserProgress>(() => storageService.getProgress());
-
-  useEffect(() => {
-    const unsubscribe = storageService.subscribe(newProgress => {
-      setProgress(newProgress);
-    });
-    return () => unsubscribe();
-  }, []);
-
-  return progress;
-}

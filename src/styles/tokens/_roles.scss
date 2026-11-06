@@ -192,6 +192,11 @@ $text-pairs: (
   --motion-twinkle: luna-twinkle var(--dur-loop) var(--ease-in-out) infinite;
   --motion-squish: luna-squish var(--dur-celebrate) var(--ease-standard);
   --motion-shimmer: luna-shimmer var(--dur-loop) var(--ease-in-out) infinite;
+  // the super-rare squishies that move, and Pearl Moon's niche (PRG-5b)
+  --motion-swirl: luna-swirl calc(var(--dur-loop) * 2.25) linear infinite;
+  --motion-sheen: luna-sheen var(--dur-loop) var(--ease-in-out) infinite;
+  --motion-halo: luna-halo var(--dur-loop) var(--ease-in-out) infinite;
+  --motion-pearl-glow: luna-pearl-glow var(--dur-loop) var(--ease-in-out) infinite;
   --motion-petal-fall: luna-petal-fall var(--dur-petals) var(--ease-in-out) forwards;
   --motion-grow-in: luna-grow-in var(--dur-enter) var(--ease-springy) both;
   // sparks flying out of a found "?" (DES-22b)
@@ -233,7 +238,7 @@ $text-pairs: (
   @each $name, $ms in p.$duration {
     --dur-#{$name}: 0ms;
   }
-  @each $name in (pop, wobble, glow, float, sway, twinkle, squish, shimmer, petal-fall, grow-in, burst, talk, blink, open, glide-in, glide-out) {
+  @each $name in (pop, wobble, glow, float, sway, twinkle, squish, shimmer, swirl, sheen, halo, pearl-glow, petal-fall, grow-in, burst, talk, blink, open, glide-in, glide-out) {
     --motion-#{$name}: none;
   }
 }

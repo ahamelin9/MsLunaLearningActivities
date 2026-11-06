@@ -53,9 +53,11 @@ const run = steps => page.evaluate(async list => {
   return out;
 }, steps);
 
-let r = await run([{ game: 'letter-jar' }, { lesson: 'k-lesson-x' }]);
+// three good plays learn a lesson (CUR-6)
+let r = await run([{ game: 'letter-jar' }, { lesson: 'k-lesson-x' }, { lesson: 'k-lesson-x' }, { lesson: 'k-lesson-x' }]);
 ok('a game alone leaves "First Word Wonder" locked', !r[0].unlocked.includes('first_step'), r[0].unlocked.join(', ') || 'none');
-ok('… a lesson unlocks it', r[1].unlocked.includes('first_step'), r[1].unlocked.join(', '));
+ok('… one play of a lesson does too little', !r[1].unlocked.includes('first_step'), r[1].unlocked.join(', ') || 'none');
+ok('… a lesson learned unlocks it', r[3].unlocked.includes('first_step'), r[3].unlocked.join(', '));
 
 // 9 games at 3 stars = 27, a 10th = 30
 r = await run(Array.from({ length: 10 }, (_, i) => ({ game: `game-${i}`, stars: 3 })));

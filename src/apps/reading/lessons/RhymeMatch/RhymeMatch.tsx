@@ -31,7 +31,7 @@ export const RhymeMatch: React.FC<{ question: RhymeMatchQuestion; api: GameApi }
           title="Hear the word"
         >
           <span className={kit.cardPicture}>{question.targetEmoji}</span>
-          <span className={kit.cardWord}>{question.targetWord}</span>
+          <span className={kit.cardWord}>{question.targetWord.toUpperCase()}</span>
           <span className={kit.cardTap}>tap to listen</span>
         </button>
       </PaperCard>

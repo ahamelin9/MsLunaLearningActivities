@@ -163,14 +163,6 @@ for (const line of new Set(lunaLines)) push(line, o => pronunciation.speakText(l
 // source of the half-second of robot voice before the next clip cut it off.
 for (const s of ['Let\u2019s start Kindergarten!', 'Let\u2019s start First Grade!', 'Let\u2019s start Second Grade!'])
   push(s, o => pronunciation.speakText(s, o));
-for (const item of content.SENTENCES)
-  for (const t of item.truth ?? [])
-    if (t.claim) push(t.claim, o => pronunciation.speakText(t.claim, o));
-// Treasure Path reads a cloze sentence with "what?" in the gap until it is solved
-for (const item of content.SENTENCES) {
-  const parts = content.readWithGap(item);
-  push(parts.map(p => p.text ?? `(${p.pause} ms)`).join(' + '), o => pronunciation.speakSequence(parts, o));
-}
 
 // Treasure Path's passages (GAME-1a): every line and each of its words, the
 // true/false claims, and every blank: read with "what?" in the gap until it is
@@ -246,10 +238,8 @@ for (const { game, parts } of roundParts.values()) {
   push(`${game}: ${parts.map(p => Object.values(p)[0]).join(' + ')}`, o => pronunciation.speakSequence(parts, o));
 }
 
-// Words a hint names on its own: a letter's anchor ("like moon"), a wrong
-// word tried in a gap
+// Words a hint names on its own: a letter's anchor ("like moon")
 for (const l of [...content.LETTERS, ...content.DIGRAPHS]) push(l.anchor, o => pronunciation.speakWord(l.anchor, o));
-for (const s of content.SENTENCES) for (const d of s.decoys ?? []) push(d, o => pronunciation.speakWord(d, o));
 
 // Every literal { text: '…' } part anywhere in the app: the fixed wording of
 // hints and cues that games and lessons put together around a word or sound
@@ -360,6 +350,22 @@ for (const check of ['distractor-check.mjs', 'passage-check.mjs', 'story-check.m
   }
 }
 
+// one owl per screen (DES-12): Luna is the owl, so none of what she teaches is
+// drawn as one. (A trophy can be: she isn't on that screen.)
+const owlPictures = [
+  ...content.WORDS.filter(w => w.emoji === '🦉').map(w => w.word),
+  ...content.SENTENCES.filter(s => s.emoji === '🦉').map(s => s.text),
+  ...content.PASSAGES.filter(p => p.emoji === '🦉').map(p => p.id),
+  ...content.MINI_STORIES.filter(s => s.emoji === '🦉').map(s => s.title),
+  ...Object.values(curriculum.READING_CURRICULUM).flat().flatMap(skill => skill.lessons).filter(l => JSON.stringify(l.questions).includes('🦉')).map(l => l.title)
+];
+if (owlPictures.length) {
+  failed = true;
+  console.error(`  ✗ an owl picture beside Luna (DES-12): ${owlPictures.join(', ')}`);
+} else {
+  console.log('  ✓ no owl pictures beside Luna');
+}
+
 // one picture per word: two words drawn the same can't be told apart, and the
 // stand-ins CNT-3 replaced stay gone (no emoji draws a mop, a table or a sleepy cat)
 const WRONG_PICTURES = { mop: '🧹', 'The little cat is sleeping.': '😴', 'The little cat is sleeping under the table.': '🛋️' };
@@ -372,6 +378,22 @@ for (const w of content.WORDS) {
 for (const item of [...content.WORDS, ...content.SENTENCES]) {
   const name = item.word ?? item.text;
   if (WRONG_PICTURES[name] && item.emoji === WRONG_PICTURES[name]) pictureProblems.push(`"${name}" is drawn as ${item.emoji} again (CNT-3)`);
+}
+// a lesson's words come from the bank too, with its picture and spelling (CNT-2)
+const bankPicture = new Map(content.WORDS.map(w => [w.word, w.emoji]));
+const checkLessonWord = (where, word, picture) => {
+  if (!bankPicture.has(word)) pictureProblems.push(`${where}: "${word}" isn't in the word bank`);
+  else if (bankPicture.get(word) !== picture) pictureProblems.push(`${where}: "${word}" is ${picture}, the bank's is ${bankPicture.get(word)}`);
+};
+for (const lesson of Object.values(curriculum.READING_CURRICULUM).flat().flatMap(skill => skill.lessons)) {
+  for (const q of lesson.questions) {
+    if (q.type === 'rhyme-match') {
+      checkLessonWord(q.id, q.targetWord, q.targetEmoji);
+      for (const o of q.options) checkLessonWord(q.id, o.word, o.emoji);
+    } else if (q.type === 'blend-and-read' || q.type === 'read-and-match') {
+      for (const o of q.options) checkLessonWord(q.id, o.word, o.imageEmoji);
+    }
+  }
 }
 if (pictureProblems.length) {
   failed = true;

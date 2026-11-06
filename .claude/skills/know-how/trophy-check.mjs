@@ -4,8 +4,8 @@
 //   node .claude/skills/know-how/trophy-check.mjs [port=5199]
 //   SHOT=<dir> THEME=dark node …   also saves the moon's visit and the Trophy room
 //
-// Needs Vite running on the port. From a save at Kindergarten with 7 of the 8
-// kinds on the shelf (the bear missing):
+// Needs Vite running on the port. From a save at Kindergarten with every kind but
+// the bear on the shelf:
 //   - the Trophy room doesn't show the trophy, and the shelf hints at it only
 //     with the "?" at the top of its arch;
 //   - Letter Cookies (whose squishy is the bear) brings the last one: the
@@ -34,11 +34,12 @@ await page.setViewport({ width: 1180, height: 820 });
 await page.emulateMediaFeatures([{ name: 'prefers-color-scheme', value: theme }]);
 await page.evaluateOnNewDocument(() => { window.speechSynthesis.speak = () => {}; });
 await page.goto(`http://localhost:${port}/`, { waitUntil: 'networkidle0' });
-await page.evaluate(key => {
+await page.evaluate(async key => {
+  const { SQUISHY_KINDS } = await import('/src/apps/reading/engine/squishies.ts');
   localStorage.clear();
   localStorage.setItem(key, JSON.stringify({
     selectedGrade: 'kindergarten',
-    stickers: ['ball:oat', 'cat:caramel', 'bunny:cream', 'butter:cream', 'peach:oat', 'cloud:cream', 'moon:oat']
+    stickers: SQUISHY_KINDS.filter(k => k.kind !== 'bear').map(k => `${k.kind}:${k.usual}`)
   }));
 }, KEY);
 await page.reload({ waitUntil: 'networkidle0' });

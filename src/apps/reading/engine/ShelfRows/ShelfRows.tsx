@@ -4,8 +4,8 @@ import { SQUISHY_KINDS, SUPER_RARE, coloursOf, type SquishyKindDef } from '../sq
 import type { SquishyKind } from '@/components/kit';
 import styles from './ShelfRows.module.scss';
 
-/** The kinds four to a plank, as on the Squishies board. */
-const ROWS = [SQUISHY_KINDS.slice(0, 4), SQUISHY_KINDS.slice(4)];
+/** The kinds six to a plank, as on the Squishies board. */
+const ROWS = [SQUISHY_KINDS.slice(0, 6), SQUISHY_KINDS.slice(6, 12), SQUISHY_KINDS.slice(12)];
 
 interface ShelfRowsProps {
   /** the squishies on the shelf, as saved ("kind:colour") */
@@ -30,11 +30,13 @@ export const ShelfRows: React.FC<ShelfRowsProps> = ({ owned, size, picked, dots 
   const found = (def: SquishyKindDef) => coloursOf(def.kind).filter(c => owned.includes(`${def.kind}:${c}`));
   const shown = (def: SquishyKindDef, colours: SquishyColour[]): SquishyColour =>
     colours.includes(SUPER_RARE) ? SUPER_RARE : colours.includes(def.rare) ? def.rare : def.usual;
+  // the plank a small shelf keeps on a portrait iPad: the one with the new squishy
+  const newRow = Math.max(0, ROWS.findIndex(row => row.some(def => def.kind === picked)));
 
   return (
     <>
       {ROWS.map((row, r) => (
-        <div key={r} className={styles.row}>
+        <div key={r} className={styles.row} data-spare={size === 64 && r !== newRow ? '' : undefined}>
           <div className={styles.kinds}>
             {row.map(def => {
               const colours = found(def);

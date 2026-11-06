@@ -7,8 +7,8 @@
 // from a fresh save at Kindergarten, plays for real, reading the right answer
 // from React each round (a lesson's options, Letter Cookies' round):
 //   - Lesson 1 with every round right first time: 3 stars;
-//   - Lesson 1 again, one round missed once: 2 stars, and the total stays put
-//     (the best was 3);
+//   - Lesson 1 again, one round missed once, quickly: lifted to 3 (PRG-10), and
+//     the total stays put (the best was 3);
 //   - Lesson 1 again, a miss in every round: 1 star, the total still put;
 //   - Letter Cookies with a miss in every round: 1 star, the total up by 1;
 //   - Letter Cookies again with none: 3 stars, the total up by 2 more.
@@ -149,15 +149,16 @@ async function cookiesPlay(misses) {
 const t0 = await total();
 const clean = await lessonPlay(() => 0);
 const t1 = await total();
-ok('Lesson 1, every round right first time: 3 stars', clean === '3 of 3 stars, 4 of 4 first try' && t1 - t0 === 3, `${clean}; total ${t0} → ${t1}`);
+ok('Lesson 1, every round right first time: 3 stars', clean === '3 of 3 stars, 5 of 5 first try' && t1 - t0 === 3, `${clean}; total ${t0} → ${t1}`);
 
 const oneMiss = await lessonPlay(r => (r === 0 ? 1 : 0));
 const t2 = await total();
-ok('Lesson 1 again, one round missed: 2 stars, and no more in the total', oneMiss === '2 of 3 stars, 3 of 4 first try' && t2 === t1, `${oneMiss}; total ${t1} → ${t2}`);
+// quick and careful lifts it to 3 (PRG-10; star-time-check holds the time rule)
+ok('Lesson 1 again, one round missed, quickly: lifted to 3, and no more in the total', oneMiss === '3 of 3 stars, 4 of 5 first try' && t2 === t1, `${oneMiss}; total ${t1} → ${t2}`);
 
 const allMissed = await lessonPlay(() => 1);
 const t3 = await total();
-ok('Lesson 1 again, a miss every round: 1 star, the total still put', allMissed === '1 of 3 stars, 0 of 4 first try' && t3 === t1, `${allMissed}; total ${t2} → ${t3}`);
+ok('Lesson 1 again, a miss every round: 1 star, the total still put', allMissed === '1 of 3 stars, 0 of 5 first try' && t3 === t1, `${allMissed}; total ${t2} → ${t3}`);
 
 const gameMissy = await cookiesPlay(true);
 const t4 = await total();
@@ -171,6 +172,9 @@ ok('Letter Cookies again, no misses: 3 stars, the total up by 2 more', /^3 of 3 
 await page.evaluate(async () => {
   const key = 'ms_luna_learning_progress_v1';
   const saved = JSON.parse(localStorage.getItem(key));
+  const { lessonsFor } = await import('/src/apps/reading/engine/lessons.ts');
+  saved.completedLessons = [lessonsFor('kindergarten')[0].lesson.id];
+  delete saved.lessonPractice;
   delete saved.bestStars;
   saved.totalStars = 23;
   localStorage.setItem(key, JSON.stringify(saved));

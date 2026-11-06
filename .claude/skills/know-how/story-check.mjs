@@ -6,7 +6,7 @@
 //   node .claude/skills/know-how/story-check.mjs <src-root> # another copy
 //
 // The rules:
-// - at least 3 stories per tier;
+// - at least 9 stories per tier (GAME-9);
 // - every story has a title, a picture, 2–4 lines and a question with exactly
 //   one right answer among different answers;
 // - the right answer never repeats 3 words in a row from a line of its story
@@ -45,7 +45,7 @@ await build({
 const { MINI_STORIES, GAMES, tierFor } = await import(pathToFileURL(join(out, 'bundle.mjs')).href);
 rmSync(out, { recursive: true, force: true });
 
-const PER_TIER = 3;
+const PER_TIER = 9;
 const COPY_RUN = 3;
 const PLAYS = 300;
 const words = text => text.toLowerCase().replace(/[’']/g, "'").replace(/[^a-z'\s]/g, ' ').split(/\s+/).filter(Boolean);

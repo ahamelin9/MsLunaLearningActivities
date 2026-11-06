@@ -10,7 +10,8 @@
 //   - a tap on a locked lesson doesn't open it, wobbles it, and plays Luna's
 //     line naming the lesson up next;
 //   - every game opens;
-//   - finishing Lesson 1 (played through for real) offers "Next lesson" and
+//   - finishing Lesson 1 (on its last play of practice, CUR-6; played through
+//     for real) offers "Next lesson" and
 //     opens Lesson 2, whose card pops in back on the library (DES-13), and a
 //     locked tap then names Lesson 2;
 //   - an old save with Lessons 1 and 3 done keeps both done and open, opens
@@ -106,6 +107,15 @@ const setDone = ids =>
     saved.completedLessons = list;
     localStorage.setItem(key, JSON.stringify(saved));
   }, KEY, ids);
+
+// a lesson is done once it's practiced (CUR-6): this puts one on its last play,
+// so whatever the next play's like, it finishes it
+const onLastPlay = id =>
+  page.evaluate((key, lesson) => {
+    const saved = JSON.parse(localStorage.getItem(key));
+    saved.lessonPractice = { ...saved.lessonPractice, [lesson]: { good: 2, plays: 5 } };
+    localStorage.setItem(key, JSON.stringify(saved));
+  }, KEY, id);
 
 /** Taps lesson card i while it's locked; returns whether it opened and what was said. */
 const tapLocked = async i => {
@@ -222,6 +232,10 @@ for (let i = 0; i < games; i++) {
 check(`every game opens (${opened} of ${games})`, opened === games && games === 8);
 
 // ---- finishing Lesson 1 ----
+const ids = await lessonIds('kindergarten');
+await onLastPlay(ids[0]);
+await page.reload({ waitUntil: 'networkidle0' });
+await intoLibrary();
 const finished = await playLesson(0);
 const doneOne = await doneScreen();
 const nextOffered = await nextLessonOffered();
@@ -242,7 +256,6 @@ const lockedTwo = await tapLocked(3);
 check(`then a locked tap names Lesson 2 (${JSON.stringify(lockedTwo.said)})`, !lockedTwo.opened && lockedTwo.said.includes('Let’s finish Lesson 2 first!'));
 
 // ---- an old save, done out of order ----
-const ids = await lessonIds('kindergarten');
 await setDone([ids[0], ids[2]]);
 await page.reload({ waitUntil: 'networkidle0' });
 await intoLibrary();
@@ -250,7 +263,7 @@ const oldSave = await states();
 await page.reload({ waitUntil: 'networkidle0' });
 await intoLibrary();
 const reloaded = await states();
-const want = 'done next done locked locked locked';
+const want = ['done', 'next', 'done', ...ids.slice(3).map(() => 'locked')].join(' ');
 check(`Lessons 1 and 3 done: ${oldSave.join(' ')}, after a reload ${reloaded.join(' ')}`, oldSave.join(' ') === want && reloaded.join(' ') === want);
 const three = await playLesson(2);
 const doneThree = await doneScreen();
@@ -261,6 +274,20 @@ check(`after Lesson 1 the done screen reads "${doneOne.title}", its bar moves on
 check(`replaying Lesson 3, the bar stays (${doneThree.seen.join(' → ')}) and nothing opened (${doneThree.opened})`,
   doneThree.seen.join(' ') === '2' && doneThree.opened === null);
 await back();
+
+// ---- a late lesson up next is on screen as the library opens (CUR-4) ----
+for (const [width, height] of [[1180, 820], [744, 1133]]) {
+  await page.setViewport({ width, height });
+  await setDone(ids.slice(0, ids.length - 1));
+  await page.reload({ waitUntil: 'networkidle0' });
+  await intoLibrary();
+  const onScreen = await page.$$eval(at('lesson-tile'), (els, n) => {
+    const r = els[n].getBoundingClientRect();
+    return r.top >= 0 && r.bottom <= window.innerHeight;
+  }, ids.length - 1);
+  check(`at ${width} wide, the last lesson, up next, is on screen as the library opens`, onScreen);
+}
+await page.setViewport({ width: 1180, height: 820 });
 
 const spoke = await page.evaluate(() => window.__browserSpoke);
 check(`no line fell back to the browser voice${spoke.length ? `: ${JSON.stringify(spoke)}` : ''}`, spoke.length === 0);

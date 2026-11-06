@@ -35,7 +35,7 @@ for (const [speed, rate, bucket] of [['Beginner', 0.75, 'slow'], ['Normal', 0.95
   const story = await page.evaluate(async () => {
     const { lessonsFor } = await import('/src/apps/reading/engine/lessons.ts');
     const lessons = lessonsFor('grade2');
-    const i = lessons.findIndex(l => l.makeRounds({}).some(q => q.type === 'story-read'));
+    const i = lessons.findIndex(l => l.makeRounds({ count: 50 }).some(q => q.type === 'story-read'));
     return { index: i, done: lessons.slice(0, i).map(l => l.lesson.id), count: lessons.length };
   });
   await page.evaluate((key, done, rate) => {

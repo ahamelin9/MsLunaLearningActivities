@@ -24,6 +24,12 @@ export interface PartWay {
   counted?: number;
 }
 
+/** How a lesson's practice stands (CUR-6): its good plays and all its finished plays. */
+export interface LessonPractice {
+  good: number;
+  plays: number;
+}
+
 export interface PlayTimes {
   last: number;
   best: number;
@@ -34,7 +40,10 @@ export interface PlayTimes {
 export interface UserProgress {
   selectedGrade: GradeLevel | null;
   totalStars: number;
+  /** the lessons learned: `engine/practice.ts` says when (CUR-6); an older save's finished ones count */
   completedLessons: string[];
+  /** how each lesson's practice stands (CUR-6) */
+  lessonPractice: Record<string, LessonPractice>;
   skillMastery: Record<string, number>;
   streakDays: number;
   lastPlayedDate: string | null;

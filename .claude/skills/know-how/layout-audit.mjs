@@ -99,8 +99,9 @@ function audit({ screen, midRound, scrolls = false }) {
     }
 
   // one Luna per screen (DES-12): the kit's Luna (her root carries data-mood),
-  // and any owl emoji, which a child reads as her too
-  const lunas = [...document.querySelectorAll('[data-mood]')].filter(visible).length;
+  // and any owl emoji, which a child reads as her too. The milestone moon also
+  // has moods, and her visit is meant to share the screen with Luna.
+  const lunas = [...document.querySelectorAll('[data-mood]')].filter(el => visible(el) && !el.closest('[data-shot="moon-visit"]')).length;
   const owls = (document.body.innerText.match(/🦉/gu) ?? []).length;
   if (lunas + owls > 1) problems.push({ text: `two owls: ${lunas} Luna${lunas === 1 ? '' : 's'} and ${owls} owl emoji`, stage: false });
   return { screen, problems };

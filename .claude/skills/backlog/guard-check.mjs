@@ -10,6 +10,7 @@
 // as a write.
 
 import { spawnSync } from 'node:child_process';
+import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 const root = process.argv[2] ?? process.cwd();
@@ -25,28 +26,41 @@ const run = input => {
   return 'denied: ' + JSON.parse(r.stdout).hookSpecificOutput.permissionDecisionReason.slice(0, 140);
 };
 
-// The edits target lines that exist on the board and in epics/DES.md today; if
-// one is gone, its case shows as allowed and needs a new target.
+// The edits are built from what's on the board today, so tickets closing don't
+// leave a case aiming at nothing. An edit that matches no text would show as
+// allowed whatever the guard does, so a target that can't be found stops the
+// check rather than passing it.
 const readme = join(root, 'kanban/README.md');
-const des = join(root, 'kanban/epics/DES.md');
+const epics = join(root, 'kanban/epics');
 const edit = (file_path, old_string, new_string) => ({ tool_name: 'Edit', tool_input: { file_path, old_string, new_string } });
 const bash = command => ({ tool_name: 'Bash', tool_input: { command } });
 
+const board = readFileSync(readme, 'utf8');
+const found = (what, value) => {
+  if (!value) throw new Error(`guard-check: no ${what} on the board today, so a case has nothing to aim at`);
+  return value;
+};
+const todo = '\\| [A-Z]+-\\w+ \\|[^\\n]*\\| Todo \\|';
+const [, firstTodo, secondTodo] = found('two Todo rows next to each other', board.match(new RegExp(`(${todo})\\n(${todo})`)));
+const oneTodo = found('Todo row', board.match(new RegExp(todo)))[0];
+const inProgress = row => row.replace('| Todo |', '| In progress |');
+const opsLink = found('OPS epic link', board.match(/- \[OPS[^\n]*/))[0];
+// a ticket's one-line Complete when, and a heading to leave as it is
+const opsFile = join(epics, 'OPS.md');
+const ops = readFileSync(opsFile, 'utf8');
+const completeWhen = found('one-line Complete when in the OPS epic', ops.match(/- \*\*Complete when:\*\* [^\n]+/))[0];
+const heading = found('ticket in the OPS epic', ops.match(/### [^\n]+/))[0];
+
 const cases = [
-  // two In progress at once (DES-2 is Blocked while waiting, so set two others)
   [
     'deny',
     'a second In progress',
-    edit(
-      readme,
-      '| DES-3 | One set of design tokens | Story | P0 | M | Todo |\n| DES-4 | Typography and local fonts | Story | P0 | S | Todo |',
-      '| DES-3 | One set of design tokens | Story | P0 | M | In progress |\n| DES-4 | Typography and local fonts | Story | P0 | S | In progress |'
-    )
+    edit(readme, `${firstTodo}\n${secondTodo}`, `${inProgress(firstTodo)}\n${inProgress(secondTodo)}`)
   ],
-  ['deny', 'a ticket deleted with no changelog line', edit(readme, '| OPS-1 | Delete dead code | Task | P2 | S | Todo |\n', '')],
-  ['deny', 'a ticket losing its Complete when', edit(des, '- **Complete when:** the app shows the right fonts', '- the app shows the right fonts')],
-  ['deny', 'a status that is not allowed', edit(readme, '| DES-4 | Typography and local fonts | Story | P0 | S | Todo |', '| DES-4 | Typography and local fonts | Story | P0 | S | Done |')],
-  ['deny', 'a link to an epic file that does not exist', edit(readme, '- [OPS — Housekeeping](epics/OPS.md) · anytime', '- [OPS — Housekeeping](epics/OPS.md) · anytime\n- [NEW — Something](epics/NEW.md)')],
+  ['deny', 'a ticket deleted with no changelog line', edit(readme, `${oneTodo}\n`, '')],
+  ['deny', 'a ticket losing its Complete when', edit(opsFile, completeWhen, completeWhen.replace('- **Complete when:** ', '- '))],
+  ['deny', 'a status that is not allowed', edit(readme, oneTodo, oneTodo.replace('| Todo |', '| Done |'))],
+  ['deny', 'a link to an epic file that does not exist', edit(readme, opsLink, `${opsLink}\n- [NEW — Something](epics/NEW.md)`)],
   ['deny', 'a shell write into kanban/', bash("sed -i '' 's/Todo/Done/' kanban/README.md")],
   ['deny', 'a shell move of the folder', bash('mv kanban backlog-old')],
   ['deny', 'removing a linked epic file', bash('rm kanban/epics/OPS.md')],
@@ -54,7 +68,7 @@ const cases = [
   ['allow', 'removing an unlinked epic file', bash('rm kanban/epics/NEW.md')],
   ['allow', 'reading kanban/ in the shell', bash('grep -n DES-2 kanban/README.md')],
   ['allow', 'a new, unlinked epic file', { tool_name: 'Write', tool_input: { file_path: join(root, 'kanban/epics/NEW.md'), content: '# NEW — Something\n' } }],
-  ['allow', 'a progress note on a ticket', edit(des, '### DES-4 · Typography and local fonts', '### DES-4 · Typography and local fonts')],
+  ['allow', 'a progress note on a ticket', edit(opsFile, heading, `${heading}\n- A note.`)],
   ['allow', 'a file outside the backlog', edit(join(root, 'src/App.tsx'), 'x', 'y')]
 ];
 

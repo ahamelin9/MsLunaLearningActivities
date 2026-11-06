@@ -9,10 +9,10 @@
 //   - leave it after winning 2 rounds: its card shows the thin rounds bar at
 //     2 of N, and opening it again starts on round 3;
 //   - the same after a reload;
-//   - finishing it: the bar is gone and the lesson is done, with 3 stars
-//     (the 2 rounds won before count as first time);
-//   - "Play again" on it, and replaying the done lesson from the library,
-//     start on round 1; a game always starts on round 1;
+//   - finishing it: the bar is gone and the play counts towards learning it
+//     (CUR-6), with 3 stars (the 2 rounds won before count as first time);
+//   - "Practice again" on it, and opening it again from the library, start on
+//     round 1; a game always starts on round 1;
 //   - a save from before PRG-8 (no part-way field) loads with no error.
 // It fails on the commit before PRG-8, where leaving restarted the lesson.
 
@@ -108,18 +108,18 @@ await wait(1200);
 const stars = await page.evaluate(() => document.querySelector('[aria-label$="of 3 stars"]')?.getAttribute('aria-label'));
 ok('finishing it: 3 stars, the rounds before counted as first time', stars === '3 of 3 stars', stars);
 let playAgain = null;
-for (const b of await page.$$('button')) if ((await b.evaluate(e => e.textContent.trim())) === 'Play again') playAgain = b;
+for (const b of await page.$$('button')) if ((await b.evaluate(e => e.textContent.trim())) === 'Practice again') playAgain = b;
 await playAgain.click();
 await page.waitForSelector(at('lesson-choice'));
 await wait(600);
-ok('"Play again" starts on round 1', (await pips()) === first, await pips());
+ok('"Practice again" starts on round 1', (await pips()) === first, await pips());
 await intoLibrary();
 const done = await page.evaluate(key => JSON.parse(localStorage.getItem(key)), KEY);
-ok('the lesson is done, and nothing is part-way', done.completedLessons.length === 1 && Object.keys(done.partway ?? {}).length === 0 && (await bar()) === null, JSON.stringify(done.partway));
+ok('the play counted towards learning it, and nothing is part-way', Object.values(done.lessonPractice)[0]?.good === 1 && Object.keys(done.partway ?? {}).length === 0 && (await bar()) === null, JSON.stringify(done.partway));
 
-// ---- the done lesson again, and a game ----
+// ---- the lesson again, and a game ----
 await open('lesson-tile', 'First Letter Sounds');
-ok('replaying the done lesson starts on round 1', (await pips()) === first, await pips());
+ok('opening it again starts on round 1', (await pips()) === first, await pips());
 await intoLibrary();
 await open('game-tile', 'Letter Jar');
 const gameRound = await pips();

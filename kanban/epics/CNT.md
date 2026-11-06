@@ -1,5 +1,12 @@
 # CNT — One content model (Phase 4)
 
+### CNT-5 · The word bank grows
+Story · P1 · M · needs: CNT-2
+- **Why:** Alex (2026-11-06) wants much more content and variety. Every game and, after CNT-2, every lesson deals from the bank, so more words there means more of everything.
+- **How:** add words children this age know, each with a picture that really shows it (one picture per word, `voice:audit`), tiered by spelling pattern, with the rime on rhyming ones. American English. New look-alike pairs go in `LOOK_ALIKE`.
+- **Complete when:** the bank has at least 200 words, at least 70 at tier 1 and 60 at each of tiers 2 and 3; `distractor-check`, `voice:audit`, build and lint pass; a review sheet shows every new word with its picture for Alex to strike anything.
+- **Built (2026-11-06), waits for Alex's OK:** 99 words became 256 (81, 80 and 95 at tiers 1, 2 and 3). The review page is <https://claude.ai/artifact/XKeifMgCASqZ3B3mp7SV1M>.
+
 ### CNT-2 · Lessons draw their words from the content bank
 Story · P1 · M · needs: —
 - **Why:** lessons are hand-written in `data/readingCurriculum.ts`, separately from the word bank in `engine/content.ts`, and use different emojis and capitalisation for the same words (a truck is 🚚 in lessons and 🚛 in the bank).
@@ -13,3 +20,4 @@ Story · P1 · M · needs: —
   4. Spelling: lessons say "Cat", the bank "cat". **Pick: the bank's lower case everywhere**, as the games already show; a lesson's caption appears only once solved.
   5. Sentence answers ("Green frog hopping 🐸") are phrases, not words. **Pick: keep the phrase, take the picture from the bank** (`word: 'frog'`).
   6. Sight-word choices (she, then, lake…) have no picture. **Pick: they stay plain text**, not bank words.
+- **Built (2026-11-06), waits for Alex's OK:** went with the six picks, as he said to. See `screenshots/review/HANDOVER.md`.

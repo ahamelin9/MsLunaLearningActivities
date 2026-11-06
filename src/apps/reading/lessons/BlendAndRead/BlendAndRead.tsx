@@ -65,11 +65,11 @@ export const BlendAndRead: React.FC<{ question: BlendAndReadQuestion; api: GameA
             data-shot="lesson-choice"
             state={choiceState(option.id, option.isCorrect, wrongId, solved, revealed)}
             onClick={() =>
-              choose(option.id, option.isCorrect, [{ text: option.text }])
+              choose(option.id, option.isCorrect, [{ word: option.word }])
             }
-            aria-label={option.text}
+            aria-label={option.word}
             // named once found: written, it could be matched letter for letter without blending
-            caption={solved ? option.text : undefined}
+            caption={solved ? option.word : undefined}
           >
             {option.imageEmoji}
           </Choice>

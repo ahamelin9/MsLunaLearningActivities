@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import type { GameApi, GameDef } from '../../engine/types';
-import { pick, sentencesFor, shuffle, tierFor, type SentenceItem } from '../../engine/content';
+import { sentencesFor, shuffle, tierFor, type SentenceItem } from '../../engine/content';
+import { deal } from '../../engine/deck';
 import { pickWrong, textChoice } from '../../engine/distractors';
 import { soundManager } from '@/utils/audio';
 import { pronunciation } from '@/utils/pronunciation';
@@ -24,8 +25,7 @@ interface Round {
 
 const EXTRA_WORDS = ['jumped', 'purple', 'banana', 'quickly', 'seven', 'window'];
 
-function buildRound(tier: 1 | 2 | 3): Round {
-  const sentence = pick(sentencesFor(tier));
+function buildRound(tier: 1 | 2 | 3, sentence: SentenceItem): Round {
   const words = sentence.text.replace(/\.$/, '').split(' ');
 
   const tiles: Tile[] = words.map((w, i) => ({ id: `w-${i}`, word: w, isExtra: false }));
@@ -35,7 +35,7 @@ function buildRound(tier: 1 | 2 | 3): Round {
     pickWrong(sentence.text, EXTRA_WORDS, 1, {
       as: textChoice,
       onScreen: words,
-      blank: { alsoFits: sentence.alsoFits }
+      blank: { alsoFits: sentence.alsoFits ?? [] }
     }).forEach((w, i) =>
       tiles.push({ id: `x-${i}`, word: w, isExtra: true })
     );
@@ -217,18 +217,7 @@ export const buildSentence: GameDef<Round> = {
   sticker: 'quill',
   makeRounds: ({ grade, difficulty, count }) => {
     const tier = tierFor(grade, difficulty);
-    const rounds: Round[] = [];
-    const used = new Set<string>();
-    let guard = 0;
-    while (rounds.length < count && guard < 40) {
-      guard++;
-      const r = buildRound(tier);
-      if (used.has(r.sentence.text)) continue;
-      used.add(r.sentence.text);
-      rounds.push(r);
-    }
-    while (rounds.length < count) rounds.push(buildRound(tier));
-    return rounds;
+    return deal('build-sentence', sentencesFor(tier), count, s => s.text).map(s => buildRound(tier, s));
   },
   Play
 };

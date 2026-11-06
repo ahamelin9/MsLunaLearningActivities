@@ -61,6 +61,31 @@
   75%, 100% { left: 130%; }
 }
 
+// A super-rare squishy that moves (PRG-5b). Each one's transform-box is its
+// fill-box. The swirl's waves drift by one wave, a third of their length, so
+// the loop doesn't show
+@keyframes luna-swirl {
+  to { transform: translateX(-33.333%); }
+}
+
+// a soft light crosses a super-rare shimmer now and then
+@keyframes luna-sheen {
+  0%, 35% { transform: translateX(-120%); }
+  80%, 100% { transform: translateX(200%); }
+}
+
+// a super-rare glow breathes in and out
+@keyframes luna-halo {
+  0%, 100% { opacity: 0.55; transform: scale(0.96); }
+  50% { opacity: 1; transform: scale(1.04); }
+}
+
+// Pearl Moon's niche, glowing softly
+@keyframes luna-pearl-glow {
+  0%, 100% { box-shadow: 0 0 0 0 transparent; }
+  50% { box-shadow: 0 0 var(--space-4) var(--space-1) var(--illo-squishy-pearl-glow); }
+}
+
 // a petal drifting down the screen after a win
 @keyframes luna-petal-fall {
   0% { transform: translate(0, -5vh) rotate(0deg); opacity: 0; }

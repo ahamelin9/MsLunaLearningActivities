@@ -10,6 +10,7 @@ import {
   type BlankItem,
   type PassageItem
 } from '../../engine/content';
+import { deal } from '../../engine/deck';
 import { pickWrong, textChoice } from '../../engine/distractors';
 import { pronunciation, type SpeechPart } from '@/utils/pronunciation';
 import { Choice, ChunkyButton, Icon, PaperCard } from '@/components/kit';
@@ -228,7 +229,7 @@ export const treasureRead: GameDef<Round> = {
   // Passages are written per grade, so the grade picks them; the dial doesn't
   // change them yet (LVL-1 sets what it does).
   makeRounds: ({ grade, count }) => {
-    const passages = shuffle(passagesFor(grade)).slice(0, count);
+    const passages = deal('treasure-read', passagesFor(grade), count, p => p.id);
     // every play has both kinds: one of each, then either at random
     const kinds = shuffle(
       passages.map((_, i): Round['kind'] =>

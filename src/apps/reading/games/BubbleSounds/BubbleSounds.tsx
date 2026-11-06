@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import type { GameApi, GameDef } from '../../engine/types';
 import { lettersFor, pick, sample, shuffle, tierFor, type LetterItem } from '../../engine/content';
+import { deal } from '../../engine/deck';
 import { pickWrong, textChoice } from '../../engine/distractors';
 import { soundManager } from '@/utils/audio';
 import { pronunciation } from '@/utils/pronunciation';
@@ -308,8 +309,9 @@ export const bubbleSounds: GameDef<Round> = {
     const pool = lettersFor(tier);
     const rounds: Round[] = [];
     // any letter in the tier's pool, none twice in a play (BUG-21: slots i*3
-    // to i*3+2 only ever reached the pool's first 12)
-    const letters = sample(pool, count);
+    // to i*3+2 only ever reached the pool's first 12), and none again until
+    // the rest have had their turn (GAME-8)
+    const letters = deal('bubble-sounds', pool, count, l => l.letter);
 
     for (let i = 0; i < count; i++) {
       const letter = letters[i % letters.length];

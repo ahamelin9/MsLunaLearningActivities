@@ -51,8 +51,16 @@
   gap: var(--space-4);
   max-width: calc(var(--space-16) * 5);
 
+  // on a portrait iPad, side by side under the cabinet, so the page fits
   @include bp(narrow) {
+    flex-direction: row;
+    align-items: flex-start;
     max-width: none;
+
+    > * {
+      flex: 1;
+      min-width: 0;
+    }
   }
 }
 

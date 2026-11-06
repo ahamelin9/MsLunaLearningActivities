@@ -21,13 +21,16 @@ npm run ui:shots -- --label before   # every screen at four iPad sizes, in scree
 ```
 src/
   apps/reading/
-    engine/        game shell, content bank, Luna's character and dialogue
-    games/         one file per mini-game
-    components/    the guided lessons' question screens (one per question type)
-    pages/         library hub, grade select
-  components/os/   tablet shell: status bar, app window, settings, trophies
+    engine/        game shell, content bank, the deck, Luna's character and dialogue
+    games/         one folder per mini-game
+    lessons/       the guided lessons' question screens (one per question type)
+    pages/         library hub, grade select, the shelf
+  components/
+    kit/           the building blocks every screen is made from
+    os/            tablet shell: status bar, app window, settings, trophies
+  styles/tokens/   the design values: colours, type, spacing, motion
   utils/           audio (sound effects), pronunciation (speech), phonics, storage
-  data/            the guided reading curriculum
+  data/            the guided reading curriculum, one file of new lessons per grade
 scripts/voice/     renders Ms. Luna's voice to audio files (see below)
 public/voice/      the rendered clips, committed
 ```
@@ -75,20 +78,24 @@ api.miss({ hint: [{ text: 'Listen for' }, { sound: 'M' }, { text: 'like' }, { wo
 ```
 
 Content comes from one bank (`engine/content.ts`) at three difficulty tiers, so
-adding a word or sentence there reaches every game at once.
+adding a word or sentence there reaches every game at once. A game deals through
+`engine/deck.ts`, so nothing comes back until its whole pool has had a turn.
 
 ### Lessons
 
-The guided lessons in `data/readingCurriculum.ts` are the structured teaching,
-so they sit at the top of the library, numbered in the order they are taught,
-with the games below. They run in the same `GameShell` as the games:
-`engine/lessons.ts` turns each lesson into a `GameDef` whose rounds are its fixed
-questions, and `components/LessonRound.tsx` shows each question type. A lesson
-therefore gets Luna, spoken hints, "Again", stickers and the reward screen like
-any game, with no difficulty to choose; its `lesson` field makes it earn the
-curriculum's stars and marks it done in the child's progress. A new lesson is
-data only. A new question type is one screen in `components/`, built from
-`LessonKit.tsx` and `lessonHooks.ts`, plus a case in `LessonRound`.
+The guided lessons in `data/readingCurriculum.ts` and `data/lessons/` are the
+structured teaching, so they sit at the top of the library, numbered in the order
+they are taught, with the games below. They run in the same `GameShell` as the
+games: `engine/lessons.ts` turns each lesson into a `GameDef` that deals a few of
+its questions per play, what was missed last time first, and
+`lessons/shared/LessonRound.tsx` shows each question type. A lesson therefore
+gets Luna, spoken hints, "Again", stickers and the reward screen like any game,
+with no difficulty to choose; its `lesson` field makes it earn the curriculum's
+stars and count toward being learned (`LEARN_RULE` in `engine/practice.ts`). A
+new lesson is data only: its words and pictures come from the bank, and
+`data/lessonRounds.ts` writes a round from one line. A new question type is one
+screen in `lessons/`, built from `LessonKit.module.scss` and `lessonHooks.ts`,
+plus a case in `LessonRound`.
 
 ## Speech and phonics
 

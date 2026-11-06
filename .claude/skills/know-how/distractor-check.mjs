@@ -132,7 +132,7 @@ const GAME_CHOICES = {
         target: text(r.sentence.text),
         wrong: extra,
         onScreen: r.words.map(w => text(w.replace(/[^a-zA-Z']/g, ''))),
-        ...(extra.length > 0 && { blank: { alsoFits: r.sentence.alsoFits } })
+        ...(extra.length > 0 && { blank: { alsoFits: r.sentence.alsoFits ?? [] } })
       }
     ];
   },
@@ -163,7 +163,7 @@ const GAME_CHOICES = {
 
 const right = options => options.find(o => o.isCorrect);
 const wrongOf = options => options.filter(o => !o.isCorrect);
-const picture = o => ({ text: o.text, picture: o.imageEmoji });
+const picture = o => ({ text: o.word ?? o.text, picture: o.imageEmoji });
 
 const LESSON_CHOICES = {
   'sound-to-letter': q => letterSet(q.targetLetter, wrongOf(q.options).map(o => o.letter), 'sound'),
@@ -240,7 +240,6 @@ for (const grade of GRADES) {
 // ---- every fill-in-the-blank item, played or not: its list, and its own wrong words ----
 
 const FILL_INS = [
-  ...(content.SENTENCES ?? []).map(s => [`sentence "${s.text}"`, s]),
   // Treasure Path's passages (GAME-1a)
   ...(content.PASSAGES ?? []).flatMap(p => p.blanks.map(b => [`passage ${p.id} "${b.text}"`, b]))
 ];

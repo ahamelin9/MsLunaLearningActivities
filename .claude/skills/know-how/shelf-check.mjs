@@ -6,15 +6,19 @@
 // Needs Vite running on the port. From a fresh save at Kindergarten:
 //   - finishing Lesson 1 puts a squishy on the shelf: the done screen shows
 //     "New squishy for your shelf", the squishy drawn (no emoji), and "See my
-//     shelf" opens the shelf at "1 of 8" with that kind found and "New";
-//   - finishing a game puts another there ("2 of 8"), and the game's done
+//     shelf" opens the shelf at "1 of 18" with that kind found and "New";
+//   - finishing a game puts another there ("2 of 18"), and the game's done
 //     screen shows the shelf on its right, the new one picked out "New"
 //     (PRG-9), where a lesson's shows its lessons bar and no shelf;
-//   - the library's Squishy Shelf card says "2 of 8 found", draws them, opens
+//   - the library's Squishy Shelf card says "2 of 18 found", draws them, opens
 //     the shelf, and "My trophies" is still beside it;
 //   - on the shelf a found squishy says its line, one still to find its clue;
 //   - no emoji on the home screen, the library, the shelf or the done screen;
-//   - a save with the 18 old stickers loads with 18 squishies (8 of 8 kinds).
+//   - six kinds to a plank, the top of the arch a "?" that gives its line;
+//   - a save with the 18 old stickers loads with 18 squishies, the same 8 kinds
+//     they were before PRG-5b, so nobody's shelf is suddenly full;
+//   - a full shelf: Pearl Moon at the top of the arch, with her own line, and a
+//     kind found in super rare wears its look.
 // The squishy data's own rules (the odds, old saves) are squishy-check.mjs.
 
 import puppeteer from 'puppeteer-core';
@@ -96,7 +100,7 @@ ok('a lesson\'s done screen shows its lessons bar, and no shelf (PRG-9)', await 
 await page.click(at('see-shelf'));
 await page.waitForSelector(at('shelf'), { timeout: 5000 }).catch(() => {});
 const count1 = await page.$eval(at('shelf-count'), e => e.textContent.trim()).catch(() => 'no shelf');
-ok('"See my shelf" opens it at 1 of 8, with "New"', count1 === '1 of 8' && (await page.evaluate(() => [...document.querySelectorAll('[data-shot="shelf-kind"]')].some(k => k.textContent.includes('New')))), count1);
+ok('"See my shelf" opens it at 1 of 18, with "New"', count1 === '1 of 18' && (await page.evaluate(() => [...document.querySelectorAll('[data-shot="shelf-kind"]')].some(k => k.textContent.includes('New')))), count1);
 await page.click(at('shell-back'));
 await page.waitForSelector(at('hub'));
 await wait(600);
@@ -126,7 +130,7 @@ const gameShelf = await page.evaluate(() => {
     newOn: [...(s?.querySelectorAll('[data-shot="shelf-kind"]') ?? [])].find(k => k.textContent.includes('New'))?.querySelector('button')?.getAttribute('aria-label') ?? ''
   };
 });
-ok('a game\'s done screen shows the shelf, 2 of 8, the new one picked out (PRG-9)', /2 of 8/i.test(gameShelf.text) && gameShelf.kinds === 8 && /bear/i.test(gameShelf.newOn), `${gameShelf.text}; New on ${gameShelf.newOn}`);
+ok('a game\'s done screen shows the shelf, 2 of 18, the new one picked out (PRG-9)', /2 of 18/i.test(gameShelf.text) && gameShelf.kinds === 18 && /bear/i.test(gameShelf.newOn), `${gameShelf.text}; New on ${gameShelf.newOn}`);
 await intoLibrary();
 
 // ---- the library's card ----
@@ -134,12 +138,12 @@ const card = await page.evaluate(() => {
   const c = document.querySelector('[data-shot="hub-tin"]');
   return { text: c?.innerText ?? '', drawn: c ? c.querySelectorAll('svg').length : 0, trophies: Boolean(document.querySelector('[data-shot="open-trophies"]')) };
 });
-ok('the library card: "2 of 8 found", drawn; the header\'s stars still open the trophies', /2 of 8/.test(card.text) && card.drawn >= 2 && card.trophies, card.text.replace(/\s+/g, ' '));
+ok('the library card: "2 of 18 found", drawn; the header\'s stars still open the trophies', /2 of 18/.test(card.text) && card.drawn >= 2 && card.trophies, card.text.replace(/\s+/g, ' '));
 ok('no emoji on the library', (await emoji(at('hub'))) === '', await emoji(at('hub')));
 await page.click(at('open-shelf'));
 await page.waitForSelector(at('shelf'));
 await wait(400);
-ok('the card opens the shelf at 2 of 8', (await page.$eval(at('shelf-count'), e => e.textContent.trim())) === '2 of 8');
+ok('the card opens the shelf at 2 of 18', (await page.$eval(at('shelf-count'), e => e.textContent.trim())) === '2 of 18');
 ok('no emoji on the shelf', (await emoji(at('shelf'))) === '', await emoji(at('shelf')));
 
 // ---- taps on the shelf ----
@@ -161,6 +165,19 @@ await kinds[missingAt].click();
 await wait(500);
 said = await page.evaluate(() => window.__said.slice());
 ok('one still to find gives its clue', lines.some(l => said.includes(l.hint)), said.join(' | '));
+const planks = await page.evaluate(() => {
+  const tops = [...document.querySelectorAll('[data-shot="shelf-kind"]')].map(k => Math.round(k.parentElement.getBoundingClientRect().top));
+  return Object.values(tops.reduce((n, t) => ({ ...n, [t]: (n[t] ?? 0) + 1 }), {}));
+});
+ok('six kinds to a plank, three planks', planks.length === 3 && planks.every(n => n === 6), planks.join(', '));
+const shelfLines = await page.evaluate(async () => (await import('/src/apps/reading/engine/squishies.ts')).SHELF_LINES);
+await page.evaluate(() => { window.__said = []; });
+const special = await page.$('button[aria-label="Something special"]');
+ok('the top of the arch is a "?" before the shelf is full', Boolean(special) && (await special.evaluate(b => b.textContent.trim())) === '?');
+await special.click();
+await wait(500);
+said = await page.evaluate(() => window.__said.slice());
+ok('its line says something special will live there', said.includes(shelfLines.top), said.join(' | '));
 
 // ---- an old save ----
 await page.evaluate(key => {
@@ -178,7 +195,33 @@ const saved = await page.evaluate(async () => {
   return storageService.getProgress().stickers;
 });
 const hub = await page.evaluate(() => document.querySelector('[data-shot="hub-tin"]')?.innerText ?? '');
-ok('18 old stickers load as 18 squishies, 8 of 8 kinds', saved.length === 18 && saved.every(s => s.includes(':')) && /8 of 8/.test(hub), `${saved.length}; ${hub.replace(/\s+/g, ' ')}`);
+ok('18 old stickers load as 18 squishies, the same 8 kinds as before', saved.length === 18 && saved.every(s => s.includes(':')) && /8 of 18/.test(hub), `${saved.length}; ${hub.replace(/\s+/g, ' ')}`);
+
+// ---- a full shelf ----
+await page.evaluate(async key => {
+  const { SQUISHY_KINDS } = await import('/src/apps/reading/engine/squishies.ts');
+  const saved = JSON.parse(localStorage.getItem(key));
+  saved.stickers = [...SQUISHY_KINDS.map(k => `${k.kind}:${k.usual}`), 'moon:honey', 'cloud:honey', 'heart:honey', 'cat:honey'];
+  localStorage.setItem(key, JSON.stringify(saved));
+}, KEY);
+await page.reload({ waitUntil: 'networkidle0' });
+await page.click(at('open-reading'));
+await page.waitForSelector(at('hub'));
+await page.click(at('open-shelf'));
+await page.waitForSelector(at('shelf'));
+await wait(400);
+await hookSpeech();
+ok('a full shelf says 18 of 18', (await page.$eval(at('shelf-count'), e => e.textContent.trim())) === '18 of 18');
+const pearl = await page.$('button[aria-label="Pearl Moon"]');
+ok('Pearl Moon sits at the top of a full shelf, drawn', Boolean(pearl) && (await pearl.evaluate(b => Boolean(b.querySelector('svg')))));
+ok('no "?" left at the top', !(await page.$('button[aria-label="Something special"]')));
+await page.evaluate(() => { window.__said = []; });
+await pearl.click();
+await wait(500);
+said = await page.evaluate(() => window.__said.slice());
+ok('she has her own line', said.includes(shelfLines.pearl), said.join(' | '));
+const looks = await page.evaluate(() => Object.fromEntries(['Little Moon', 'Cloud', 'Heart', 'Mochi Cat'].map(n => [n, document.querySelector(`button[aria-label^="${n},"]`)?.getAttribute('aria-label')])));
+ok('a kind found in super rare wears its look', looks['Little Moon'] === 'Little Moon, swirl' && looks.Cloud === 'Cloud, shimmer' && looks.Heart === 'Heart, glow' && looks['Mochi Cat'] === 'Mochi Cat, glow', JSON.stringify(looks));
 
 await browser.close();
 const passed = results.every(Boolean);

@@ -80,7 +80,6 @@ export const GENERAL: Bank = {
 /** Per-game flavour so two games never sound alike. */
 export const PER_GAME: Record<string, Partial<Bank>> = {
   'letter-hunt': {
-    intro: [{ text: 'The letters escaped the jar. Catch every one!', mood: 'oops' }],
     correct: [
       { text: 'Got one! Into the jar it goes.', mood: 'cheer' },
       { text: 'Caught it! Keep looking…', mood: 'happy' }
@@ -88,7 +87,6 @@ export const PER_GAME: Record<string, Partial<Bank>> = {
     missFirst: [{ text: 'Careful — some letters look like twins.', mood: 'think' }]
   },
   'bubble-sounds': {
-    intro: [{ text: 'Bubbles! Pop only the right ones, quick!', mood: 'surprise' }],
     correct: [
       { text: 'POP! Nice one!', mood: 'cheer' },
       { text: 'Ha! Got it before it floated off.', mood: 'cheer' }
@@ -96,7 +94,6 @@ export const PER_GAME: Record<string, Partial<Bank>> = {
     missFirst: [{ text: 'Oops, wrong bubble. Soapy fingers!', mood: 'oops' }]
   },
   'feed-luna': {
-    intro: [{ text: 'I’m hungry! Feed me the matching letter.', mood: 'happy' }],
     correct: [
       { text: 'Crunchy letter. Delicious!', mood: 'cheer' },
       { text: 'Yum! That one tastes like honey.', mood: 'cheer' }
@@ -104,7 +101,6 @@ export const PER_GAME: Record<string, Partial<Bank>> = {
     missFirst: [{ text: 'Bleh! That one is the wrong flavour.', mood: 'oops' }]
   },
   'memory-match': {
-    intro: [{ text: 'I mixed up my cards. Find the pairs!', mood: 'oops' }],
     correct: [
       { text: 'A pair! Put them on my desk.', mood: 'cheer' },
       { text: 'You remembered! I never do.', mood: 'surprise' }
@@ -112,7 +108,6 @@ export const PER_GAME: Record<string, Partial<Bank>> = {
     missFirst: [{ text: 'Not a pair. But now you know where they live.', mood: 'think' }]
   },
   'build-sentence': {
-    intro: [{ text: 'The words fell off the page. Line them up!', mood: 'oops' }],
     correct: [
       { text: 'That sentence sounds just right!', mood: 'cheer' },
       { text: 'Perfect order. Very tidy.', mood: 'happy' }
@@ -120,7 +115,6 @@ export const PER_GAME: Record<string, Partial<Bank>> = {
     missFirst: [{ text: 'Hmm, that reads a little wobbly. Try again.', mood: 'think' }]
   },
   'whats-missing': {
-    intro: [{ text: 'Look hard… I’m about to take something!', mood: 'surprise' }],
     correct: [
       { text: 'You spotted it! Nothing gets past you.', mood: 'cheer' },
       { text: 'Correct! I’ll put it back. Probably.', mood: 'happy' }
@@ -128,7 +122,6 @@ export const PER_GAME: Record<string, Partial<Bank>> = {
     missFirst: [{ text: 'That one is still on the desk. Look again!', mood: 'think' }]
   },
   'treasure-read': {
-    intro: [{ text: 'Read each stone or we’ll never reach the treasure!', mood: 'think' }],
     correct: [
       { text: 'Step forward! The chest is closer.', mood: 'cheer' },
       { text: 'Safe stone! Keep going.', mood: 'happy' }
@@ -136,7 +129,6 @@ export const PER_GAME: Record<string, Partial<Bank>> = {
     missFirst: [{ text: 'Careful, that stone wobbles. Read it again.', mood: 'think' }]
   },
   'story-time': {
-    intro: [{ text: 'Snuggle in. A very short story…', mood: 'happy' }],
     correct: [
       { text: 'You were really reading! I can tell.', mood: 'cheer' },
       { text: 'That’s exactly what happened.', mood: 'happy' }
@@ -213,10 +205,10 @@ export function saysAny(text: string, words: string[]): boolean {
  * an immediate repeat of the previous line, and any line that has one of the
  * `avoid` words: a word the child must find by ear (BUG-27).
  */
-export function lunaSay(kind: keyof typeof GENERAL | 'intro', gameId?: string, avoid: string[] = []): LunaLine {
+export function lunaSay(kind: keyof typeof GENERAL, gameId?: string, avoid: string[] = []): LunaLine {
   const specific = gameId ? PER_GAME[gameId]?.[kind] : undefined;
   const general = GENERAL[kind] ?? GENERAL.happy ?? GENERAL.correct;
-  const pool = [...(specific ?? []), ...(kind === 'intro' ? [] : general ?? [])].filter(l => !saysAny(l.text, avoid));
+  const pool = [...(specific ?? []), ...(general ?? [])].filter(l => !saysAny(l.text, avoid));
   const options = pool.length > 0 ? pool : general;
 
   let line = pick(options);

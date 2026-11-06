@@ -181,6 +181,10 @@ changed screens.
 - Does the grown-up gate hold (SET-1)? `node .claude/skills/know-how/gate-check.mjs 5199`
   (and `--reduced-motion`): a tap or a short hold on the gears or the grade
   opens nothing, a 1.5s hold does.
+- Does all the writing fit, not just what a play deals first?
+  `node .claude/skills/know-how/fit-check.mjs 5199`: every story, sentence and
+  passage alone, at the four iPad sizes (about 45 minutes; `only=` and a size to
+  try one fix).
 - Does a screen fit? `node .claude/skills/know-how/layout-audit.mjs 5199 <grade 0|1|2>`
   (Vite on 5199): nothing scrolls or is cut off mid-round, and no tap target
   outside a game's stage is small, overlapping or in the edge band (DES-10).

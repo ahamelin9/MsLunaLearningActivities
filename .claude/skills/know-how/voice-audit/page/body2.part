@@ -32,6 +32,8 @@
   <nav class="tabs" role="tablist" aria-label="What to listen to">
     <button class="tab" role="tab" data-tab="sounds" aria-selected="true">Letter sounds <span class="count" id="c-sounds"></span></button>
     <button class="tab" role="tab" data-tab="words" aria-selected="false">Names and words <span class="count" id="c-words"></span></button>
+    <button class="tab" role="tab" data-tab="research" aria-selected="false">Research run <span class="count" id="c-research"></span></button>
+    <button class="tab" role="tab" data-tab="refs" aria-selected="false">Reference sounds <span class="count" id="c-refs"></span></button>
     <button class="tab" role="tab" data-tab="r1" aria-selected="false">Round 1 results</button>
     <button class="tab" role="tab" data-tab="plan" aria-selected="false">The plan</button>
     <span class="status" id="status" role="status">Loading the clips…</span>
@@ -42,6 +44,22 @@
     <div class="group"><h3>Letter names you marked "both wrong"</h3><div id="names" class="group"></div></div>
     <div class="group"><h3>Words you marked "both wrong"</h3><p class="how">Plus "sheep" and "stops", which start with a stray sound.</p><div id="words" class="group"></div></div>
   </section>
+  <section id="p-research" role="tabpanel" hidden>
+    <div class="verdict"><h2>From the research run (28 October)</h2><p>Research only: nothing in the app changed. The full notes are in the repo at <code>docs/voice/research-2026-10-28.md</code>, and the per-sound standard at <code>docs/voice/sound-standard.md</code>. These are the experiments worth your ear before round 3. Pick the best in each, or None.</p></div>
+    <div id="research"></div>
+  </section>
+  <section id="p-refs" role="tabpanel" hidden>
+    <p class="how">Before I measure Luna against anything, check the reference. Each card has Luna's best take so far and a link to Wikimedia's free recording of the same sound (it opens in a new tab; press play there). Then tell me: is the Wikimedia one how a teacher would say it to a kindergartner?</p>
+    <div class="verdict"><h3>What these recordings are</h3><ul>
+      <li><b>Consonants:</b> one man, a phonetician raised in Sweden, recorded for Wikipedia's articles on speech sounds. Most are said on their own and then between two "a"s ("sa, asa"), not as a teacher's "sss".</li>
+      <li><b>Vowels:</b> another speaker, saying textbook IPA vowels. They're close to American short vowels, but long A, long I, long O and OY are two-part vowels in American English, and Wikimedia only has the single sound they start from.</li>
+      <li><b>Free to use</b> (CC BY-SA), so I may measure them, but they'd never go in the app.</li></ul></div>
+    <div id="refs" class="group"></div>
+    <div class="verdict"><h3>Other places to listen (for your ear; I can't use their audio)</h3><ul>
+      <li><a href="https://home.oxfordowl.co.uk/phonics-videos/" target="_blank" rel="noopener">Oxford Owl: How to pronounce pure sounds</a>. A teacher saying all 44 sounds the phonics way, no "uh". British, so OR, AR, ER and short O differ from American.</li>
+      <li><a href="https://ufli.education.ufl.edu/foundations/printable-resources" target="_blank" rel="noopener">UFLI Foundations sound wall</a>. American (University of Florida): a mouth picture and how to make each sound. Pictures, no audio.</li>
+      <li>Sounds of Speech, the University of Iowa's app (iPad, a few dollars): American English, a video of a speaker and an animation for every sound.</li></ul></div>
+  </section>
   <section id="p-r1" role="tabpanel" hidden><div class="r1" id="r1"></div></section>
   <section id="p-plan" role="tabpanel" hidden><div class="plan" id="plan"></div></section>
 </div>
@@ -49,6 +67,31 @@
 <script>
 const META = /*META*/null;
 const R1_HTML = /*R1*/'';
+const BEST = /*BEST*/null;
+const RESEARCH = /*RESEARCH*/null;
+const REFS = [
+  ['Short vowels', [['a', '/ă/ as in apple', 'Near-open front unrounded vowel.ogg', ''], ['e', '/ĕ/ as in egg', 'Open-mid front unrounded vowel.ogg', ''], ['i', '/ĭ/ as in igloo', 'Near-close near-front unrounded vowel.ogg', ''], ['o', '/ŏ/ as in ox', 'Open back unrounded vowel.ogg', ''], ['u', '/ŭ/ as in umbrella', 'Open-mid back unrounded vowel.ogg', '']]],
+  ['Long vowels', [['ee', '/ē/ as in tree', 'Close front unrounded vowel.ogg', ''], ['oo', '/oo/ as in moon', 'Close back rounded vowel.ogg', ''], ['ay', '/ā/ as in cake', 'Close-mid front unrounded vowel.ogg', 'only the start of American long A'], ['oh', '/ō/ as in bone', 'Close-mid back rounded vowel.ogg', 'only the start of American long O'], ['er', '/er/ as in her', 'Open-mid central unrounded vowel.ogg', 'no R in it: British-style']]],
+  ['Stops', [['b', '/b/', 'Voiced bilabial plosive.ogg', ''], ['d', '/d/', 'Voiced alveolar plosive.ogg', ''], ['g', '/g/', 'Voiced velar plosive 02.ogg', ''], ['p', '/p/', 'Voiceless bilabial plosive.ogg', ''], ['t', '/t/', 'Voiceless alveolar plosive.ogg', ''], ['k', '/k/', 'Voiceless velar plosive.ogg', '']]],
+  ['Hisses and buzzes', [['f', '/f/', 'Voiceless labiodental fricative.ogg', 'said between two a’s'], ['v', '/v/', 'Voiced labiodental fricative.ogg', ''], ['th', '/th/ as in thumb', 'Voiceless dental fricative.ogg', ''], ['dh', '/th/ as in this', 'Voiced dental fricative.ogg', ''], ['s', '/s/', 'Voiceless alveolar sibilant.ogg', ''], ['z', '/z/', 'Voiced alveolar sibilant.ogg', ''], ['sh', '/sh/', 'Voiceless palato-alveolar sibilant.ogg', ''], ['h', '/h/', 'Voiceless glottal fricative.ogg', '']]],
+  ['Hums, glides, J and CH', [['m', '/m/', 'Bilabial nasal.ogg', ''], ['n', '/n/', 'Alveolar nasal.ogg', ''], ['ng', '/ng/', 'Velar nasal.ogg', ''], ['l', '/l/', 'Alveolar lateral approximant.ogg', ''], ['r', '/r/', 'Alveolar approximant.ogg', ''], ['w', '/w/', 'Voiced labio-velar approximant.ogg', ''], ['y', '/y/', 'Palatal approximant.ogg', ''], ['ch', '/ch/', 'Voiceless palato-alveolar affricate.ogg', ''], ['j', '/j/', 'Voiced palato-alveolar affricate.ogg', '']]]
+];
+function refCard([s, title, file, caveat]) {
+  const b = BEST[s]; const item = `ref:${s}`;
+  const url = 'https://commons.wikimedia.org/wiki/File:' + encodeURIComponent(file.replace(/ /g, '_'));
+  return `<article class="card" data-item="${item}">
+    <div class="card-head"><span class="sym">${esc(title)}</span>${caveat ? `<span class="letters">${esc(caveat)}</span>` : ''}</div>
+    <div class="row">
+      ${b ? `<button class="play" data-clip="${esc(b.clip)}" aria-label="Play Luna's ${esc(title)}">${PLAY}</button><span class="label">Luna<small>${esc(b.label)}</small></span>` : ''}
+      <a class="chip" href="${url}" target="_blank" rel="noopener">Hear it on Wikimedia ↗</a>
+    </div>
+    <div class="row"><span class="letters">Is the Wikimedia one how a teacher says it?</span>
+      <button class="chip" data-item="${item}" data-choice="yes" aria-pressed="false">Yes</button>
+      <button class="chip" data-item="${item}" data-choice="close" aria-pressed="false">Close</button>
+      <button class="chip none" data-item="${item}" data-choice="no" aria-pressed="false">No</button></div>
+    <textarea class="note" id="note-${esc(item)}" data-item="${item}" rows="1" placeholder="Note (optional)"></textarea>
+  </article>`;
+}
 const PLAN_HTML = /*PLAN*/'';
 const PLAY = '<svg viewBox="0 0 20 20" aria-hidden="true"><path fill="currentColor" d="M5 3.5v13a1 1 0 0 0 1.5.86l11-6.5a1 1 0 0 0 0-1.72l-11-6.5A1 1 0 0 0 5 3.5z"/></svg>';
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -83,9 +126,10 @@ let current = null, currentBtn = null;
 function clip(id) {
   if (!AUDIO || !AUDIO[id]) return null;
   if (!urls.has(id)) {
-    const bin = atob(AUDIO[id]); const u8 = new Uint8Array(bin.length);
+    const raw = AUDIO[id]; const wav = raw.startsWith('WAV:');
+    const bin = atob(wav ? raw.slice(4) : raw); const u8 = new Uint8Array(bin.length);
     for (let i = 0; i < bin.length; i += 1) u8[i] = bin.charCodeAt(i);
-    urls.set(id, URL.createObjectURL(new Blob([u8], { type: 'audio/mp4' })));
+    urls.set(id, URL.createObjectURL(new Blob([u8], { type: wav ? 'audio/wav' : 'audio/mp4' })));
   }
   return urls.get(id);
 }
@@ -141,6 +185,8 @@ function build() {
   const NAME_TEXT = { CH: 'C H' };
   document.getElementById('names').innerHTML = META.nameCards.map(c => card({ item: c.item, title: NAME_TEXT[c.name] || c.name, sub: 'letter name', r1note: c.note, takes: c.takes, prefix: 'n2', id: c.name })).join('');
   document.getElementById('words').innerHTML = META.wordCards.map(c => card({ item: c.item, title: c.word, sub: 'word', r1note: c.note, takes: c.takes, prefix: 'w2', id: c.word })).join('');
+  document.getElementById('research').innerHTML = RESEARCH.map(g => `<div class="group"><h3>${esc(g.title)}</h3><p class="how">${g.how}</p>${g.cards.map(c => card({ item: c.item, title: c.title, sub: c.sub, r1note: '', takes: c.takes, prefix: c.prefix, id: c.id })).join('')}</div>`).join('');
+  document.getElementById('refs').innerHTML = REFS.map(([t, list]) => `<div class="group"><h3>${esc(t)}</h3>${list.map(refCard).join('')}</div>`).join('');
   document.getElementById('r1').innerHTML = R1_HTML;
   document.getElementById('plan').innerHTML = PLAN_HTML;
   for (const [item, p] of Object.entries(picks)) paint(item, p);
@@ -156,6 +202,8 @@ function paint(item, p) {
 function counts() {
   const n = pre => Object.entries(picks).filter(([k, p]) => pre.some(x => k.startsWith(x)) && p.choice).length;
   document.getElementById('c-sounds').textContent = `${n(['s2:'])}/${META.cards.length}`;
+  document.getElementById('c-research').textContent = `${n(['rx:'])}/${RESEARCH.reduce((a, g) => a + g.cards.length, 0)}`;
+  document.getElementById('c-refs').textContent = `${n(['ref:'])}/${REFS.reduce((a, [, l]) => a + l.length, 0)}`;
   document.getElementById('c-words').textContent = `${n(['n2:', 'w2:'])}/${META.nameCards.length + META.wordCards.length}`;
 }
 document.addEventListener('click', e => {

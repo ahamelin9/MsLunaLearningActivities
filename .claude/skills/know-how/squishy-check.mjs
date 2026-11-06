@@ -65,6 +65,9 @@ ok('the shelf fills before a kind repeats', S.kindsFound(owned) === S.SQUISHY_KI
 const OLD = ['magnifier', 'jar', 'bubble', 'cookie', 'cards', 'quill', 'lamp', 'headphones', 'chest', 'basket', 'book', 'moon', 'star', 'leaf', 'cat', 'rainbow', 'cupcake', 'crown'];
 const up = S.upgradeStickers(OLD);
 ok('an old save\'s 18 stickers become 18 different squishies', up.length === 18 && new Set(up).size === 18 && up.every(id => S.parseSquishy(id)), `${up.length}`);
+ok('and the same 8 kinds as before PRG-5b, so its shelf isn\'t suddenly full', S.kindsFound(up) === 8, `${S.kindsFound(up)} kinds`);
+ok('18 kinds, each with its look', S.SQUISHY_KINDS.length === 18 && S.SQUISHY_KINDS.every(k => S.nextSquishy([], k.kind, () => 0).look), `${S.SQUISHY_KINDS.length}`);
+ok('a super-rare award says its look', S.nextSquishy([], 'heart', () => 0).look === 'glow' && S.nextSquishy([], 'heart', () => 0).rarity === 'super-rare');
 const mixed = S.upgradeStickers(['jar', 'cat:caramel', 'cookie', 'bear:toffee']);
 ok('a save mixing old and new keeps every one', mixed.length === 4 && new Set(mixed).size === 4, mixed.join(', '));
 ok('the count is kinds found', S.kindsFound(['cat:caramel', 'cat:butter', 'bear:toffee']) === 2);

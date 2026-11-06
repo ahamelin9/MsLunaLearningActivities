@@ -14,8 +14,9 @@
 // The boards are rebuilt from gen.py into a temporary folder (project/ is left
 // alone), and the tokens are compiled from src/styles/tokens/ with
 // sass-embedded. Left out on purpose, and listed in the report: the viewer's
-// own chrome (nav bars, zoom), the Luna options the teacher didn't pick, and
-// the seed colour of the dropped seeds-to-flowers progress.
+// own chrome (nav bars, zoom), the Luna options the teacher didn't pick, the
+// seed colour of the dropped seeds-to-flowers progress, and the Pearl Moon's
+// two ovals, which Alex took off her (2026-10-20).
 //
 // --drop <token> forgets one token, to prove the check fails without it.
 // Exits 1 on any gap.
@@ -31,6 +32,9 @@ const HERE = dirname(fileURLToPath(import.meta.url));
 const root = resolve(process.argv[2] ?? process.cwd());
 const dropAt = process.argv.indexOf('--drop');
 const dropped = dropAt === -1 ? null : process.argv[dropAt + 1];
+
+/** Drawn on a board, then taken off by a later decision. */
+const TAKEN_OFF = ['#E3DAF0', '#D6E8EE']; // the Pearl Moon's lilac and mist ovals
 
 /** Prototype colour name → app token (null: left out on purpose). */
 const MAP = {
@@ -171,6 +175,7 @@ const snapped = [];
 const snaps = new Map(Object.entries(SNAPPED).map(([text, token]) => [norm(text), { text, token }]));
 for (const [c, { text, where }] of drawn) {
   const snap = snaps.get(c);
+  if (TAKEN_OFF.some(off => norm(off) === c)) continue;
   if (holders.get(c)) covered.push(c);
   else if (snap && tokens.light.has(snap.token)) { covered.push(c); snapped.push(`${snap.text} → --${snap.token}`); }
   else problems.push(`${text} has no role or --illo-* entry (${where})`);
@@ -179,7 +184,7 @@ for (const [c, { text, where }] of drawn) {
 console.log(`Prototype colour names: ${mapped} map to a token with the same light and dark value.`);
 console.log(`Colours drawn on the ${boards.length} boards: ${covered.length} of ${drawn.size} have a role or an --illo-* entry.`);
 if (snapped.length) console.log(`Snapped: ${snapped.join(', ')}.`);
-console.log(`Left out on purpose: ${left.join(', ')} (dropped progress); Luna options ${UNPICKED_LUNAS.join(', ')} (not picked); the viewer's nav and zoom.`);
+console.log(`Left out on purpose: ${left.join(', ')} (dropped progress); Luna options ${UNPICKED_LUNAS.join(', ')} (not picked); ${TAKEN_OFF.join(', ')} (the Pearl Moon's ovals, taken off); the viewer's nav and zoom.`);
 if (dropped) console.log(`(--drop ${dropped}: that token was ignored)`);
 if (problems.length) {
   console.log(`\n❌ ${problems.length} gap(s):`);

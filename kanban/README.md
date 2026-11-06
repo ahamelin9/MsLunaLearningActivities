@@ -10,7 +10,7 @@ tickets.
 - **`epics/<EPIC>.md`**: one file per epic, with its goal and every ticket's full section (Why / How / Complete when). A ticket never moves files when its status changes.
 - **`CHANGELOG.md`**: finished and dropped tickets. Once a ticket is deleted, its changelog line is its only record.
 
-**Last updated:** 2026-10-28
+**Last updated:** 2026-11-06
 
 ## How to read this
 
@@ -72,8 +72,8 @@ be pulled into Phase 1 for a break from styling.
 
 ### Now / Next
 
-- **Now:** the VOX epic, ahead of everything (Alex, 2026-10-28): VOX-1 once Alex's picks are in on the Sound Check page, with VOX-4 alongside it.
-- **Next:** VOX-2, then VOX-3. Then PRG-5b's sample sheet as an artifact, Pearl Moon first (Alex wants to see it before it's built); CNT-2 (six calls for Alex on the ticket), then CUR-4 and GAME-5; DES-27's 100 pictures after his notes on the first sample; the rest of PRG-5b once its sheet is OKed. The Writing app (WRT) after Phase 7. OPS-11 stays parked.
+- **Now:** much more content and variety, and lessons practiced until they're learned, with as little of his input as possible (Alex, 2026-11-06): GAME-8, CNT-2, CUR-6, CNT-5, CUR-4a, CUR-4b, CUR-4c, GAME-5 and GAME-9 are built and wait for his read-through and OK (`screenshots/review/HANDOVER.md`). Meanwhile, the small jobs that need nothing from him: OPS-2, OPS-1, OPS-7. CUR-7 once he's picked how the library folds.
+- **Next:** the VOX epic, set aside for later (Alex, 2026-11-06): VOX-1 once his picks are in on the Sound Check page, with VOX-4 alongside it; VOX-5 (the Luna/Kore blend for single words; his call first: lines too?), then VOX-2, then VOX-3. DES-27's pictures after his notes on the first sample; PRG-5b once he and the teacher have OKed its sample sheet. The Writing app (WRT) after Phase 7. OPS-11 stays parked.
 
 ## Epics
 
@@ -97,6 +97,7 @@ In board order. A new epic gets its file in `epics/` first, then a link here
 |---|---|---|---|---|---|
 | **VOX** | **Luna's voice: letter sounds and words** | Epic | **P0** | | |
 | VOX-1 | Letter sounds retuned by ear | Story | P0 | M | Todo |
+| VOX-5 | Single words in a blend of Luna and Kore | Story | P1 | M | Todo |
 | VOX-2 | Words said alone end cleanly | Story | P1 | S | Todo |
 | VOX-4 | A sound check that can fail | Task | P1 | S | Todo |
 | VOX-3 | Words and lines in Kokoro's own phoneme spelling, as far as it helps | Story | P2 | M | Todo |
@@ -106,19 +107,26 @@ In board order. A new epic gets its file in `epics/` first, then a link here
 | **LVL** | **Difficulty** | Epic | **P0** | | |
 | LVL-3 | Adaptive difficulty from skill mastery | Story | P2 | L | Todo |
 | **CNT** | **One content model** | Epic | **P1** | | |
-| CNT-2 | Lessons draw their words from the content bank | Story | P1 | M | Todo |
+| CNT-2 | Lessons draw their words from the content bank | Story | P1 | M | Blocked |
+| CNT-5 | The word bank grows | Story | P1 | M | Blocked |
 | **GAME** | **Games to standard** | Epic | **P1** | | |
-| GAME-5 | Words Off the Page: bigger sentence pool | Story | P2 | S | Todo |
+| GAME-8 | Every game deals something new until it has dealt everything | Story | P1 | S | Blocked |
+| GAME-9 | Treasure Path and Story Corner: far more to read | Story | P1 | M | Blocked |
+| GAME-5 | Words Off the Page: bigger sentence pool | Story | P2 | S | Blocked |
 | **CUR** | **Curriculum** | Epic | **P1** | | |
-| CUR-4 | Expand the curriculum per grade | Story | P1 | L | Todo |
+| CUR-6 | A lesson is practiced until it's learned | Story | P1 | M | Blocked |
+| CUR-4a | Kindergarten's lessons: 6 become 19 | Story | P1 | M | Blocked |
+| CUR-4b | 1st grade's lessons: 3 become 18 | Story | P1 | M | Blocked |
+| CUR-4c | 2nd grade's lessons: 3 become 18 | Story | P1 | M | Blocked |
+| CUR-7 | The library stays short with 19 lessons | Story | P2 | S | Todo |
 | **PRG** | **Progress & rewards** | Epic | **P1** | | |
-| PRG-5b | More squishies: kinds, colours and super-rare looks | Story | P2 | M | Todo |
+| PRG-5b | More squishies: kinds, colours and super-rare looks | Story | P2 | M | In progress |
 | **WRT** | **Writing & grammar app** | Epic | **P1** | | |
 | WRT-1 | Writing app on the home screen | Story | P1 | M | Todo |
 | WRT-2 | Punctuation game: where does the mark go? | Story | P1 | L | Todo |
 | **OPS** | **Housekeeping** | Epic | **P2** | | |
-| OPS-1 | Delete dead code | Task | P2 | S | Todo |
-| OPS-2 | README and stale copy | Task | P2 | S | Todo |
-| OPS-7 | Drop Treasure Path's leftovers from the sentence bank | Task | P2 | S | Todo |
-| OPS-8 | Retarget the backlog guard check's two stale cases | Task | P2 | S | Todo |
+| OPS-1 | Delete dead code | Task | P2 | S | Blocked |
+| OPS-2 | README and stale copy | Task | P2 | S | Blocked |
+| OPS-7 | Drop Treasure Path's leftovers from the sentence bank | Task | P2 | S | Blocked |
+| OPS-8 | Retarget the backlog guard check's two stale cases | Task | P2 | S | Blocked |
 | OPS-11 | A first cloud session (parked) | Task | P2 | M | Todo |

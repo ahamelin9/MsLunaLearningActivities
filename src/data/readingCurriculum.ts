@@ -1,4 +1,17 @@
-import type { GradeInfo, GradeLevel, ReadingSkill } from '../types/reading';
+import type { GradeInfo, GradeLevel, Lesson, ReadingSkill } from '../types/reading';
+import { phraseChoice, pictureChoice, pictureOf, rhymeChoice } from './lessonChoices';
+import {
+  K_HUNT_2, K_HUNT_3, K_MORE_ROUNDS, K_RHYME_2, K_SHORT_A, K_SHORT_E_U, K_SHORT_I_O, K_SIGHT_2, K_SIGHT_3, K_SIGHT_4,
+  K_SOUNDS_2, K_SOUNDS_3, K_SOUNDS_4, K_SOUNDS_5
+} from './lessons/kindergarten';
+import {
+  G1_L_BLENDS, G1_MAGIC_A, G1_MAGIC_I_O, G1_MORE_ROUNDS, G1_R_BLENDS, G1_RHYMES, G1_S_BLENDS, G1_SENTENCES_2, G1_SENTENCES_3,
+  G1_SH_CH, G1_SIGHT_1, G1_SIGHT_2, G1_SIGHT_3, G1_STORIES_1, G1_STORIES_2, G1_TH_WH
+} from './lessons/grade1';
+import {
+  G2_AI_AY, G2_AR, G2_COMPOUNDS_2, G2_EE_EA, G2_ER_IR_UR, G2_IGH, G2_MORE_ROUNDS, G2_OA_OW, G2_OO, G2_OR, G2_OU_OW,
+  G2_SIGHT_1, G2_SIGHT_2, G2_SIGHT_3, G2_STORIES_2, G2_STORIES_3
+} from './lessons/grade2';
 
 export const GRADES: GradeInfo[] = [
   { id: 'kindergarten', title: 'Kindergarten' },
@@ -6,7 +19,7 @@ export const GRADES: GradeInfo[] = [
   { id: 'grade2', title: '2nd Grade' }
 ];
 
-export const READING_CURRICULUM: Record<GradeLevel, ReadingSkill[]> = {
+const FIRST_LESSONS: Record<GradeLevel, ReadingSkill[]> = {
   kindergarten: [
     {
       id: 'k-match-sounds',
@@ -87,7 +100,8 @@ export const READING_CURRICULUM: Record<GradeLevel, ReadingSkill[]> = {
                 { id: 'opt-l', letter: 'L', isCorrect: false },
                 { id: 'opt-m', letter: 'M', isCorrect: false }
               ]
-            }
+            },
+            ...K_MORE_ROUNDS['k-ms-m-s-b-t']
           ]
         }
       ]
@@ -149,7 +163,8 @@ export const READING_CURRICULUM: Record<GradeLevel, ReadingSkill[]> = {
                 { id: 'opt-s', letter: 'S', isCorrect: true },
                 { id: 'opt-g', letter: 'G', isCorrect: false }
               ]
-            }
+            },
+            ...K_MORE_ROUNDS['k-lh-easy']
           ]
         }
       ]
@@ -165,7 +180,7 @@ export const READING_CURRICULUM: Record<GradeLevel, ReadingSkill[]> = {
           skillId: 'k-blend-words',
           grade: 'kindergarten',
           title: 'Pet & Animal Words',
-          description: 'Sound out and read cat, pig, and dog!',
+          description: 'Sound out and read animal words!',
           icon: '🐱',
           difficulty: 1,
           starsToEarn: 3,
@@ -183,9 +198,9 @@ export const READING_CURRICULUM: Record<GradeLevel, ReadingSkill[]> = {
               ],
               hint: 'It’s a furry pet that purrs!',
               options: [
-                { id: 'opt-cat', text: 'Cat', imageEmoji: '🐱', isCorrect: true },
-                { id: 'opt-cap', text: 'Cap', imageEmoji: '🧢', isCorrect: false },
-                { id: 'opt-pig', text: 'Pig', imageEmoji: '🐷', isCorrect: false }
+                pictureChoice('cat', true),
+                pictureChoice('cap', false),
+                pictureChoice('pig', false)
               ]
             },
             {
@@ -201,9 +216,9 @@ export const READING_CURRICULUM: Record<GradeLevel, ReadingSkill[]> = {
               ],
               hint: 'An oinking farm friend!',
               options: [
-                { id: 'opt-pen', text: 'Pen', imageEmoji: '🖊️', isCorrect: false },
-                { id: 'opt-pig', text: 'Pig', imageEmoji: '🐷', isCorrect: true },
-                { id: 'opt-dog', text: 'Dog', imageEmoji: '🐶', isCorrect: false }
+                pictureChoice('pen', false),
+                pictureChoice('pig', true),
+                pictureChoice('dog', false)
               ]
             },
             {
@@ -219,11 +234,12 @@ export const READING_CURRICULUM: Record<GradeLevel, ReadingSkill[]> = {
               ],
               hint: 'A puppy that barks woof!',
               options: [
-                { id: 'opt-dog', text: 'Dog', imageEmoji: '🐶', isCorrect: true },
-                { id: 'opt-fox', text: 'Fox', imageEmoji: '🦊', isCorrect: false },
-                { id: 'opt-duck', text: 'Duck', imageEmoji: '🦆', isCorrect: false }
+                pictureChoice('dog', true),
+                pictureChoice('fox', false),
+                pictureChoice('duck', false)
               ]
-            }
+            },
+            ...K_MORE_ROUNDS['k-bw-animals']
           ]
         },
         {
@@ -251,10 +267,10 @@ export const READING_CURRICULUM: Record<GradeLevel, ReadingSkill[]> = {
               ],
               hint: 'It shines warm and bright up in the sky!',
               options: [
-                { id: 'opt-sun', text: 'Sun', imageEmoji: '☀️', isCorrect: true },
-                { id: 'opt-moon', text: 'Moon', imageEmoji: '🌙', isCorrect: false },
-                { id: 'opt-sock', text: 'Sock', imageEmoji: '🧦', isCorrect: false },
-                { id: 'opt-bug', text: 'Bug', imageEmoji: '🐛', isCorrect: false }
+                pictureChoice('sun', true),
+                pictureChoice('moon', false),
+                pictureChoice('sock', false),
+                pictureChoice('bug', false)
               ]
             },
             {
@@ -270,10 +286,10 @@ export const READING_CURRICULUM: Record<GradeLevel, ReadingSkill[]> = {
               ],
               hint: 'Where you sleep with a cozy pillow!',
               options: [
-                { id: 'opt-bed', text: 'Bed', imageEmoji: '🛏️', isCorrect: true },
-                { id: 'opt-bug', text: 'Bug', imageEmoji: '🐛', isCorrect: false },
-                { id: 'opt-cup', text: 'Cup', imageEmoji: '🥤', isCorrect: false },
-                { id: 'opt-hen', text: 'Hen', imageEmoji: '🐔', isCorrect: false }
+                pictureChoice('bed', true),
+                pictureChoice('bug', false),
+                pictureChoice('cup', false),
+                pictureChoice('hen', false)
               ]
             },
             {
@@ -289,12 +305,13 @@ export const READING_CURRICULUM: Record<GradeLevel, ReadingSkill[]> = {
               ],
               hint: 'Used to drink warm milk or cold juice!',
               options: [
-                { id: 'opt-cup', text: 'Cup', imageEmoji: '🥤', isCorrect: true },
-                { id: 'opt-cap', text: 'Cap', imageEmoji: '🧢', isCorrect: false },
-                { id: 'opt-box', text: 'Box', imageEmoji: '📦', isCorrect: false },
-                { id: 'opt-pup', text: 'Pup', imageEmoji: '🐕', isCorrect: false }
+                pictureChoice('cup', true),
+                pictureChoice('cap', false),
+                pictureChoice('box', false),
+                pictureChoice('pup', false)
               ]
-            }
+            },
+            ...K_MORE_ROUNDS['k-bw-everyday']
           ]
         }
       ]
@@ -392,7 +409,8 @@ export const READING_CURRICULUM: Record<GradeLevel, ReadingSkill[]> = {
                 { id: 'opt-a', word: 'a', isCorrect: true },
                 { id: 'opt-an', word: 'an', isCorrect: false }
               ]
-            }
+            },
+            ...K_MORE_ROUNDS['k-sw-starter']
           ]
         }
       ]
@@ -408,7 +426,7 @@ export const READING_CURRICULUM: Record<GradeLevel, ReadingSkill[]> = {
           skillId: 'k-rhyming',
           grade: 'kindergarten',
           title: 'Rhyme Matcher',
-          description: 'Find rhyming words for cat, sun, and fox.',
+          description: 'Find the pictures that rhyme.',
           icon: '🎩',
           difficulty: 1,
           starsToEarn: 3,
@@ -418,13 +436,13 @@ export const READING_CURRICULUM: Record<GradeLevel, ReadingSkill[]> = {
               type: 'rhyme-match',
               prompt: 'Which word rhymes with CAT?',
               speechPrompt: 'Cat! Which picture rhymes with cat?',
-              targetWord: 'CAT',
-              targetEmoji: '🐱',
+              targetWord: 'cat',
+              targetEmoji: pictureOf('cat'),
               hint: 'Say each picture out loud: dog, hat, sun. Which one ends just like cat?',
               options: [
-                { word: 'HAT', emoji: '🎩', isRhyme: true },
-                { word: 'DOG', emoji: '🐶', isRhyme: false },
-                { word: 'SUN', emoji: '☀️', isRhyme: false }
+                rhymeChoice('hat', true),
+                rhymeChoice('dog', false),
+                rhymeChoice('sun', false)
               ]
             },
             {
@@ -432,13 +450,13 @@ export const READING_CURRICULUM: Record<GradeLevel, ReadingSkill[]> = {
               type: 'rhyme-match',
               prompt: 'Which word rhymes with SUN?',
               speechPrompt: 'Sun! Which picture rhymes with sun?',
-              targetWord: 'SUN',
-              targetEmoji: '☀️',
+              targetWord: 'sun',
+              targetEmoji: pictureOf('sun'),
               hint: 'Say each picture out loud: pig, car, run. Which one ends just like sun?',
               options: [
-                { word: 'RUN', emoji: '🏃', isRhyme: true },
-                { word: 'PIG', emoji: '🐷', isRhyme: false },
-                { word: 'CAR', emoji: '🚗', isRhyme: false }
+                rhymeChoice('run', true),
+                rhymeChoice('pig', false),
+                rhymeChoice('car', false)
               ]
             },
             {
@@ -446,15 +464,16 @@ export const READING_CURRICULUM: Record<GradeLevel, ReadingSkill[]> = {
               type: 'rhyme-match',
               prompt: 'Which word rhymes with FOX?',
               speechPrompt: 'Fox! Which picture rhymes with fox?',
-              targetWord: 'FOX',
-              targetEmoji: '🦊',
+              targetWord: 'fox',
+              targetEmoji: pictureOf('fox'),
               hint: 'Say each picture out loud: ball, box, bird. Which one ends just like fox?',
               options: [
-                { word: 'BOX', emoji: '📦', isRhyme: true },
-                { word: 'BALL', emoji: '⚽', isRhyme: false },
-                { word: 'BIRD', emoji: '🐦', isRhyme: false }
+                rhymeChoice('box', true),
+                rhymeChoice('ball', false),
+                rhymeChoice('bird', false)
               ]
-            }
+            },
+            ...K_MORE_ROUNDS['k-rh-pairs']
           ]
         }
       ]
@@ -473,7 +492,7 @@ export const READING_CURRICULUM: Record<GradeLevel, ReadingSkill[]> = {
           skillId: 'g1-digraphs',
           grade: 'grade1',
           title: 'Ship, Frog & Star',
-          description: 'Sound out and decode ship, frog, and star!',
+          description: 'Sound out words with letter teams and blends!',
           icon: '🚢',
           difficulty: 1,
           starsToEarn: 3,
@@ -491,9 +510,9 @@ export const READING_CURRICULUM: Record<GradeLevel, ReadingSkill[]> = {
               ],
               hint: 'A large boat that sails on the ocean!',
               options: [
-                { id: 'opt-ship', text: 'Ship', imageEmoji: '🚢', isCorrect: true },
-                { id: 'opt-shell', text: 'Shell', imageEmoji: '🐚', isCorrect: false },
-                { id: 'opt-plane', text: 'Plane', imageEmoji: '✈️', isCorrect: false }
+                pictureChoice('ship', true),
+                pictureChoice('shell', false),
+                pictureChoice('plane', false)
               ]
             },
             {
@@ -509,9 +528,9 @@ export const READING_CURRICULUM: Record<GradeLevel, ReadingSkill[]> = {
               ],
               hint: 'A green hopper that ribbits near the pond!',
               options: [
-                { id: 'opt-frog', text: 'Frog', imageEmoji: '🐸', isCorrect: true },
-                { id: 'opt-duck', text: 'Duck', imageEmoji: '🦆', isCorrect: false },
-                { id: 'opt-fish', text: 'Fish', imageEmoji: '🐟', isCorrect: false }
+                pictureChoice('frog', true),
+                pictureChoice('duck', false),
+                pictureChoice('fish', false)
               ]
             },
             {
@@ -526,11 +545,12 @@ export const READING_CURRICULUM: Record<GradeLevel, ReadingSkill[]> = {
               ],
               hint: 'It shines gold in the night sky!',
               options: [
-                { id: 'opt-star', text: 'Star', imageEmoji: '⭐', isCorrect: true },
-                { id: 'opt-cloud', text: 'Cloud', imageEmoji: '☁️', isCorrect: false },
-                { id: 'opt-sun', text: 'Sun', imageEmoji: '☀️', isCorrect: false }
+                pictureChoice('star', true),
+                pictureChoice('cloud', false),
+                pictureChoice('sun', false)
               ]
-            }
+            },
+            ...G1_MORE_ROUNDS['g1-ph-digraphs']
           ]
         }
       ]
@@ -559,9 +579,9 @@ export const READING_CURRICULUM: Record<GradeLevel, ReadingSkill[]> = {
               word: 'cake',
               hint: 'A sweet birthday treat with frosting and candles!',
               options: [
-                { id: 'opt-cake', text: 'Cake', imageEmoji: '🎂', isCorrect: true },
-                { id: 'opt-cup', text: 'Cup', imageEmoji: '🥤', isCorrect: false },
-                { id: 'opt-cookie', text: 'Cookie', imageEmoji: '🍪', isCorrect: false }
+                pictureChoice('cake', true),
+                pictureChoice('cup', false),
+                pictureChoice('cookie', false)
               ]
             },
             {
@@ -572,9 +592,9 @@ export const READING_CURRICULUM: Record<GradeLevel, ReadingSkill[]> = {
               word: 'kite',
               hint: 'Flies high in the wind on a string!',
               options: [
-                { id: 'opt-kite', text: 'Kite', imageEmoji: '🪁', isCorrect: true },
-                { id: 'opt-balloon', text: 'Balloon', imageEmoji: '🎈', isCorrect: false },
-                { id: 'opt-key', text: 'Key', imageEmoji: '🔑', isCorrect: false }
+                pictureChoice('kite', true),
+                pictureChoice('balloon', false),
+                pictureChoice('key', false)
               ]
             },
             {
@@ -585,11 +605,12 @@ export const READING_CURRICULUM: Record<GradeLevel, ReadingSkill[]> = {
               word: 'bone',
               hint: 'A puppy’s favorite chew toy!',
               options: [
-                { id: 'opt-bone', text: 'Bone', imageEmoji: '🦴', isCorrect: true },
-                { id: 'opt-ball', text: 'Ball', imageEmoji: '⚽', isCorrect: false },
-                { id: 'opt-bowl', text: 'Bowl', imageEmoji: '🥣', isCorrect: false }
+                pictureChoice('bone', true),
+                pictureChoice('ball', false),
+                pictureChoice('bowl', false)
               ]
-            }
+            },
+            ...G1_MORE_ROUNDS['g1-bw-magic-e']
           ]
         }
       ]
@@ -605,7 +626,7 @@ export const READING_CURRICULUM: Record<GradeLevel, ReadingSkill[]> = {
           skillId: 'g1-sentences',
           grade: 'grade1',
           title: 'Animal Action Sentences',
-          description: 'Read sentences about hopping frogs and playful cats.',
+          description: 'Read sentences about what animals do.',
           icon: '🐾',
           difficulty: 2,
           starsToEarn: 3,
@@ -618,9 +639,9 @@ export const READING_CURRICULUM: Record<GradeLevel, ReadingSkill[]> = {
               sentence: 'The green frog jumps high.',
               hint: 'Tap any word to hear it. Which animal is in the sentence?',
               options: [
-                { id: 'opt-frog', text: 'Green frog hopping', imageEmoji: '🐸', isCorrect: true },
-                { id: 'opt-cat', text: 'Sleeping cat', imageEmoji: '🐱', isCorrect: false },
-                { id: 'opt-bird', text: 'Flying bird', imageEmoji: '🐦', isCorrect: false }
+                phraseChoice('frog', 'Green frog hopping', true),
+                phraseChoice('cat', 'Sleeping cat', false),
+                phraseChoice('bird', 'Flying bird', false)
               ]
             },
             {
@@ -631,11 +652,12 @@ export const READING_CURRICULUM: Record<GradeLevel, ReadingSkill[]> = {
               sentence: 'A cute cat plays with yellow yarn.',
               hint: 'Tap any word to hear it. Which animal is in the sentence?',
               options: [
-                { id: 'opt-cat', text: 'Playful cat with yarn', imageEmoji: '🐱', isCorrect: true },
-                { id: 'opt-dog', text: 'Dog with a bone', imageEmoji: '🐶', isCorrect: false },
-                { id: 'opt-bear', text: 'Bear sleeping in cave', imageEmoji: '🐻', isCorrect: false }
+                phraseChoice('cat', 'Playful cat with yarn', true),
+                phraseChoice('dog', 'Dog with a bone', false),
+                phraseChoice('bear', 'Bear sleeping in cave', false)
               ]
-            }
+            },
+            ...G1_MORE_ROUNDS['g1-rs-happy-pets']
           ]
         }
       ]
@@ -667,9 +689,9 @@ export const READING_CURRICULUM: Record<GradeLevel, ReadingSkill[]> = {
               word: 'train',
               hint: 'Rides on railroad tracks and goes choo-choo!',
               options: [
-                { id: 'opt-train', text: 'Train', imageEmoji: '🚆', isCorrect: true },
-                { id: 'opt-truck', text: 'Truck', imageEmoji: '🚚', isCorrect: false },
-                { id: 'opt-boat', text: 'Boat', imageEmoji: '⛵', isCorrect: false }
+                pictureChoice('train', true),
+                pictureChoice('truck', false),
+                pictureChoice('boat', false)
               ]
             },
             {
@@ -680,9 +702,9 @@ export const READING_CURRICULUM: Record<GradeLevel, ReadingSkill[]> = {
               word: 'boat',
               hint: 'Floats on blue water with a sail!',
               options: [
-                { id: 'opt-boat', text: 'Boat', imageEmoji: '⛵', isCorrect: true },
-                { id: 'opt-car', text: 'Car', imageEmoji: '🚗', isCorrect: false },
-                { id: 'opt-bike', text: 'Bike', imageEmoji: '🚲', isCorrect: false }
+                pictureChoice('boat', true),
+                pictureChoice('car', false),
+                pictureChoice('bike', false)
               ]
             },
             {
@@ -693,11 +715,12 @@ export const READING_CURRICULUM: Record<GradeLevel, ReadingSkill[]> = {
               word: 'beach',
               hint: 'Sandy place where ocean waves splash under the sun!',
               options: [
-                { id: 'opt-beach', text: 'Beach', imageEmoji: '🏖️', isCorrect: true },
-                { id: 'opt-forest', text: 'Forest', imageEmoji: '🌲', isCorrect: false },
-                { id: 'opt-bread', text: 'Bread', imageEmoji: '🥖', isCorrect: false }
+                pictureChoice('beach', true),
+                pictureChoice('forest', false),
+                pictureChoice('bread', false)
               ]
-            }
+            },
+            ...G2_MORE_ROUNDS['g2-wp-vowel-teams']
           ]
         }
       ]
@@ -728,9 +751,9 @@ export const READING_CURRICULUM: Record<GradeLevel, ReadingSkill[]> = {
               word: 'rainbow',
               hint: 'Colorful arc of light in the sky after rain!',
               options: [
-                { id: 'opt-rainbow', text: 'Rainbow', imageEmoji: '🌈', isCorrect: true },
-                { id: 'opt-rose', text: 'Rose', imageEmoji: '🌹', isCorrect: false },
-                { id: 'opt-cloud', text: 'Cloud', imageEmoji: '☁️', isCorrect: false }
+                pictureChoice('rainbow', true),
+                pictureChoice('rose', false),
+                pictureChoice('cloud', false)
               ]
             },
             {
@@ -741,11 +764,12 @@ export const READING_CURRICULUM: Record<GradeLevel, ReadingSkill[]> = {
               word: 'cupcake',
               hint: 'A mini cake in a paper cup with yummy frosting!',
               options: [
-                { id: 'opt-cupcake', text: 'Cupcake', imageEmoji: '🧁', isCorrect: true },
-                { id: 'opt-donut', text: 'Donut', imageEmoji: '🍩', isCorrect: false },
-                { id: 'opt-cookie', text: 'Cookie', imageEmoji: '🍪', isCorrect: false }
+                pictureChoice('cupcake', true),
+                pictureChoice('donut', false),
+                pictureChoice('cookie', false)
               ]
-            }
+            },
+            ...G2_MORE_ROUNDS['g2-bw-compounds']
           ]
         }
       ]
@@ -764,6 +788,7 @@ export const READING_CURRICULUM: Record<GradeLevel, ReadingSkill[]> = {
           description: 'Read about Ms. Luna flying past shiny stars and moons.',
           icon: '🚀',
           difficulty: 3,
+          perPlay: 2,
           // 3, as every lesson, for its one story (CUR-1; it paid 5); PRG-1
           // makes every lesson's stars follow how it was played
           starsToEarn: 3,
@@ -787,10 +812,59 @@ export const READING_CURRICULUM: Record<GradeLevel, ReadingSkill[]> = {
                 correctIndex: 0,
                 explanation: 'Yes! The rocket zoomed into the starry night sky, way up in space!'
               }
-            }
+            },
+            ...G2_MORE_ROUNDS['g2-story-luna-space']
           ]
         }
       ]
     }
+  ]
+};
+
+/** Skills that begin with the lessons added in CUR-4. */
+const LATER_SKILLS: Omit<ReadingSkill, 'lessons'>[] = [
+  { id: 'g1-rhymes', name: 'Rhyme Matcher', icon: '🎵', description: 'Match words that sound the same at the end!' },
+  { id: 'g1-sight-words', name: 'Sight Word Power', icon: '⚡', description: 'Recognize common words instantly by sight.' },
+  { id: 'g1-stories', name: 'Little Storybooks', icon: '📖', description: 'Read little stories on your own, then answer a question.' },
+  { id: 'g2-sight-words', name: 'Sight Word Power', icon: '⚡', description: 'Recognize common words instantly by sight.' },
+  { id: 'g2-r-vowels', name: 'Vowels with R', icon: '🚗', description: 'When R comes after a vowel, it changes the vowel’s sound.' }
+];
+
+/** Lessons on the path after a grade's first ones: a skill's lessons needn't sit together. */
+function thenOn(grade: GradeLevel, lessons: Lesson[]): ReadingSkill[] {
+  const skills = [...FIRST_LESSONS[grade], ...LATER_SKILLS];
+  return lessons.map(lesson => {
+    const skill = skills.find(s => s.id === lesson.skillId);
+    if (!skill) throw new Error('Lesson "' + lesson.id + '" has no skill "' + lesson.skillId + '"');
+    return { id: skill.id, name: skill.name, icon: skill.icon, description: skill.description, lessons: [lesson] };
+  });
+}
+
+/**
+ * Each grade's lessons, in the order they open: new letters, then words that
+ * use them, with sight words and rhymes in between. A grade's first lessons
+ * stay where they were, so an older save's progress still fits (CUR-4).
+ */
+export const READING_CURRICULUM: Record<GradeLevel, ReadingSkill[]> = {
+  kindergarten: [
+    ...FIRST_LESSONS.kindergarten,
+    ...thenOn('kindergarten', [
+      K_SOUNDS_2, K_HUNT_2, K_SHORT_A, K_SIGHT_2, K_SOUNDS_3, K_SHORT_I_O, K_HUNT_3, K_SIGHT_3, K_RHYME_2,
+      K_SOUNDS_4, K_SHORT_E_U, K_SIGHT_4, K_SOUNDS_5
+    ])
+  ],
+  grade1: [
+    ...FIRST_LESSONS.grade1,
+    ...thenOn('grade1', [
+      G1_SH_CH, G1_SIGHT_1, G1_TH_WH, G1_L_BLENDS, G1_STORIES_1, G1_R_BLENDS, G1_SIGHT_2, G1_S_BLENDS, G1_SENTENCES_2,
+      G1_MAGIC_A, G1_RHYMES, G1_MAGIC_I_O, G1_SIGHT_3, G1_SENTENCES_3, G1_STORIES_2
+    ])
+  ],
+  grade2: [
+    ...FIRST_LESSONS.grade2,
+    ...thenOn('grade2', [
+      G2_AI_AY, G2_SIGHT_1, G2_EE_EA, G2_STORIES_2, G2_OA_OW, G2_IGH, G2_SIGHT_2, G2_OO, G2_OU_OW, G2_STORIES_3,
+      G2_AR, G2_OR, G2_SIGHT_3, G2_ER_IR_UR, G2_COMPOUNDS_2
+    ])
   ]
 };

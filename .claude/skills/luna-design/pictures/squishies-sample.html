@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>More Squishies</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&family=Fraunces:opsz,wght,SOFT@9..144,600,100&display=swap">
+<style>
+  /* PRG-5b's sample sheet: the board's other 10 kinds, the 4 outlines, the
+     super-rare looks and Pearl Moon, for Alex and the teacher before the kit.
+     The app's own tan palette and type, so it reads as the app will.
+     Layout: the shelf first, as a child sees it, then the parts to judge. */
+  :root {
+    --page: #F5EDE1; --card: #FFFBF5; --well: #F2E6D3; --edge: #E9DCC9;
+    --ink: #3B2A20; --quiet: #6E5747; --soil: #D9C4A6; --soil-deep: #C9AE8B;
+    --accent: #9A6B45; --shine: rgba(255, 255, 255, 0.85);
+    --display: 'Fraunces', Georgia, serif; --read: 'Andika', system-ui, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --page: #1E1813; --card: #2A211B; --well: #352A21; --edge: #433629;
+      --ink: #F4EADC; --quiet: #C9B6A1; --soil: #5A4636; --soil-deep: #433629;
+      --accent: #D9AE7C; --shine: rgba(255, 251, 245, 0.35); color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --page: #1E1813; --card: #2A211B; --well: #352A21; --edge: #433629;
+    --ink: #F4EADC; --quiet: #C9B6A1; --soil: #5A4636; --soil-deep: #433629;
+    --accent: #D9AE7C; --shine: rgba(255, 251, 245, 0.35); color-scheme: dark;
+  }
+  body {
+    background: var(--page); color: var(--ink); font: 400 17px/1.5 var(--read); margin: 0;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+    padding-block: 32px 64px;
+  }
+  .wrap { max-width: 1040px; margin: 0 auto; display: flex; flex-direction: column; gap: 40px; }
+  section { display: flex; flex-direction: column; gap: 14px; }
+  header { display: flex; flex-direction: column; gap: 10px; max-width: 68ch; }
+  .eyebrow { font: 700 12px/1.2 var(--read); letter-spacing: .08em; text-transform: uppercase; color: var(--quiet); }
+  h1 { font: 600 40px/1.1 var(--display); font-variation-settings: 'SOFT' 100; margin: 0; text-wrap: balance; }
+  h2 { font: 600 26px/1.2 var(--display); font-variation-settings: 'SOFT' 100; margin: 0; text-wrap: balance; }
+  p { margin: 0; color: var(--quiet); max-width: 68ch; }
+  ol { margin: 0; padding-left: 24px; display: flex; flex-direction: column; gap: 8px; max-width: 72ch; }
+  b.pick { color: var(--accent); }
+
+  svg.sq { display: block; overflow: visible; }
+
+  /* the arched shelf, as on the board */
+  .cabinet {
+    background: var(--card); border: 2px solid var(--edge); box-sizing: border-box; width: 100%;
+    border-radius: min(40vw, 300px) min(40vw, 300px) 22px 22px; padding: 22px clamp(12px, 3vw, 36px) 26px;
+    display: flex; flex-direction: column; gap: 14px;
+  }
+  .kinds { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 4px; align-items: end; justify-items: center; }
+  .kinds > div { display: flex; flex-direction: column; align-items: center; gap: 2px; min-width: 0; width: 100%; }
+  .kinds svg.sq { width: 100%; max-width: 104px; height: auto; }
+  .code { font: 700 12px/1.2 var(--read); color: var(--accent); min-height: 15px; }
+  .plank { height: 12px; border-radius: 8px; background: var(--soil); box-shadow: 0 5px 0 var(--soil-deep); margin: 0 -6px 8px; }
+  .top { align-self: center; position: relative; margin-bottom: 6px; }
+  .niche {
+    position: relative; width: 112px; height: 118px; border-radius: 56px 56px 22px 22px; box-sizing: border-box;
+    border: 3px solid #BDB3C9; background: var(--well); overflow: hidden; isolation: isolate;
+    display: flex; align-items: flex-end; justify-content: center;
+  }
+  .niche .q { position: absolute; inset: 0; display: grid; place-items: center; font: 700 54px/1 var(--display); color: #8E819E; }
+  .spark { position: absolute; }
+
+  /* the ten new kinds */
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr)); gap: 14px; }
+  .kind { background: var(--card); border: 2px solid var(--edge); border-radius: 18px; padding: 14px; display: flex; flex-direction: column; gap: 10px; }
+  .kind h3 { font: 700 18px/1.2 var(--read); margin: 0; display: flex; gap: 8px; align-items: baseline; }
+  .kind .line { font-size: 14px; line-height: 1.4; color: var(--quiet); margin: 0; }
+  .kind .line b { color: var(--ink); font-weight: 700; }
+  .trio { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px; align-items: end; }
+  .trio figure { margin: 0; display: flex; flex-direction: column; align-items: center; gap: 2px; min-width: 0; }
+  .trio svg.sq { width: 100%; height: auto; }
+  figcaption { font: 700 11px/1.25 var(--read); color: var(--quiet); text-align: center; }
+  .slot {
+    width: 85%; aspect-ratio: 80 / 72; box-sizing: border-box; border: 2.5px dashed var(--soil); background: var(--well);
+    border-radius: 24px 24px 16px 16px; display: grid; place-items: center; font: 700 26px/1 var(--display); color: var(--quiet);
+  }
+
+  .strip { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 14px; }
+  .tile { background: var(--card); border: 2px solid var(--edge); border-radius: 18px; padding: 12px; display: flex; flex-direction: column; gap: 6px; align-items: center; }
+  .tile svg.sq { width: 110px; height: auto; }
+  .tile strong { font: 700 15px/1.25 var(--read); text-align: center; }
+  .tile span { font: 400 13px/1.35 var(--read); color: var(--quiet); text-align: center; }
+
+  table { border-collapse: collapse; width: 100%; font-size: 15px; }
+  .scroll { overflow-x: auto; background: var(--card); border: 2px solid var(--edge); border-radius: 18px; padding: 6px 14px; }
+  th { text-align: left; font: 700 12px/1.2 var(--read); letter-spacing: .06em; text-transform: uppercase; color: var(--quiet); }
+  th, td { padding: 8px 10px 8px 0; border-bottom: 1px solid var(--edge); vertical-align: top; }
+  tr:last-child td { border-bottom: 0; }
+
+  .board { display: flex; flex-wrap: wrap; gap: 14px; }
+  .board figure { margin: 0; flex: 1 1 300px; min-width: 0; display: flex; flex-direction: column; gap: 6px; }
+  .board img { width: 100%; max-width: 100%; border-radius: 12px; border: 2px solid var(--edge); display: block; }
+
+  /* the gentle loops, each one stops under Reduce Motion */
+  @media (prefers-reduced-motion: no-preference) {
+    .mv-swirl { animation: drift 9s linear infinite; }
+    .mv-shimmer { animation: sweep 4.2s ease-in-out infinite; }
+    .mv-glow { transform-box: fill-box; transform-origin: center; animation: pulse 3.2s ease-in-out infinite; }
+    .twinkle { animation: twinkle 2.4s ease-in-out infinite; }
+  }
+  @keyframes drift { from { transform: translateX(0); } to { transform: translateX(-100px); } }
+  @keyframes sweep { 0%, 35% { transform: translateX(-70px); } 80%, 100% { transform: translateX(120px); } }
+  @keyframes pulse { 0%, 100% { opacity: .55; transform: scale(.96); } 50% { opacity: 1; transform: scale(1.04); } }
+  @keyframes twinkle { 0%, 100% { opacity: .25; transform: scale(.6); } 50% { opacity: 1; transform: scale(1.1); } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <span class="eyebrow">PRG-5b, sample sheet</span>
+    <h1>More squishies for Luna's shelf</h1>
+    <p>The board shows 18 kinds on the shelf, and the app draws 8. Here are the other 10, drawn the way the first 8 are, along with the outlines the 4 missing colours need, the super-rare looks, and Pearl Moon as you OKed her. Nothing is in the app yet. Strike or change anything by its code.</p>
+  </header>
+
+  <section>
+    <h2>What I need from you and the teacher</h2>
+    <ol>
+      <li>The board names 6 new kinds, and 4 of its slots are a "?". I filled those with Toast, Acorn, Star and Penguin (N7 to N10). <b class="pick">My pick: these four, because two are brown and all four are words children know.</b></li>
+      <li>Each kind's usual colour and rare tint, as shown under "The ten new kinds". <b class="pick">My pick: as shown.</b></li>
+      <li>Today every kind's super-rare is honey. <b class="pick">My pick: each kind has one super-rare look, so a kind stays at 3 colours and the shelf's dots don't change.</b> A child's saved honey squishy would show as that kind's look.</li>
+      <li>Which kinds also get a gentle moving version. <b class="pick">My pick: three, one for each look: Little Moon, Cloud and Heart.</b></li>
+      <li>Which kinds show as a "?" until they're found, while the rest show as a grey shape. <b class="pick">My pick: Toast, Acorn, Star and Penguin, where the board has its "?" slots, plus Butter Block and Little Moon, which already do.</b></li>
+    </ol>
+  </section>
+
+  <section>
+    <h2>The whole shelf, every kind found</h2>
+    <p>In the board's order, each in its usual colour, with Pearl Moon at the top. The new kinds carry a code.</p>
+    <div class="cabinet" id="shelf"></div>
+  </section>
+
+  <section>
+    <h2>The ten new kinds</h2>
+    <p>Before it's found, then its usual colour, its rare tint and its super-rare look. Luna says the first line when it's squeezed and the clue when it's tapped still to find. All lines would be rendered in her voice.</p>
+    <div class="grid" id="kinds"></div>
+  </section>
+
+  <section>
+    <h2>The four outlines</h2>
+    <p>Cocoa, sage, sky and lilac are on the board as dots, but they have never had an outline, so nothing could be drawn in them. These are the outlines I'd add, in the same brown-leaning way as the others.</p>
+    <div class="strip" id="outlines"></div>
+  </section>
+
+  <section>
+    <h2>Super-rare looks</h2>
+    <p>The board names three: swirl, shimmer and glow. The swirl is the board's own, on its Little Moon. The other two are my drawing of the names. On an iPad set to Reduce Motion, the moving ones hold still and look like the last row.</p>
+    <div class="strip" id="looks"></div>
+    <div class="strip" id="still"></div>
+    <div class="scroll"><table id="lookTable"></table></div>
+  </section>
+
+  <section>
+    <h2>Pearl Moon, as you OKed her</h2>
+    <p>The purple and blue ovals are gone, as you asked. Everything else is as it was on her page.</p>
+    <div class="strip" id="pearl"></div>
+  </section>
+
+  <section>
+    <h2>The board, for comparing</h2>
+    <p>The approved board shows the same shelf part-way through, with greyed shapes and "?" slots still to find.</p>
+    <div class="board">
+      <figure><img src="board-light.png" alt="The approved Squishies board in light mode"><figcaption>Board, light</figcaption></figure>
+      <figure><img src="board-dark.png" alt="The approved Squishies board in dark mode"><figcaption>Board, dark</figcaption></figure>
+    </div>
+  </section>
+</div>
+
+<script>
+  const LINE = '#3B2A20', SHADOW = 'opacity="0.12"';
+  const CREAM = ['#FFF6E8', '#CDB592'], COCOA = ['#8A6446', '#5E4130'];
+  const COLOURS = {
+    oat: ['#EFE3D1', '#C9AE8B'], caramel: ['#D2A878', '#9A6B45'], toffee: ['#B07D52', '#7A5236'], cream: CREAM, cocoa: COCOA,
+    blush: ['#F1C9BC', '#C98E7B'], butter: ['#F5E2A0', '#C9A94F', '#FFF4CC'], sage: ['#CFD8BE', '#8E9A74'], sky: ['#CADBE4', '#8AA5B4'], lilac: ['#DCCFE6', '#A393B5'],
+    honey: ['#E6C47A', '#A9832F']
+  };
+
+  const eyesMouth = (l, r, m, rr = 3) =>
+    `<circle cx="${l[0]}" cy="${l[1]}" r="${rr}" fill="${LINE}"/><circle cx="${r[0]}" cy="${r[1]}" r="${rr}" fill="${LINE}"/><path d="${m}" fill="none" stroke="${LINE}" stroke-linecap="round" stroke-width="2.4"/>`;
+  const cheeks = (a, b, y, rx = 5, ry = 3) =>
+    `<ellipse cx="${a}" cy="${y}" rx="${rx}" ry="${ry}" fill="#E59C8A" opacity=".6"/><ellipse cx="${b}" cy="${y}" rx="${rx}" ry="${ry}" fill="#E59C8A" opacity=".6"/>`;
+
+  // a star with its tips and dips rounded, as soft as the others
+  const softStar = (cx, cy, R, r) => {
+    const pts = [];
+    for (let i = 0; i < 10; i++) {
+      const a = -Math.PI / 2 + (i * Math.PI) / 5, d = i % 2 ? r : R;
+      pts.push([cx + d * Math.cos(a), cy + d * Math.sin(a)]);
+    }
+    const mid = (p, q) => [(p[0] + q[0]) / 2, (p[1] + q[1]) / 2];
+    let d = `M${mid(pts[9], pts[0]).map(n => n.toFixed(1)).join(' ')}`;
+    pts.forEach((p, i) => {
+      const m = mid(p, pts[(i + 1) % 10]);
+      d += ` Q${p[0].toFixed(1)} ${p[1].toFixed(1)} ${m[0].toFixed(1)} ${m[1].toFixed(1)}`;
+    });
+    return d + ' Z';
+  };
+  // the donut's glaze: a scalloped ring round the hole
+  const glaze = () => {
+    const n = 14, R = 28, dip = 24.5;
+    let d = '';
+    for (let i = 0; i <= n; i++) {
+      const a = (i / n) * 2 * Math.PI, b = ((i + 0.5) / n) * 2 * Math.PI;
+      const on = [50 + dip * Math.cos(a), 56 + dip * Math.sin(a)], ctrl = [50 + (R + 4) * Math.cos(b), 56 + (R + 4) * Math.sin(b)];
+      if (i === 0) d += `M${on[0].toFixed(1)} ${on[1].toFixed(1)}`;
+      else d += ` ${on[0].toFixed(1)} ${on[1].toFixed(1)}`;
+      if (i < n) d += ` Q${ctrl[0].toFixed(1)} ${ctrl[1].toFixed(1)}`;
+    }
+    return d + ' Z M39 56 a11 11 0 1 0 22 0 a11 11 0 1 0 -22 0 Z';
+  };
+
+  const MOON = 'M40 60.2 A72 72 0 1 0 160 60.2 A60 60 0 1 1 40 60.2 Z';
+  const HEART = 'M50 86 C20 66 12 48 22 36 C32 24 46 28 50 40 C54 28 68 24 78 36 C88 48 80 66 50 86 Z';
+  const fixed = ([f, e], tag, w = 3) => tag.replace(/^<(\w+) /, `<$1 fill="${f}" stroke="${e}" stroke-width="${w}" stroke-linejoin="round" `);
+
+  // Each kind: the shapes that take its colour (`parts`), what sits behind them
+  // (`under`) and what sits on top (`after`). The first 8 are the kit's drawings.
+  const KINDS = {
+    ball: { name: 'Squish Ball', usual: 'oat', look: 'swirl', sh: 28, parts: ['<circle cx="50" cy="52" r="34"/>'],
+      after: () => `<ellipse cx="38" cy="36" rx="9" ry="5.5" fill="#fff" opacity=".7"/>${eyesMouth([41, 56], [59, 56], 'M46 62 q4 4 8 0')}` },
+    cat: { name: 'Mochi Cat', usual: 'caramel', look: 'glow', sh: 30, parts: ['<path d="M24 44 L28 22 L44 34 Z M76 44 L72 22 L56 34 Z"/>', '<ellipse cx="50" cy="60" rx="38" ry="26"/>'],
+      after: c => `${eyesMouth([40, 58], [60, 58], 'M45 64 q2.5 3 5 0 q2.5 3 5 0')}<path d="M22 60 h10 M22 66 l10 -2 M78 60 h-10 M78 66 l-10 -2" stroke="${c[1]}" stroke-linecap="round" stroke-width="1.8"/>` },
+    bunny: { name: 'Bunny', usual: 'cream', look: 'swirl', sh: 30, parts: ['<ellipse cx="38" cy="28" rx="8" ry="20"/>', '<ellipse cx="62" cy="28" rx="8" ry="20"/>', '<ellipse cx="50" cy="62" rx="36" ry="24"/>'],
+      after: () => `<ellipse cx="38" cy="30" rx="3.5" ry="12" fill="#FFFBF5" opacity=".7"/><ellipse cx="62" cy="30" rx="3.5" ry="12" fill="#FFFBF5" opacity=".7"/>${eyesMouth([41, 60], [59, 60], 'M46 66 q4 4 8 0')}${cheeks(33, 67, 67)}` },
+    bear: { name: 'Bear', usual: 'toffee', look: 'glow', sh: 28, parts: ['<circle cx="26" cy="30" r="11"/>', '<circle cx="74" cy="30" r="11"/>', '<circle cx="50" cy="54" r="32"/>'],
+      after: () => `<ellipse cx="50" cy="65" rx="13" ry="9" fill="#E9D3AE"/><ellipse cx="50" cy="61" rx="4" ry="3" fill="${LINE}"/>${eyesMouth([39, 50], [61, 50], 'M47 67 q3 3 6 0')}` },
+    butter: { name: 'Butter Block', usual: 'cream', look: 'swirl', sh: 32, parts: ['<rect x="16" y="38" width="68" height="46" rx="16"/>'],
+      after: c => `<rect x="30" y="28" width="40" height="18" rx="8" fill="${c[2] ?? c[0]}" stroke="${c[1]}" stroke-width="3"/>${eyesMouth([40, 62], [60, 62], 'M46 68 q4 4 8 0')}` },
+    peach: { name: 'Peach', usual: 'oat', look: 'shimmer', sh: 28, parts: ['<circle cx="50" cy="54" r="32"/>'],
+      after: c => `<path d="M50 24 q-10 30 0 62" fill="none" stroke="${c[1]}" stroke-width="2.5" opacity=".6"/><path d="M52 24 q8 -14 22 -12 q-6 14 -22 12 z" fill="#A9B391" stroke="#5C6849" stroke-width="2" stroke-linejoin="round"/>${eyesMouth([40, 58], [60, 58], 'M46 64 q4 4 8 0')}` },
+    cloud: { name: 'Cloud', usual: 'cream', look: 'shimmer', sh: 34, parts: ['<path d="M24 82 C8 82 6 60 20 56 C18 38 40 30 50 42 C56 26 82 28 82 48 C96 50 96 82 78 82 Z"/>'],
+      after: () => eyesMouth([42, 64], [60, 64], 'M47 70 q4 4 8 0') },
+    moon: { name: 'Little Moon', usual: 'oat', look: 'swirl', sh: 26, width: 6, parts: [`<path d="${MOON}" transform="scale(0.5) rotate(-18 100 110)"/>`],
+      after: () => eyesMouth([47, 72], [62, 67], 'M52 77 q4 2.5 8 -1.5', 2.6) },
+
+    frog: { code: 'N1', name: 'Frog', usual: 'oat', rare: 'sage', look: 'glow', sh: 32, ghost: true,
+      parts: ['<circle cx="32" cy="40" r="12"/>', '<circle cx="68" cy="40" r="12"/>', '<ellipse cx="50" cy="64" rx="36" ry="24"/>'],
+      after: () => `${eyesMouth([32, 39], [68, 39], 'M37 66 q13 10 26 0', 3.6)}${cheeks(25, 75, 70)}`,
+      line: 'A little frog! Ribbit, ribbit!', hint: 'This one hops and says ribbit.' },
+    donut: { code: 'N2', name: 'Donut', usual: 'caramel', rare: 'blush', look: 'shimmer', sh: 30, ghost: true,
+      parts: ['<path fill-rule="evenodd" d="M16 56 a34 34 0 1 0 68 0 a34 34 0 1 0 -68 0 Z M39 56 a11 11 0 1 0 22 0 a11 11 0 1 0 -22 0 Z"/>'],
+      after: () => `<path fill-rule="evenodd" d="${glaze()}" fill="${CREAM[0]}" stroke="${CREAM[1]}" stroke-width="2" stroke-linejoin="round"/>${eyesMouth([31, 56], [69, 56], 'M46 74 q4 3.5 8 0', 2.8)}`,
+      line: 'A soft donut with a hole in the middle.', hint: 'This one is round, with a hole in the middle.' },
+    mushroom: { code: 'N3', name: 'Mushroom', usual: 'toffee', rare: 'blush', look: 'glow', sh: 24, ghost: true,
+      under: () => fixed(CREAM, '<rect x="33" y="50" width="34" height="34" rx="11"/>'), ghostUnder: '<rect x="36" y="50" width="28" height="34" rx="10"/>',
+      parts: ['<path d="M14 56 Q14 18 50 18 Q86 18 86 56 Q50 63 14 56 Z"/>'],
+      after: () => `<circle cx="32" cy="38" r="5" fill="#FFFBF5" opacity=".85"/><circle cx="56" cy="30" r="4.5" fill="#FFFBF5" opacity=".85"/><circle cx="71" cy="43" r="3.5" fill="#FFFBF5" opacity=".85"/>${eyesMouth([43, 68], [57, 68], 'M46 74 q4 3.5 8 0', 2.8)}`,
+      line: 'A little mushroom. It pops up after the rain!', hint: 'This one grows in the forest, under the trees.' },
+    dumpling: { code: 'N4', name: 'Dumpling', usual: 'cream', rare: 'butter', look: 'swirl', sh: 36, ghost: true,
+      parts: ['<path d="M12 80 Q12 38 50 32 Q88 38 88 80 Q50 90 12 80 Z"/>'],
+      after: c => `<path d="M50 33 q-9 5 -15 13 M50 33 q-3 6 -5 14 M50 33 q3 6 5 14 M50 33 q9 5 15 13" fill="none" stroke="${c[1]}" stroke-linecap="round" stroke-width="2.5" opacity=".7"/>${eyesMouth([40, 64], [60, 64], 'M46 70 q4 4 8 0')}${cheeks(30, 70, 71)}`,
+      line: 'A warm little dumpling. Soft and squishy!', hint: 'This one is a soft food, folded on top.' },
+    hamster: { code: 'N5', name: 'Hamster', usual: 'oat', rare: 'butter', look: 'swirl', sh: 32, ghost: true,
+      parts: ['<circle cx="28" cy="38" r="9"/>', '<circle cx="72" cy="38" r="9"/>', '<ellipse cx="50" cy="62" rx="38" ry="26"/>'],
+      after: () => `<circle cx="28" cy="39" r="4.5" fill="#E59C8A" opacity=".5"/><circle cx="72" cy="39" r="4.5" fill="#E59C8A" opacity=".5"/><ellipse cx="50" cy="73" rx="13" ry="8.5" fill="#FFFBF5" opacity=".85"/><ellipse cx="50" cy="67" rx="3" ry="2.2" fill="${LINE}"/>${eyesMouth([38, 58], [62, 58], 'M47 72 q3 3 6 0')}${cheeks(23, 77, 68, 7, 5)}`,
+      line: 'A little hamster with big, round cheeks.', hint: 'This one has round cheeks and a tiny nose.' },
+    heart: { code: 'N6', name: 'Heart', usual: 'cocoa', rare: 'blush', look: 'glow', sh: 20, ghost: true,
+      parts: [`<path d="${HEART}"/>`],
+      after: () => `${eyesMouth([40, 50], [60, 50], 'M46 56 q4 4 8 0')}${cheeks(31, 69, 58)}`,
+      line: 'A big heart, full of love!', hint: 'This one means love.' },
+    toast: { code: 'N7', name: 'Toast', usual: 'caramel', rare: 'butter', look: 'shimmer', sh: 32, hard: true,
+      parts: ['<path d="M24 84 Q16 84 16 76 L16 46 C6 40 8 18 30 18 L70 18 C92 18 94 40 84 46 L84 76 Q84 84 76 84 Z"/>'],
+      after: () => `<path d="M28 77 Q23 77 23 72 L23 42 C15 38 17 25 31 25 L69 25 C83 25 85 38 77 42 L77 72 Q77 77 72 77 Z" fill="${CREAM[0]}" stroke="${CREAM[1]}" stroke-width="1.5"/>${eyesMouth([40, 52], [60, 52], 'M46 58 q4 4 8 0')}${cheeks(32, 68, 60)}`,
+      line: 'Warm toast, just for you!', hint: 'This one is bread, and it pops up in the morning.' },
+    acorn: { code: 'N8', name: 'Acorn', usual: 'caramel', rare: 'sage', look: 'shimmer', sh: 22, hard: true,
+      parts: ['<path d="M24 44 C24 66 36 80 50 86 C64 80 76 66 76 44 Z"/>'],
+      after: () => `<path d="M50 18 q-1 -8 5 -11" fill="none" stroke="${COCOA[1]}" stroke-linecap="round" stroke-width="4"/><path d="M16 44 C16 26 32 18 50 18 C68 18 84 26 84 44 C84 50 80 52 74 52 L26 52 C20 52 16 50 16 44 Z" fill="${COCOA[0]}" stroke="${COCOA[1]}" stroke-width="3" stroke-linejoin="round"/>${eyesMouth([41, 62], [59, 62], 'M46 68 q4 4 8 0')}`,
+      line: 'A little acorn. A big tree could grow from it!', hint: 'A squirrel would love this one.' },
+    star: { code: 'N9', name: 'Star', usual: 'cream', rare: 'lilac', look: 'glow', sh: 26, hard: true,
+      parts: [`<path d="${softStar(50, 50, 46, 26)}"/>`],
+      after: () => `${eyesMouth([41, 50], [59, 50], 'M46 56 q4 4 8 0')}${cheeks(34, 66, 58)}`,
+      line: 'A little star! It twinkles all night.', hint: 'This one shines in the night sky.' },
+    penguin: { code: 'N10', name: 'Penguin', usual: 'cocoa', rare: 'sky', look: 'shimmer', sh: 24, hard: true,
+      under: () => `<ellipse cx="38" cy="85" rx="9" ry="3.5" fill="#E6C47A" stroke="#A9832F" stroke-width="1.5"/><ellipse cx="62" cy="85" rx="9" ry="3.5" fill="#E6C47A" stroke="#A9832F" stroke-width="1.5"/>`,
+      parts: ['<ellipse cx="50" cy="52" rx="33" ry="33"/>'],
+      after: () => `<path d="M50 30 C60 24 72 34 71 50 C71 70 62 80 50 80 C38 80 29 70 29 50 C28 34 40 24 50 30 Z" fill="${CREAM[0]}"/><path d="M45 52 L55 52 L50 59 Z" fill="#E6C47A" stroke="#A9832F" stroke-width="1.5" stroke-linejoin="round"/><circle cx="41" cy="46" r="3" fill="${LINE}"/><circle cx="59" cy="46" r="3" fill="${LINE}"/>${cheeks(35, 65, 55)}`,
+      line: 'A little penguin! It waddles on the ice.', hint: 'This one is a bird that swims, but it can’t fly.' }
+  };
+
+  let uid = 0;
+  const paint = (part, fill, edge, width) => part.replace(/^<(\w+) /, `<$1 fill="${fill}" stroke="${edge}" stroke-width="${width}" stroke-linejoin="round" `);
+  const outline = (part, edge, width) => part.replace(/^<(\w+) /, `<$1 fill="none" stroke="${edge}" stroke-width="${width}" stroke-linejoin="round" `);
+
+  // draw(kind, { colour, look, moving, ghost })
+  function draw(id, { colour, look, moving = false, ghost = false, width: px } = {}) {
+    const k = KINDS[id], w = k.width ?? 3, size = px ? ` width="${px}" height="${px * 0.92}"` : '';
+    const open = `<svg class="sq"${size} viewBox="0 0 100 92" role="img" aria-label="${k.name}${ghost ? ', not found yet' : ''}">`;
+    if (ghost) {
+      const under = k.ghostUnder ?? '';
+      const grey = p => p.replace(/^<(\w+) /, '<$1 style="fill: var(--edge)" ');
+      return `${open}${under && grey(under)}${k.parts.map(grey).join('')}</svg>`;
+    }
+    const lookColour = look === 'swirl' ? 'caramel' : 'honey';
+    const c = COLOURS[look ? lookColour : (colour ?? k.usual)];
+    const n = ++uid;
+    const clip = `<clipPath id="c${n}">${k.parts.map(p => p.replace(' fill-rule="evenodd"', ' clip-rule="evenodd"')).join('')}</clipPath>`;
+    let behind = '', over = '', defs = '';
+    if (look === 'glow') {
+      defs = `<radialGradient id="g${n}"><stop offset="55%" stop-color="#F5E2A0" stop-opacity=".75"/><stop offset="100%" stop-color="#F5E2A0" stop-opacity="0"/></radialGradient>`;
+      behind = `<ellipse class="${moving ? 'mv-glow' : ''}" cx="50" cy="50" rx="56" ry="52" fill="url(#g${n})"/>`;
+    }
+    if (look === 'swirl') {
+      const waves = 'M-100 40 Q-75 28 -50 44 T0 40 T50 44 T100 40 T150 44 T200 40 M-100 62 Q-75 50 -50 66 T0 62 T50 66 T100 62 T150 66 T200 62 M-100 84 Q-75 72 -50 88 T0 84 T50 88 T100 84 T150 88 T200 84 M-100 18 Q-75 6 -50 22 T0 18 T50 22 T100 18 T150 22 T200 18';
+      over = `<g clip-path="url(#c${n})"><path class="${moving ? 'mv-swirl' : ''}" d="${waves}" fill="none" stroke="${CREAM[0]}" stroke-width="7"/></g>`;
+    }
+    if (look === 'shimmer') {
+      over = `<g clip-path="url(#c${n})"><g class="${moving ? 'mv-shimmer' : ''}"><path d="M30 -6 L52 -6 L30 98 L8 98 Z" fill="#FFFBF5" opacity=".62"/><path d="M60 -6 L67 -6 L45 98 L38 98 Z" fill="#FFFBF5" opacity=".42"/></g></g>`;
+    }
+    const body = k.parts.map(p => paint(p, c[0], c[1], w)).join('');
+    const lines = over ? k.parts.map(p => outline(p, c[1], w)).join('') : '';
+    return `${open}<defs>${clip}${defs}</defs>${behind}<ellipse cx="50" cy="88" rx="${k.sh}" ry="4" fill="${LINE}" ${SHADOW}/>${k.under?.() ?? ''}${body}${over}${lines}${k.after(c)}</svg>`;
+  }
+
+  const SPARK = (style, s, fill = '#EEE8F2', edge = '#8E819E') => `<svg class="spark twinkle" style="${style}" width="${s}" height="${s}" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l2.6 7.4L22 12l-7.4 2.6L12 22l-2.6-7.4L2 12l7.4-2.6z" fill="${fill}" stroke="${edge}" stroke-linejoin="round"/></svg>`;
+  // Pearl Moon: her page, less the lilac and mist ovals (Alex, 2026-10-20)
+  const PEARL = px => `<svg class="sq" width="${px}" height="${px * 0.92}" viewBox="0 0 100 92" role="img" aria-label="Pearl Moon">
+    <ellipse cx="50" cy="88" rx="28" ry="4" fill="${LINE}" ${SHADOW}/>
+    <circle cx="50" cy="54" r="34" fill="#F7F3F8" stroke="#BDB3C9" stroke-width="3"/>
+    <ellipse cx="62" cy="38" rx="6" ry="4" fill="#FBEFD9" opacity=".9"/>
+    <path d="M47 26 a7 7 0 1 0 8 8 a5.5 5.5 0 1 1 -8 -8 z" fill="#F2CF63" stroke="#C9A23A" stroke-width="1"/>
+    <path d="M38 56 q4 -4 8 0 M54 56 q4 -4 8 0" fill="none" stroke="${LINE}" stroke-linecap="round" stroke-width="2.6"/>
+    <path d="M46 63 q4 4 8 0" fill="none" stroke="${LINE}" stroke-linecap="round" stroke-width="2.4"/>
+    <ellipse cx="34" cy="63" rx="5" ry="3" fill="#E9B8C8" opacity=".7"/><ellipse cx="66" cy="63" rx="5" ry="3" fill="#E9B8C8" opacity=".7"/>
+  </svg>`;
+  const niche = inner => `<div class="top"><div class="niche">${inner}</div>${SPARK('left:-18px;top:14px', 16)}${SPARK('right:-20px;top:40px;animation-delay:.9s', 20)}${SPARK('left:-10px;top:78px;animation-delay:1.6s', 12)}</div>`;
+
+  // the board's rows: its 8 kinds, its 6 named ghosts and its 4 "?" slots, in order
+  const ROWS = [['ball', 'cat', 'butter', 'peach', 'frog', 'donut'], ['cloud', 'moon', 'bear', 'bunny', 'mushroom', 'toast'], ['dumpling', 'acorn', 'hamster', 'heart', 'star', 'penguin']];
+  document.getElementById('shelf').innerHTML = niche(PEARL(96)) + ROWS.map(row =>
+    `<div class="kinds">${row.map(id => `<div>${draw(id)}<span class="code">${KINDS[id].code ?? ''}</span></div>`).join('')}</div><div class="plank"></div>`
+  ).join('');
+
+  const FIG = (inner, cap) => `<figure>${inner}<figcaption>${cap}</figcaption></figure>`;
+  const NEW = Object.keys(KINDS).filter(id => KINDS[id].code);
+  document.getElementById('kinds').innerHTML = NEW.map(id => {
+    const k = KINDS[id];
+    return `<article class="kind">
+      <h3><span class="code">${k.code}</span>${k.name}</h3>
+      <div class="trio">
+        ${FIG(k.hard ? '<div class="slot" role="img" aria-label="A mystery squishy">?</div>' : draw(id, { ghost: true }), k.hard ? 'mystery' : 'to find')}
+        ${FIG(draw(id), k.usual)}
+        ${FIG(draw(id, { colour: k.rare }), k.rare + ', rare')}
+        ${FIG(draw(id, { look: k.look }), k.look)}
+      </div>
+      <p class="line"><b>Found:</b> “${k.line}”</p>
+      <p class="line"><b>Clue:</b> “${k.hint}”</p>
+    </article>`;
+  }).join('');
+
+  const TILE = (svg, title, note) => `<div class="tile">${svg}<strong>${title}</strong><span>${note}</span></div>`;
+  document.getElementById('outlines').innerHTML = [
+    TILE(draw('ball', { colour: 'cocoa' }), 'Cocoa', 'usual: Heart, Penguin, the Acorn’s cap'),
+    TILE(draw('ball', { colour: 'sage' }), 'Sage', 'rare: Frog, Acorn'),
+    TILE(draw('ball', { colour: 'sky' }), 'Sky', 'rare: Penguin'),
+    TILE(draw('ball', { colour: 'lilac' }), 'Lilac', 'rare: Star')
+  ].join('');
+
+  document.getElementById('looks').innerHTML = [
+    TILE(draw('moon', { look: 'swirl', moving: true }), 'Little Moon, swirl', 'moving: the cream waves drift slowly'),
+    TILE(draw('cloud', { look: 'shimmer', moving: true }), 'Cloud, shimmer', 'moving: a soft light crosses it now and then'),
+    TILE(draw('heart', { look: 'glow', moving: true }), 'Heart, glow', 'moving: the glow breathes in and out')
+  ].join('');
+  document.getElementById('still').innerHTML = [
+    TILE(draw('moon', { look: 'swirl' }), 'Little Moon, swirl', 'still'),
+    TILE(draw('cloud', { look: 'shimmer' }), 'Cloud, shimmer', 'still'),
+    TILE(draw('heart', { look: 'glow' }), 'Heart, glow', 'still')
+  ].join('');
+  const names = look => Object.values(KINDS).filter(k => k.look === look).map(k => k.name).join(', ');
+  document.getElementById('lookTable').innerHTML = `<thead><tr><th>Look</th><th>Worn by</th></tr></thead><tbody>${['swirl', 'shimmer', 'glow'].map(l => `<tr><td><strong>${l[0].toUpperCase() + l.slice(1)}</strong></td><td>${names(l)}</td></tr>`).join('')}</tbody>`;
+
+  document.getElementById('pearl').innerHTML = [
+    TILE(`<div style="display:grid;place-items:center;min-height:150px">${niche('<span class="q">?</span>')}</div>`, 'Before the shelf is full', 'the "?" at the top of the arch'),
+    TILE(`<div style="display:grid;place-items:center;min-height:150px">${niche(PEARL(96))}</div>`, 'Once every kind is found', 'she comes with the secret trophy'),
+    TILE(`<div style="display:grid;place-items:center;min-height:150px">${PEARL(150)}</div>`, 'Pearl Moon, bigger', 'pearl body, cream sheen, gold moon, sleepy eyes')
+  ].join('');
+</script>
+</body>
+</html>

@@ -266,12 +266,82 @@ ok('its colours come from the illustration palette', await cat.evaluate(b => {
 const ghost = await sq('Not found yet: Bear');
 await ghost.click();
 ok('a ghost wobbles when tapped', (await ghost.evaluate(b => getComputedStyle(b.firstElementChild).animationName)) === 'luna-wobble');
-ok('a ghost has no face', await ghost.evaluate(b => [...b.querySelectorAll('circle')].some(c => getComputedStyle(c).display === 'none')));
+ok('a ghost has no face', await ghost.evaluate(b => b.querySelectorAll('[class*="eye"], [class*="mouth"]').length === 0 && b.querySelectorAll('[class*="body"]').length > 0));
 ok('a mystery squishy is a "?" slot', (await page.evaluate(() => document.querySelector('button[aria-label="Not found yet: a mystery squishy"]').textContent)) === '?');
 ok('rare and super-rare wear a sparkle, usual doesn\'t', await page.evaluate(() => {
   const badge = l => !!document.querySelector(`button[aria-label="${l}"] [data-variant]`);
-  return badge('Bear, blush') && badge('Bear, honey') && !badge('Bear, toffee');
+  return badge('Bear, blush') && badge('Bear, glow') && !badge('Bear, toffee');
 }));
+
+// PRG-5b: the board's 18 kinds, every colour's outline, the looks, Pearl Moon
+const allKinds = ['Squish Ball, oat', 'Mochi Cat, caramel', 'Butter Block, cream', 'Peach, oat', 'Frog, oat', 'Donut, caramel', 'Cloud, cream', 'Little Moon, oat', 'Bear, toffee', 'Bunny, cream', 'Mushroom, toffee', 'Toast, caramel', 'Dumpling, cream', 'Acorn, caramel', 'Hamster, oat', 'Heart, cocoa', 'Star, cream', 'Penguin, cocoa'];
+const drawn = await page.evaluate(names => names.filter(n => {
+  const b = document.querySelector(`button[aria-label="${n}"]`);
+  return !(b?.querySelector('[class*="body"]') && b?.querySelector('[class*="eye"]'));
+}), allKinds);
+ok('all 18 kinds are drawn, each with a body and a face', drawn.length === 0, drawn.join(', '));
+const outlines = await page.evaluate(() => ['cocoa', 'sage', 'sky', 'lilac', 'oat', 'caramel', 'toffee', 'cream', 'blush', 'butter'].filter(c => {
+  const b = document.querySelector(`button[aria-label="Bear, ${c}"]`);
+  const body = b?.querySelector('[class*="body"]');
+  if (!body) return true;
+  const probe = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+  probe.style.stroke = `var(--illo-squishy-${c}-edge)`;
+  probe.style.fill = `var(--illo-squishy-${c})`;
+  b.querySelector('svg').append(probe);
+  const [wantEdge, wantFill] = [getComputedStyle(probe).stroke, getComputedStyle(probe).fill];
+  probe.remove();
+  return wantEdge === 'none' || getComputedStyle(body).stroke !== wantEdge || getComputedStyle(body).fill !== wantFill;
+}));
+ok('every colour has its own fill and outline', outlines.length === 0, outlines.join(', '));
+const lookMotion = () => page.evaluate(() => {
+  const name = (l, part) => {
+    const el = document.querySelector(`button[aria-label="${l}"] [class*="${part}"]`);
+    return el ? getComputedStyle(el).animationName : 'missing';
+  };
+  return {
+    swirl: name('Little Moon, swirl', 'waves'), sheen: name('Cloud, shimmer', 'sheen'), halo: name('Heart, glow', 'halo'),
+    stillSwirl: name('Squish Ball, swirl', 'waves'), stillSheen: name('Donut, shimmer', 'sheen'), stillHalo: name('Bear, glow', 'halo')
+  };
+});
+const moving = await lookMotion();
+ok('the select few looks move: swirl, shimmer and glow', moving.swirl === 'luna-swirl' && moving.sheen === 'luna-sheen' && moving.halo === 'luna-halo', JSON.stringify(moving));
+ok('the rest wear their look still', moving.stillSwirl === 'none' && moving.stillSheen === 'none' && moving.stillHalo === 'none', JSON.stringify(moving));
+ok('a swirl is caramel with cream waves, a shimmer honey', await page.evaluate(() => {
+  const fill = l => getComputedStyle(document.querySelector(`button[aria-label="${l}"] [class*="body"]`)).fill;
+  return fill('Squish Ball, swirl') !== fill('Donut, shimmer') && fill('Donut, shimmer') === fill('Bear, glow');
+}));
+const pearlParts = await page.evaluate(() => {
+  const empty = document.querySelector('button[aria-label="Something special"]');
+  const found = document.querySelector('button[aria-label="Pearl Moon"]');
+  const niche = found?.querySelector('[class*="niche"]');
+  return {
+    mark: empty?.textContent.trim(),
+    emptyDrawn: Boolean(empty?.querySelector('[class*="drawing"]')),
+    drawn: Boolean(found?.querySelector('[class*="drawing"]')),
+    glow: niche ? getComputedStyle(niche).animationName : 'missing',
+    sweep: niche ? getComputedStyle(niche, '::after').animationName : 'missing',
+    sparks: found?.querySelectorAll('[class*="spark"]').length
+  };
+});
+ok('Pearl Moon: a "?" until she\'s found, then her drawing', pearlParts.mark === '?' && !pearlParts.emptyDrawn && pearlParts.drawn, JSON.stringify(pearlParts));
+ok('her niche glows, a light sweeps it, three sparkles', pearlParts.glow === 'luna-pearl-glow' && pearlParts.sweep === 'luna-shimmer' && pearlParts.sparks === 3, JSON.stringify(pearlParts));
+await page.evaluate(() => document.querySelector('button[aria-label="Pearl Moon"]').click());
+await sleep(80);
+ok('she squishes when tapped', (await page.evaluate(() => getComputedStyle(document.querySelector('button[aria-label="Pearl Moon"] [class*="art"]')).animationName)) === 'luna-squish');
+await page.evaluate(() => document.querySelector('button[aria-label="Something special"]').click());
+await sleep(80);
+ok('the "?" wobbles when tapped', (await page.evaluate(() => getComputedStyle(document.querySelector('button[aria-label="Something special"] [class*="art"]')).animationName)) === 'luna-wobble');
+await sleep(900);
+await page.evaluate(() => document.documentElement.setAttribute('data-reduced-motion', ''));
+const stilled = await lookMotion();
+const stillPearl = await page.evaluate(() => {
+  const found = document.querySelector('button[aria-label="Pearl Moon"]');
+  const niche = found.querySelector('[class*="niche"]');
+  return [getComputedStyle(niche).animationName, getComputedStyle(niche, '::after').animationName, getComputedStyle(found.querySelector('[class*="spark"]')).animationName];
+});
+ok('reduced motion: every look holds still', Object.values(stilled).every(n => n === 'none'), JSON.stringify(stilled));
+ok('reduced motion: Pearl Moon holds still', stillPearl.every(n => n === 'none'), stillPearl.join(', '));
+await page.evaluate(() => document.documentElement.removeAttribute('data-reduced-motion'));
 ok('a shimmering tag sweeps with the shared shimmer', await page.evaluate(() => {
   const t = document.querySelector('[data-shimmer]');
   return getComputedStyle(t, '::after').animationName === 'luna-shimmer';

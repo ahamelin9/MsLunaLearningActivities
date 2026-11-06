@@ -50,27 +50,25 @@ export interface PhonemeChunk {
   spokenSound: string;
 }
 
+/** A picture to pick: a word from the bank, with its one picture (CNT-2). */
+export interface PictureOption {
+  id: string;
+  word: string;
+  imageEmoji: string;
+  isCorrect: boolean;
+}
+
 export interface BlendAndReadQuestion extends BaseQuestion {
   type: 'blend-and-read';
   word: string;
   phonemes: PhonemeChunk[];
-  options: {
-    id: string;
-    text: string;
-    imageEmoji: string;
-    isCorrect: boolean;
-  }[];
+  options: PictureOption[];
 }
 
 export interface ReadAndMatchQuestion extends BaseQuestion {
   type: 'read-and-match';
   word: string;
-  options: {
-    id: string;
-    text: string;
-    imageEmoji: string;
-    isCorrect: boolean;
-  }[];
+  options: PictureOption[];
 }
 
 export interface SightWordReaderQuestion extends BaseQuestion {
@@ -151,7 +149,10 @@ export interface Lesson {
   description: string;
   icon: string;
   difficulty: 1 | 2 | 3;
+  /** the pool a play's rounds are dealt from (CUR-6) */
   questions: LessonQuestion[];
+  /** rounds in one play, when not the usual `ROUNDS_PER_PLAY`: a story takes longer */
+  perPlay?: number;
   /** the most a lesson can earn: 3, as every game; how many follows PRG-1's rule (`engine/stars.ts`) */
   starsToEarn: number;
 }

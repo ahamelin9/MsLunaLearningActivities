@@ -111,11 +111,12 @@ export interface GameDef<TRound = never> {
   hiddenWord?: (round: TRound) => string | undefined;
   /**
    * Set when this is one of the curriculum's guided lessons rather than a
-   * game (see engine/lessons.tsx). Its rounds are the lesson's fixed
-   * questions, so there is no difficulty to choose; it earns stars by the
-   * same rule as a game (PRG-1), and finishing it marks the lesson done.
+   * game (see engine/lessons.ts). Its rounds are dealt from the lesson's
+   * questions, so there is no difficulty to choose; it earns stars by the same
+   * rule as a game (PRG-1), and practicing it until it's learned marks the
+   * lesson done (CUR-6). `missed` notes a round missed, to bring it back.
    */
-  lesson?: { id: string; skillId: string };
+  lesson?: { id: string; skillId: string; missed?: (round: TRound) => void };
 }
 
 /** Registry entry with the round type erased. */

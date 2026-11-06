@@ -7,6 +7,8 @@
  *         out, the card shows no time (until PRG-6 measures them; DES-13)
  *         rounds?: { done, total }: up next, once started, shows a thin rounds
  *         bar (from the data; PRG-8)
+ *         practice?: { done, goal }: up next, the good plays so far, shown as a
+ *         chip once there is one (from the data; CUR-6)
  *         opened?: the lesson that just opened: it pops in once (DES-13)
  *         onClick: a done or up-next card opens the lesson; a locked one
  *         wobbles first, and the screen has Luna say to finish the open one
@@ -46,6 +48,7 @@ interface LessonCardProps {
   state: 'done' | 'next' | 'locked';
   minutes?: number;
   rounds?: { done: number; total: number };
+  practice?: { done: number; goal: number };
   opened?: boolean;
   onClick?: () => void;
   className?: string;
@@ -60,6 +63,7 @@ export function LessonCard({
   state,
   minutes,
   rounds,
+  practice,
   opened = false,
   onClick,
   className,
@@ -80,7 +84,9 @@ export function LessonCard({
 
   const n = minutes === undefined ? undefined : Math.max(1, Math.round(minutes));
   const time = n === undefined ? '' : state === 'done' ? `, took ${n} minutes` : state === 'next' ? `, about ${n} minutes` : '';
-  const said = `Lesson ${number}, ${title}, ${state === 'done' ? 'done' : state === 'next' ? 'up next' : 'locked'}${time}`;
+  const practiced = state === 'next' && practice && practice.done > 0;
+  const practiceSaid = practiced ? `, practice ${practice.done} of ${practice.goal}` : '';
+  const said = `Lesson ${number}, ${title}, ${state === 'done' ? 'done' : state === 'next' ? 'up next' : 'locked'}${practiceSaid}${time}`;
   const started = state === 'next' && rounds && rounds.done > 0;
 
   return (
@@ -101,6 +107,11 @@ export function LessonCard({
       <span className={styles.number}>Lesson {number}</span>
       <span className={styles.title}>{title}</span>
       {started && <ProgressBar size="rounds" done={rounds.done} total={rounds.total} className={styles.rounds} />}
+      {practiced && (
+        <span data-shot="lesson-practice">
+          <Chip variant="took">Practice {practice.done} of {practice.goal}</Chip>
+        </span>
+      )}
       {minutes !== undefined && (
         <TimeChip
           minutes={minutes}

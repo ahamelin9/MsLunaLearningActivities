@@ -8,6 +8,7 @@ import { lessonStates } from '../lessons';
 import { gameMilestones, lessonMilestones, milestoneId } from '../milestones';
 import { SHELF_LINES, SIGNATURE_KIND, SQUISHY_KINDS, kindsFound, nextSquishy, type SquishyAward } from '../squishies';
 import { starsFor, starsWithTime, type TimeStar } from '../stars';
+import { isGoodPlay, outcomeOf, practiceLine, type PlayOutcome } from '../practice';
 import { estimateMinutes } from '../times';
 import { soundManager } from '@/utils/audio';
 import { pronunciation, type SpeechPart } from '@/utils/pronunciation';
@@ -81,6 +82,10 @@ const closingParts = (award: { squishy: SquishyAward | null; fullShelf: boolean 
   ...(award.fullShelf ? [{ text: SHELF_LINES.full }] : [])
 ];
 
+/** Luna's closing line: where a lesson's practice stands (CUR-6), or one of her usual ones. */
+const closingLine = (practice: PlayOutcome | undefined, gameId: string): string =>
+  (practice && practiceLine(practice)) ?? lunaSay('finish', gameId).text;
+
 /**
  * The frame every game and lesson plays in (DES-22a), as on the round 2 Round
  * board: the stage, a card with two soft blobs in the game's picture tint, and
@@ -120,8 +125,10 @@ export const GameShell: React.FC<GameShellProps> = ({
   // keeps falling into the next round (DES-11)
   const [petalFalls, setPetalFalls] = useState(0);
 
+  // dealt as a play starts, not as its start screen opens: a deal uses up what
+  // it deals (GAME-8), and the dial may still change. Luna's Pick starts at once
   const [rounds, setRounds] = useState<unknown[]>(() =>
-    game.makeRounds({ grade, difficulty: startDifficulty, count: game.roundsPerPlay })
+    autoStart ? game.makeRounds({ grade, difficulty: startDifficulty, count: game.roundsPerPlay }) : []
   );
 
   const timers = useRef<number[]>([]);
@@ -136,6 +143,8 @@ export const GameShell: React.FC<GameShellProps> = ({
     /** how long it took, on screen (PRG-6), and "about N min" from before this play */
     seconds: number;
     estimate: number;
+    /** a lesson's practice, this play included (CUR-6) */
+    practice?: PlayOutcome;
   } | null>(null);
 
   // the time a play takes, counted only while the app is on screen (PRG-6):
@@ -223,11 +232,16 @@ export const GameShell: React.FC<GameShellProps> = ({
   const startPlay = (level: Difficulty) => {
     soundManager.playPop();
     setDifficulty(level);
-    setRounds(game.makeRounds({ grade, difficulty: level, count: game.roundsPerPlay }));
-    answeredRef.current = false;
-    // a lesson left part-way picks up where it was, once (PRG-8)
+    // a lesson left part-way picks up where it was, once (PRG-8): the rounds
+    // still to play are dealt, and the rounds won keep their places
     const from = resumeRef.current;
     resumeRef.current = undefined;
+    const won = from?.won ?? 0;
+    setRounds([
+      ...Array<unknown>(won).fill(undefined),
+      ...game.makeRounds({ grade, difficulty: level, count: game.roundsPerPlay - won })
+    ]);
+    answeredRef.current = false;
     setRoundIndex(from?.won ?? 0);
     setAttempts(0);
     setHintLevel(0);
@@ -274,7 +288,14 @@ export const GameShell: React.FC<GameShellProps> = ({
         fullShelf: Boolean(squishy) && kindsFound(progress.stickers) < all && kindsFound([...progress.stickers, squishy!.id]) === all,
         stars,
         timeStar: time,
-        firstTry: cleanRef.current
+        firstTry: cleanRef.current,
+        practice: game.lesson
+          ? outcomeOf(
+              progress.lessonPractice[game.lesson.id],
+              progress.completedLessons.includes(game.lesson.id),
+              isGoodPlay(cleanRef.current, game.roundsPerPlay)
+            )
+          : undefined
       });
       setPhase('reward');
     } else {
@@ -286,7 +307,7 @@ export const GameShell: React.FC<GameShellProps> = ({
       answeredRef.current = false;
       setRoundIndex(roundIndex + 1);
     }
-  }, [game, progress.completedLessons, progress.stickers, progress.times, roundIndex]);
+  }, [game, progress.completedLessons, progress.lessonPractice, progress.stickers, progress.times, roundIndex]);
 
   // the words Luna's line must not have (BUG-27): a round's heard-only word
   const hiddenAt = useCallback(
@@ -327,6 +348,8 @@ export const GameShell: React.FC<GameShellProps> = ({
     (opts?: { lunaLine?: string; hint?: SpeechPart[]; reveal?: () => void }) => {
       const attemptNumber = attempts + 1;
       setAttempts(attemptNumber);
+      // a lesson brings it back next play, even if this one is left here (CUR-6)
+      if (attemptNumber === 1) game.lesson?.missed?.(rounds[roundIndex]);
       setWinStreak(0);
       setFlash('miss');
       soundManager.playTryAgain();
@@ -355,7 +378,7 @@ export const GameShell: React.FC<GameShellProps> = ({
         (attemptNumber >= 2 ? lunaSay('missAgain', game.id, avoid).text : lunaSay('missFirst', game.id, avoid).text);
       speak(line, attemptNumber >= 2 ? 'think' : 'oops', spokenHint ?? []);
     },
-    [attempts, game.id, hiddenAt, later, roundIndex, speak]
+    [attempts, game.id, game.lesson, hiddenAt, later, roundIndex, rounds, speak]
   );
 
   // An answer is being said (FB-1): input waits, and Luna with it.
@@ -459,7 +482,7 @@ export const GameShell: React.FC<GameShellProps> = ({
     recorded.current = true;
 
     // Luna's closing line, and a new squishy's after it
-    const closing = () => speak(lunaSay('finish', game.id).text, 'cheer', closingParts(award));
+    const closing = () => speak(closingLine(award.practice, game.id), 'cheer', closingParts(award));
 
     // how long it took, and today's minutes with it (PRG-6), less those a
     // lesson left part-way already added (PRG-11)
@@ -471,7 +494,8 @@ export const GameShell: React.FC<GameShellProps> = ({
         game.lesson.id,
         award.stars,
         game.lesson.skillId,
-        award.squishy?.id ?? null
+        award.squishy?.id ?? null,
+        award.practice?.good
       );
       reached = lessons?.length
         ? lessonMilestones(lessons, doneBefore, storageService.getProgress().completedLessons, award.stars)
@@ -579,7 +603,7 @@ export const GameShell: React.FC<GameShellProps> = ({
           moon={moon}
           onMoonGone={() => {
             setMoon(null);
-            speak(lunaSay('finish', game.id).text, 'cheer', award ? closingParts(award) : []);
+            speak(closingLine(award?.practice, game.id), 'cheer', award ? closingParts(award) : []);
           }}
         />
       </>

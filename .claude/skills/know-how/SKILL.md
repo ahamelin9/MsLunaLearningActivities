@@ -136,6 +136,18 @@ build, or a tool that misbehaved. Skip routine fixes.
   a word's stray edges.
 - **Check:** your ear first (the Sound Check page; a machine ear can't judge
   vowels or held sounds), then `voice-audit/score.py` for the consonants.
+- **Measure it against real speech** (*2026-10-28, research run*): what each
+  sound should be is in `docs/voice/sound-standard.md`, with targets from
+  real American women in `docs/voice/research-2026-10-28.md`. Example: an R
+  has F2 about 1500 Hz and F3 at most about 2000; a light L, F1 about 550
+  and F2 about 1450–1500. To find the right stretch of a word to hold,
+  align it (`voice-audit/align.py`), measure (`measure_clips.py`), and hold
+  that span (`holdspan.mjs`). Guessing the cut point gave a "clear L" that
+  measured like W and an L that was really the vowel of "bell".
+- **Pitfall, a take that's silently broken** (*round 2*): 12 takes came out
+  60–165 ms because the cutter took the *last* voiced run, which in a slow
+  render ending in "." is a stray breath. Check every take's length before
+  publishing a round (`measure_clips.py` prints it).
 
 ## Two voices at once, or a line cut off
 
@@ -712,6 +724,49 @@ Pitfalls that cost time:
   shoots its done screen at all four sizes and fails if a button or the shelf
   runs off screen.
 
+## Is a lesson learned when it should be? (CUR-6)
+
+*2026-11-06 · CUR-6*
+
+- **Symptom:** a check that plays a lesson once expects the next lesson to open,
+  and now it stays locked; or you need to know that practice really holds.
+- **Cause:** a lesson is learned after 3 good plays (4 of 5 rounds right the first
+  time), or 6 plays of any kind (`LEARN_RULE`, `engine/practice.ts`). `completedLessons`
+  means learned from now on.
+- **Fix:** to test what happens *after* a lesson, seed the save so the next play
+  finishes it, whatever it's like: `lessonPractice: { [id]: { good: 2, plays: 5 } }`,
+  then reload. `onLastPlay` in `moon-check.mjs` and `lesson-order-check.mjs` does it.
+- **Check:** `node .claude/skills/know-how/practice-check.mjs 5199` plays it for real:
+  2 good plays leave the next lesson locked, a weak play doesn't count, the 3rd
+  good one opens it, 6 of any kind do too, an old save's lessons stay done, and a
+  replay differs, with a missed round back first. It needs a lesson with at least 2
+  plays' worth of rounds.
+
+## The same things come up over and over (GAME-8)
+
+*2026-11-06 · GAME-8*
+
+- **Symptom:** a game or lesson brings back what it just asked.
+- **Cause:** everything has to deal through `engine/deck.ts`, which remembers what
+  was dealt, saved under `ms_luna_seen_v1`. A game that picks at random, or fills
+  a gap from the whole pool, repeats early. Muddled Cards did that for a board with
+  two look-alike words, and it only failed once the bank and `LOOK_ALIKE` grew (CNT-5).
+- **Fix:** ask the deck for it, one item at a time if need be. A lesson also passes
+  what each round is about (`aboutOf`), so a play asks each letter once first.
+- **Check:** `node .claude/skills/know-how/deck-check.mjs` plays all 8 games at every
+  grade and dial, with no browser. Run it again after adding content.
+
+## A script's `.replace` changed the code it was pasting
+
+*2026-11-06 · CUR-6*
+
+- **Symptom:** after patching a check by script, it fails with `(intermediate value)
+  is not iterable`: `page.$$('button')` has become `page.$('button')`.
+- **Cause:** in `String.replace`'s replacement text, `$$` means one `$` (and `$'` and
+  `` $` `` paste other parts of the string).
+- **Fix:** pass a function, `s.replace(a, () => b)`, or use the Edit tool.
+- **Check:** `git diff` the file for lines with `$` in them.
+
 ## Two screenshot runs of the same code don't match
 
 *2026-10-11 · DES-18a*
@@ -872,6 +927,20 @@ Pitfalls that cost time:
   first and last things (the path of stones, the answers). The layout audit
   plays only round 1, so a game whose content grows by round needs its own
   check: `treasure-fit.mjs` next to this file plays all 5 stones.
+- **Pitfall, the audit only meets what's dealt first** (*2026-11-06, CUR-4*):
+  since the decks (GAME-8), round 1 differs every play, so a story that doesn't
+  fit can stay out of sight for months. `fit-check.mjs [port] [lessons|stories|sentences|passages]
+  [sizes] [only=Title words]` shows each item alone: in the page's own modules
+  it narrows the pool to it (`lesson.questions = [q]`; a splice of `MINI_STORIES`,
+  `SENTENCES` or `PASSAGES`, which the games read at the start of a play), then
+  opens it for real. It takes about 12 minutes a size. The URL has to be the
+  app's own module instance, so it reads it from `performance.getEntriesByType('resource')`.
+  What overflows is usually answers, not lines: the three stories it caught had
+  the longest answers in the app, one wrapping to two lines (26 characters or more).
+- **Pitfall, the moon counts as a Luna** (*2026-11-06*): the milestone moon has
+  `data-mood` too, so "two owls: 2 Lunas" on a done screen was her visit. The
+  audit skips anything inside `[data-shot="moon-visit"]`. A real one, an owl
+  picture beside Luna, now fails `voice:audit` (no 🦉 in what she teaches).
 - **Check:** it passes at every grade today, and fails with GameShell's
   `.shell-stage { min-height }` set to 1400px for a moment.
 

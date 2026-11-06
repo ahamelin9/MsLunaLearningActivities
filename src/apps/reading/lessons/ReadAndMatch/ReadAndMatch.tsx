@@ -45,11 +45,11 @@ export const ReadAndMatch: React.FC<{ question: ReadAndMatchQuestion; api: GameA
             data-shot="lesson-choice"
             state={choiceState(option.id, option.isCorrect, wrongId, solved, revealed)}
             onClick={() =>
-              choose(option.id, option.isCorrect, [{ text: option.text }])
+              choose(option.id, option.isCorrect, [{ word: option.word }])
             }
-            aria-label={option.text}
+            aria-label={option.word}
             // named once found: written, it would be matched to the word letter for letter
-            caption={solved ? option.text : undefined}
+            caption={solved ? option.word : undefined}
           >
             {option.imageEmoji}
           </Choice>

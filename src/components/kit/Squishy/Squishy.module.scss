@@ -34,12 +34,19 @@
 .root[data-colour='toffee'] { --sq-fill: var(--illo-squishy-toffee); --sq-edge: var(--illo-squishy-toffee-edge); }
 .root[data-colour='cream'] { --sq-fill: var(--illo-squishy-cream); --sq-edge: var(--illo-squishy-cream-edge); }
 .root[data-colour='blush'] { --sq-fill: var(--illo-squishy-blush); --sq-edge: var(--illo-squishy-blush-edge); }
+.root[data-colour='cocoa'] { --sq-fill: var(--illo-squishy-cocoa); --sq-edge: var(--illo-squishy-cocoa-edge); }
+.root[data-colour='blush'] { --sq-fill: var(--illo-squishy-blush); --sq-edge: var(--illo-squishy-blush-edge); }
+.root[data-colour='sage'] { --sq-fill: var(--illo-squishy-sage); --sq-edge: var(--illo-squishy-sage-edge); }
+.root[data-colour='sky'] { --sq-fill: var(--illo-squishy-sky); --sq-edge: var(--illo-squishy-sky-edge); }
+.root[data-colour='lilac'] { --sq-fill: var(--illo-squishy-lilac); --sq-edge: var(--illo-squishy-lilac-edge); }
 .root[data-colour='honey'] { --sq-fill: var(--illo-squishy-honey); --sq-edge: var(--illo-squishy-honey-edge); }
 .root[data-colour='butter'] {
   --sq-fill: var(--illo-squishy-butter);
   --sq-edge: var(--illo-squishy-butter-edge);
   --sq-top: var(--illo-squishy-butter-top);
 }
+// a super-rare swirl is caramel under its cream waves; shimmer and glow stay honey
+.root[data-look='swirl'] { --sq-fill: var(--illo-squishy-caramel); --sq-edge: var(--illo-squishy-caramel-edge); }
 
 // ── the drawing ────────────────────────────────────────────────────────────
 .art {
@@ -52,10 +59,12 @@
   display: block;
   width: var(--sq-size);
   height: calc(var(--sq-size) * 0.92); // the drawings' 100 × 92 grid
+  overflow: visible; // a glow reaches past its box
 }
 
 .body,
-.top {
+.top,
+.outline {
   fill: var(--sq-fill);
   stroke: var(--sq-edge);
   stroke-width: 3;
@@ -63,6 +72,7 @@
 }
 
 .top { fill: var(--sq-top); }
+.outline { fill: none; }
 .halfScale { stroke-width: 6; } // the Little Moon is drawn at half scale
 
 .shadow { fill: var(--illo-shadow); }
@@ -100,6 +110,93 @@
   stroke-linejoin: round;
 }
 
+// the mushroom's stem, the acorn's cap, the toast's middle, the donut's glaze:
+// the same whatever colour the squishy comes in
+.stem {
+  fill: var(--illo-squishy-cream);
+  stroke: var(--illo-squishy-cream-edge);
+  stroke-width: 3;
+  stroke-linejoin: round;
+}
+
+.glaze {
+  fill: var(--illo-squishy-cream);
+  stroke: var(--illo-squishy-cream-edge);
+  stroke-width: 2;
+  stroke-linejoin: round;
+}
+
+.crumb {
+  fill: var(--illo-squishy-cream);
+  stroke: var(--illo-squishy-cream-edge);
+  stroke-width: 1.5;
+}
+
+.cap {
+  fill: var(--illo-squishy-cocoa);
+  stroke: var(--illo-squishy-cocoa-edge);
+  stroke-width: 3;
+  stroke-linejoin: round;
+}
+
+.capStem {
+  fill: none;
+  stroke: var(--illo-squishy-cocoa-edge);
+  stroke-width: 4;
+  stroke-linecap: round;
+}
+
+.belly { fill: var(--illo-squishy-cream); }
+
+// the penguin's beak and feet
+.beak {
+  fill: var(--illo-squishy-honey);
+  stroke: var(--illo-squishy-honey-edge);
+  stroke-width: 1.5;
+  stroke-linejoin: round;
+}
+
+.spot { fill: var(--illo-squishy-light); opacity: 0.85; }
+.earInside { fill: var(--illo-squishy-cheek); opacity: 0.5; }
+
+.pleat {
+  fill: none;
+  stroke: var(--sq-edge);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  opacity: 0.7;
+}
+
+// ── the super-rare looks (PRG-5b) ──────────────────────────────────────────
+.waves {
+  fill: none;
+  stroke: var(--illo-squishy-cream);
+  stroke-width: 7;
+}
+
+.band { fill: var(--illo-squishy-light); opacity: 0.62; }
+.bandThin { fill: var(--illo-squishy-light); opacity: 0.42; }
+
+.glowInner { stop-color: var(--illo-squishy-butter); stop-opacity: 0.75; }
+.glowOuter { stop-color: var(--illo-squishy-butter); stop-opacity: 0; }
+
+// a select few move, gently; all three hold still under reduced motion
+.root[data-moves] {
+  .waves,
+  .sheen,
+  .halo {
+    transform-box: fill-box;
+  }
+
+  .waves { animation: var(--motion-swirl); }
+  .sheen { animation: var(--motion-sheen); }
+
+  .halo {
+    transform-origin: center;
+    animation: var(--motion-halo);
+  }
+}
+
 // a rare or super-rare colour wears a sparkle that twinkles
 .badge {
   --icon-fill: var(--illo-spark-rare);
@@ -117,27 +214,13 @@
 }
 
 // ── states ─────────────────────────────────────────────────────────────────
-// not found yet: its own shape, greyed, with no face
-.root[data-state~='ghost'] {
-  .body,
-  .top {
-    fill: var(--edge);
-    stroke: none;
-  }
-
-  .shadow,
-  .shine,
-  .eye,
-  .mouth,
-  .muzzle,
-  .innerEar,
-  .cheek,
-  .whisker,
-  .crease,
-  .leaf {
-    display: none;
-  }
+// not found yet: its own shape, greyed, with no face (only the shape is drawn)
+.root[data-state~='ghost'] .body {
+  fill: var(--edge);
+  stroke: none;
 }
+
+.ghostPart { fill: var(--edge); }
 
 // a harder one: a dashed "?" slot
 .slot {

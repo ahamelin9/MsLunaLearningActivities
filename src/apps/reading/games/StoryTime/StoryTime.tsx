@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import type { GameApi, GameDef } from '../../engine/types';
 import { MINI_STORIES, pick, shuffle, tierFor, type MiniStory } from '../../engine/content';
+import { deal } from '../../engine/deck';
 import { soundManager } from '@/utils/audio';
 import { pronunciation } from '@/utils/pronunciation';
 import { Choice, ChunkyButton } from '@/components/kit';
@@ -280,8 +281,7 @@ export const storyTime: GameDef<Round> = {
   makeRounds: ({ grade, difficulty, count }) => {
     const tier = tierFor(grade, difficulty);
     const preferred = MINI_STORIES.filter(s => s.tier <= tier);
-    const ordered = shuffle(preferred.length > 0 ? preferred : MINI_STORIES);
-    return Array.from({ length: count }, (_, i) => buildRound(ordered[i % ordered.length]));
+    return deal('story-time', preferred.length > 0 ? preferred : MINI_STORIES, count, s => s.id).map(buildRound);
   },
   Play
 };

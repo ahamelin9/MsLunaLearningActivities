@@ -2,9 +2,18 @@
 // game's done screen (PRG-9): roles and the space scale only; the squishies
 // are the kit's.
 
+@use 'styles/mixins' as *;
+
 .row {
   display: flex;
   flex-direction: column;
+}
+
+// a done screen on a portrait iPad has room for one plank (PRG-5b)
+.row[data-spare] {
+  @include bp(narrow) {
+    display: none;
+  }
 }
 
 .kinds {
