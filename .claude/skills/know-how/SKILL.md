@@ -937,6 +937,12 @@ Pitfalls that cost time:
   app's own module instance, so it reads it from `performance.getEntriesByType('resource')`.
   What overflows is usually answers, not lines: the three stories it caught had
   the longest answers in the app, one wrapping to two lines (26 characters or more).
+- **Pitfall, "nothing scrolls" isn't "it fits"** (*2026-11-07, PRG-5b*): on a
+  1024 iPad six squishies ran past the end of their plank and poked out of the
+  shelf, while every fit measure stayed empty: the row overflowed its own box,
+  not the screen or the card. A measure against the screen can't see that, so
+  compare a piece with what holds it (`shelf-check` does, kind against plank,
+  at the four sizes), and look at the 1024 shot, the tightest width.
 - **Pitfall, the moon counts as a Luna** (*2026-11-06*): the milestone moon has
   `data-mood` too, so "two owls: 2 Lunas" on a done screen was her visit. The
   audit skips anything inside `[data-shot="moon-visit"]`. A real one, an owl

@@ -10,7 +10,7 @@ tickets.
 - **`epics/<EPIC>.md`**: one file per epic, with its goal and every ticket's full section (Why / How / Complete when). A ticket never moves files when its status changes.
 - **`CHANGELOG.md`**: finished and dropped tickets. Once a ticket is deleted, its changelog line is its only record.
 
-**Last updated:** 2026-11-06
+**Last updated:** 2026-11-07
 
 ## How to read this
 
@@ -72,8 +72,8 @@ be pulled into Phase 1 for a break from styling.
 
 ### Now / Next
 
-- **Now:** much more content and variety, and lessons practiced until they're learned, with as little of his input as possible (Alex, 2026-11-06): GAME-8, CNT-2, CUR-6, CNT-5, CUR-4a, CUR-4b, CUR-4c, GAME-5 and GAME-9 are built and wait for his read-through and OK (`screenshots/review/HANDOVER.md`). Meanwhile, the small jobs that need nothing from him: OPS-2, OPS-1, OPS-7. CUR-7 once he's picked how the library folds.
-- **Next:** the VOX epic, set aside for later (Alex, 2026-11-06): VOX-1 once his picks are in on the Sound Check page, with VOX-4 alongside it; VOX-5 (the Luna/Kore blend for single words; his call first: lines too?), then VOX-2, then VOX-3. DES-27's pictures after his notes on the first sample; PRG-5b once he and the teacher have OKed its sample sheet. The Writing app (WRT) after Phase 7. OPS-11 stays parked.
+- **Now:** much more content and variety, and lessons practiced until they're learned, with as little of his input as possible (Alex, 2026-11-06): GAME-8, CNT-2, CUR-6, CNT-5, CUR-4a, CUR-4b, CUR-4c, GAME-5 and GAME-9, with the small jobs OPS-1, OPS-2 and OPS-7, are built and wait for his read-through and OK (`screenshots/review/HANDOVER.md`). PRG-5b is built too, and waits for the teacher's OK on the look. CUR-7 once he's picked how the library folds.
+- **Next:** the VOX epic, set aside for later (Alex, 2026-11-06): VOX-1 once his picks are in on the Sound Check page, with VOX-4 alongside it; VOX-5 (the Luna/Kore blend for single words; his call first: lines too?), then VOX-2, then VOX-3. DES-27's pictures after his notes on the first sample. The Writing app (WRT) after Phase 7. OPS-11 stays parked.
 
 ## Epics
 

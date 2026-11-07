@@ -85,15 +85,76 @@
   color: var(--ink-soft);
 }
 
+// a kind of colour: its name, and the dots or looks under it, as on the board
+.group {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-1);
+  font: var(--text-label-small);
+  font-weight: 700;
+}
+
+// the same sparkle a rare or super-rare squishy wears, held still here
+.sparkled {
+  --icon-fill: var(--illo-spark-rare);
+
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  color: var(--ink);
+
+  svg {
+    color: var(--illo-spark-rare-deep);
+  }
+
+  &[data-variant='super'] {
+    --icon-fill: var(--illo-spark-super);
+
+    svg {
+      color: var(--illo-spark-super-edge);
+    }
+  }
+}
+
+.looks {
+  font-weight: 400;
+  color: var(--ink-soft);
+}
+
+.still {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding-top: var(--space-2);
+  border-top: var(--border-regular) dashed var(--edge);
+}
+
 .key {
   display: flex;
   align-items: center;
   gap: var(--space-2);
   font: var(--text-label-small);
   font-weight: 400;
+}
 
-  strong {
-    font-weight: 700;
-    min-width: calc(var(--space-16) + var(--space-6));
-  }
+// the key's small pictures of a kind still to find: its greyed shape, its "?" slot
+.ghostMark {
+  width: var(--space-5);
+  height: var(--space-4);
+  border-radius: var(--radius-chip);
+  background: var(--edge);
+}
+
+.slotMark {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--space-5);
+  height: var(--space-5);
+  border: var(--border-hair) dashed var(--soil);
+  border-radius: var(--radius-tag);
+  background: var(--well);
+  color: var(--ink-soft);
+  font: var(--text-tag);
 }

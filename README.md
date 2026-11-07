@@ -156,7 +156,7 @@ That trade matters a lot on a tablet:
 
 |                            | on-device synthesis | pre-rendered |
 | -------------------------- | ------------------- | ------------ |
-| download before it speaks  | 21.6 MB WASM + ~325 MB weights | ~0.8 MB of audio |
+| download before it speaks  | 21.6 MB WASM + ~325 MB weights | 116 MB of audio in all |
 | delay on a tap             | 5–10 s              | none         |
 | `kokoro-js` in the bundle  | yes                 | no           |
 

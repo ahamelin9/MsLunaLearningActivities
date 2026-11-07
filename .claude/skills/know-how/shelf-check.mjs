@@ -101,6 +101,27 @@ await page.click(at('see-shelf'));
 await page.waitForSelector(at('shelf'), { timeout: 5000 }).catch(() => {});
 const count1 = await page.$eval(at('shelf-count'), e => e.textContent.trim()).catch(() => 'no shelf');
 ok('"See my shelf" opens it at 1 of 18, with "New"', count1 === '1 of 18' && (await page.evaluate(() => [...document.querySelectorAll('[data-shot="shelf-kind"]')].some(k => k.textContent.includes('New')))), count1);
+const shelfKinds = await page.evaluate(() => [...document.querySelectorAll('[data-shot="shelf-kind"]')].map(k => ({
+  found: !k.querySelector('[data-state~="ghost"], [data-state~="mystery"]'),
+  dots: getComputedStyle(k.querySelector('[role="img"]')).visibility === 'visible'
+})));
+ok('as on the board, only a kind found shows its colour dots', shelfKinds.length === 18 && shelfKinds.every(k => k.dots === k.found), JSON.stringify(shelfKinds.filter(k => k.dots !== k.found)));
+const shelfKey = await page.$eval(at('shelf'), e => e.textContent);
+ok('the key says what a grey shape and a "?" slot mean', /an easy one, coming soon/.test(shelfKey) && /a hard one, a mystery/.test(shelfKey), shelfKey.slice(-160));
+// six kinds a plank is tight on a small iPad: nothing scrolls, but one can still run off the end
+const viewport = page.viewport();
+for (const [width, height] of [[1180, 820], [820, 1180], [1024, 768], [744, 1133]]) {
+  await page.setViewport({ width, height });
+  await wait(300);
+  const past = await page.evaluate(() => [...document.querySelectorAll('[data-shot="shelf-kind"]')].filter(k => {
+    const plank = k.parentElement.nextElementSibling.getBoundingClientRect();
+    const box = k.getBoundingClientRect();
+    return box.left < plank.left - 1 || box.right > plank.right + 1;
+  }).length);
+  ok(`every kind stays on its plank at ${width}×${height}`, past === 0, `${past} past it`);
+}
+await page.setViewport(viewport);
+await wait(300);
 await page.click(at('shell-back'));
 await page.waitForSelector(at('hub'));
 await wait(600);

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import type { UserProgress } from '@/types/user';
-import { Chip, Luna, PaperCard, PearlMoon, SpeechBubble, SquishyDots, type LunaMood } from '@/components/kit';
+import { Chip, Icon, Luna, PaperCard, PearlMoon, SpeechBubble, SquishyDots, type LunaMood } from '@/components/kit';
 import { AppHeader } from '@/components/os/AppHeader/AppHeader';
 import { soundManager } from '@/utils/audio';
 import { SHELF_LINES, SQUISHY_KINDS, kindsFound, parseSquishy } from '../../engine/squishies';
@@ -11,7 +11,7 @@ import styles from './Shelf.module.scss';
  * Luna's Squishy Shelf (PRG-5a), as on the round 2 Squishies board: an arched
  * cabinet with the kinds on planks, each in the rarest colour found and its
  * colour dots under it; one still to find is a greyed shape (easy) or a "?"
- * slot (hard), and the top of the arch keeps a "?" for something special,
+ * slot (hard), with no dots, and the top of the arch keeps a "?" for something special,
  * Pearl Moon once the shelf is full (PRG-4, PRG-5b). Beside it Luna, and what
  * the colours mean. A tap squishes a found
  * one and Luna says its line, or wobbles one still to find and she gives a
@@ -69,25 +69,37 @@ export const Shelf: React.FC<{ progress: UserProgress; onBack: () => void }> = (
 
           <PaperCard className={styles.legend}>
             <h3 className={styles.label}>Colours</h3>
-            <span className={styles.key}>
+            <span className={styles.group}>
               <strong>Usual</strong>
               <SquishyDots dots={['oat', 'cream', 'caramel', 'toffee', 'cocoa']} label="Usual colours" />
             </span>
-            <span className={styles.key}>
-              <strong>Rare</strong>
+            <span className={styles.group}>
+              <strong className={styles.sparkled}>
+                <Icon name="sparkle" size={16} filled /> Rare
+              </strong>
               <SquishyDots dots={['blush', 'sage', 'sky', 'butter', 'lilac']} label="Rare colours" />
             </span>
-            <span className={styles.key}>
-              <strong>Super rare</strong>
-              swirl · shimmer · glow
+            <span className={styles.group}>
+              <strong className={styles.sparkled} data-variant="super">
+                <Icon name="sparkle" size={16} filled /> Super rare
+              </strong>
+              <span className={styles.looks}>swirl · shimmer · glow</span>
             </span>
-            <h3 className={styles.label}>Still to find</h3>
-            <span className={styles.key}>
-              <SquishyDots dots={['grey']} label="A usual colour" /> a usual colour
-            </span>
-            <span className={styles.key}>
-              <SquishyDots dots={['?']} label="A rare colour" /> a rare colour
-            </span>
+            <div className={styles.still}>
+              <h3 className={styles.label}>Still to find</h3>
+              <span className={styles.key}>
+                <SquishyDots dots={['grey']} label="A usual colour" /> a usual colour
+              </span>
+              <span className={styles.key}>
+                <SquishyDots dots={['?']} label="A rare colour" /> a rare colour
+              </span>
+              <span className={styles.key}>
+                <span className={styles.ghostMark} aria-hidden="true" /> an easy one, coming soon
+              </span>
+              <span className={styles.key}>
+                <span className={styles.slotMark} aria-hidden="true">?</span> a hard one, a mystery
+              </span>
+            </div>
           </PaperCard>
         </aside>
       </div>

@@ -27,7 +27,8 @@ the order of things.
    `screenshots/review/HANDOVER.md`: what's built, Complete when ✅/❌/⏳,
    his call, the exact `git add` and message. Keep the "where things stand"
    block at the top current, so a session that ends mid-ticket leaves a clear
-   state.
+   state. While a voice render runs, that block opens with "don't commit yet"
+   and says why: run 7's commit caught one a quarter done, and needed a second.
 5. **Wrap up** with the `wrap-up` checklist before the next ticket: the
    ticket's notes and Now/Next, every learning routed (memory, know-how,
    `docs/design-system/`, a skill), stale notes fixed, the voice queue.

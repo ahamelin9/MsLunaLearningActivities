@@ -16,7 +16,7 @@ Task · P2 · S
 - The README says ~0.8 MB of audio; it's 21 MB.
 - Grade Select mentions a "dashboard" that doesn't exist.
 - **Complete when:** the README's audio size and layout match the repo, and no screen mentions a dashboard.
-- **Built (2026-11-06), waits for Alex's OK:** the README's layout and lessons match the repo, and no screen mentions a dashboard. Its audio size goes in with the run's last render.
+- **Built (2026-11-06), waits for Alex's OK:** the README's layout and lessons match the repo, and no screen mentions a dashboard. Its audio size is the last render's real one, 116 MB.
 
 ### OPS-7 · Drop Treasure Path's leftovers from the sentence bank
 Task · P2 · S

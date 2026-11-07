@@ -13,7 +13,7 @@ interface ShelfRowsProps {
   size: 64 | 96;
   /** the kind that wears "New" */
   picked?: SquishyKind;
-  /** each kind's colour dots under it, found and still to find (the shelf page) */
+  /** the colour dots under each kind found (the shelf page) */
   dots?: boolean;
   /** a squishy tapped: a found one squishes, one still to find wobbles */
   onTap: (def: SquishyKindDef, found: boolean) => void;
@@ -57,6 +57,7 @@ export const ShelfRows: React.FC<ShelfRowsProps> = ({ owned, size, picked, dots 
                   />
                   {dots && (
                     <SquishyDots
+                      className={has ? undefined : styles.noDots}
                       dots={coloursOf(def.kind).map((c, i) => (colours.includes(c) ? c : i === 0 ? 'grey' : '?'))}
                       label={`${def.name}: ${colours.length} of 3 colours found`}
                     />
