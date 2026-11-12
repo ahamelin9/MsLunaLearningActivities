@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import type { AnyGameDef } from '../types';
 import { ODDS, SQUISHY_KINDS, kindsFound, type SquishyAward } from '../squishies';
 import { ShelfRows } from '../ShelfRows/ShelfRows';
+import { useFirstSqueeze } from '../firstSqueeze';
 import type { TimeStar } from '../stars';
 import { LEARN_RULE, goodPlayNeeds, type PlayOutcome } from '../practice';
 import { soundManager } from '@/utils/audio';
@@ -140,6 +141,10 @@ export const DoneScreen: React.FC<DoneScreenProps> = ({
 }) => {
   // each tap on the mark pops it again
   const [pops, setPops] = useState(0);
+  // the new squishy and the shelf's speak on their first squeeze, and once
+  // between them for the same line (BUG-30); later squeezes only squish
+  const firstSqueeze = useFirstSqueeze();
+  const speakOnce = (line: string) => firstSqueeze(line, () => soundManager.speak(line));
   const stars = Math.max(0, Math.min(3, award?.stars ?? 1)) as 0 | 1 | 2 | 3;
   const squishy = award?.squishy ?? null;
   const practice = award?.practice;
@@ -239,7 +244,7 @@ export const DoneScreen: React.FC<DoneScreenProps> = ({
                 colour={squishy.colour}
                 size={96}
                 label={`${squishy.name}: hear Ms. Luna`}
-                onClick={() => soundManager.speak(squishy.line)}
+                onClick={() => speakOnce(squishy.line)}
               />
               <span className={styles.rewardWords}>
                 <span className={styles.rewardLabel}>New squishy for your shelf</span>
@@ -270,7 +275,7 @@ export const DoneScreen: React.FC<DoneScreenProps> = ({
                   owned={owned}
                   size={64}
                   picked={squishy?.kind}
-                  onTap={(def, found) => soundManager.speak(found ? def.line : def.hint)}
+                  onTap={(def, found) => speakOnce(found ? def.line : def.hint)}
                 />
               </div>
             </section>

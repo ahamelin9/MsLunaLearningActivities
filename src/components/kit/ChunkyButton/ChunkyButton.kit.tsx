@@ -11,7 +11,7 @@ function TryHold() {
   const [opened, setOpened] = useState(0);
   return (
     <Specimen label={opened ? `opened ${opened}×` : 'try it: hold'}>
-      <ChunkyButton variant="icon" icon="gear" aria-label="Hold to try" data-shot="kit-hold" onHold={() => setOpened(n => n + 1)} />
+      <ChunkyButton variant="icon" icon="apple" aria-label="Hold to try" data-shot="kit-hold" onHold={() => setOpened(n => n + 1)} />
     </Specimen>
   );
 }
@@ -71,7 +71,7 @@ export default function ChunkyButtonKit() {
           <Specimens title={`icon · ${size}`}>
             {STATES.map(s => (
               <Specimen key={s.label} label={s.label}>
-                <ChunkyButton variant="icon" size={size} icon="gear" aria-label="Grown-ups: settings" {...s.props} />
+                <ChunkyButton variant="icon" size={size} icon="apple" aria-label="Grown-ups: Teacher’s corner" {...s.props} />
               </Specimen>
             ))}
           </Specimens>
@@ -86,10 +86,10 @@ export default function ChunkyButtonKit() {
       </Specimens>
       <Specimens title="hold: the grown-up gate, a 1.5s press and hold (SET-1)">
         <Specimen label="idle">
-          <ChunkyButton variant="icon" icon="gear" aria-label="Grown-ups: settings" onHold={noop} />
+          <ChunkyButton variant="icon" icon="apple" aria-label="Grown-ups: Teacher’s corner" onHold={noop} />
         </Specimen>
         <Specimen label="held part-way">
-          <ChunkyButton variant="icon" icon="gear" aria-label="Grown-ups: settings" onHold={noop} style={{ '--hold-progress': 0.6 } as CSSProperties} />
+          <ChunkyButton variant="icon" icon="apple" aria-label="Grown-ups: Teacher’s corner" onHold={noop} style={{ '--hold-progress': 0.6 } as CSSProperties} />
         </Specimen>
         <Specimen label="a grade, held part-way">
           <ChunkyButton onHold={noop} style={{ '--hold-progress': 0.35 } as CSSProperties}>Kindergarten</ChunkyButton>
@@ -100,7 +100,7 @@ export default function ChunkyButtonKit() {
         <Specimen label="after a quick tap">
           {/* room for the note, which hangs left from the button's right edge, as under the header's gear */}
           <div style={{ paddingLeft: 'calc(var(--space-16) * 3)', paddingBottom: 'var(--space-10)' }}>
-            <ChunkyButton variant="icon" icon="gear" aria-label="Grown-ups: settings" onHold={noop} holdNote />
+            <ChunkyButton variant="icon" icon="apple" aria-label="Grown-ups: Teacher’s corner" onHold={noop} holdNote />
           </div>
         </Specimen>
         <Specimen label="holdNoteAt start: from its left edge (Luna's mute)">

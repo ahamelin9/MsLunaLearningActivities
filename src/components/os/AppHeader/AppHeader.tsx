@@ -1,7 +1,7 @@
 /**
  * AppHeader: the one header inside an app (DES-8). A way back, the screen's
- * title, and what the screen puts at its end: the stars and the gear on the
- * library, a game's rounds and Again.
+ * title, and what the screen puts at its end: the stars and the apple (the
+ * Teacher's corner) on the library, a game's rounds and Again.
  *
  * Props:  back: 'home' (leaves the app) | 'library' (from a game) · onBack
  *         title · beside?: what sits next to the title (the library's grade

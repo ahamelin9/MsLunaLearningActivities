@@ -10,7 +10,7 @@ tickets.
 - **`epics/<EPIC>.md`**: one file per epic, with its goal and every ticket's full section (Why / How / Complete when). A ticket never moves files when its status changes.
 - **`CHANGELOG.md`**: finished and dropped tickets. Once a ticket is deleted, its changelog line is its only record.
 
-**Last updated:** 2026-11-11
+**Last updated:** 2026-11-12
 
 ## How to read this
 
@@ -72,7 +72,7 @@ be pulled into Phase 1 for a break from styling.
 
 ### Now / Next
 
-- **Now:** CUR-9, this week's words (the teacher picks up to 10, and the games deal them first). Then CUR-10 (Luna says a skill's name when it's tapped; 13 lines to render on the Mac). The library is in skills (CUR-7, done 2026-11-11), with the teacher's cheat sheet beside it (CUR-8); the content run is closed (CNT, GAME and PRG complete, 2026-11-08).
+- **Now:** nothing startable without Alex. The Teacher's corner is done (DES-29, DES-30: two panels behind an apple, and every setting does something, 2026-11-12). Waiting on him: DES-28 (which Chromebooks the class has), DES-27 (his notes on the first picture sample), SAY-1 (his recordings), and his Sound Check picks for VOX. The curriculum epic is complete (CUR-7 to CUR-10, 2026-11-11), and so are CNT, GAME and PRG (2026-11-08).
 - **Next:** the VOX epic, set aside for later (Alex, 2026-11-06): VOX-1 once his picks are in on the Sound Check page, with VOX-4 alongside it; VOX-5 (the Luna/Kore blend for single words; his call first: lines too?), then VOX-2, then VOX-3. DES-27's pictures after his notes on the first sample. The Writing app (WRT) after Phase 7. OPS-11 stays parked.
 
 ## Epics
@@ -85,7 +85,6 @@ In board order. A new epic gets its file in `epics/` first, then a link here
 - [DES — Design system & layout](epics/DES.md) · Phase 1
 - [BUG — Bugs](epics/BUG.md) · P0/P1 in Phase 2, P2 anytime
 - [LVL — Difficulty](epics/LVL.md) · Phase 4
-- [CUR — Curriculum](epics/CUR.md) · Phase 6
 - [WRT — Writing & grammar app](epics/WRT.md) · Phase 8
 - [OPS — Housekeeping](epics/OPS.md) · anytime
 
@@ -107,9 +106,6 @@ In board order. A new epic gets its file in `epics/` first, then a link here
 | **BUG** | **Bugs** | | | | |
 | **LVL** | **Difficulty** | Epic | **P0** | | |
 | LVL-3 | Adaptive difficulty from skill mastery | Story | P2 | L | Todo |
-| **CUR** | **Curriculum** | Epic | **P1** | | |
-| CUR-9 | This week's words | Story | P2 | M | Todo |
-| CUR-10 | Luna says a skill's name when it's tapped | Story | P2 | S | Todo |
 | **WRT** | **Writing & grammar app** | Epic | **P1** | | |
 | WRT-1 | Writing app on the home screen | Story | P1 | M | Todo |
 | WRT-2 | Punctuation game: where does the mark go? | Story | P1 | L | Todo |

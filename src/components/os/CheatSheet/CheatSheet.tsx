@@ -36,7 +36,7 @@ export const CheatSheet: React.FC<CheatSheetProps> = ({ open, progress, onBack, 
     <Modal open={open} onClose={onClose} title="What they learn" data-shot="teaches" className={styles.sheet}>
       <div className={styles.top}>
         <ChunkyButton icon="arrow-left" onClick={onBack} data-shot="sheet-back">
-          Back to settings
+          Back
         </ChunkyButton>
         <span className={styles.grades} role="group" aria-label="Grade">
           {GRADES.map(g => (

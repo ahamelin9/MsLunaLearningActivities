@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import type { GameApi, GameDef } from '../../engine/types';
 import { lettersFor, pick, shuffle, tierFor, wordsUpTo, type LetterItem, type WordItem } from '../../engine/content';
 import { deal } from '../../engine/deck';
+import { isWeekWord } from '../../engine/weekWords';
 import { pickWrong, textChoice } from '../../engine/distractors';
 import { Icon, ListenCue, Luna } from '@/components/kit';
 import { soundManager } from '@/utils/audio';
@@ -31,16 +32,35 @@ interface Round {
 
 const lettersOf = (tier: 1 | 2 | 3) => lettersFor(tier).filter(l => l.letter.length === 1);
 
-function buildRound(tier: 1 | 2 | 3, letter: LetterItem): Round {
-  const letters = lettersOf(tier);
-  const modes: Mode[] =
-    tier === 1
-      ? ['toLower', 'toLower', 'bySound']
-      : tier === 2
-        ? ['toLower', 'toUpper', 'bySound']
-        : ['toUpper', 'bySound', 'byWord'];
+/** What each tier's plates ask for, picked at random per round. */
+const MODES: Record<1 | 2 | 3, Mode[]> = {
+  1: ['toLower', 'toLower', 'bySound'],
+  2: ['toLower', 'toUpper', 'bySound'],
+  3: ['toUpper', 'bySound', 'byWord']
+};
 
-  const mode = pick(modes);
+/** The words a plate can ask the first letter of: one letter at the start, one of this tier's cookies. */
+const cookieWords = (tier: 1 | 2 | 3) => {
+  const letters = lettersOf(tier);
+  return wordsUpTo(tier).filter(w => w.initial.length === 1 && letters.some(l => l.letter.toLowerCase() === w.initial));
+};
+
+/**
+ * This week's words first (CUR-9), on the tier whose plates ask for a word's
+ * first letter: a "first letter of" round each, one word per letter, so no
+ * letter comes twice in a play.
+ */
+function weekWordsFor(tier: 1 | 2 | 3, count: number): WordItem[] {
+  if (!MODES[tier].includes('byWord')) return [];
+  const usable = cookieWords(tier).filter(w => isWeekWord(w.word));
+  const dealt = deal('feed-luna-words', usable, Math.min(count, usable.length), w => w.word, w => w.initial);
+  return dealt.filter((w, i) => dealt.findIndex(other => other.initial === w.initial) === i);
+}
+
+/** A round for this letter; given one of this week's words, a "first letter of" round for it. */
+function buildRound(tier: 1 | 2 | 3, letter: LetterItem, weekWord?: WordItem): Round {
+  const letters = lettersOf(tier);
+  const mode: Mode = weekWord ? 'byWord' : pick(MODES[tier]);
   const decoyCount = tier === 1 ? 2 : 3;
   /** wrong cookies: never the same letter, nor one that makes the same sound when sounds are asked for */
   const wrongCookies = (answer: string, cased: (letter: string) => string, letterBy: 'sound' | 'name') =>
@@ -51,9 +71,9 @@ function buildRound(tier: 1 | 2 | 3, letter: LetterItem): Round {
   if (mode === 'byWord') {
     // a word for this round's own letter, so no letter comes twice in a play
     const initial = letter.letter.toLowerCase();
-    const anyWord = wordsUpTo(tier).filter(w => w.initial.length === 1 && letters.some(l => l.letter.toLowerCase() === w.initial));
+    const anyWord = cookieWords(tier);
     const forLetter = anyWord.filter(w => w.initial === initial);
-    const [word]: WordItem[] = deal('feed-luna-words', forLetter.length ? forLetter : anyWord, 1, w => w.word);
+    const [word]: WordItem[] = weekWord ? [weekWord] : deal('feed-luna-words', forLetter.length ? forLetter : anyWord, 1, w => w.word);
     const answer = word.initial.toLowerCase();
     // "cat" starts with the sound k makes too, so k can't be a wrong cookie
     const decoys = wrongCookies(answer, lower, 'sound');
@@ -299,7 +319,13 @@ export const feedLuna: GameDef<Round> = {
   sticker: 'cookie',
   makeRounds: ({ grade, difficulty, count }) => {
     const tier = tierFor(grade, difficulty);
-    return deal('feed-luna', lettersOf(tier), count, l => l.letter).map(letter => buildRound(tier, letter));
+    const week = weekWordsFor(tier, count);
+    const weekLetter = (word: WordItem) => lettersOf(tier).find(l => l.letter.toLowerCase() === word.initial) as LetterItem;
+    const rest = lettersOf(tier).filter(l => !week.some(w => w.initial === l.letter.toLowerCase()));
+    return [
+      ...week.map(word => buildRound(tier, weekLetter(word), word)),
+      ...deal('feed-luna', rest, count - week.length, l => l.letter).map(letter => buildRound(tier, letter))
+    ];
   },
   Play
 };

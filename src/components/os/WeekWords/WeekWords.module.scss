@@ -1,0 +1,74 @@
+// This week's words (CUR-9): the kit Modal holds it; this lays out the picked
+// words, the grade row and the bank's kinds of word tiles, with roles and the
+// space scale, as the cheat sheet does.
+
+// its own wide window: the Modal's width token, on its card (className is the
+// card's width only)
+.sheet {
+  --modal-width: calc(var(--space-16) * 16);
+}
+
+.top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.part {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding-top: var(--space-3);
+  border-top: var(--border-hair) solid var(--edge);
+}
+
+.partName {
+  font: var(--text-tag);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-tag);
+  color: var(--accent-text);
+}
+
+.note {
+  font: var(--text-label-small);
+  color: var(--ink-soft);
+}
+
+// the picked words, as chips in a row
+.picked {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  list-style: none;
+}
+
+.grades {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.kind {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.kindName {
+  font: var(--text-label);
+  color: var(--ink);
+}
+
+// as many tiles to a row as fit, each at least two of the scale's 64s wide
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(calc(var(--space-16) * 2), 1fr));
+  gap: var(--space-3);
+}
+
+// a word's picture, as big as an answer word
+.emoji {
+  font: var(--text-answer-word);
+}

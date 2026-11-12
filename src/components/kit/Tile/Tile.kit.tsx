@@ -47,6 +47,17 @@ export default function TileKit() {
           </Specimen>
         ))}
       </Specimens>
+      <Specimens title="a pick-many set: picked, not picked, and disabled once it's full (CUR-9, this week's words)">
+        <Specimen label="picked" wide>
+          <Tile name="cat" picture={<Icon name="star" size={32} />} aria-pressed style={{ flex: 1 }} data-set="many" />
+        </Specimen>
+        <Specimen label="not picked" wide>
+          <Tile name="sun" tint={3} picture={<Icon name="sun" size={32} />} aria-pressed={false} style={{ flex: 1 }} data-set="many" />
+        </Specimen>
+        <Specimen label="disabled (the set is full)" wide>
+          <Tile name="ship" tint={4} picture={<Icon name="sparkle" size={32} />} aria-pressed={false} disabled style={{ flex: 1 }} data-set="many" />
+        </Specimen>
+      </Specimens>
     </>
   );
 }

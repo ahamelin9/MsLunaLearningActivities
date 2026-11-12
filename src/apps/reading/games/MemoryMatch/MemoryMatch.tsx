@@ -1,7 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import type { GameApi, GameDef } from '../../engine/types';
 import { lettersFor, shuffle, tierFor, wordsUpTo, type LetterItem, type WordItem } from '../../engine/content';
-import { deal } from '../../engine/deck';
+import { deal, dealWeekFirst } from '../../engine/deck';
+import { isWeekWord } from '../../engine/weekWords';
 import { distinctByEmoji } from '../../engine/distractors';
 import { soundManager } from '@/utils/audio';
 import { pronunciation, type SpeechPart } from '@/utils/pronunciation';
@@ -57,10 +58,12 @@ function buildRounds(tier: 1 | 2 | 3, count: number): Round[] {
     return Array.from({ length: count }, (_, i) => letterRound(letters.slice(i * pairCount, (i + 1) * pairCount)));
   }
   const words = wordsUpTo(tier);
-  const dealt = deal('memory-match-words', words, pairCount * count, w => w.word);
+  // this week's words are dealt first (CUR-9), and each board takes what's left of them before the rest
+  const dealt = dealWeekFirst('memory-match-words', words, pairCount * count, w => w.word, w => isWeekWord(w.word));
   const used = new Set<WordItem>();
   return Array.from({ length: count }, () => {
-    let chosen = distinctByEmoji(dealt.filter(w => !used.has(w)), pairCount);
+    const left = dealt.filter(w => !used.has(w));
+    let chosen = distinctByEmoji(left, pairCount, [], distinctByEmoji(left.filter(w => isWeekWord(w.word)), pairCount));
     // two words that look alike can't share a board: the deck gives a spare,
     // so it isn't a word seen last time
     for (let tries = 0; chosen.length < pairCount && tries < words.length; tries++) {

@@ -2,6 +2,7 @@
 // The layout audit (DES-10): at the four iPad sizes, visits Grade Select
 // (DES-9c), the library, the teacher's cheat sheet past the grown-up gate
 // (CUR-8: its buttons, and nothing wider than its window at each grade),
+// this week's words beside it (CUR-9, the same),
 // every game's start screen and first round, the
 // first question of every lesson of one grade, and Lesson 1's done screen,
 // played through (DES-22d), and reports:
@@ -186,8 +187,23 @@ for (const [width, height] of SIZES) {
     if (wide > 1) sheet.problems.push({ text: `runs past its window: ${id} by ${wide}px`, stage: false });
   }
   results.push(sheet);
+  // this week's words (CUR-9), from Settings the same way: its buttons and word
+  // tiles, and at each grade's words, nothing wider than its window
+  await page.click(at('sheet-back'));
+  await page.waitForSelector(at('settings'));
+  await page.click(at('open-week-words'));
+  await page.waitForSelector(at('week-words'));
+  await wait(500);
+  const picker = await page.evaluate(audit, { screen: 'week words', midRound: false, scrolls: true, within: at('week-words') });
+  for (const id of ['kindergarten', 'grade1', 'grade2']) {
+    await page.click(at(`week-grade-${id}`));
+    await wait(300);
+    const wide = await page.$eval(at('week-words'), el => el.scrollWidth - el.clientWidth);
+    if (wide > 1) picker.problems.push({ text: `runs past its window: ${id} by ${wide}px`, stage: false });
+  }
+  results.push(picker);
   await page.click(at('modal-close'));
-  await page.waitForSelector(at('teaches'), { hidden: true });
+  await page.waitForSelector(at('week-words'), { hidden: true });
   await wait(400);
 
   const open = async (shot, i) => openCard((await page.$$(at(shot)))[i]);

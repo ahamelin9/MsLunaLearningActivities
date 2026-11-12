@@ -285,6 +285,11 @@ const walkQ = node => {
   Object.values(node).forEach(walkQ);
 };
 walkQ(curriculum.READING_CURRICULUM);
+// a skill's name, said when its card is tapped on the library (CUR-10); the
+// type makes every skill have one
+for (const skill of Object.values(curriculum.READING_CURRICULUM).flat()) {
+  push(skill.said.text, o => pronunciation.speakSequence([skill.said], o));
+}
 
 // --- run them, at every speed the settings screen offers ---
 //

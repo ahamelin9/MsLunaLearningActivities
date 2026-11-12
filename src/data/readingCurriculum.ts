@@ -24,6 +24,7 @@ const FIRST_LESSONS: Record<GradeLevel, ReadingSkill[]> = {
     {
       id: 'k-match-sounds',
       name: 'Letter sounds',
+      said: { text: 'Letter sounds!' },
       icon: '👂',
       description: 'Hears a letter’s sound and finds the letter that makes it.',
       lessons: [
@@ -109,6 +110,7 @@ const FIRST_LESSONS: Record<GradeLevel, ReadingSkill[]> = {
     {
       id: 'k-letter-hunter',
       name: 'Letter shapes',
+      said: { text: 'Letter shapes!' },
       icon: '🔍',
       description: 'Hears a letter’s name and finds it, big or little, among letters that look alike.',
       lessons: [
@@ -172,6 +174,7 @@ const FIRST_LESSONS: Record<GradeLevel, ReadingSkill[]> = {
     {
       id: 'k-blend-words',
       name: 'Sound it out',
+      said: { text: 'Sound it out!' },
       icon: '🧩',
       description: 'Blends the sounds of a short word (c-a-t) and finds its picture.',
       lessons: [
@@ -319,6 +322,7 @@ const FIRST_LESSONS: Record<GradeLevel, ReadingSkill[]> = {
     {
       id: 'k-sight-words',
       name: 'Sight words',
+      said: { text: 'Sight words!' },
       icon: '⚡',
       description: 'Hears a common word and finds it written, without sounding it out.',
       lessons: [
@@ -418,6 +422,7 @@ const FIRST_LESSONS: Record<GradeLevel, ReadingSkill[]> = {
     {
       id: 'k-rhyming',
       name: 'Rhymes',
+      said: { text: 'Rhymes!' },
       icon: '🎵',
       description: 'Hears which words end with the same sound.',
       lessons: [
@@ -484,6 +489,7 @@ const FIRST_LESSONS: Record<GradeLevel, ReadingSkill[]> = {
     {
       id: 'g1-digraphs',
       name: 'Letter teams and blends',
+      said: { text: 'Letter teams and blends!' },
       icon: '🔤',
       description: 'Reads words with SH, CH, TH, WH, CK and NG, and blends like FR, PL and ST.',
       lessons: [
@@ -558,6 +564,7 @@ const FIRST_LESSONS: Record<GradeLevel, ReadingSkill[]> = {
     {
       id: 'g1-magic-e',
       name: 'Magic E',
+      said: { text: 'Magic E!' },
       icon: '🪄',
       description: 'Reads words where a silent E makes the vowel say its name (cake, kite, bone).',
       lessons: [
@@ -618,6 +625,7 @@ const FIRST_LESSONS: Record<GradeLevel, ReadingSkill[]> = {
     {
       id: 'g1-sentences',
       name: 'Sentences',
+      said: { text: 'Sentences!' },
       icon: '📖',
       description: 'Reads a whole sentence and picks the picture that matches it.',
       lessons: [
@@ -668,6 +676,7 @@ const FIRST_LESSONS: Record<GradeLevel, ReadingSkill[]> = {
     {
       id: 'g2-vowel-teams',
       name: 'Vowel teams',
+      said: { text: 'Vowel teams!' },
       icon: '✨',
       description: 'Reads letters that team up for one vowel sound: AI, AY, EE, EA, OA, OW, IGH, OO and OU.',
       lessons: [
@@ -728,6 +737,7 @@ const FIRST_LESSONS: Record<GradeLevel, ReadingSkill[]> = {
     {
       id: 'g2-compounds',
       name: 'Compound words',
+      said: { text: 'Compound words!' },
       icon: '🧩',
       description: 'Reads two small words joined into one (rain + bow, cup + cake).',
       lessons: [
@@ -777,6 +787,7 @@ const FIRST_LESSONS: Record<GradeLevel, ReadingSkill[]> = {
     {
       id: 'g2-storybooks',
       name: 'Storybooks',
+      said: { text: 'Storybooks!' },
       icon: '📖',
       description: 'Reads a longer story alone, then answers a question about it.',
       lessons: [
@@ -823,11 +834,11 @@ const FIRST_LESSONS: Record<GradeLevel, ReadingSkill[]> = {
 
 /** Skills that begin with the lessons added in CUR-4. */
 const LATER_SKILLS: Omit<ReadingSkill, 'lessons'>[] = [
-  { id: 'g1-rhymes', name: 'Rhymes', icon: '🎵', description: 'Hears which words end with the same sound.' },
-  { id: 'g1-sight-words', name: 'Sight words', icon: '⚡', description: 'Hears a common word and finds it written, without sounding it out.' },
-  { id: 'g1-stories', name: 'Little stories', icon: '📖', description: 'Reads a little story alone, then answers a question about it.' },
-  { id: 'g2-sight-words', name: 'Sight words', icon: '⚡', description: 'Hears a common word and finds it written, without sounding it out.' },
-  { id: 'g2-r-vowels', name: 'Vowels with R', icon: '🚗', description: 'Reads AR, OR, ER, IR and UR, where the R changes the vowel’s sound.' }
+  { id: 'g1-rhymes', name: 'Rhymes', said: { text: 'Rhymes!' }, icon: '🎵', description: 'Hears which words end with the same sound.' },
+  { id: 'g1-sight-words', name: 'Sight words', said: { text: 'Sight words!' }, icon: '⚡', description: 'Hears a common word and finds it written, without sounding it out.' },
+  { id: 'g1-stories', name: 'Little stories', said: { text: 'Little stories!' }, icon: '📖', description: 'Reads a little story alone, then answers a question about it.' },
+  { id: 'g2-sight-words', name: 'Sight words', said: { text: 'Sight words!' }, icon: '⚡', description: 'Hears a common word and finds it written, without sounding it out.' },
+  { id: 'g2-r-vowels', name: 'Vowels with R', said: { text: 'Vowels with R!' }, icon: '🚗', description: 'Reads AR, OR, ER, IR and UR, where the R changes the vowel’s sound.' }
 ];
 
 /** Lessons on the path after a grade's first ones: a skill's lessons needn't sit together. */
@@ -836,7 +847,7 @@ function thenOn(grade: GradeLevel, lessons: Lesson[]): ReadingSkill[] {
   return lessons.map(lesson => {
     const skill = skills.find(s => s.id === lesson.skillId);
     if (!skill) throw new Error('Lesson "' + lesson.id + '" has no skill "' + lesson.skillId + '"');
-    return { id: skill.id, name: skill.name, icon: skill.icon, description: skill.description, lessons: [lesson] };
+    return { id: skill.id, name: skill.name, said: skill.said, icon: skill.icon, description: skill.description, lessons: [lesson] };
   });
 }
 

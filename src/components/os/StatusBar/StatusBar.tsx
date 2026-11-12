@@ -15,8 +15,9 @@ const clock = (now: Date) => `${now.getHours() % 12 || 12}:${String(now.getMinut
 
 /**
  * The home screen's status bar, as on the round 2 Home board: the time, and
- * the gear for grown-ups (DES-9a), behind the grown-up gate: a 1.5s press and
- * hold (SET-1). Beside the gear, a day/night button a child may tap: the moon
+ * the grown-ups' button (DES-9a; an apple for the Teacher's corner since
+ * DES-29, once a gear), behind the grown-up gate: a 1.5s press and hold
+ * (SET-1). Beside it, a day/night button a child may tap: the moon
  * by day, the sun at night (DES-16; not on the board, Alex's idea). Inside an
  * app there is none: the app's own header takes its place (DES-8).
  */
@@ -41,8 +42,8 @@ export const StatusBar: React.FC<StatusBarProps> = ({ onOpenSettings, theme, onT
         />
         <ChunkyButton
           variant="icon"
-          icon="gear"
-          aria-label="Grown-ups: settings"
+          icon="apple"
+          aria-label="Grown-ups: Teacher’s corner"
           data-shot="open-settings"
           onHold={onOpenSettings}
         />

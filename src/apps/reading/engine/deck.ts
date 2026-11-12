@@ -91,6 +91,22 @@ export function deal<T>(deck: string, pool: T[], count: number, keyOf: (item: T)
   return Array.from({ length: count }, (_, i) => dealt[i % dealt.length]);
 }
 
+/**
+ * This week's words first (CUR-9): the items that use one of the words the
+ * teacher picked (weekWords.ts) open the play, as many as it has room for,
+ * taking turns among themselves when there are more; the deck deals the rest
+ * as usual. They come every play while they're picked, and once cleared they
+ * have been seen, so they wait their turn like anything else. With nothing
+ * picked, or nothing in the pool using a picked word, it is `deal`.
+ */
+export function dealWeekFirst<T>(deck: string, pool: T[], count: number, keyOf: (item: T) => string, usesWeekWord: (item: T) => boolean): T[] {
+  const week = pool.filter(usesWeekWord);
+  if (week.length === 0) return deal(deck, pool, count, keyOf);
+  const first = deal(deck, week, Math.min(count, week.length), keyOf);
+  const rest = deal(deck, pool.filter(item => !week.includes(item)), count - first.length, keyOf);
+  return [...first, ...rest];
+}
+
 const missedIn = (deck: string) => `missed:${deck}`;
 
 /**

@@ -9,7 +9,9 @@
  *         attribute (onClick, data-shot); className is layout only
  * States: idle · pressed (:active, sinks onto its ledge) · picked:
  *         aria-pressed="true" takes the action look, for a pick-one set
- *         (Grade Select; DES-9c)
+ *         (Grade Select; DES-9c) or a pick-many one (this week's words,
+ *         CUR-9) · disabled: faded and still, for the unpicked ones of a
+ *         pick-many set that's full (CUR-9)
  * Tokens: --tile-bg, --tile-ink, --tile-edge, --tile-tint, --tile-picture-ink,
  *         --tile-picture
  * Reads:  --card, --ink, --edge, --action, --action-ink, --action-edge,
@@ -17,6 +19,7 @@
  *         --ledge-small, --press-depth, --text-label, --space-2, --space-3,
  *         --space-4, --space-16
  * Board:  Library, the Play Shelf's eight games; no board for Grade Select
+ *         or this week's words
  */
 
 import type { ButtonHTMLAttributes, ReactNode } from 'react';

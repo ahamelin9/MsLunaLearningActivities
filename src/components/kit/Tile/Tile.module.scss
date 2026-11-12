@@ -39,6 +39,16 @@
   --tile-edge: var(--action-edge);
 }
 
+// a pick-many set that's full (CUR-9, this week's words): the ones still
+// unpicked fade, as a disabled ChunkyButton does, and don't sink
+.root:disabled,
+.root:disabled:active {
+  cursor: default;
+  opacity: 0.5;
+  transform: none;
+  box-shadow: 0 var(--ledge-small) 0 var(--tile-edge);
+}
+
 .picture {
   display: flex;
   align-items: center;

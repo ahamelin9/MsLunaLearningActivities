@@ -12,6 +12,12 @@ export interface UserSettings {
   theme: ThemeChoice;
   /** which Kokoro voice Ms. Luna speaks with; its accent comes with it (SET-3) */
   voiceId: string;
+  /**
+   * This week's words (CUR-9): up to 10 bank words the teacher picked, which
+   * the games deal first (engine/weekWords.ts). A setting, so a progress reset
+   * keeps them; "Clear" empties it.
+   */
+  weekWords: string[];
 }
 
 /** One lesson's or game's times (PRG-6), in seconds. */

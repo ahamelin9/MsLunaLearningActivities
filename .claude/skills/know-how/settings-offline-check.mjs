@@ -10,9 +10,10 @@
 // (a page stuck re-rendering fires it late or not at all). Checks:
 //   - opening Settings saves at most once;
 //   - the page stays responsive (the timer is never more than 200 ms late);
-//   - Settings shows Luna's voice as picked, not an empty list.
-// It fails on the commit before BUG-10, where the voice picker's correction
-// saved on every render.
+//   - the Teacher's corner opens, with Ms. Luna's voice switch.
+// It failed on the commit before BUG-10, where the voice picker's correction
+// saved on every render. The picker itself went in DES-30 (one voice, nothing
+// to pick), and this still guards against any setting that saves as it draws.
 
 import puppeteer from 'puppeteer-core';
 import { chromePath } from '../../../scripts/chrome-path.cjs';
@@ -68,8 +69,8 @@ const r = await page.evaluate(saves0 => new Promise(done => {
 }), before);
 ok('opening Settings saves at most once', r.saves <= 1, `${r.saves} saves in its first 3 s`);
 ok('the page stays responsive', r.worst <= 200, `a 50 ms timer was at most ${r.worst} ms late`);
-const voice = await page.evaluate(() => document.querySelector('[data-shot="settings"]')?.textContent ?? '');
-ok('Settings still shows the voice section', /Which voice/.test(voice));
+const voice = await page.evaluate(() => !!document.querySelector('[data-shot="settings"] [role="switch"][aria-label="Ms. Luna’s voice"]'));
+ok('the Teacher\'s corner opens, with Ms. Luna\'s voice switch', voice);
 
 await browser.close();
 const passed = results.every(Boolean);

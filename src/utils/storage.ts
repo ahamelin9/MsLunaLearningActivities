@@ -6,6 +6,7 @@ import { ACHIEVEMENTS } from '../data/achievements';
 import { upgradeStickers } from '../apps/reading/engine/squishies';
 import { forgetDecks } from '../apps/reading/engine/deck';
 import { NO_PRACTICE, afterPlay, isLearned } from '../apps/reading/engine/practice';
+import { setWeekWords } from '../apps/reading/engine/weekWords';
 
 const STORAGE_KEY = 'ms_luna_learning_progress_v1';
 
@@ -25,6 +26,7 @@ export const DEFAULT_SETTINGS: UserSettings = {
   reducedMotion: false,
   theme: 'match',
   voiceId: DEFAULT_VOICE_ID,
+  weekWords: [],
 };
 
 export const DEFAULT_PROGRESS: UserProgress = {
@@ -95,7 +97,9 @@ class StorageService {
       delete parsed.totalPoints;
       const loadedSettings = {
         ...DEFAULT_SETTINGS,
-        ...savedSettings
+        ...savedSettings,
+        // an older save has no week words yet (CUR-9)
+        weekWords: Array.isArray(savedSettings.weekWords) ? savedSettings.weekWords : []
       };
       // what an older save has already earned, unlocked now (PRG-3)
       return withEarned({
@@ -182,6 +186,8 @@ class StorageService {
     soundManager.setSpeechMuted(!settings.speechEnabled);
     soundManager.setSpeechRate(settings.speechRate);
     pronunciation.setVoice(settings.voiceId || DEFAULT_VOICE_ID);
+    // the games' decks read this week's words from here (CUR-9)
+    setWeekWords(settings.weekWords ?? []);
   }
 
   public recordLessonCompletion(

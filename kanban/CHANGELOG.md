@@ -400,3 +400,25 @@ only record of them. One line each: date, ID, title, and `Done` or
   | The library opens | the one holding the lesson up next; it and that lesson both say "Up next" |
   | Every lesson is done | the first skill |
   | A skill is tapped | that one (only one open at a time); lessons still open one at a time in path order (PRG-7) |
+- **2026-11-11** — CUR-9 This week's words — Done. Settings has "This week's words": a "Pick words" window (kit Modal, Tiles and Chips) where the teacher taps up to 10 bank words by their pictures, one grade at a time in kinds, with "Clear for next week"; a full set fades the rest (Tile's new disabled state). Saved on the device as a setting, so every group gets them and "Reset all progress" keeps them. Each play opens with the picked words that fit its pool, taking turns when there are more (`dealWeekFirst`); lessons keep their order. Checked by `week-words-check.mjs` at Kindergarten and 2nd grade. Which games use a word (Alex's OK):
+  | Game | Uses a picked word by |
+  |---|---|
+  | What's Missing? | making it the thing that goes missing |
+  | Luna's Muddled Cards | putting it on a word board (from 1st grade's "Just right") |
+  | Letter Cookies | a "first letter of" plate, where its tier has them (2nd grade, 1st grade's Tricky) |
+  | Words Off the Page, Story Corner, Treasure Path | dealing a sentence, story or passage with the word in it (with an s or es too) |
+  | The Letter Jar, Bubble Sounds | can't: letters only, so they play as before |
+- **2026-11-11** — CUR-10 Luna says a skill's name when it's tapped — Done. Tapping a skill card on the library opens it and Luna says its name with "!" ("Letter sounds!", "Magic E!"), from `said` beside the name in `readingCurriculum.ts`; 13 lines, rendered at the three speeds; nothing plays while she's muted. Checked by `skill-say-check.mjs`; Alex OKed how they sound.
+- **2026-11-11** — Epic CUR complete (curriculum): 19 lessons in order across the three grades, the library by skill (CUR-7), the teacher's cheat sheet (CUR-8), this week's words (CUR-9) and Luna saying a skill's name (CUR-10).
+- **2026-11-11** — BUG-30 A squishy says its line on every squeeze — Done. The first squeeze of a squishy says its line (a "?" its clue, the Pearl Moon its line); later squeezes only squish, until the screen is opened again (`engine/firstSqueeze.ts`, on the library's Squishy Shelf card, Luna's Squishy Shelf and the done screen). It goes by the line, so two colours of one kind, or the done screen's new squishy and its shelf, speak once between them; Luna herself still speaks on every tap. Checked by `squeeze-check.mjs`, which failed 5 of 9 before.
+- **2026-11-11** — DES-29 Settings becomes the Teacher's corner — Done. The grown-ups' window is "Teacher’s corner": as wide as the cheat sheet, with two flat PaperCard panels side by side, **My class** (grade, this week's words as chips with "Pick words", what they learn, reset at its foot) and **On this device** (sound effects, Ms. Luna's voice, voice speed, less motion and day or night; "device", as it may be a Chromebook), stacked on a portrait iPad. Nothing scrolls on a landscape iPad, 1024×768 included (`teacher-corner-shot.mjs`). The gear is a drawn apple (kit Icon), behind the same 1.5s hold; the cheat sheet's and word picker's "Back to settings" read "Back". Alex OKed the look.
+- **2026-11-12** — DES-30 Every setting in the Teacher's corner does something — Done. Alex: "some of them don't really do anything". `settings-audit.mjs` flips each setting through the corner's own buttons and listens or looks for its effect; all did something except "Which voice", a status line with one rendered voice, which is gone with its picker (and `voice-section-check.mjs`). Voice speed's note now says what it changes. Now nothing in the corner scrolls at any iPad size. What each setting does, as measured:
+  | Setting | What changes |
+  |---|---|
+  | Sound effects | off: no pops, Luna still talks |
+  | Ms. Luna's voice | off: pops only, no clips |
+  | Voice speed | a line 1.31 s Beginner, 0.88 s Normal, 0.77 s Quick; a word slower at Beginner only; a letter sound never (one tuned clip) |
+  | Less motion | every move's duration goes to 0 |
+  | Day or night | the page's light or dark |
+  | Grade | the library's skills |
+  | Reset all progress | clears stars, squishies, finished lessons and what the games have dealt; keeps the settings and this week's words |

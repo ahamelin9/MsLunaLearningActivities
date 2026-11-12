@@ -10,6 +10,7 @@
 // DES-9b: the Switch flips and slides its knob (at once under reduced motion),
 // and a selected ChunkyButton (aria-pressed) takes the action colour.
 // DES-9c: a picked Tile (aria-pressed) takes the action colour too.
+// CUR-9: a pick-many set of Tiles, and a disabled one faded and still.
 // DES-13: a LessonCard with no time shows none, and the one that just opened
 // pops then glows (no pop under reduced motion).
 // CUR-7: SkillCard's states: up next glows with a centred tag, done has a
@@ -502,8 +503,9 @@ ok('the picked button in a row takes the action colour, the others don\'t', awai
 }));
 
 // ── the picked Tile (DES-9c, Grade Select) ─────────────────────────────────
+// the pick-one set; CUR-9's pick-many set carries data-set="many"
 ok('the picked Tile in a set takes the action colour, the others don\'t', await page.evaluate(() => {
-  const set = [...document.querySelectorAll('button[data-tint]')].filter(b => b.hasAttribute('aria-pressed'));
+  const set = [...document.querySelectorAll('button[data-tint]')].filter(b => b.hasAttribute('aria-pressed') && !b.dataset.set);
   const probe = document.createElement('span');
   probe.style.background = 'var(--action)';
   set[0].parentElement.append(probe);
@@ -514,11 +516,39 @@ ok('the picked Tile in a set takes the action colour, the others don\'t', await 
   return set.length === 3 && bg(picked) === action && set.filter(b => b !== picked).every(b => bg(b) !== action);
 }));
 ok('… and its picture keeps the ink, not the action ink', await page.evaluate(() => {
-  const set = [...document.querySelectorAll('button[data-tint]')].filter(b => b.hasAttribute('aria-pressed'));
+  const set = [...document.querySelectorAll('button[data-tint]')].filter(b => b.hasAttribute('aria-pressed') && !b.dataset.set);
   const ink = b => getComputedStyle(b.firstElementChild).color;
   const picked = set.find(b => b.getAttribute('aria-pressed') === 'true');
   return ink(picked) === ink(set.find(b => b !== picked)) && ink(picked) !== getComputedStyle(picked).color;
 }));
+
+// ── a pick-many set of Tiles (CUR-9, this week's words) ─────────────────────
+// the picked one takes the action colour; once the set is full the unpicked
+// ones are disabled: faded, and they don't sink when pressed
+const many = await page.$$('button[data-set="many"]');
+ok('a pick-many set: the picked Tile takes the action colour, the unpicked don\'t', await page.evaluate(() => {
+  const set = [...document.querySelectorAll('button[data-set="many"]')];
+  const probe = document.createElement('span');
+  probe.style.background = 'var(--action)';
+  set[0].parentElement.append(probe);
+  const action = getComputedStyle(probe).backgroundColor;
+  probe.remove();
+  const bg = b => getComputedStyle(b).backgroundColor;
+  return set.length === 3 && bg(set[0]) === action && bg(set[1]) !== action && bg(set[2]) !== action;
+}));
+const heldTile = async tile => {
+  await tile.evaluate(e => e.scrollIntoView({ block: 'center' }));
+  const at = await tile.boundingBox();
+  await page.mouse.move(at.x + at.width / 2, at.y + at.height / 2);
+  await page.mouse.down();
+  await new Promise(r => setTimeout(r, 300));
+  const held = await tile.evaluate(b => ({ opacity: getComputedStyle(b).opacity, transform: getComputedStyle(b).transform }));
+  await page.mouse.up();
+  return held;
+};
+const heldDisabled = await heldTile(many[2]);
+const heldEnabled = await heldTile(many[1]);
+ok('… a disabled Tile is faded and doesn\'t sink; an enabled one does', heldDisabled.opacity === '0.5' && heldDisabled.transform === 'none' && heldEnabled.opacity === '1' && heldEnabled.transform !== 'none', `disabled ${JSON.stringify(heldDisabled)}, enabled ${JSON.stringify(heldEnabled)}`);
 
 // ── a SpeechBubble with no tail (DES-22a, the perch of a game with its own Luna) ──
 const bare = await page.evaluateHandle(() => document.querySelector('button[aria-label="Hear Ms. Luna again"]'));

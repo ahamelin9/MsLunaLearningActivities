@@ -6,6 +6,7 @@ import { GAMES } from '../../games';
 import { ChunkyButton, Icon, LessonCard, Luna, PaperCard, ProgressBar, SkillCard, Squishy, Tile } from '@/components/kit';
 import { greeting, lunaSay, type LunaLine, type LunaMood } from '../../engine/luna';
 import { SQUISHY_KINDS, kindDef, kindsFound, parseSquishy } from '../../engine/squishies';
+import { useFirstSqueeze } from '../../engine/firstSqueeze';
 import { soundManager } from '@/utils/audio';
 import { pronunciation } from '@/utils/pronunciation';
 import { minutesOf, storageService } from '@/utils/storage';
@@ -67,6 +68,8 @@ export const Hub: React.FC<HubProps> = ({
     setMood(line.mood);
     speak(line);
   };
+  // the Squishy Shelf card's squishies speak on their first squeeze (BUG-30)
+  const firstSqueeze = useFirstSqueeze();
 
   // as the library opens (her mood already matches the line)
   useEffect(() => {
@@ -189,7 +192,7 @@ export const Hub: React.FC<HubProps> = ({
                     kind={kind}
                     colour={colour}
                     size={64}
-                    onClick={() => say({ text: kindDef(kind).line, mood: 'happy' })}
+                    onClick={() => firstSqueeze(kindDef(kind).line, () => say({ text: kindDef(kind).line, mood: 'happy' }))}
                   />
                 ))}
                 {Array.from({ length: ON_THE_PLANK - latest.length }, (_, i) => (
@@ -258,6 +261,10 @@ export const Hub: React.FC<HubProps> = ({
                 onClick={() => {
                   soundManager.playPop();
                   setOpenId(b.id);
+                  // most children can't read its name yet, so Luna says it (CUR-10);
+                  // nothing plays while she's muted
+                  setMood('happy');
+                  pronunciation.speakSequence([b.said]);
                 }}
               />
             ))}

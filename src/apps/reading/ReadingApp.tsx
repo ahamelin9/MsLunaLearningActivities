@@ -132,7 +132,7 @@ export const ReadingApp: React.FC<ReadingAppProps> = ({ progress, onReturnToHome
       <ChunkyButton icon="star" aria-label={`My trophies: ${progress.totalStars} stars`} onClick={onOpenTrophies} data-shot="open-trophies">
         {progress.totalStars}
       </ChunkyButton>
-      <ChunkyButton variant="icon" icon="gear" aria-label="Grown-ups: settings" data-shot="open-settings" onHold={onOpenSettings} />
+      <ChunkyButton variant="icon" icon="apple" aria-label="Grown-ups: Teacher’s corner" data-shot="open-settings" onHold={onOpenSettings} />
     </AppHeader>
   );
 

@@ -1,7 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import type { GameApi, GameDef } from '../../engine/types';
 import { sentencesFor, shuffle, tierFor, type SentenceItem } from '../../engine/content';
-import { deal } from '../../engine/deck';
+import { dealWeekFirst } from '../../engine/deck';
+import { mentionsWeekWord } from '../../engine/weekWords';
 import { pickWrong, textChoice } from '../../engine/distractors';
 import { soundManager } from '@/utils/audio';
 import { pronunciation } from '@/utils/pronunciation';
@@ -217,7 +218,8 @@ export const buildSentence: GameDef<Round> = {
   sticker: 'quill',
   makeRounds: ({ grade, difficulty, count }) => {
     const tier = tierFor(grade, difficulty);
-    return deal('build-sentence', sentencesFor(tier), count, s => s.text).map(s => buildRound(tier, s));
+    // a sentence with one of this week's words in it comes first (CUR-9)
+    return dealWeekFirst('build-sentence', sentencesFor(tier), count, s => s.text, s => mentionsWeekWord(s.text)).map(s => buildRound(tier, s));
   },
   Play
 };

@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import type { GameApi, GameDef } from '../../engine/types';
 import { shuffle, tierFor, wordsUpTo, type WordItem } from '../../engine/content';
-import { deal } from '../../engine/deck';
+import { dealWeekFirst } from '../../engine/deck';
+import { isWeekWord } from '../../engine/weekWords';
 import { distinctByEmoji, pickWrong, wordChoice } from '../../engine/distractors';
 import { soundManager } from '@/utils/audio';
 import { pronunciation } from '@/utils/pronunciation';
@@ -164,7 +165,8 @@ export const whatsMissing: GameDef<Round> = {
   sticker: 'lamp',
   makeRounds: ({ grade, difficulty, count }) => {
     const tier = tierFor(grade, difficulty);
-    return deal('whats-missing', wordsUpTo(tier), count, w => w.word).map(w => buildRound(tier, w));
+    // this week's words go missing first (CUR-9)
+    return dealWeekFirst('whats-missing', wordsUpTo(tier), count, w => w.word, w => isWeekWord(w.word)).map(w => buildRound(tier, w));
   },
   Play
 };

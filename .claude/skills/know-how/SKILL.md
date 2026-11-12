@@ -772,6 +772,80 @@ Pitfalls that cost time:
   over a dimmed screen, pass `within` to `audit()`, or the buttons behind the dim
   count as overlaps.
 
+## Does Luna say a skill's name when its card is tapped? (CUR-10)
+
+*2026-11-11 · CUR-10*
+
+- **What it is:** each skill has `said: { text }` beside its name in
+  `readingCurriculum.ts` (the type makes it required); the library says it on a
+  tap with `pronunciation.speakSequence`, which a mute silences. The inventory
+  harvests it (any `text` in the curriculum), and `voice:audit` lists every
+  skill's line, so an unrendered one fails it.
+- **Check:** `node .claude/skills/know-how/skill-say-check.mjs 5199` taps every
+  skill card at each grade: its line, a clip, no browser voice; then muted,
+  nothing. Pops are oscillators, so counting `AudioBufferSourceNode` starts
+  counts only her voice.
+- **A lone letter in a line** ("Magic E!", "Vowels with R!"): espeak reads a
+  capital letter alone as its name ("ee", "ar"), except A, which `lexicon.mjs`
+  respells. Check with the phonemizer before rendering (see "A new line says
+  'ay' for 'a'").
+
+## Does a squishy speak on its first squeeze only? (BUG-30)
+
+*2026-11-11 · BUG-30*
+
+- **The rule:** `engine/firstSqueeze.ts` (`useFirstSqueeze`) remembers, while a
+  screen is open, which lines a squeeze has said, keyed by the line: the
+  library's Squishy Shelf card, Luna's Squishy Shelf (squishies, a "?"'s clue,
+  the Pearl Moon) and the done screen (the new squishy and its plank share one
+  memory, so the same kind speaks once between them). Luna herself still says
+  her line on every tap. A new place to squeeze a squishy goes through it too.
+- **Check:** `node .claude/skills/know-how/squeeze-check.mjs 5199` squeezes the
+  same squishy 3 times, 1.8 s apart, on the card, the shelf and a done screen
+  (Letter Cookies played through, as `game-done-shot.mjs`): one clip, then
+  none, and every squeeze squishes (`data-state` has `squish`, or `wobble` for
+  one still to find); another squishy speaks on its first; leaving and coming
+  back, it speaks again. It wraps `pronunciation.say` from the copy the page
+  loaded (a hot-reloaded module has `?t=`), found in the performance entries.
+  It failed 5 of 9 before the fix.
+
+## Does the Teacher's corner fit? (DES-29)
+
+*2026-11-11 · DES-29*
+
+- **Check:** `node .claude/skills/know-how/teacher-corner-shot.mjs <outDir> 5199`
+  opens it from the home screen's apple at the four iPad sizes, light and dark,
+  with 3 words picked, saves a shot of each and fails if a landscape size
+  scrolls or its two panels aren't side by side (portrait: stacked; the iPad
+  mini scrolls about 20px, allowed). Its `data-shot` names are still
+  `settings` and `open-settings`, so every older check opens it as before.
+- **What fit it into 1024×768:** the panels stretch to one height (resetting
+  progress at the foot of My class), Less motion and Day or night share a
+  group, and Day or night's note is one line. A new row in On this device
+  needs that room found again: rerun this first.
+
+## Does every setting do something? (DES-30)
+
+*2026-11-11 · DES-30*
+
+- **Check:** `node .claude/skills/know-how/settings-audit.mjs 5199` flips each
+  setting through the corner's own buttons (opened by the hold on the apple)
+  and looks for its effect: pops (`OscillatorNode` starts) with Sound effects,
+  clips (`AudioBufferSourceNode` starts) with Ms. Luna's voice, which speed of
+  clip `voiceClips.get` fetches and how long it plays for Voice speed,
+  `data-reduced-motion` and a 700 ms move at 0 for Less motion, the page's
+  background for Day or night, the library's skills for Grade, and what
+  Reset clears (stars, squishies, `ms_luna_seen_v1`) and keeps (the
+  settings). A new setting gets a line here.
+- **Voice speed, as measured:** a line plays 1.31 s at Beginner, 0.88 s
+  Normal, 0.77 s Quick; a word 0.66 / 0.46 / 0.44 s (Quick never pushes a
+  word or sound past natural pace, `speedFor`); a letter sound is one tuned
+  clip for every speed (`render.mjs` routes all three buckets to one job), so
+  Beginner can't slow it.
+- **Which voice went** (DES-30): with one rendered voice it was a status line.
+  A saved voice that isn't rendered still falls back to Luna's in
+  `pronunciation.setVoice`, so old saves are fine.
+
 ## Does the library stay short? (CUR-7)
 
 *2026-11-08 · CUR-7*
@@ -825,6 +899,28 @@ Pitfalls that cost time:
   what each round is about (`aboutOf`), so a play asks each letter once first.
 - **Check:** `node .claude/skills/know-how/deck-check.mjs` plays all 8 games at every
   grade and dial, with no browser. Run it again after adding content.
+
+## Do this week's words come first? (CUR-9)
+
+*2026-11-11 · CUR-9*
+
+- **What it is:** the teacher's up to 10 words (Settings, "This week's words";
+  `components/os/WeekWords`) are a setting that storage hands to
+  `engine/weekWords.ts`. A game asks `dealWeekFirst` (deck.ts) instead of `deal`,
+  saying which items use a picked word: a bank word itself (What's Missing?,
+  Muddled Cards' word boards), or a sentence, story or passage with one in it
+  (`mentionsWeekWord`). Letter Cookies has its own: a "first letter of" plate per
+  word, where its tier asks for them. A new game that deals words should do the same.
+- **Check:** `node .claude/skills/know-how/week-words-check.mjs 5199`: the picker
+  (opens on the grade played, picks, takes off, disables the rest at 10, saved),
+  then every game's first play at Kindergarten and 2nd Grade, and after "Clear".
+  To try the picker's look: `week-words-shot.mjs` (words=, tab=, scroll=).
+- **Pitfall: what did a play deal?** The decks' memory can't say: a deal moves a
+  key it deals again to the back of the list, so a before/after diff loses it
+  (cat and dog, dealt at Kindergarten, dealt again at 2nd Grade, read as missing).
+  Read the shell's own rounds instead: from the stage's React fiber, walk up to
+  the fiber whose props have `game.makeRounds`, and walk its hooks
+  (`memoizedState`, `.next`) to the array of `roundsPerPlay` objects.
 
 ## A script's `.replace` changed the code it was pasting
 

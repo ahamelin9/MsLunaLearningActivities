@@ -27,7 +27,9 @@ Screens are where the kit, the roles and the content meet.
 src/
   components/os/<Name>/            the tablet shell: HomeScreen, StatusBar, AppWindow,
                                    AppHeader (the one header inside an app, DES-8),
-                                   SettingsModal, CheatSheet (CUR-8), TrophyModal…
+                                   SettingsModal (the Teacher’s corner, DES-29),
+                                   CheatSheet (CUR-8), WeekWords (CUR-9),
+                                   TrophyModal…
   apps/
     registry.ts                    the apps on the home screen
     reading/
@@ -94,7 +96,7 @@ For a pure refactor (moving files, CSS modules), nothing may look different.
 The round 2 boards show the look, the home screen, the library, lesson
 progress, a round, the lesson-done screen, the squishy shelf and Luna. They
 don't show:
-- Settings and the Trophy room;
+- the Teacher’s corner (once Settings) and the Trophy room;
 - Grade Select;
 - the game start screens;
 - each game's own scenery;

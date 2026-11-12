@@ -5,6 +5,7 @@ import { AppHeader } from '@/components/os/AppHeader/AppHeader';
 import { soundManager } from '@/utils/audio';
 import { SHELF_LINES, SQUISHY_KINDS, kindsFound, parseSquishy } from '../../engine/squishies';
 import { ShelfRows } from '../../engine/ShelfRows/ShelfRows';
+import { useFirstSqueeze } from '../../engine/firstSqueeze';
 import styles from './Shelf.module.scss';
 
 /**
@@ -29,6 +30,10 @@ export const Shelf: React.FC<{ progress: UserProgress; onBack: () => void }> = (
     setMood(m);
     soundManager.speak(text);
   };
+  // a squishy, a "?" or the Pearl Moon speaks on its first squeeze; later
+  // ones only squish (BUG-30). Luna herself says her line again every tap.
+  const firstSqueeze = useFirstSqueeze();
+  const sayOnce = (text: string, m: LunaMood) => firstSqueeze(text, () => say(text, m));
 
   return (
     <>
@@ -47,7 +52,7 @@ export const Shelf: React.FC<{ progress: UserProgress; onBack: () => void }> = (
             <span className={styles.top}>
               <PearlMoon
                 found={full}
-                onClick={() => (full ? say(SHELF_LINES.pearl, 'cheer') : say(SHELF_LINES.top, 'surprise'))}
+                onClick={() => (full ? sayOnce(SHELF_LINES.pearl, 'cheer') : sayOnce(SHELF_LINES.top, 'surprise'))}
               />
             </span>
             <ShelfRows
@@ -55,7 +60,7 @@ export const Shelf: React.FC<{ progress: UserProgress; onBack: () => void }> = (
               size={96}
               picked={newest}
               dots
-              onTap={(def, has) => (has ? say(def.line, 'cheer') : say(def.hint, 'think'))}
+              onTap={(def, has) => (has ? sayOnce(def.line, 'cheer') : sayOnce(def.hint, 'think'))}
             />
           </PaperCard>
         </div>

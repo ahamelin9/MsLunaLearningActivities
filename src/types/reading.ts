@@ -141,6 +141,12 @@ export interface ReadingSkill {
   id: string;
   /** the bucket's name, in plain words */
   name: string;
+  /**
+   * Its name as Luna says it when its card is tapped on the library (CUR-10):
+   * most children can't read it yet. A whole `{ text }` part, so it is a
+   * rendered clip (voice:audit).
+   */
+  said: { text: string };
   icon: string;
   /** what it teaches, in plain words for grown-ups (the lessons' objective) */
   description: string;

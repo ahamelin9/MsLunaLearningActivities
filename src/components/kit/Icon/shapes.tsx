@@ -39,6 +39,8 @@ export const SHAPES = {
   // the home screen's day/night button (DES-16): the sun shows at night, the moon by day
   sun: <><circle cx="12" cy="12" r="4" /><path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M5.3 18.7l1.4-1.4M17.3 6.7l1.4-1.4" /></>,
   moon: <path d="M19.5 14.5A8 8 0 1 1 9.5 4.5a6.5 6.5 0 0 0 10 10z" />,
+  // the Teacher's corner, where the gear was (DES-29): a teacher's apple
+  apple: <path d="M12 7.6c-1.2-1-2.6-1.4-4-1.1C5.5 7 4 9.6 4.5 12.9c.5 3.6 2.9 7.1 5.2 7.1.9 0 1.4-.5 2.3-.5s1.4.5 2.3.5c2.3 0 4.7-3.5 5.2-7.1.5-3.3-1-5.9-3.5-6.4-1.4-.3-2.8.1-4 1.1zM12 7.6c0-1.6.3-2.9 1-4M12.9 5c.8-1.7 2.4-2.4 4.3-2.1-.3 1.8-1.9 2.9-4.3 2.1z" />,
 } satisfies Record<string, ReactNode>;
 
 export type IconName = keyof typeof SHAPES;

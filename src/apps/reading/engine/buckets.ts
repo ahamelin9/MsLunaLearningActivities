@@ -9,6 +9,8 @@ export interface Bucket {
   /** the skill's id */
   id: string;
   name: string;
+  /** its name as Luna says it when its card is tapped (CUR-10) */
+  said: { text: string };
   icon: string;
   /** what it teaches, in plain words */
   description: string;
@@ -23,7 +25,7 @@ export function bucketsFor(grade: GradeLevel): Bucket[] {
   for (const skill of READING_CURRICULUM[grade] ?? []) {
     let bucket = buckets.find(b => b.id === skill.id);
     if (!bucket) {
-      bucket = { id: skill.id, name: skill.name, icon: skill.icon, description: skill.description, lessons: [] };
+      bucket = { id: skill.id, name: skill.name, said: skill.said, icon: skill.icon, description: skill.description, lessons: [] };
       buckets.push(bucket);
     }
     for (const lesson of skill.lessons) bucket.lessons.push({ number: ++number, lesson });
