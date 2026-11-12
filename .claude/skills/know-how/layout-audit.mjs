@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 // The layout audit (DES-10): at the four iPad sizes, visits Grade Select
-// (DES-9c), the library, every game's start screen and first round, the
+// (DES-9c), the library, the teacher's cheat sheet past the grown-up gate
+// (CUR-8: its buttons, and nothing wider than its window at each grade),
+// every game's start screen and first round, the
 // first question of every lesson of one grade, and Lesson 1's done screen,
 // played through (DES-22d), and reports:
 //   - more than one owl on a screen: the kit's Luna and owl emoji (DES-12);
@@ -28,6 +30,7 @@
 
 import puppeteer from 'puppeteer-core';
 import { chromePath } from '../../../scripts/chrome-path.cjs';
+import { allLessonCards, lessonCard, lessonCount } from './library.mjs';
 
 const port = process.argv[2] ?? '5199';
 const grade = Number(process.argv[3] ?? 0);
@@ -41,8 +44,12 @@ const SIZES = [
 const at = n => `[data-shot="${n}"]`;
 const wait = ms => new Promise(r => setTimeout(r, ms));
 
-/** In the page: what this screen gets wrong, each marked as in the stage or not. */
-function audit({ screen, midRound, scrolls = false }) {
+/**
+ * In the page: what this screen gets wrong, each marked as in the stage or not.
+ * `within`: a window's selector, so only its own tap targets count, not the
+ * screen dimmed behind it.
+ */
+function audit({ screen, midRound, scrolls = false, within = null }) {
   const W = innerWidth;
   const H = innerHeight;
   const name = el =>
@@ -78,7 +85,7 @@ function audit({ screen, midRound, scrolls = false }) {
     }
   }
 
-  const taps = [...document.querySelectorAll('button, a[href], [role="button"], input, select')].filter(visible);
+  const taps = [...(within ? document.querySelector(within) : document).querySelectorAll('button, a[href], [role="button"], input, select')].filter(visible);
   for (const el of taps) {
     const b = el.getBoundingClientRect();
     const answer = el.matches('[data-shot="lesson-choice"]');
@@ -126,7 +133,9 @@ function library() {
         .some(p => p.width > 0 && Math.min(title.right, p.right) - Math.max(title.left, p.left) > 2 && Math.min(title.bottom, p.bottom) - Math.max(title.top, p.top) > 2);
     })
     .map(t => t.querySelector('[data-shot="tile-title"]').textContent.trim());
-  return { nextLesson: whole(document.querySelector('[data-shot="lesson-tile"]')), lunasPick: whole(pick), rug };
+  // the lesson up next (its skill is the one open, CUR-7)
+  const next = document.querySelector('[data-shot="lesson-tile"]:not([data-state~="done"]):not([data-state~="locked"])');
+  return { nextLesson: whole(next), lunasPick: whole(pick), rug };
 }
 
 const browser = await puppeteer.launch({
@@ -157,8 +166,32 @@ for (const [width, height] of SIZES) {
   results.push(await page.evaluate(audit, { screen: 'library', midRound: false, scrolls: true }));
   const lib = await page.evaluate(library);
 
-  const open = async (shot, i) => {
-    const el = (await page.$$(at(shot)))[i];
+  // the teacher's cheat sheet (CUR-8), past the grown-up gate: its own buttons,
+  // and at each grade, nothing wider than its window (it scrolls down: it's
+  // for grown-ups, not mid-round)
+  const gear = await (await page.$(at('open-settings'))).boundingBox();
+  await page.mouse.move(gear.x + gear.width / 2, gear.y + gear.height / 2);
+  await page.mouse.down();
+  await wait(2300);
+  await page.mouse.up();
+  await page.waitForSelector(at('settings'));
+  await page.click(at('open-teaches'));
+  await page.waitForSelector(at('teaches'));
+  await wait(500);
+  const sheet = await page.evaluate(audit, { screen: 'cheat sheet', midRound: false, scrolls: true, within: at('teaches') });
+  for (const id of ['kindergarten', 'grade1', 'grade2']) {
+    await page.click(at(`sheet-grade-${id}`));
+    await wait(300);
+    const wide = await page.$eval(at('teaches'), el => el.scrollWidth - el.clientWidth);
+    if (wide > 1) sheet.problems.push({ text: `runs past its window: ${id} by ${wide}px`, stage: false });
+  }
+  results.push(sheet);
+  await page.click(at('modal-close'));
+  await page.waitForSelector(at('teaches'), { hidden: true });
+  await wait(400);
+
+  const open = async (shot, i) => openCard((await page.$$(at(shot)))[i]);
+  const openCard = async el => {
     await el.evaluate(e => e.scrollIntoView({ block: 'center' }));
     await el.click();
     await page.waitForSelector(at('shell-intro'));
@@ -197,11 +230,12 @@ for (const [width, height] of SIZES) {
   await page.click(at('open-reading'));
   await page.waitForSelector(at('hub'));
   await wait(400);
-  const lessons = (await page.$$(at('lesson-tile'))).length;
-  const locked = await page.$$eval(`${at('lesson-tile')}[data-state~="locked"]`, els => els.length);
+  // one skill's lessons show at a time (CUR-7): library.mjs opens each one's skill
+  const lessons = await lessonCount(page);
+  const locked = (await allLessonCards(page, el => el.getAttribute('data-state') ?? '')).filter(s => /\blocked\b/.test(s)).length;
   if (locked) throw new Error(`${locked} lesson(s) still locked after marking every lesson done`);
   for (let i = 0; i < lessons; i++) {
-    await open('lesson-tile', i);
+    await openCard(await lessonCard(page, i));
     await play();
     results.push(await page.evaluate(audit, { screen: `Lesson ${i + 1}, question 1`, midRound: true }));
     await back();
@@ -209,7 +243,7 @@ for (const [width, height] of SIZES) {
 
   // the done screen (DES-22d): Lesson 1 played through, each choice tried in
   // turn until the round moves on (as lesson-order-check.mjs does)
-  await open('lesson-tile', 0);
+  await openCard(await lessonCard(page, 0));
   await play();
   const shownNow = sel => page.evaluate(q => !!document.querySelector(q), sel);
   const round = () => page.evaluate(() => document.querySelector('[data-shot="round-pips"]')?.getAttribute('aria-label') ?? null);

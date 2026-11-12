@@ -23,6 +23,7 @@
 
 import puppeteer from 'puppeteer-core';
 import { chromePath } from '../../../scripts/chrome-path.cjs';
+import { allLessonCards, lessonCard } from './library.mjs';
 
 const port = process.argv.find(a => /^\d+$/.test(a)) ?? '5199';
 const at = n => `[data-shot="${n}"]`;
@@ -65,7 +66,8 @@ await page.click(at('open-reading'));
 await page.waitForSelector(at('hub'));
 await wait(600);
 
-const cardTimes = () => page.$$eval('[data-shot="lesson-tile"]', ts => ts.map(t => t.textContent.match(/(about|took) \d+ min/)?.[0] ?? null));
+// every lesson card's time, in path order, across the skills (CUR-7)
+const cardTimes = () => allLessonCards(page, t => t.textContent.match(/(about|took) \d+ min/)?.[0] ?? null);
 const tileTimes = () => page.$$eval('[data-shot="game-tile"]', ts => ts.map(t => t.textContent.match(/about \d+ min/)?.[0] ?? null));
 const today = () => page.$eval('[data-shot="hub-today"]', e => Number(e.textContent.match(/(\d+)\s*min reading/)?.[1] ?? NaN)).catch(() => NaN);
 
@@ -77,7 +79,7 @@ const today0 = await today();
 ok('Today shows the minutes read', today0 === 0, `${today0} min`);
 
 // ---- Lesson 1: 2 minutes on screen, 1 hidden ----
-await (await page.$$(at('lesson-tile')))[0].click();
+await (await lessonCard(page, 0)).click();
 await page.waitForSelector(at('play'));
 await page.click(at('play'));
 await page.waitForSelector(at('lesson-choice'));
@@ -136,7 +138,7 @@ ok('after a reload Today and the card still say so', (await today()) === today1 
 
 // ---- PRG-11: Lesson 2 left part-way, then picked up and finished ----
 const openLesson = async n => {
-  await (await page.$$(at('lesson-tile')))[n].click();
+  await (await lessonCard(page, n)).click();
   await page.waitForSelector(at('play'));
   await page.click(at('play'));
   await page.waitForSelector(at('lesson-choice'));

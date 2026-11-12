@@ -115,7 +115,8 @@ ok('one tap gives her voice back', (await voice()) === true);
 await openGame();
 ok('… and the game shows no resting note', !(await shown(at('luna-resting'))));
 
-// ---- SET-5: past the gate, what each game and lesson teaches ----
+// ---- SET-5, now CUR-8: past the gate, the teacher's cheat sheet ----
+// (cheatsheet-check.mjs checks every grade's lessons and games on it)
 await page.click(at('shell-back')).catch(() => {});
 await page.waitForSelector(at('hub'));
 await wait(600);
@@ -127,11 +128,12 @@ const teaches = await page.$eval(at('teaches'), el => el.textContent);
 const objectives = await page.evaluate(async () => {
   const { GAMES } = await import('/src/apps/reading/games/index.ts');
   const { lessonsFor } = await import('/src/apps/reading/engine/lessons.ts');
-  return [...GAMES, ...['kindergarten', 'grade1', 'grade2'].flatMap(g => lessonsFor(g))].map(x => x.objective);
+  const grade = JSON.parse(localStorage.getItem('ms_luna_learning_progress_v1')).selectedGrade;
+  return [...GAMES, ...lessonsFor(grade)].map(x => x.objective);
 });
 const missing = objectives.filter(o => !teaches.includes(o));
-ok(`past the gate, Settings lists what all ${objectives.length} games and lessons teach (SET-5)`, missing.length === 0, missing.join(' | '));
-await page.click('[data-shot="teaches"] button');
+ok('past the gate, the cheat sheet says what every game and this grade\'s lessons teach (SET-5, CUR-8)', missing.length === 0, missing.join(' | '));
+await page.click(at('sheet-back'));
 await wait(300);
 ok('… and "Back to settings" goes back', !(await shown(at('teaches'))) && (await shown(at('open-teaches'))));
 await page.click(at('modal-close'));

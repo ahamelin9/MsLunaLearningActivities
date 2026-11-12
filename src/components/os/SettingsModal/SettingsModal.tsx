@@ -6,7 +6,7 @@ import { GRADES } from '@/data/readingCurriculum';
 import { soundManager } from '@/utils/audio';
 import { ChunkyButton, Icon, Modal, Switch } from '@/components/kit';
 import { VoicePicker } from '../VoicePicker/VoicePicker';
-import { TeachesList } from './TeachesList';
+import { CheatSheet } from '../CheatSheet/CheatSheet';
 import styles from './SettingsModal.module.scss';
 
 interface SettingsModalProps {
@@ -36,12 +36,12 @@ const speedOf = (rate: number) => (rate < 0.85 ? 0.75 : rate <= 1.05 ? 0.95 : 1.
 /**
  * Settings, for grown-ups (DES-9b): a kit Modal of switches and pick-one
  * rows, in plain words, behind the grown-up gate (SET-1). Light and dark
- * is a pick-one row (DES-16). "What they learn" swaps the panel for what each
- * game and lesson teaches (SET-5, TeachesList).
+ * is a pick-one row (DES-16). "What they learn" opens the teacher's cheat
+ * sheet in place of Settings (CUR-8, CheatSheet; SET-5's list before it).
  */
 export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, progress, onClose, onGradeChange }) => {
   const [confirmingReset, setConfirmingReset] = useState(false);
-  // what each game and lesson teaches, in place of the settings (SET-5)
+  // the cheat sheet, in place of Settings (CUR-8)
   const [teaching, setTeaching] = useState(false);
   const [resetDone, setResetDone] = useState(false);
   const { settings } = progress;
@@ -69,23 +69,23 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, progress, 
     }, 1200);
   };
 
+  // the cheat sheet, in its own wide window (CUR-8); its "Back" comes here
+  if (teaching) {
+    return (
+      <CheatSheet
+        open={isOpen}
+        progress={progress}
+        onClose={close}
+        onBack={() => {
+          soundManager.playPop();
+          setTeaching(false);
+        }}
+      />
+    );
+  }
+
   return (
-    <Modal
-      open={isOpen}
-      onClose={close}
-      title={teaching ? 'What each one teaches' : 'Settings'}
-      closeLabel="Close settings"
-      data-shot="settings"
-    >
-      {teaching ? (
-        <TeachesList
-          onBack={() => {
-            soundManager.playPop();
-            setTeaching(false);
-          }}
-        />
-      ) : (
-      <>
+    <Modal open={isOpen} onClose={close} title="Settings" closeLabel="Close settings" data-shot="settings">
       <section className={styles.group}>
         <h3 className={styles.groupName}>Sound</h3>
         <div className={styles.row}>
@@ -235,8 +235,6 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, progress, 
           </div>
         )}
       </section>
-      </>
-      )}
     </Modal>
   );
 };

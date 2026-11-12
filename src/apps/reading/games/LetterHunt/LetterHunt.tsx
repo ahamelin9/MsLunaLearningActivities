@@ -243,7 +243,7 @@ export const letterHunt: GameDef<Round> = {
   title: 'The Letter Jar',
   emoji: '🫙',
   tagline: 'Letters escaped! Catch every single one.',
-  objective: 'Letter recognition — hear a letter’s name, then find it among letters that look alike.',
+  objective: 'Letter names: hears a letter’s name and finds it among letters that look alike.',
   skill: 'letters',
   mission: 'They wriggled out of the jar again. Catch them all!',
   roundsPerPlay: 4,

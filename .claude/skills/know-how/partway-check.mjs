@@ -18,6 +18,7 @@
 
 import puppeteer from 'puppeteer-core';
 import { chromePath } from '../../../scripts/chrome-path.cjs';
+import { lessonCard } from './library.mjs';
 
 const port = process.argv.find(a => /^\d+$/.test(a)) ?? '5199';
 const at = n => `[data-shot="${n}"]`;
@@ -50,7 +51,9 @@ const intoLibrary = async () => {
   await wait(600);
 };
 const open = async (kind, title) => {
-  for (const t of await page.$$(at(kind))) {
+  // a lesson's skill opens first: the library shows one skill's lessons at a time (CUR-7)
+  if (kind === 'lesson-tile') await (await lessonCard(page, title)).click();
+  else for (const t of await page.$$(at(kind))) {
     if ((await t.evaluate(e => e.textContent)).includes(title)) { await t.click(); break; }
   }
   await page.waitForSelector(at('play'));

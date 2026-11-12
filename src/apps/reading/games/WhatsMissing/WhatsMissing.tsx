@@ -156,7 +156,7 @@ export const whatsMissing: GameDef<Round> = {
   title: 'What’s Missing?',
   emoji: '🔦',
   tagline: 'Memorise Luna’s desk. She takes one thing away.',
-  objective: 'Vocabulary recall — hold picture and word together in memory.',
+  objective: 'New words: remembers the pictures on Luna’s desk with their words, then finds the one she took away.',
   skill: 'vocabulary',
   mission: 'Look hard at my desk… I am about to take something!',
   roundsPerPlay: 4,

@@ -3,6 +3,7 @@
 // (DES-13) and the Play Shelf, whose drawings have their own module
 // (games/shared/GamePicture).
 
+@use 'sass:math';
 @use 'styles/mixins' as *;
 
 .page {
@@ -178,7 +179,8 @@
   }
 }
 
-// ---- the lessons: the heading and one bar, then the cards in order (DES-13) ----
+// ---- the lessons: the heading and one bar (DES-13), the skills, then the
+// open skill's lesson cards in order (CUR-7) ----
 .lessons {
   display: flex;
   flex-direction: column;
@@ -199,6 +201,89 @@
 .lessons-bar {
   flex: 1;
   min-width: 0;
+}
+
+// the skills (CUR-7), six across like the lessons below them, three on a
+// portrait iPad. The open one's lessons sit in a tray of its own fill, in the
+// row right under it, with a notch pointing up at it (Alex, 2026-11-08: "tab
+// and tray"), so it reads as the card that opened them. The fill is the
+// shelves' soil: the accent's soft fill was too close to the page to see
+// (Alex, 2026-11-08).
+$skill-columns: 6;
+$skill-columns-narrow: 3;
+
+.skills {
+  --columns: #{$skill-columns};
+  --skill-gap: var(--space-4);
+  --tray-notch: var(--space-6);
+
+  display: grid;
+  grid-template-columns: repeat(var(--columns), minmax(0, 1fr));
+  gap: var(--space-6) var(--skill-gap);
+
+  @include bp(narrow) {
+    --columns: #{$skill-columns-narrow};
+  }
+}
+
+// where the open skill sits (`data-open`, its place in the row): the tray
+// takes the grid row under it, and the notch its column's middle. Cards past
+// it in a row below flow on under the tray
+@for $i from 0 through 2 * $skill-columns - 1 {
+  .skills[data-open='#{$i}'] {
+    --open-column: #{$i % $skill-columns};
+    --tray-row: #{math.floor(math.div($i, $skill-columns)) + 2};
+
+    @include bp(narrow) {
+      --open-column: #{$i % $skill-columns-narrow};
+      --tray-row: #{math.floor(math.div($i, $skill-columns-narrow)) + 2};
+    }
+  }
+}
+
+.tray {
+  --tray-fill: var(--soil);
+
+  position: relative;
+  grid-column: 1 / -1;
+  grid-row: var(--tray-row);
+  display: flex;
+  flex-direction: column;
+  // room for the lesson cards' "Up next" tag and badges, as above
+  gap: var(--space-6);
+  padding: var(--space-4) var(--space-4) var(--space-5);
+  border-radius: var(--radius-card);
+  background: var(--tray-fill);
+
+  // the notch: a square turned 45°, as the speech bubble's tail, half above
+  // the tray, under the middle of the open skill's column
+  &::before {
+    content: '';
+    position: absolute;
+    top: calc(var(--tray-notch) / -2);
+    left: calc(
+      (100% - (var(--columns) - 1) * var(--skill-gap)) / var(--columns) * (var(--open-column) + 0.5) +
+        var(--open-column) * var(--skill-gap) - var(--tray-notch) / 2
+    );
+    width: var(--tray-notch);
+    height: var(--tray-notch);
+    background: var(--tray-fill);
+    transform: rotate(45deg);
+  }
+}
+
+// the open skill's name over its lessons, as the Play Shelf's heading; its
+// count in the main ink, which is the text paired with soil
+.skill-heading {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  margin: 0;
+  font: var(--text-display-s);
+
+  .count {
+    color: var(--ink);
+  }
 }
 
 // six across, as on the board, so every card is one size at every grade;

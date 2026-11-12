@@ -25,7 +25,13 @@ page shows them live (DES-20).
    set through classes in their module, never `fill="#…"` in the markup.
 8. **No gradient washes and no rainbow.** Flat colour, paper grain, and the
    occasional soft glow.
-9. **Something new that doesn't fit an existing role?** Go down the ladder in
+9. **A panel meant to stand apart from the page needs a fill you can see on
+   it.** The contrast check covers text, not a fill on `--ground`, and the
+   accent's soft fill is only 1.06:1 on it in light: Alex couldn't see the
+   library's tray (CUR-7). `--soil` is 1.46:1 in light and 1.98:1 in dark,
+   with `--ink` for its text. Check a new one the way `library-fit-check`
+   does, in both modes.
+10. **Something new that doesn't fit an existing role?** Go down the ladder in
    [fitting-in.md](fitting-in.md). A new role needs Alex's OK; a new palette
    colour needs his OK too, and the teacher's if the look changes.
 
@@ -51,7 +57,7 @@ use those names; they use roles.
 | `--card` | Cards, panels, answer choices, speech bubbles |
 | `--edge` | Borders and the hard ledge under cards |
 | `--well` | Chips, wells, empty slots, locked lessons |
-| `--soil`, `--soil-deep` | Planks, shelves and arches |
+| `--soil`, `--soil-deep` | Planks, shelves and arches; the library's open skill and its tray of lessons (CUR-7), text on it in `--ink` |
 | `--ink` | All main text |
 | `--ink-soft` | Quiet text: captions, "about 5 min" |
 | `--accent` (with `-ink`, `-edge`) | Stars, Luna's Pick, highlights |

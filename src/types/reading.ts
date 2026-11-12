@@ -133,10 +133,16 @@ export type LessonQuestion =
   | RhymeMatchQuestion
   | StoryReadQuestion;
 
+/**
+ * A skill: one of a grade's buckets of lessons. The teacher's cheat sheet
+ * (CUR-8) shows each with its lessons and a progress bar.
+ */
 export interface ReadingSkill {
   id: string;
+  /** the bucket's name, in plain words */
   name: string;
   icon: string;
+  /** what it teaches, in plain words for grown-ups (the lessons' objective) */
   description: string;
   lessons: Lesson[];
 }

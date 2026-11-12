@@ -249,7 +249,7 @@ export const memoryMatch: GameDef<Round> = {
   title: 'Luna’s Muddled Cards',
   emoji: '🃏',
   tagline: 'Flip two cards. Do they belong together?',
-  objective: 'Uppercase–lowercase pairing and picture–word vocabulary recall.',
+  objective: 'Pairs, from memory: matches a big letter with its little one, or a picture with its word.',
   skill: 'vocabulary',
   mission: 'I dropped my card box. Find the pairs before I panic!',
   roundsPerPlay: 2,

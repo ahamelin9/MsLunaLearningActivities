@@ -8,6 +8,7 @@
 // is open (lessons open in order, PRG-7). Saves <outPrefix>-<width>-<theme>.png.
 import puppeteer from 'puppeteer-core';
 import { chromePath } from '../../../scripts/chrome-path.cjs';
+import { lessonCard } from './library.mjs';
 
 const [number, out, theme = 'light', grade = '0'] = process.argv.slice(2);
 if (!number || !out) {
@@ -36,8 +37,8 @@ for (const [width, height] of [[1180, 820], [744, 1133]]) {
   await page.click(at('open-reading'));
   await page.waitForSelector(at('hub'));
   await wait(500);
-  const tiles = await page.$$(at('lesson-tile'));
-  await tiles[Number(number) - 1].click();
+  // its skill first: the library shows one skill's lessons at a time (CUR-7)
+  await (await lessonCard(page, Number(number) - 1)).click();
   await page.waitForSelector(at('play'));
   await page.click(at('play'));
   await page.waitForSelector(at('shell-play'));

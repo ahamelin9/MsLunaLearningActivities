@@ -3,7 +3,7 @@ import type { GradeLevel } from '@/types/reading';
 import type { UserProgress } from '@/types/user';
 import type { AnyGameDef } from '../../engine/types';
 import { GAMES } from '../../games';
-import { ChunkyButton, Icon, LessonCard, Luna, PaperCard, ProgressBar, Squishy, Tile } from '@/components/kit';
+import { ChunkyButton, Icon, LessonCard, Luna, PaperCard, ProgressBar, SkillCard, Squishy, Tile } from '@/components/kit';
 import { greeting, lunaSay, type LunaLine, type LunaMood } from '../../engine/luna';
 import { SQUISHY_KINDS, kindDef, kindsFound, parseSquishy } from '../../engine/squishies';
 import { soundManager } from '@/utils/audio';
@@ -12,6 +12,7 @@ import { minutesOf, storageService } from '@/utils/storage';
 import { estimateMinutes } from '../../engine/times';
 import { warmReadingVoice } from '../../engine/warmup';
 import { FINISH_FIRST, lessonStates } from '../../engine/lessons';
+import { bucketsFor } from '../../engine/buckets';
 import { LEARN_RULE } from '../../engine/practice';
 import { GAME_TINTS, GamePicture } from '../../games/shared/GamePicture/GamePicture';
 import styles from './Hub.module.scss';
@@ -38,8 +39,9 @@ const ON_THE_PLANK = 3;
  * Luna's library (DES-21), as on the round 2 Library board: the welcome row
  * (Luna, who says her greeting with no bubble; the Squishy Shelf card, PRG-5a;
  * Luna's Pick), the lessons in order on one
- * bar (DES-13: done, up next or locked, PRG-7) and the Play Shelf, all from
- * the kit.
+ * bar (DES-13: done, up next or locked, PRG-7), grouped by skill so the page
+ * stays short (CUR-7: one SkillCard each, and the open skill's lessons), and
+ * the Play Shelf, all from the kit.
  */
 export const Hub: React.FC<HubProps> = ({
   grade,
@@ -92,12 +94,21 @@ export const Hub: React.FC<HubProps> = ({
     pronunciation.speakSequence([line]);
   };
 
+  // the lessons by skill (CUR-7; engine/buckets.ts), each with the places of
+  // its lessons on the path. One skill's lessons show at a time: the one
+  // holding the lesson up next, or the first once every lesson is done
+  // (Alex, 2026-11-08)
+  const buckets = bucketsFor(grade).map(b => ({ ...b, at: b.lessons.map(({ lesson }) => lessons.findIndex(l => l.id === lesson.id)) }));
+  const bucketState = (at: number[]) =>
+    at.every(i => states[i] === 'done') ? 'done' : at.some(i => states[i] === 'next') ? 'next' : at.some(i => states[i] === 'done') ? 'started' : 'waiting';
+  const [openId, setOpenId] = useState(() => (buckets.find(b => b.at.includes(states.indexOf('next'))) ?? buckets[0])?.id);
+  const openBucket = buckets.find(b => b.id === openId);
+
   // a late lesson up next can sit below the fold, and it's what the child came for
   const lessonCards = useRef<HTMLDivElement>(null);
   useEffect(() => {
-    const next = lessonCards.current?.children[states.indexOf('next')];
+    const next = lessonCards.current?.querySelector('[data-state~="next"]');
     if (next && next.getBoundingClientRect().bottom > window.innerHeight) next.scrollIntoView({ block: 'center' });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // times (PRG-6): "took N min" on a lesson done (its last play), "about N
@@ -231,27 +242,55 @@ export const Hub: React.FC<HubProps> = ({
             <h2 className={styles.heading}>Luna’s Lessons</h2>
             <ProgressBar done={lessonsDone} total={lessons.length} className={styles.lessonsBar} />
           </div>
-          <div className={styles.lessonCards} ref={lessonCards}>
-            {lessons.map((lesson, i) => (
-              <LessonCard
-                key={lesson.id}
-                number={i + 1}
-                title={lesson.title}
-                state={states[i]}
-                minutes={timeOf(lesson, states[i] === 'done')}
-                // up next and started: the thin rounds bar (PRG-8)
-                rounds={
-                  states[i] === 'next' && progress.partway?.[lesson.id]
-                    ? { done: progress.partway[lesson.id].won, total: lesson.roundsPerPlay }
-                    : undefined
-                }
-                // how far along its practice is (CUR-6)
-                practice={{ done: progress.lessonPractice?.[lesson.id]?.good ?? 0, goal: LEARN_RULE.goodPlays }}
-                opened={lesson.id === opened}
-                data-shot="lesson-tile"
-                onClick={() => (states[i] === 'locked' ? finishFirst() : startGame(lesson))}
+          {/* one card per skill, and the open skill's lessons in a tray in the
+              row under it, its notch pointing up at it (CUR-7) */}
+          <div className={styles.skills} data-open={buckets.findIndex(b => b.id === openId)}>
+            {buckets.map(b => (
+              <SkillCard
+                key={b.id}
+                data-shot="skill-card"
+                icon={b.icon}
+                name={b.name}
+                done={b.at.filter(i => states[i] === 'done').length}
+                total={b.at.length}
+                state={bucketState(b.at)}
+                open={b.id === openId}
+                onClick={() => {
+                  soundManager.playPop();
+                  setOpenId(b.id);
+                }}
               />
             ))}
+            {openBucket && (
+              <div className={styles.tray} data-shot="skill-tray">
+                <h3 className={styles.skillHeading}>
+                  <span aria-hidden="true">{openBucket.icon}</span> {openBucket.name}{' '}
+                  <span className={styles.count}>{openBucket.at.length === 1 ? '1 lesson' : `${openBucket.at.length} lessons`}</span>
+                </h3>
+                <div className={styles.lessonCards} ref={lessonCards}>
+                  {openBucket.at.map(i => [lessons[i], i] as const).map(([lesson, i]) => (
+                    <LessonCard
+                      key={lesson.id}
+                      number={i + 1}
+                      title={lesson.title}
+                      state={states[i]}
+                      minutes={timeOf(lesson, states[i] === 'done')}
+                      // up next and started: the thin rounds bar (PRG-8)
+                      rounds={
+                        states[i] === 'next' && progress.partway?.[lesson.id]
+                          ? { done: progress.partway[lesson.id].won, total: lesson.roundsPerPlay }
+                          : undefined
+                      }
+                      // how far along its practice is (CUR-6)
+                      practice={{ done: progress.lessonPractice?.[lesson.id]?.good ?? 0, goal: LEARN_RULE.goodPlays }}
+                      opened={lesson.id === opened}
+                      data-shot="lesson-tile"
+                      onClick={() => (states[i] === 'locked' ? finishFirst() : startGame(lesson))}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </section>
       )}

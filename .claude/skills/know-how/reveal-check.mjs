@@ -18,6 +18,7 @@
 
 import puppeteer from 'puppeteer-core';
 import { chromePath } from '../../../scripts/chrome-path.cjs';
+import { lessonCard } from './library.mjs';
 
 const port = process.argv.find(a => /^\d{4,}$/.test(a)) ?? '5199';
 const at = n => `[data-shot="${n}"]`;
@@ -42,7 +43,7 @@ async function open(title, lesson = false) {
   await page.waitForSelector(at('grade-card'));
   await (await page.$$(at('grade-card')))[0].click();
   await page.waitForSelector(at('hub'));
-  if (lesson) await (await page.$$(at('lesson-tile')))[0].click();
+  if (lesson) await (await lessonCard(page, 0)).click();
   else {
     for (const t of await page.$$(at('game-tile'))) {
       if ((await t.evaluate(e => e.textContent)).includes(title)) { await t.click(); break; }

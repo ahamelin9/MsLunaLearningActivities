@@ -51,17 +51,6 @@
   gap: var(--space-3);
 }
 
-// what each game and lesson teaches (SET-5, TeachesList)
-.teaches {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-4);
-}
-
-.back {
-  align-self: flex-start;
-}
-
 .done {
   display: flex;
   align-items: center;

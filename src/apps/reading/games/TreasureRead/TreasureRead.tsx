@@ -218,7 +218,7 @@ export const treasureRead: GameDef<Round> = {
   title: 'Treasure Path',
   emoji: '🗺️',
   tagline: 'Read each stone to step closer to the chest.',
-  objective: 'Reading comprehension — read a short story, then judge true or false and fill in the missing word.',
+  objective: 'Reading a story: reads a short story, says whether a sentence is true or false, and fills in a missing word.',
   skill: 'reading',
   mission: 'Read every stone carefully or we will never reach the treasure!',
   roundsPerPlay: 5,

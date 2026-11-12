@@ -20,6 +20,7 @@
 
 import puppeteer from 'puppeteer-core';
 import { chromePath } from '../../../scripts/chrome-path.cjs';
+import { lessonCard } from './library.mjs';
 
 const runsAt = process.argv.indexOf('--runs');
 const runs = runsAt > 0 ? Number(process.argv[runsAt + 1]) : 1;
@@ -68,9 +69,8 @@ async function play(run) {
   await page.click(at('open-reading'));
   await page.waitForSelector(at('hub'));
   await wait(400);
-  for (const t of await page.$$(at('lesson-tile'))) {
-    if ((await t.evaluate(e => e.textContent)).includes('Starter Sight Words')) { await t.click(); break; }
-  }
+  // its skill first: the library shows one skill's lessons at a time (CUR-7)
+  await (await lessonCard(page, 'Starter Sight Words')).click();
   await page.waitForSelector(at('play'));
   await page.click(at('play'));
 

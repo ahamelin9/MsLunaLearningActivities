@@ -209,7 +209,7 @@ export const buildSentence: GameDef<Round> = {
   title: 'Words Off the Page',
   emoji: '🪶',
   tagline: 'The words fell out of order. Line them back up.',
-  objective: 'Understand basic English word order and sentence structure.',
+  objective: 'Word order: puts a sentence’s words back in the right order.',
   skill: 'reading',
   mission: 'Oh no, the words slid right off the page. Put them back!',
   roundsPerPlay: 4,

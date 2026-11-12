@@ -23,9 +23,9 @@ const FIRST_LESSONS: Record<GradeLevel, ReadingSkill[]> = {
   kindergarten: [
     {
       id: 'k-match-sounds',
-      name: 'Match the Sound',
+      name: 'Letter sounds',
       icon: '👂',
-      description: 'Hear a letter sound, then find the letter that makes it.',
+      description: 'Hears a letter’s sound and finds the letter that makes it.',
       lessons: [
         {
           id: 'k-ms-m-s-b-t',
@@ -108,9 +108,9 @@ const FIRST_LESSONS: Record<GradeLevel, ReadingSkill[]> = {
     },
     {
       id: 'k-letter-hunter',
-      name: 'Letter Hunter',
+      name: 'Letter shapes',
       icon: '🔍',
-      description: 'Look for the letter! Practice spotting uppercase and lowercase letters.',
+      description: 'Hears a letter’s name and finds it, big or little, among letters that look alike.',
       lessons: [
         {
           id: 'k-lh-easy',
@@ -171,9 +171,9 @@ const FIRST_LESSONS: Record<GradeLevel, ReadingSkill[]> = {
     },
     {
       id: 'k-blend-words',
-      name: 'Blend & Read CVC Words',
+      name: 'Sound it out',
       icon: '🧩',
-      description: 'Tap each letter sound, blend them together, and find the matching picture!',
+      description: 'Blends the sounds of a short word (c-a-t) and finds its picture.',
       lessons: [
         {
           id: 'k-bw-animals',
@@ -318,9 +318,9 @@ const FIRST_LESSONS: Record<GradeLevel, ReadingSkill[]> = {
     },
     {
       id: 'k-sight-words',
-      name: 'Sight Word Power',
+      name: 'Sight words',
       icon: '⚡',
-      description: 'Recognize common words instantly by sight.',
+      description: 'Hears a common word and finds it written, without sounding it out.',
       lessons: [
         {
           id: 'k-sw-starter',
@@ -417,9 +417,9 @@ const FIRST_LESSONS: Record<GradeLevel, ReadingSkill[]> = {
     },
     {
       id: 'k-rhyming',
-      name: 'Rhyme Matcher',
+      name: 'Rhymes',
       icon: '🎵',
-      description: 'Match words that sound the same at the end!',
+      description: 'Hears which words end with the same sound.',
       lessons: [
         {
           id: 'k-rh-pairs',
@@ -483,9 +483,9 @@ const FIRST_LESSONS: Record<GradeLevel, ReadingSkill[]> = {
   grade1: [
     {
       id: 'g1-digraphs',
-      name: 'Digraphs & Blends Decoder',
+      name: 'Letter teams and blends',
       icon: '🔤',
-      description: 'Decode 2-letter teams like SH, CH, TH, and blends like FR and ST!',
+      description: 'Reads words with SH, CH, TH, WH, CK and NG, and blends like FR, PL and ST.',
       lessons: [
         {
           id: 'g1-ph-digraphs',
@@ -557,9 +557,9 @@ const FIRST_LESSONS: Record<GradeLevel, ReadingSkill[]> = {
     },
     {
       id: 'g1-magic-e',
-      name: 'Magic Silent E Readers',
+      name: 'Magic E',
       icon: '🪄',
-      description: 'The magic E jumps over the consonant to make the vowel say its long name!',
+      description: 'Reads words where a silent E makes the vowel say its name (cake, kite, bone).',
       lessons: [
         {
           id: 'g1-bw-magic-e',
@@ -617,9 +617,9 @@ const FIRST_LESSONS: Record<GradeLevel, ReadingSkill[]> = {
     },
     {
       id: 'g1-sentences',
-      name: 'Read Sentences & Match',
+      name: 'Sentences',
       icon: '📖',
-      description: 'Read full sentences and pick the picture that matches what you read!',
+      description: 'Reads a whole sentence and picks the picture that matches it.',
       lessons: [
         {
           id: 'g1-rs-happy-pets',
@@ -667,9 +667,9 @@ const FIRST_LESSONS: Record<GradeLevel, ReadingSkill[]> = {
   grade2: [
     {
       id: 'g2-vowel-teams',
-      name: 'Vowel Team Readers',
+      name: 'Vowel teams',
       icon: '✨',
-      description: 'When two vowels go walking, the first one does the talking! (ai, ea, oa)',
+      description: 'Reads letters that team up for one vowel sound: AI, AY, EE, EA, OA, OW, IGH, OO and OU.',
       lessons: [
         {
           id: 'g2-wp-vowel-teams',
@@ -727,9 +727,9 @@ const FIRST_LESSONS: Record<GradeLevel, ReadingSkill[]> = {
     },
     {
       id: 'g2-compounds',
-      name: 'Compound Word Readers',
+      name: 'Compound words',
       icon: '🧩',
-      description: 'Read two smaller words joined together into one big exciting word!',
+      description: 'Reads two small words joined into one (rain + bow, cup + cake).',
       lessons: [
         {
           id: 'g2-bw-compounds',
@@ -776,9 +776,9 @@ const FIRST_LESSONS: Record<GradeLevel, ReadingSkill[]> = {
     },
     {
       id: 'g2-storybooks',
-      name: 'Decodable Storybooks',
+      name: 'Storybooks',
       icon: '📖',
-      description: 'Read short stories on your own, then answer questions about them.',
+      description: 'Reads a longer story alone, then answers a question about it.',
       lessons: [
         {
           id: 'g2-story-luna-space',
@@ -823,11 +823,11 @@ const FIRST_LESSONS: Record<GradeLevel, ReadingSkill[]> = {
 
 /** Skills that begin with the lessons added in CUR-4. */
 const LATER_SKILLS: Omit<ReadingSkill, 'lessons'>[] = [
-  { id: 'g1-rhymes', name: 'Rhyme Matcher', icon: '🎵', description: 'Match words that sound the same at the end!' },
-  { id: 'g1-sight-words', name: 'Sight Word Power', icon: '⚡', description: 'Recognize common words instantly by sight.' },
-  { id: 'g1-stories', name: 'Little Storybooks', icon: '📖', description: 'Read little stories on your own, then answer a question.' },
-  { id: 'g2-sight-words', name: 'Sight Word Power', icon: '⚡', description: 'Recognize common words instantly by sight.' },
-  { id: 'g2-r-vowels', name: 'Vowels with R', icon: '🚗', description: 'When R comes after a vowel, it changes the vowel’s sound.' }
+  { id: 'g1-rhymes', name: 'Rhymes', icon: '🎵', description: 'Hears which words end with the same sound.' },
+  { id: 'g1-sight-words', name: 'Sight words', icon: '⚡', description: 'Hears a common word and finds it written, without sounding it out.' },
+  { id: 'g1-stories', name: 'Little stories', icon: '📖', description: 'Reads a little story alone, then answers a question about it.' },
+  { id: 'g2-sight-words', name: 'Sight words', icon: '⚡', description: 'Hears a common word and finds it written, without sounding it out.' },
+  { id: 'g2-r-vowels', name: 'Vowels with R', icon: '🚗', description: 'Reads AR, OR, ER, IR and UR, where the R changes the vowel’s sound.' }
 ];
 
 /** Lessons on the path after a grade's first ones: a skill's lessons needn't sit together. */

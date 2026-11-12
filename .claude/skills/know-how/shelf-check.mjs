@@ -13,7 +13,8 @@
 //   - the library's Squishy Shelf card says "2 of 18 found", draws them, opens
 //     the shelf, and "My trophies" is still beside it;
 //   - on the shelf a found squishy says its line, one still to find its clue;
-//   - no emoji on the home screen, the library, the shelf or the done screen;
+//   - no emoji on the home screen, the library (but the skills' pictures, CUR-7,
+//     until DES-27 draws them), the shelf or the done screen;
 //   - six kinds to a plank, the top of the arch a "?" that gives its line;
 //   - a save with the 18 old stickers loads with 18 squishies, the same 8 kinds
 //     they were before PRG-5b, so nobody's shelf is suddenly full;
@@ -23,6 +24,7 @@
 
 import puppeteer from 'puppeteer-core';
 import { chromePath } from '../../../scripts/chrome-path.cjs';
+import { lessonCard } from './library.mjs';
 
 const port = process.argv.find(a => /^\d+$/.test(a)) ?? '5199';
 const at = n => `[data-shot="${n}"]`;
@@ -49,10 +51,16 @@ const hookSpeech = () => page.evaluate(async () => {
   const say = pronunciation.say.bind(pronunciation);
   pronunciation.say = (req, text, o) => { window.__said.push(String(text)); return say(req, text, o); };
 });
-const emoji = sel => page.evaluate(s => {
+// `allow`: pieces whose emoji are expected for now, hidden while it reads
+const emoji = (sel, allow) => page.evaluate((s, a) => {
   const el = document.querySelector(s);
-  return el ? (el.innerText.match(/\p{Extended_Pictographic}/gu) ?? []).join('') : 'missing';
-}, sel);
+  if (!el) return 'missing';
+  const skip = a ? [...el.querySelectorAll(a)] : [];
+  for (const x of skip) x.style.display = 'none';
+  const found = (el.innerText.match(/\p{Extended_Pictographic}/gu) ?? []).join('');
+  for (const x of skip) x.style.display = '';
+  return found;
+}, sel, allow);
 const round = () => page.evaluate(() => document.querySelector('[data-shot="round-pips"]')?.getAttribute('aria-label') ?? null);
 const intoLibrary = async () => { await page.click(at('shell-back')); await page.waitForSelector(at('hub')); await wait(600); };
 
@@ -66,7 +74,9 @@ await hookSpeech();
 
 // ---- Lesson 1 ----
 const open = async (kind, title) => {
-  for (const t of await page.$$(at(kind))) if ((await t.evaluate(e => e.textContent)).includes(title)) { await t.click(); break; }
+  // a lesson's skill opens first: the library shows one skill's lessons at a time (CUR-7)
+  if (kind === 'lesson-tile') await (await lessonCard(page, title)).click();
+  else for (const t of await page.$$(at(kind))) if ((await t.evaluate(e => e.textContent)).includes(title)) { await t.click(); break; }
   await page.waitForSelector(at('play'));
   await page.click(at('play'));
   await page.waitForSelector(at('shell-play'));
@@ -160,7 +170,10 @@ const card = await page.evaluate(() => {
   return { text: c?.innerText ?? '', drawn: c ? c.querySelectorAll('svg').length : 0, trophies: Boolean(document.querySelector('[data-shot="open-trophies"]')) };
 });
 ok('the library card: "2 of 18 found", drawn; the header\'s stars still open the trophies', /2 of 18/.test(card.text) && card.drawn >= 2 && card.trophies, card.text.replace(/\s+/g, ' '));
-ok('no emoji on the library', (await emoji(at('hub'))) === '', await emoji(at('hub')));
+// the skill cards' pictures (CUR-7) are emoji until DES-27 draws them; the
+// open skill's heading shows its picture too. Nothing else on the library is
+const SKILL_PICTURES = `${at('skill-card')} [aria-hidden="true"], h3 > [aria-hidden="true"]`;
+ok('no emoji on the library but the skills\' pictures (DES-27 draws them)', (await emoji(at('hub'), SKILL_PICTURES)) === '', await emoji(at('hub'), SKILL_PICTURES));
 await page.click(at('open-shelf'));
 await page.waitForSelector(at('shelf'));
 await wait(400);

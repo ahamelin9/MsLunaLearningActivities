@@ -1,0 +1,103 @@
+// SkillCard (CUR-7): component tokens first; the states swap only these. Built
+// like the LessonCard below it on the library, so the badge and the "Up next"
+// tag overhang the top edge the same way.
+
+@use 'styles/mixins' as *;
+
+.root {
+  --skill-bg: var(--card);
+  --skill-border: var(--edge);
+  --skill-border-width: var(--border-regular);
+  --skill-border-style: solid;
+  --skill-edge: var(--edge);
+  --skill-ledge: var(--ledge-small);
+  --skill-motion: none;
+  --skill-count: var(--ink-soft);
+
+  @include press(var(--skill-ledge), var(--skill-edge));
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-5) var(--space-3) var(--space-3);
+  border: var(--skill-border-width) var(--skill-border-style) var(--skill-border);
+  border-radius: var(--radius-card);
+  background: var(--skill-bg);
+  color: var(--ink);
+  text-align: center;
+  animation: var(--skill-motion);
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+.icon {
+  font: var(--text-display-l);
+}
+
+.name {
+  font: var(--text-label-small);
+}
+
+.bar {
+  align-self: stretch;
+  margin-top: var(--space-1);
+}
+
+.count {
+  font: var(--text-tag);
+  letter-spacing: var(--tracking-tag);
+  color: var(--skill-count);
+}
+
+// centred by its own margins, not a transform, so reduced motion can't move it
+.tag {
+  position: absolute;
+  top: calc(var(--space-4) * -1);
+  left: 0;
+  right: 0;
+  width: max-content;
+  margin-inline: auto;
+}
+
+.badge {
+  position: absolute;
+  top: calc(var(--space-3) * -1);
+  right: var(--space-3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--space-8);
+  height: var(--space-8);
+  border-radius: var(--radius-chip);
+  background: var(--right);
+  color: var(--right-ink);
+}
+
+// ── states ─────────────────────────────────────────────────────────────────
+// the one holding the lesson to play next glows, as its lesson card does
+.root[data-state~='next'] {
+  --skill-border: var(--action);
+  --skill-border-width: var(--border-thick);
+  --skill-ledge: 0;
+  --skill-edge: transparent;
+  --skill-motion: var(--motion-glow);
+}
+
+// none of its lessons open yet
+.root[data-state~='waiting'] {
+  --skill-bg: var(--well);
+  --skill-border-style: dashed;
+  --skill-ledge: 0;
+  --skill-edge: transparent;
+}
+
+// the open one: its lessons are the ones showing, in a tray of this fill on
+// the library. The shelves' soil, as the accent's soft fill barely showed on
+// the page (Alex, 2026-11-08); the main ink is the text paired with it
+.root[aria-expanded='true'] {
+  --skill-bg: var(--soil);
+  --skill-count: var(--ink);
+}

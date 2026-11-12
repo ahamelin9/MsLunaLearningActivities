@@ -23,6 +23,7 @@
 
 import puppeteer from 'puppeteer-core';
 import { chromePath } from '../../../scripts/chrome-path.cjs';
+import { lessonCard } from './library.mjs';
 
 const port = process.argv.find(a => /^\d+$/.test(a)) ?? '5199';
 const reduced = process.argv.includes('--reduced-motion');
@@ -144,7 +145,8 @@ async function playRounds(miss, pieces) {
 
 async function openTile(kind, n, title) {
   const tiles = await page.$$(at(kind));
-  let tile = tiles[n];
+  // a lesson's skill opens first: the library shows one skill's lessons at a time (CUR-7)
+  let tile = kind === 'lesson-tile' ? await lessonCard(page, n) : tiles[n];
   if (title) for (const t of tiles) if ((await t.evaluate(e => e.textContent)).includes(title)) tile = t;
   await tile.click();
   await page.waitForSelector(at('shell-intro'));

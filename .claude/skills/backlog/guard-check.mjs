@@ -10,7 +10,7 @@
 // as a write.
 
 import { spawnSync } from 'node:child_process';
-import { readFileSync } from 'node:fs';
+import { readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 
 const root = process.argv[2] ?? process.cwd();
@@ -45,10 +45,17 @@ const [, firstTodo, secondTodo] = found('two Todo rows next to each other', boar
 const oneTodo = found('Todo row', board.match(new RegExp(todo)))[0];
 const inProgress = row => row.replace('| Todo |', '| In progress |');
 const opsLink = found('OPS epic link', board.match(/- \[OPS[^\n]*/))[0];
-// a ticket's one-line Complete when, and a heading to leave as it is
+// a ticket's one-line Complete when, in whichever epic has one today (a list
+// one, like OPS-11's, can't lose its label in one line), and a heading to leave
+// as it is
+const oneLine = /- \*\*Complete when:\*\* [^\n]+/;
+const cwFile = found('one-line Complete when in any epic', readdirSync(epics)
+  .filter(name => name.endsWith('.md'))
+  .map(name => join(epics, name))
+  .find(file => oneLine.test(readFileSync(file, 'utf8'))));
+const completeWhen = readFileSync(cwFile, 'utf8').match(oneLine)[0];
 const opsFile = join(epics, 'OPS.md');
 const ops = readFileSync(opsFile, 'utf8');
-const completeWhen = found('one-line Complete when in the OPS epic', ops.match(/- \*\*Complete when:\*\* [^\n]+/))[0];
 const heading = found('ticket in the OPS epic', ops.match(/### [^\n]+/))[0];
 
 const cases = [
@@ -58,7 +65,7 @@ const cases = [
     edit(readme, `${firstTodo}\n${secondTodo}`, `${inProgress(firstTodo)}\n${inProgress(secondTodo)}`)
   ],
   ['deny', 'a ticket deleted with no changelog line', edit(readme, `${oneTodo}\n`, '')],
-  ['deny', 'a ticket losing its Complete when', edit(opsFile, completeWhen, completeWhen.replace('- **Complete when:** ', '- '))],
+  ['deny', 'a ticket losing its Complete when', edit(cwFile, completeWhen, completeWhen.replace('- **Complete when:** ', '- '))],
   ['deny', 'a status that is not allowed', edit(readme, oneTodo, oneTodo.replace('| Todo |', '| Done |'))],
   ['deny', 'a link to an epic file that does not exist', edit(readme, opsLink, `${opsLink}\n- [NEW — Something](epics/NEW.md)`)],
   ['deny', 'a shell write into kanban/', bash("sed -i '' 's/Todo/Done/' kanban/README.md")],

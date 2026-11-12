@@ -298,7 +298,7 @@ export const bubbleSounds: GameDef<Round> = {
   title: 'Bubble Sounds',
   emoji: '🫧',
   tagline: 'Pop only the bubbles that make the right sound.',
-  objective: 'Match a spoken phoneme to its letter under light time pressure (sound–symbol fluency).',
+  objective: 'Letter sounds, quickly: hears a sound and pops the bubbles with its letter before they float away.',
   skill: 'phonics',
   mission: 'Quick! Pop the bubbles with that sound before they float away!',
   roundsPerPlay: 4,

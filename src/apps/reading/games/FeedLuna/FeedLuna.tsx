@@ -290,7 +290,7 @@ export const feedLuna: GameDef<Round> = {
   title: 'Letter Cookies',
   emoji: '🍪',
   tagline: 'She only eats the letter she asked for.',
-  objective: 'Hear a letter’s name, its sound or a word, then find that letter — big or little.',
+  objective: 'Big and little letters: hears a letter’s name, its sound or a word, and finds that letter.',
   skill: 'letters',
   mission: 'I am SO hungry. Feed me the right letter cookie!',
   roundsPerPlay: 5,

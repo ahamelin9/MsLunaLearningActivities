@@ -270,7 +270,7 @@ export const storyTime: GameDef<Round> = {
   title: 'Story Corner',
   emoji: '📗',
   tagline: 'Read a tiny story, hunt a word, answer one question.',
-  objective: 'Reading comprehension and locating a target word inside a passage.',
+  objective: 'Reading a story: reads a tiny story, finds a word in it, and answers one question about it.',
   skill: 'reading',
   mission: 'Snuggle in. This one is short, I promise.',
   roundsPerPlay: 2,

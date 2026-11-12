@@ -17,6 +17,7 @@
 
 import puppeteer from 'puppeteer-core';
 import { chromePath } from '../../../scripts/chrome-path.cjs';
+import { lessonCard } from './library.mjs';
 
 const port = process.argv.find(a => /^\d+$/.test(a)) ?? '5199';
 const shotDir = process.env.SHOT;
@@ -85,7 +86,7 @@ const answers = () => page.evaluate(() => {
 const tap = l => page.evaluate(l => [...document.querySelectorAll('[data-shot="lesson-choice"]')].find(e => (e.getAttribute('aria-label') ?? e.textContent).trim() === l)?.click(), l);
 
 const play = async (skipMinutes, name) => {
-  await (await page.$$(at('lesson-tile')))[0].click();
+  await (await lessonCard(page, 0)).click();
   await page.waitForSelector(at('play'));
   await page.click(at('play'));
   await page.waitForSelector(at('lesson-choice'));

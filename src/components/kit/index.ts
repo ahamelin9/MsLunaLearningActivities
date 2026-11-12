@@ -14,6 +14,7 @@ export { SpeechBubble } from './SpeechBubble/SpeechBubble';
 export { StarRow } from './StarRow/StarRow';
 export { ProgressBar } from './ProgressBar/ProgressBar';
 export { LessonCard } from './LessonCard/LessonCard';
+export { SkillCard } from './SkillCard/SkillCard';
 export { Squishy, SquishyDots, type SquishyColour, type SquishyKind, type SquishyLook } from './Squishy/Squishy';
 export { PearlMoon } from './PearlMoon/PearlMoon';
 export { Luna, type LunaMood } from './Luna/Luna';

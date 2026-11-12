@@ -152,7 +152,8 @@ const spoke = await page.evaluate(() => window.__browserSpoke);
 const once = list => JSON.stringify([...new Set(list)]);
 const checks = [
   ['after Grade Select: no greeting, "Let’s start Kindergarten!" said', grade.greeting.length === 0 && grade.said.some(t => /start Kindergarten/.test(t))],
-  ['from home: her greeting, with its clip(s)', home.greeting.length >= 1 && home.greeting.length === home.said.length && home.clips >= 1],
+  // every line said is her greeting; "shhh", said on its own, has no words to match
+  ['from home: her greeting, with its clip(s)', home.greeting.length >= 1 && home.greeting.length === home.said.filter(t => norm(t)).length && home.clips >= 1],
   ['tap Luna: the same greeting again, with its clip(s)', once(tap.said) === once(home.said) && tap.clips >= 1],
   ['back from a game: no greeting', game.greeting.length === 0],
   [`the header's grade opens Grade Select with Kindergarten picked (${JSON.stringify(picked)})`, JSON.stringify(picked) === '["true","false","false"]'],

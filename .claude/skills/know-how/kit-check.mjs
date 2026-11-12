@@ -12,6 +12,11 @@
 // DES-9c: a picked Tile (aria-pressed) takes the action colour too.
 // DES-13: a LessonCard with no time shows none, and the one that just opened
 // pops then glows (no pop under reduced motion).
+// CUR-7: SkillCard's states: up next glows with a centred tag, done has a
+// check, waiting is dashed on the well, open sits on the shelves' soil with
+// its count in the main ink;
+// its bar reads its lessons; it sinks when pressed; nothing glows under
+// reduced motion.
 // DES-22a: a SpeechBubble with no tail draws none, and its line is a 48px
 // button that still reads as her words.
 // DES-22d: Icon's 96 size, and PaperCard's dashed reward panel.
@@ -244,6 +249,64 @@ const opened = await page.evaluateHandle(() => document.querySelector('button[da
 ok('the lesson that just opened pops, then glows', (await anim(opened)) === 'luna-pop, luna-glow', await anim(opened));
 await page.evaluate(() => document.documentElement.setAttribute('data-reduced-motion', ''));
 ok('reduced motion: it opens with no pop', /^none(, none)?$/.test(await anim(opened)), await anim(opened));
+await page.evaluate(() => document.documentElement.removeAttribute('data-reduced-motion'));
+
+// CUR-7: SkillCard, a skill on the library. Found by its name and whether it's open
+const skill = (name, open) => page.evaluateHandle((n, o) =>
+  [...document.querySelectorAll('button[aria-expanded]')].find(b => b.getAttribute('aria-label').startsWith(`${n},`) && b.getAttribute('aria-expanded') === String(o) && !(b.dataset.state ?? '').includes('pressed')), name, open);
+// a role's colour where the card sits (the Kit page sets light and dark per pane)
+const roleColour = (role, near) => near.evaluate((el, r) => {
+  const probe = document.createElement('div');
+  probe.style.background = `var(${r})`;
+  el.parentElement.append(probe);
+  const c = getComputedStyle(probe).backgroundColor;
+  probe.remove();
+  return c;
+}, role);
+const skillNext = await skill('Sight words', false);
+ok('a skill up next glows', (await anim(skillNext)) === 'luna-glow', await anim(skillNext));
+const skillTag = () => skillNext.evaluate(b => {
+  const tag = [...b.children].find(c => c.textContent === 'Up next');
+  if (!tag) return Infinity;
+  const [a, c] = [tag.getBoundingClientRect(), b.getBoundingClientRect()];
+  return Math.abs((a.left + a.width / 2) - (c.left + c.width / 2));
+});
+ok('its "Up next" tag is centred', (await skillTag()) < 1, String(await skillTag()));
+const skillBar = await skillNext.evaluate(b => {
+  const bar = b.querySelector('[role="progressbar"]');
+  return { label: bar?.getAttribute('aria-label'), now: bar?.getAttribute('aria-valuenow'), max: bar?.getAttribute('aria-valuemax'), said: b.getAttribute('aria-label') };
+});
+ok('its bar and name read its lessons done', skillBar.label === '1 of 4 lessons done' && skillBar.now === '1' && skillBar.max === '4' && skillBar.said === 'Sight words, 1 of 4 lessons done, up next', JSON.stringify(skillBar));
+const skillDone = await skill('Letter shapes', false);
+ok('a skill with every lesson done has a check badge', await skillDone.evaluate(b => !!b.querySelector('svg') && b.getAttribute('data-state').includes('done')));
+const waitingCard = await skill('Rhymes', false);
+const waiting = await waitingCard.evaluate(b => ({ style: getComputedStyle(b).borderStyle, bg: getComputedStyle(b).backgroundColor }));
+ok('a skill with none open yet is dashed on the well', waiting.style === 'dashed' && waiting.bg === (await roleColour('--well', waitingCard)), JSON.stringify(waiting));
+const started = await skill('Letter sounds', false);
+const openOne = await skill('Letter sounds', true);
+const [shutBg, openBg] = [await started.evaluate(b => getComputedStyle(b).backgroundColor), await openOne.evaluate(b => getComputedStyle(b).backgroundColor)];
+ok('an open skill sits on the shelves\' soil, a shut one on the card', openBg === (await roleColour('--soil', openOne)) && shutBg === (await roleColour('--card', started)), `${shutBg} → ${openBg}`);
+// soil's text pair is the main ink, so its count turns from the soft ink
+const countInk = b => b.evaluate(el => getComputedStyle([...el.querySelectorAll('span')].find(s => /^\d+ of \d+$/.test(s.textContent))).color);
+const inkOf = (role, near) => near.evaluate((el, r) => {
+  const probe = document.createElement('span');
+  probe.style.color = `var(${r})`;
+  el.parentElement.append(probe);
+  const c = getComputedStyle(probe).color;
+  probe.remove();
+  return c;
+}, role);
+ok('its count is in the main ink when open, the soft ink when shut', (await countInk(openOne)) === (await inkOf('--ink', openOne)) && (await countInk(started)) === (await inkOf('--ink-soft', started)), `${await countInk(started)} → ${await countInk(openOne)}`);
+await started.evaluate(el => el.scrollIntoView({ block: 'center' }));
+const sbox = await started.boundingBox();
+await page.mouse.move(sbox.x + sbox.width / 2, sbox.y + sbox.height / 2);
+await page.mouse.down();
+await sleep(400);
+const skillPressed = await started.evaluate(e => getComputedStyle(e).transform);
+await page.mouse.up();
+ok('a skill sinks when pressed', skillPressed !== 'none', skillPressed);
+await page.evaluate(() => document.documentElement.setAttribute('data-reduced-motion', ''));
+ok('reduced motion: its tag stays centred and nothing glows', (await skillTag()) < 1 && (await anim(skillNext)) === 'none');
 await page.evaluate(() => document.documentElement.removeAttribute('data-reduced-motion'));
 
 const sq = l => page.evaluateHandle(l => document.querySelector(`button[aria-label="${l}"]`), l);

@@ -14,6 +14,7 @@
 
 import puppeteer from 'puppeteer-core';
 import { chromePath } from '../../../scripts/chrome-path.cjs';
+import { lessonCard } from './library.mjs';
 
 const port = process.argv.find(a => /^\d+$/.test(a)) ?? '5199';
 const at = n => `[data-shot="${n}"]`;
@@ -44,7 +45,7 @@ for (const [speed, rate, bucket] of [['Beginner', 0.75, 'slow'], ['Normal', 0.95
   await page.reload({ waitUntil: 'networkidle0' });
   await page.click(at('open-reading'));
   await page.waitForSelector(at('hub'));
-  await (await page.$$(at('lesson-tile')))[story.index].click();
+  await (await lessonCard(page, story.index)).click();
   await page.waitForSelector(at('play'));
   await page.click(at('play'));
   await page.waitForSelector(at('stage'));

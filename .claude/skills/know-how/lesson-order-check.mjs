@@ -21,16 +21,22 @@
 //     reads "Lesson 1 · …", the bar moves on from 0 to 1 and "Lesson 2 is
 //     open now" shows; replaying Lesson 3 there, the bar stays and nothing
 //     says it opened;
+//   - the skills (CUR-7): with one lesson to go, the skill holding it is open
+//     and the only one saying "Up next"; with every lesson done, the first
+//     skill is open, none says "Up next", and every lesson is there, done;
 //   - nothing falls back to the browser voice.
 // Lines are matched by what pronunciation.say was asked (clip labels stick,
 // know-how). Lesson cards are read by data-state: "done", "locked", or
-// neither for the one up next.
+// neither for the one up next. The library shows one skill's lessons at a
+// time, so cards are found through library.mjs, which opens their skill.
 
 import puppeteer from 'puppeteer-core';
 import { chromePath } from '../../../scripts/chrome-path.cjs';
+import { allLessonCards, lessonCard, shownLessonCard, stateOf } from './library.mjs';
 
 const port = process.argv[2] ?? '5199';
 const at = n => `[data-shot="${n}"]`;
+const shownLesson = i => shownLessonCard(page, i);
 const wait = ms => new Promise(r => setTimeout(r, ms));
 // the grown-up gate (SET-1): press and hold for --dur-hold (1.5s), then let go
 const hold = async selector => {
@@ -84,11 +90,16 @@ const hook = () =>
     };
   });
 const said = () => page.evaluate(() => window.__said.slice());
-const states = () =>
-  page.$$eval(at('lesson-tile'), els => els.map(el => {
-    const s = el.getAttribute('data-state') ?? '';
-    return /\bdone\b/.test(s) ? 'done' : /\blocked\b/.test(s) ? 'locked' : 'next';
-  }));
+// every lesson's state in path order, across the skills (CUR-7: one skill's
+// lessons show at a time)
+const states = async () => (await allLessonCards(page, el => el.getAttribute('data-state') ?? '')).map(stateOf);
+// the skill cards as the library opens: which is open, and which says "Up next"
+const skills = () =>
+  page.$$eval(at('skill-card'), els => els.map(el => ({
+    name: el.getAttribute('aria-label').split(',')[0],
+    open: el.getAttribute('aria-expanded') === 'true',
+    next: /\bnext\b/.test(el.getAttribute('data-state') ?? '')
+  })));
 const shown = sel => page.evaluate(s => !!document.querySelector(s), sel);
 // the done screen's "Next lesson", found by its words
 const nextLessonOffered = () =>
@@ -121,8 +132,9 @@ const onLastPlay = id =>
 const tapLocked = async i => {
   const before = (await said()).length;
   const clips = await page.evaluate(() => window.__starts);
-  await (await page.$$(at('lesson-tile')))[i].click();
-  const wobbled = await page.$$eval(at('lesson-tile'), (els, n) => /\bwobbling\b/.test(els[n]?.getAttribute('data-state') ?? ''), i);
+  const card = await lessonCard(page, i);
+  await card.click();
+  const wobbled = await card.evaluate(el => /\bwobbling\b/.test(el.getAttribute('data-state') ?? ''));
   await wait(2500);
   const opened = await shown(at('shell-intro'));
   const result = { opened, wobbled, said: (await said()).slice(before), clips: (await page.evaluate(() => window.__starts)) - clips };
@@ -134,7 +146,7 @@ const tapLocked = async i => {
 /** Plays the open lesson card i through to its done screen, trying each choice in turn. */
 const playLesson = async i => {
   await page.evaluate(() => { window.__barSeen = []; });
-  await (await page.$$(at('lesson-tile')))[i].click();
+  await (await lessonCard(page, i)).click();
   await page.waitForSelector(at('shell-intro'));
   await page.click(at('play'));
   await page.waitForSelector(at('shell-play'));
@@ -241,11 +253,10 @@ const doneOne = await doneScreen();
 const nextOffered = await nextLessonOffered();
 await page.click(at('shell-back'));
 await page.waitForSelector(at('hub'));
-// DES-13: the lesson that just opened pops in once, back on the library
-const pop = await page.$$eval(at('lesson-tile'), els => {
-  const el = els[1];
-  return { opened: /\bopened\b/.test(el.getAttribute('data-state') ?? ''), motion: getComputedStyle(el).animationName };
-});
+// DES-13: the lesson that just opened pops in once, back on the library (its
+// skill is open, since it holds the lesson up next: CUR-7)
+const pop = await (await lessonCard(page, 1)).evaluate(el =>
+  ({ opened: /\bopened\b/.test(el.getAttribute('data-state') ?? ''), motion: getComputedStyle(el).animationName }));
 await wait(600);
 const afterOne = await states();
 check(`back on the library, Lesson 2 pops in once (${JSON.stringify(pop)})`, pop.opened && pop.motion.includes('luna-pop'));
@@ -281,13 +292,34 @@ for (const [width, height] of [[1180, 820], [744, 1133]]) {
   await setDone(ids.slice(0, ids.length - 1));
   await page.reload({ waitUntil: 'networkidle0' });
   await intoLibrary();
-  const onScreen = await page.$$eval(at('lesson-tile'), (els, n) => {
-    const r = els[n].getBoundingClientRect();
+  const last = await shownLesson(ids.length - 1);
+  const onScreen = last && (await last.evaluate(el => {
+    const r = el.getBoundingClientRect();
     return r.top >= 0 && r.bottom <= window.innerHeight;
-  }, ids.length - 1);
+  }));
   check(`at ${width} wide, the last lesson, up next, is on screen as the library opens`, onScreen);
 }
 await page.setViewport({ width: 1180, height: 820 });
+
+// ---- which skill opens first (CUR-7; Alex, 2026-11-08) ----
+// the one holding the lesson up next, which says "Up next" too; once every
+// lesson is done, the first
+await setDone(ids.slice(0, ids.length - 1));
+await page.reload({ waitUntil: 'networkidle0' });
+await intoLibrary();
+const nearEnd = await skills();
+const lastShown = !!(await shownLesson(ids.length - 1));
+check(`one lesson to go: the skill holding it is open and says "Up next" (${nearEnd.filter(s => s.open).map(s => s.name)}), with its lesson showing`,
+  nearEnd.filter(s => s.open).length === 1 && nearEnd.find(s => s.open).next && nearEnd.filter(s => s.next).length === 1 && lastShown);
+await setDone(ids);
+await page.reload({ waitUntil: 'networkidle0' });
+await intoLibrary();
+const allDone = await skills();
+check(`every lesson done: the first skill is open (${allDone.filter(s => s.open).map(s => s.name)}) and none says "Up next"`,
+  allDone[0].open && allDone.filter(s => s.open).length === 1 && !allDone.some(s => s.next));
+const every = await states();
+check(`every lesson done: all ${ids.length} are there, one skill tap away (${every.length} found, ${every.filter(s => s === 'done').length} done)`,
+  every.length === ids.length && every.every(s => s === 'done'));
 
 const spoke = await page.evaluate(() => window.__browserSpoke);
 check(`no line fell back to the browser voice${spoke.length ? `: ${JSON.stringify(spoke)}` : ''}`, spoke.length === 0);

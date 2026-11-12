@@ -190,7 +190,11 @@ changed screens.
   outside a game's stage is small, overlapping or in the edge band (DES-10).
   It also fails a screen with more than one owl, the kit's Luna or an owl
   emoji (DES-12), and covers Grade Select (DES-9c). Its "(stage)" lines are
-  the games' and lessons' own pieces.
+  the games' and lessons' own pieces. Does the library stay short, the
+  lesson up next and the Play Shelf within a screen at every point on the
+  path? `library-fit-check.mjs` (CUR-7). Checks that open a lesson find
+  its card through `know-how/library.mjs`, since only one skill's lessons
+  show at a time.
 - `node .claude/skills/know-how/module-refs-check.mjs "$PWD" <folders>`: every
   `styles.x` points at a real class (a typo is silently `undefined`), and no
   `className="…"` string is left. For a refactor, the know-how entry "A move to

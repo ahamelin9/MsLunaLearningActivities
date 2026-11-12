@@ -15,6 +15,7 @@
 
 import puppeteer from 'puppeteer-core';
 import { chromePath } from '../../../scripts/chrome-path.cjs';
+import { allLessonCards, lessonCard } from './library.mjs';
 
 const port = process.argv.find(a => /^\d+$/.test(a)) ?? '5199';
 const KEY = 'ms_luna_learning_progress_v1';
@@ -45,7 +46,8 @@ async function startFrom(save) {
   await wait(500);
 }
 
-const cards = () => page.$$eval(at('lesson-tile'), els => els.map(e => e.getAttribute('aria-label')));
+// every lesson's card label, in path order, across the skills (CUR-7)
+const cards = () => allLessonCards(page, e => e.getAttribute('aria-label'));
 const stateOf = async n => {
   const label = (await cards())[n - 1] ?? '';
   return /, done/.test(label) ? 'done' : /, up next/.test(label) ? 'next' : /, locked/.test(label) ? 'locked' : label;
@@ -84,7 +86,7 @@ async function play(misses, { number = 1, again = false } = {}) {
   if (again) {
     await page.click(at('play-again'));
   } else {
-    await (await page.$$(at('lesson-tile')))[number - 1].click();
+    await (await lessonCard(page, number - 1)).click();
     await page.waitForSelector(at('play'));
     await page.click(at('play'));
   }

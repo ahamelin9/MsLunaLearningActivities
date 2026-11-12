@@ -18,6 +18,7 @@
 
 import puppeteer from 'puppeteer-core';
 import { chromePath } from '../../../scripts/chrome-path.cjs';
+import { lessonCard } from './library.mjs';
 
 const args = process.argv.slice(2);
 const port = args.find(a => /^\d+$/.test(a)) ?? '5199';
@@ -144,7 +145,8 @@ for (const [W, H] of SIZES) {
             it.__all = it.__all ?? it.questions;
             it.questions = it.__all.filter(x => x.id === q);
           }, g, lesson.id, id);
-          await open((await page.$$(at('lesson-tile')))[i]);
+          // its skill first: the library shows one skill's lessons at a time (CUR-7)
+          await open(await lessonCard(page, i));
           await judge(`${g} lesson ${i + 1} "${lesson.title}" ${id}`, W, H);
           await back();
         }

@@ -713,8 +713,19 @@ Pitfalls that cost time:
   `ui:shots` does), seeds old saves in `localStorage`, and checks that
   `FINISH_FIRST` has a line for every lesson a grade can have up next. It
   takes about two minutes, and fails 9 of 11 on the commit before PRG-7.
-- **Check:** 11 of 11. A grade given more lessons (CUR-4) fails its first
-  line until the new "Let's finish Lesson N first!" is added and rendered.
+- **Check:** 19 of 19 since CUR-7, 3 of them for the skills (which opens first,
+  and every lesson there once all are done). A grade given
+  more lessons (CUR-4) fails its first line until the new "Let's finish
+  Lesson N first!" is added and rendered.
+- **A check can't find a lesson card** (*2026-11-08, CUR-7*): the library
+  shows one skill's lessons at a time, the skill holding the lesson up next
+  (or the first, once all are done), so `$$('[data-shot="lesson-tile"]')[i]`
+  is no longer Lesson i + 1, and a title loop silently clicks nothing once
+  another skill is open. Use `library.mjs` next to the checks:
+  `lessonCard(page, i)` (from 0) or `lessonCard(page, 'Sight Words 2')` opens
+  the lesson's skill if need be and returns its card; `allLessonCards(page,
+  read)` reads every lesson's card in path order across the skills;
+  `lessonCount(page)` sums the skill cards' totals. Every check here uses it.
 - **Shots of a lesson past the first** (*2026-10-19, CUR-5*): `ui:shots`
   plays only Lesson 1. `node .claude/skills/know-how/lesson-shot.mjs <lesson
   number> <outPrefix> [light|dark] [grade 0|1|2]` marks the grade's lessons
@@ -741,6 +752,65 @@ Pitfalls that cost time:
   good one opens it, 6 of any kind do too, an old save's lessons stay done, and a
   replay differs, with a missed round back first. It needs a lesson with at least 2
   plays' worth of rounds.
+
+## Is every lesson and game on the teacher's cheat sheet? (CUR-8)
+
+*2026-11-08 · CUR-8*
+
+- **Symptom:** a lesson, skill or game was added and you want to know the cheat
+  sheet (Settings → "What they learn", `components/os/CheatSheet`) shows it.
+- **Cause:** nothing to fix by hand: the sheet reads `bucketsFor` and
+  `lessonCovers` (`engine/buckets.ts`) and `GAMES`. A new question type needs a
+  case in `lessonCovers`, or its lessons show an empty "covers" line.
+- **Check:** `node .claude/skills/know-how/cheatsheet-check.mjs 5199`: every
+  grade's lessons once each, numbered as on the path, under their skill, with
+  title and a non-empty covers line; each skill's name, line and bar; every game;
+  "Back to settings". `layout-audit` visits the sheet too.
+- **Pitfalls:** read text with `textContent`, not `innerText`: `innerText` gives
+  the CSS-uppercased "LESSON 3". A `<th>`/`<td>` with `display: flex` stops being
+  a table cell, so stack a cell's lines in a `<span>` inside it. Auditing a window
+  over a dimmed screen, pass `within` to `audit()`, or the buttons behind the dim
+  count as overlaps.
+
+## Does the library stay short? (CUR-7)
+
+*2026-11-08 · CUR-7*
+
+- **Symptom:** a grade gets more lessons or skills, or a skill gets more
+  lessons, and you want to know a child still reaches the lesson up next and
+  the Play Shelf without a long scroll.
+- **Check:** `node .claude/skills/know-how/library-fit-check.mjs 5199`: at each
+  grade, the four sizes, and the start, middle and one-from-the-end of the
+  path, the library must open at its top with the whole up-next lesson card
+  on screen, and the top of the Play Shelf at most a third of a screen below.
+  The tightest is 2nd grade at the start, where Vowel teams holds 7 lessons
+  (271px of 378 at 744). The ticket's own bar, "within one screen of
+  scrolling", was met by the old library too (it scrolled itself to the
+  lesson up next, past Luna), so this one is stricter: it fails the old one,
+  every lesson shown, at 29 of 36. At the start of each grade and
+  size it also taps every skill: its tray must open in the row right under
+  it, the notch under its middle, the only one open (12 lines). With the
+  portrait layout's notch broken those fail at 820 and 744 in every grade.
+  Once per grade, in light and dark, the tray must be at least 1.3:1 on the
+  page and one fill with its notch and the open card (6 lines). The accent's
+  soft fill it had first was 1.06:1 in light and hard to see (Alex): those
+  lines fail with it, and in dark too with the card and tray on different
+  fills.
+- **Pitfalls:** the library scrolls in its window, not the page: measure
+  against the nearest scrolling box (`overflow-y: auto`), as the check does.
+  The notch is the tray's `::before`: `getComputedStyle(tray, '::before').left`
+  gives its used position in px, and turning it 45° doesn't move its middle.
+  To read a fill in the other mode, set `data-theme` on `<html>` for the
+  measurement and put it back: `getComputedStyle` restyles at once.
+  A soft fill can pass every contrast check and still vanish: the contrast
+  check covers text on fills, not a fill on the page, so a panel meant to
+  stand out needs its own ratio check.
+- **Shots:** `library-shot.mjs` next to this file shoots the library at a
+  grade with N lessons learned, a skill tapped (`tap2`), the whole height
+  (`full`), or another role tried on the tray (`fill=edge`) without touching
+  `src`. That's how soil was picked over edge.
+  The library's emoji check (`shelf-check`) lets the skill cards' pictures
+  through, until DES-27 draws them.
 
 ## The same things come up over and over (GAME-8)
 
@@ -933,7 +1003,9 @@ Pitfalls that cost time:
   [sizes] [only=Title words]` shows each item alone: in the page's own modules
   it narrows the pool to it (`lesson.questions = [q]`; a splice of `MINI_STORIES`,
   `SENTENCES` or `PASSAGES`, which the games read at the start of a play), then
-  opens it for real. It takes about 12 minutes a size. The URL has to be the
+  opens it for real. It takes about 12 minutes a size; run one size per call
+  (`… all 1024x768`), since a whole run once lost its browser ("detached Frame")
+  partway through and printed nothing. The URL has to be the
   app's own module instance, so it reads it from `performance.getEntriesByType('resource')`.
   What overflows is usually answers, not lines: the three stories it caught had
   the longest answers in the app, one wrapping to two lines (26 characters or more).

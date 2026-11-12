@@ -27,12 +27,12 @@ Screens are where the kit, the roles and the content meet.
 src/
   components/os/<Name>/            the tablet shell: HomeScreen, StatusBar, AppWindow,
                                    AppHeader (the one header inside an app, DES-8),
-                                   SettingsModal, TrophyModal…
+                                   SettingsModal, CheatSheet (CUR-8), TrophyModal…
   apps/
     registry.ts                    the apps on the home screen
     reading/
       ReadingApp.tsx               picks the screen: Grade Select, the library or a game
-      pages/Hub/                   the library (Luna's Lessons, the Play Shelf)
+      pages/Hub/                   the library (Luna's Lessons by skill, the Play Shelf)
       pages/GradeSelect/
       engine/GameShell/            the frame every game and lesson plays in:
                                    the start screen, the stage and Luna's perch

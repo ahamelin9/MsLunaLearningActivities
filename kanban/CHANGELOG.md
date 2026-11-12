@@ -360,3 +360,43 @@ only record of them. One line each: date, ID, title, and `Done` or
 - **2026-10-20** — PRG-9 A game's done screen shows the squishy shelf — Done. The shelf's planks (`engine/ShelfRows`, shared with the shelf page) fill a game's right half, the new one picked out; side by side on a portrait iPad; lessons keep their bar.
 - **2026-10-20** — PRG-4 Secret platinum trophy for a full squishy shelf — Done, but for Pearl Moon. "Squishy Champion" is a hidden badge; filling the shelf brings the moon once and Luna's trophy line (`trophy-check.mjs`). Pearl Moon moved to PRG-5b, to be reviewed in an artifact first (Alex).
 - **2026-11-06** — CUR-4 Expand the curriculum per grade — Won't do: split in three before starting, CUR-4a Kindergarten, CUR-4b 1st grade, CUR-4c 2nd grade.
+- **2026-11-08** — GAME-8 Every game deals something new until it has dealt everything — Done. All 8 games deal through one deck (`engine/deck.ts`, `deck-check.mjs`), so a child can play many times without the same things coming back. A new game deals through it too:
+  | Rule | What it does |
+  |---|---|
+  | Dealing | a play takes what hasn't been dealt yet; the deck reshuffles only once the whole pool has been |
+  | A new cycle | never starts with what was just played |
+  | Memory | its own saved key (`ms_luna_seen_v1`); a reload keeps it, Settings' reset clears it |
+  | Start screens | opening one uses nothing up: the shell makes rounds once per play |
+- **2026-11-08** — CNT-2 Lessons draw their words from the content bank — Done. Every lesson word takes its spelling and picture from `WORDS`, one entry and one picture per word; the lessons' hand-written choices stay, and new rounds' wrong choices are picked by the rules as the app loads.
+- **2026-11-08** — CNT-5 The word bank grows — Done. 99 words became 256 (81, 80 and 95 at tiers 1, 2 and 3). Owl became mountain, so no owl picture sits beside Luna, and `voice:audit` fails one.
+- **2026-11-08** — CUR-6 A lesson is practiced until it's learned — Done. A play deals 5 of a lesson's rounds from its deck, missed ones first, and the card and done screen show how far the practice has come (`practice-check.mjs`). Alex OKed the rule:
+  | `LEARN_RULE` (`engine/practice.ts`) | |
+  |---|---|
+  | A good play | at least 4 of 5 rounds right the first time |
+  | Learned | after 3 good plays, or 6 plays of any kind, so no child is stuck |
+  | Old saves | a lesson an old save finished stays done |
+- **2026-11-08** — CUR-4a Kindergarten's lessons: 6 become 19 — Done. All 26 letter sounds, letter hunts, short vowels, sight words and rhymes; each lesson deals at least 2 plays' worth.
+- **2026-11-08** — CUR-4b 1st grade's lessons: 3 become 18 — Done. SH, CH, TH and WH, blends, magic E, rhymes, sight words, sentences and little decodable stories.
+- **2026-11-08** — CUR-4c 2nd grade's lessons: 3 become 18 — Done. Vowel teams, vowels with R, compounds, sight words and stories; OU/OW words are read and matched, since that sound has no clip yet. Three storybook answers were shortened so they fit.
+- **2026-11-08** — GAME-9 Treasure Path and Story Corner: far more to read — Done. 18 passages per grade and 9 stories per tier; every story, sentence and passage fits alone at the four iPad sizes (`fit-check.mjs`).
+- **2026-11-08** — GAME-5 Words Off the Page: bigger sentence pool — Done. 16, 17 and 17 sentences at tiers 1, 2 and 3.
+- **2026-11-08** — OPS-8 Retarget the backlog guard check's two stale cases — Done. All 14 cases as expected; they now build their edits from the board and stop if a target is gone.
+- **2026-11-08** — OPS-1 Delete dead code — Done. `useUserProgress`, `AppDefinition.component`, `WindowState` and Luna's 8 unused `intro` lines are gone.
+- **2026-11-08** — OPS-2 README and stale copy — Done. The README matches the repo, with the real audio size (116 MB), and no screen mentions a dashboard.
+- **2026-11-08** — OPS-7 Drop Treasure Path's leftovers from the sentence bank — Done. `key`, `decoys` and `truth` are gone from the 50 sentences; `alsoFits` stays on the 13 tier 3 sentences where an extra tile fits.
+- **2026-11-08** — Epic CNT complete (one content model): one checked word bank, every lesson word drawn from it (CNT-2), 256 words (CNT-5).
+- **2026-11-08** — Epic GAME complete (games to standard): every game reworked to standard, dealing something new until it has dealt everything (GAME-8), with far more to read (GAME-5, GAME-9).
+- **2026-11-08** — PRG-5b More squishies: kinds, colours and super-rare looks — Done. 18 kinds as on the Squishies board, every colour outlined, one super-rare look per kind (swirl, shimmer or glow; 3 move, still under reduced motion), and Pearl Moon (`kit/PearlMoon`) at the top of a full shelf. Alex OKed the look ("all good", 2026-11-08). Old stickers upgrade only to the first 8 kinds, and every kind stays on its plank at the four sizes (`shelf-check.mjs`).
+- **2026-11-08** — Epic PRG complete (progress and rewards): stars that mean something, time toward stars, lessons in order and resumable, the squishy shelf with all 18 kinds and Pearl Moon, the secret trophy.
+- **2026-11-08** — CUR-8 A teacher's cheat sheet: what every lesson and game teaches — Done. Settings' "What they learn" opens a wide window (`components/os/CheatSheet`, replacing SET-5's list): one grade at a time, opening on the one being played, a table of its skills (Alex: "a table, not a big list", in bigger buckets with a progress bar each), each skill's lessons in path order with what they cover, then the 8 games in plain words. Alex OKed the look ("Looks good", 2026-11-08). The skills got plain names and lines in the data, and `bucketsFor` (`engine/buckets.ts`) is ready for CUR-7's library. `cheatsheet-check.mjs` fails if a lesson or game is missing, and `layout-audit` visits the sheet.
+  | A bucket | What the sheet shows |
+  |---|---|
+  | a skill, in the order the path first reaches it | its name, its line, a bar of its lessons learned on the device |
+  | each of its lessons | "Lesson N" (its place on the path), its title, what it covers |
+  | what a lesson covers (`lessonCovers`) | all its letters and sight words; 5 example words, 3 rhyme pairs (each once) or 3 story titles, then "and N more"; or how many sentences |
+- **2026-11-11** — CUR-7 The library stays short with 19 lessons — Done. Luna's Lessons is a row of skill cards (kit `SkillCard`, one per skill from `bucketsFor`, each with a bar of its lessons), and only the open skill's lesson cards show, in a tray right under it with a notch pointing up at it ("tab and tray", Alex). The tray and the open card are on the shelves' soil, as the soft accent fill was too close to the page to see (Alex). The library opens at its top with the lesson up next on screen and the Play Shelf at most a third of a screen below, at every grade, size and point on the path (`library-fit-check.mjs`), and the checks reach a lesson card through its skill (`know-how/library.mjs`). Alex OKed the look (2026-11-11). Luna saying the skill names is CUR-10; the skill emoji are DES-27's.
+  | When | Which skill is open |
+  |---|---|
+  | The library opens | the one holding the lesson up next; it and that lesson both say "Up next" |
+  | Every lesson is done | the first skill |
+  | A skill is tapped | that one (only one open at a time); lessons still open one at a time in path order (PRG-7) |

@@ -85,7 +85,10 @@ files when its status changes; the status changes in the board row only. The
 8. **Finishing an epic:** when an epic's last ticket goes, remove the epic's
    board header row, then its link in the README's epic list, then its file
    (`rm kanban/epics/<EPIC>.md` is the one shell change the guard allows, and
-   only once the file is unlinked). Log `Epic DES complete` in the changelog.
+   only once the file is unlinked; run it from the repo root, relative and on
+   its own, since a quoted absolute path, with the folder's space, is refused).
+   If `guard-check.mjs` then stops with "nothing to aim at", retarget that case
+   (OPS-8 made them read the board, so this is rare). Log `Epic DES complete` in the changelog.
 9. **Finishing a phase:** when a phase has nothing left, move `— now` in the
    Roadmap table to the next phase (the hook reads that marker).
 10. Refresh **Now / Next** and **Last updated** in the README.
