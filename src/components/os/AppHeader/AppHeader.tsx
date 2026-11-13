@@ -30,12 +30,13 @@ export function AppHeader({ back, onBack, title, beside, rounds, children }: App
   const round = rounds && `Round ${rounds.current} of ${rounds.total}`;
   return (
     <header className={styles.root}>
+      {/* on a phone, the way back is its icon alone (DES-32a), so the title has room */}
       {back === 'home' ? (
-        <ChunkyButton icon="home" onClick={onBack} data-shot="app-home">
+        <ChunkyButton icon="home" onClick={onBack} data-shot="app-home" iconOnlyOnPhone>
           Home
         </ChunkyButton>
       ) : (
-        <ChunkyButton icon="arrow-left" onClick={onBack} data-shot="shell-back">
+        <ChunkyButton icon="arrow-left" onClick={onBack} data-shot="shell-back" iconOnlyOnPhone>
           Library
         </ChunkyButton>
       )}

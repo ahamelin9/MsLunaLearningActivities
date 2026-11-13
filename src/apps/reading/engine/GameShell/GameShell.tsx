@@ -559,6 +559,7 @@ export const GameShell: React.FC<GameShellProps> = ({
       {inPlay && (
         <ChunkyButton
           icon="replay"
+          iconOnlyOnPhone
           onClick={() => {
             soundManager.playLetterTap();
             pronunciation.replayLast();

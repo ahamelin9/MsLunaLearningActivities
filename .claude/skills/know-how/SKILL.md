@@ -1175,6 +1175,44 @@ Pitfalls that cost time:
 - **Check:** it passes at every grade today, and fails with GameShell's
   `.shell-stage { min-height }` set to 1400px for a moment.
 
+## Does it work on a phone? (and an iPad shot came out as a phone)
+
+*2026-11-12 · DES-32a*
+
+- **Symptom:** on Alex's phone screens overlapped and a game's done screen
+  had no Next button. Then, building the fix, the iPad portrait shots
+  suddenly had the phone's bigger words and icon-only buttons.
+- **How phones work now:** `index.html` lays a phone held upright out 744
+  wide (the iPad mini) and lets the browser scale it, and marks `<html>`
+  `data-device="phone"`; the tokens grow the small type there, and
+  ChunkyButton's `iconOnlyOnPhone` hides the header buttons' words.
+- **Cause of the iPad-as-phone:** headless Chrome reports an 800×600 screen
+  whatever the viewport, unless the page is emulated as a phone (puppeteer's
+  `isMobile`, where the screen is the viewport). 600 is under 744, so every
+  page looked like a phone's.
+- **Fix:** the script decides "phone" once, before it widens the page: the
+  screen's short side under 744 **and** a page that fits on that screen. A
+  computer's window (or a test browser's) can be bigger than the screen it
+  reports; a phone's page never is. The checks take their sizes from
+  `scripts/ui/sizes.mjs`, whose `viewportFor()` emulates the phone sets as
+  phones (touch, `isMobile`, 2× pixels), so a phone size is a real phone to
+  the script.
+- **Pitfall, a type role that won't change:** `roles()` sets every `--text-*`
+  again on `[data-theme]`, so an override on `:root` alone loses to it
+  inside any themed element. Write it as `X, X [data-theme] { … }`, as
+  reduced motion and `[data-device="phone"]` do in `_roles.scss`.
+- **Pitfall, the button that isn't there:** "nothing scrolls" isn't enough
+  on a phone: the done screen fit and still had its buttons off the page.
+  `layout-audit.mjs` now takes `must`, an element that has to be wholly on
+  screen (a game's start button, the done screen's buttons).
+- **Check:** with Vite on 5199,
+  `node .claude/skills/know-how/layout-audit.mjs 5199 <0|1|2> sizes=phone`
+  and `library-fit-check.mjs 5199 sizes=phone`; `kit-check.mjs`'s
+  "iconOnlyOnPhone" lines (they fail with the phone rule renamed); and the
+  four iPads' shots with `--diff` against a "before", which must show 0
+  changed. To see what a page decided: `document.documentElement.dataset.device`
+  and the viewport meta's `content`.
+
 ## A card's row of pictures is squeezed, or slides under its buttons (PRG-5a)
 
 *2026-10-19*

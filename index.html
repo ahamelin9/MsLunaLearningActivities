@@ -8,6 +8,39 @@
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/manifest.webmanifest" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <!-- A phone held upright (DES-32a): a device narrower than the iPad mini
+         (744) lays the page out at 744, as the iPad mini does, and the browser
+         scales it to fit the phone. data-device="phone" makes the small text
+         and the header bigger and tighter to make up for it (tokens: $type-phone;
+         ChunkyButton's iconOnlyOnPhone). Turned sideways, a phone keeps its own
+         width (DES-32b). iPads, Chromebooks and computers never match. -->
+    <script>
+      (function () {
+        var IPAD_MINI = 744;
+        var meta = document.querySelector('meta[name="viewport"]');
+        var own = meta.getAttribute('content');
+        var upright = matchMedia('(orientation: portrait)');
+        var short = Math.min(screen.width, screen.height);
+        var long = Math.max(screen.width, screen.height);
+        // decided once, before the page is widened: a real phone's page fits on
+        // the screen it reports, while a computer's window (and a test browser,
+        // which reports 800×600) can be bigger than that
+        var isPhone =
+          short < IPAD_MINI &&
+          Math.max(innerWidth, innerHeight) <= long + 1 &&
+          Math.min(innerWidth, innerHeight) <= short + 1;
+        function fit() {
+          var phone = isPhone && upright.matches;
+          var want = phone ? 'width=' + IPAD_MINI + ', user-scalable=no' : own;
+          if (meta.getAttribute('content') !== want) meta.setAttribute('content', want);
+          if (phone) document.documentElement.setAttribute('data-device', 'phone');
+          else document.documentElement.removeAttribute('data-device');
+        }
+        fit();
+        if (upright.addEventListener) upright.addEventListener('change', fit);
+        else upright.addListener(fit);
+      })();
+    </script>
     <title>Ms. Luna's Learning Pad · Reading & Phonics</title>
     <!-- Andika and Fraunces are served from public/fonts/ (src/styles/base/_fonts.scss) -->
     <!-- Light or dark before the first paint, so there's no flash (DES-16): the

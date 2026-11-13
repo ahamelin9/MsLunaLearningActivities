@@ -31,17 +31,17 @@
 
 import puppeteer from 'puppeteer-core';
 import { chromePath } from '../../../scripts/chrome-path.cjs';
+import { sizesFrom, viewportFor } from '../../../scripts/ui/sizes.mjs';
 import { allLessonCards, lessonCard, lessonCount } from './library.mjs';
 
-const port = process.argv[2] ?? '5199';
-const grade = Number(process.argv[3] ?? 0);
+// DES-32: `sizes=phone` (or `ipad,phone,big`, …) from scripts/ui/sizes.mjs;
+// the four iPads without it. A phone turned sideways may scroll (its scrolling
+// is listed, not failed), but nothing may be cut off.
+const positional = process.argv.slice(2).filter(a => !a.includes('='));
+const port = positional[0] ?? '5199';
+const grade = Number(positional[1] ?? 0);
 const url = `http://localhost:${port}/`;
-const SIZES = [
-  [1180, 820],
-  [820, 1180],
-  [1024, 768],
-  [744, 1133]
-];
+const SIZES = sizesFrom(process.argv);
 const at = n => `[data-shot="${n}"]`;
 const wait = ms => new Promise(r => setTimeout(r, ms));
 
@@ -50,7 +50,7 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
  * `within`: a window's selector, so only its own tap targets count, not the
  * screen dimmed behind it.
  */
-function audit({ screen, midRound, scrolls = false, within = null }) {
+function audit({ screen, midRound, scrolls = false, within = null, must = null, mayScroll = false }) {
   const W = innerWidth;
   const H = innerHeight;
   const name = el =>
@@ -68,14 +68,26 @@ function audit({ screen, midRound, scrolls = false, within = null }) {
   const problems = [];
   const add = (el, text) => problems.push({ text, stage: el ? inStage(el) : false });
 
+  // DES-32: the screen's main action (Start, the done screen's buttons) is on
+  // screen as it opens, without scrolling: on a phone the done screen's
+  // "Next lesson" was below the fold
+  if (must) {
+    for (const el of document.querySelectorAll(must)) {
+      const b = el.getBoundingClientRect();
+      if (b.width === 0 && b.height === 0) continue;
+      if (b.top < -1 || b.left < -1 || b.bottom > H + 1 || b.right > W + 1)
+        problems.push({ text: `off screen: ${name(el)} at ${Math.round(b.left)},${Math.round(b.top)}–${Math.round(b.right)},${Math.round(b.bottom)}`, stage: false });
+    }
+  }
+
   if (midRound) {
     for (const el of document.querySelectorAll('*')) {
       const s = getComputedStyle(el);
       if (/(auto|scroll)/.test(s.overflowY) && el.scrollHeight > el.clientHeight + 1)
-        problems.push({ text: `scrolls: ${name(el)} by ${el.scrollHeight - el.clientHeight}px`, stage: false, scroll: true });
+        problems.push({ text: `scrolls: ${name(el)} by ${el.scrollHeight - el.clientHeight}px`, stage: mayScroll, scroll: true });
     }
     if (document.scrollingElement.scrollHeight > H + 1)
-      problems.push({ text: `scrolls: the page by ${document.scrollingElement.scrollHeight - H}px`, stage: false, scroll: true });
+      problems.push({ text: `scrolls: the page by ${document.scrollingElement.scrollHeight - H}px`, stage: mayScroll, scroll: true });
     const shown = ['shell-play', 'stage', 'shell-reward'].map(n => document.querySelector(`[data-shot="${n}"]`)).filter(Boolean);
     const taps = [...document.querySelectorAll('button, [role="button"]')].filter(visible);
     for (const el of [...shown, ...taps]) {
@@ -146,9 +158,11 @@ const browser = await puppeteer.launch({
 });
 
 let failing = 0;
-for (const [width, height] of SIZES) {
+for (const size of SIZES) {
+  const { width, height } = size;
+  const mayScroll = size.set === 'phone-landscape';
   const page = await browser.newPage();
-  await page.setViewport({ width, height, deviceScaleFactor: 1, hasTouch: true });
+  await page.setViewport(viewportFor(size));
   // the macOS voice stays quiet if a line ever falls back to it
   await page.evaluateOnNewDocument(() => {
     window.speechSynthesis.speak = () => {};
@@ -227,9 +241,9 @@ for (const [width, height] of SIZES) {
   const games = await page.$$eval(`${at('game-tile')} ${at('tile-title')}`, els => els.map(el => el.textContent.trim()));
   for (const [i, title] of games.entries()) {
     await open('game-tile', i);
-    results.push(await page.evaluate(audit, { screen: `${title}, start`, midRound: false }));
+    results.push(await page.evaluate(audit, { screen: `${title}, start`, midRound: false, must: at('play') }));
     await play();
-    results.push(await page.evaluate(audit, { screen: `${title}, round 1`, midRound: true }));
+    results.push(await page.evaluate(audit, { screen: `${title}, round 1`, midRound: true, mayScroll }));
     await back();
   }
   // Lessons open in order (PRG-7), so a fresh save opens only the first. Mark
@@ -252,8 +266,9 @@ for (const [width, height] of SIZES) {
   if (locked) throw new Error(`${locked} lesson(s) still locked after marking every lesson done`);
   for (let i = 0; i < lessons; i++) {
     await openCard(await lessonCard(page, i));
+    if (i === 0) results.push(await page.evaluate(audit, { screen: 'Lesson 1, start', midRound: false, must: at('play') }));
     await play();
-    results.push(await page.evaluate(audit, { screen: `Lesson ${i + 1}, question 1`, midRound: true }));
+    results.push(await page.evaluate(audit, { screen: `Lesson ${i + 1}, question 1`, midRound: true, mayScroll }));
     await back();
   }
 
@@ -281,7 +296,7 @@ for (const [width, height] of SIZES) {
   await wait(1500);
   results.push(
     (await shownNow(at('shell-reward')))
-      ? await page.evaluate(audit, { screen: 'Lesson 1, done screen', midRound: true })
+      ? await page.evaluate(audit, { screen: 'Lesson 1, done screen', midRound: true, mayScroll, must: `${at('shell-reward')} button` })
       : { screen: 'Lesson 1, done screen', problems: [{ text: 'never reached it', stage: false }] }
   );
 

@@ -32,6 +32,8 @@
 // SET-1: ChunkyButton's hold mode: the ring drawn from --hold-progress, the
 // note only after a quick tap, and a press held 2s (not 1s) opening, with
 // the same wait and a filling ring under reduced motion.
+// DES-32a: iconOnlyOnPhone, a square with the icon alone on a phone page,
+// still named for a screen reader.
 // Start Vite on 5199 first, then from the repo root:
 //   node .claude/skills/know-how/kit-check.mjs
 // Exits 1 on any ❌.
@@ -806,6 +808,34 @@ for (const rm of [false, true]) {
     `${before} → ${afterShort} → ${afterLong}, note ${tapNote}, ring ${ring.toFixed(2)} at 0.5s`);
 }
 await page.evaluate(() => document.documentElement.removeAttribute('data-reduced-motion'));
+
+// ── a header button on a phone (DES-32a): ChunkyButton's iconOnlyOnPhone ──
+// outside a data-device="phone" page it keeps its words; inside one it is a
+// square with the icon alone, and the words are clipped, not removed, so
+// the button's accessible name is still "Home"
+const phoneButton = async shot => {
+  const el = await page.$(`[data-shot="${shot}"]`);
+  const box = await el.evaluate(b => {
+    const r = b.getBoundingClientRect();
+    // a clip-path hides without shrinking the box, so read the clip, and
+    // where the icon sits: in the middle once the words are out of the flow
+    const words = [...b.querySelectorAll('span')].find(s => s.textContent.trim() === 'Home');
+    const ws = words ? getComputedStyle(words) : null;
+    const icon = b.querySelector('svg').getBoundingClientRect();
+    return {
+      w: Math.round(r.width), h: Math.round(r.height),
+      wordsHidden: ws ? ws.position === 'absolute' && ws.clipPath === 'inset(50%)' : false,
+      iconOffCentre: Math.round(Math.abs(icon.left + icon.width / 2 - (r.left + r.width / 2)))
+    };
+  });
+  const name = (await page.accessibility.snapshot({ root: el }))?.name;
+  return { ...box, name };
+};
+const ipadBtn = await phoneButton('kit-phone-off');
+const phoneBtn = await phoneButton('kit-phone-on');
+ok('iconOnlyOnPhone off a phone: the icon and the words show', ipadBtn.w > ipadBtn.h && !ipadBtn.wordsHidden && ipadBtn.name === 'Home', JSON.stringify(ipadBtn));
+ok('… on a phone: a square with the icon alone, in the middle', phoneBtn.w === phoneBtn.h && phoneBtn.wordsHidden && phoneBtn.iconOffCentre <= 1, JSON.stringify(phoneBtn));
+ok('… and a screen reader still hears "Home"', phoneBtn.name === 'Home', phoneBtn.name);
 
 // ── MilestoneMoon (DES-17) ─────────────────────────────────────────────────
 // her specimens, found by their captions; her parts by what they animate

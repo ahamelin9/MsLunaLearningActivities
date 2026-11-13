@@ -151,6 +151,18 @@ $type: (
   answer-word: 700 40px/1.1 $font-read,
   answer-letter: 700 76px/1 $font-read,
 );
+// On a phone held upright (DES-32a), the page is laid out as an iPad mini and
+// scaled to about half, so the small roles are 1.3× theirs above (Alex's pick
+// of three, 2026-11-12): about 15px of reading text on a 390-wide phone. The
+// big letters, answers, cue and the two large titles keep their size.
+$type-phone: (
+  display-m: 600 31px/1.2 $font-display,
+  display-s: 600 26px/1.25 $font-display,
+  read: 400 29px/1.45 $font-read,
+  label: 700 23px/1.25 $font-read,
+  label-small: 700 21px/1.25 $font-read,
+  tag: 700 17px/1.2 $font-read,
+);
 $tracking-tag: 0.08em;
 
 // ── Motion (DES-5), from decisions.md ──────────────────────────────────────

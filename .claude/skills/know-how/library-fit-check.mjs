@@ -1,9 +1,10 @@
 #!/usr/bin/env node
 // Does the library stay short? (CUR-7)
 //
-//   node .claude/skills/know-how/library-fit-check.mjs [port=5199]
+//   node .claude/skills/know-how/library-fit-check.mjs [port=5199] [sizes=phone]
 //
-// Needs Vite running on the port. At each grade, at the four iPad sizes, at
+// Needs Vite running on the port. At each grade, at the four iPad sizes (or
+// the sets named with sizes=, from scripts/ui/sizes.mjs), at
 // the start, the middle and one lesson from the end of the path, it opens the
 // library as a child would and checks:
 //   - it opens at its top (Luna and the welcome row showing), with the whole
@@ -24,9 +25,15 @@
 
 import puppeteer from 'puppeteer-core';
 import { chromePath } from '../../../scripts/chrome-path.cjs';
+import { sizesFrom, viewportFor } from '../../../scripts/ui/sizes.mjs';
 
 const port = process.argv.find(a => /^\d+$/.test(a)) ?? '5199';
-const SIZES = [[1180, 820], [820, 1180], [1366, 1024], [744, 1133]];
+// its own four iPads by default (one is the 12.9" iPad Pro), or the shared
+// sets with sizes= (DES-32a: sizes=phone)
+const named = process.argv.some(a => a.startsWith('sizes=') || a === '--sizes');
+const SIZES = named
+  ? sizesFrom(process.argv)
+  : [[1180, 820], [820, 1180], [1366, 1024], [744, 1133]].map(([width, height]) => ({ width, height }));
 const GRADES = ['kindergarten', 'grade1', 'grade2'];
 const at = n => `[data-shot="${n}"]`;
 const wait = ms => new Promise(r => setTimeout(r, ms));
@@ -41,8 +48,9 @@ for (const grade of GRADES) {
   await page.goto(url, { waitUntil: 'networkidle0' });
   const total = await page.evaluate(async g => (await import('/src/apps/reading/engine/lessons.ts')).lessonsFor(g).length, grade);
   for (const learned of [0, Math.floor(total / 2), total - 1]) {
-    for (const [w, h] of SIZES) {
-      await page.setViewport({ width: w, height: h });
+    for (const size of SIZES) {
+      const { width: w, height: h } = size;
+      await page.setViewport(named ? viewportFor(size) : { width: w, height: h });
       await page.goto(url, { waitUntil: 'networkidle0' });
       await page.evaluate(async (g, n) => {
         const { lessonsFor } = await import('/src/apps/reading/engine/lessons.ts');
@@ -107,7 +115,7 @@ for (const grade of GRADES) {
       // fill, 1.06:1 on the page in light, was hard to see), in light and
       // dark, and shares its fill with the open card and its notch. Once per
       // grade: the colours don't change with the size
-      if (w !== SIZES[0][0]) continue;
+      if (size !== SIZES[0]) continue;
       for (const theme of ['light', 'dark']) {
         const c = await page.evaluate(th => {
           const html = document.documentElement;

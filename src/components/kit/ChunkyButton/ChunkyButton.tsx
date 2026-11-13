@@ -23,6 +23,9 @@
  *         holdNoteAt="start" lines the note up with the button's left edge,
  *         for a button near the screen's left edge (SET-2)
  *         className goes on the wrapper here
+ *         icon only on a phone (DES-32a): with iconOnlyOnPhone and an icon,
+ *         a page marked data-device="phone" shows the icon alone in a square
+ *         button; the words stay, hidden, for screen readers
  * Tokens: --button-bg, --button-ink, --button-border, --button-border-style,
  *         --button-edge, --button-ledge, --button-height, --button-pad,
  *         --button-radius, --button-font, --hold-progress
@@ -56,6 +59,8 @@ interface ChunkyButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   holdNote?: boolean;
   /** Where the note lines up: the button's right edge (default) or its left, for a button near the screen's left edge. */
   holdNoteAt?: 'end' | 'start';
+  /** On a phone (DES-32a), only the icon shows; the words stay for screen readers. Needs an icon. */
+  iconOnlyOnPhone?: boolean;
 }
 
 const HOLD_NOTE = 'Grown-ups: press and hold';
@@ -71,19 +76,22 @@ export function ChunkyButton({
   onHold,
   holdNote,
   holdNoteAt,
+  iconOnlyOnPhone,
   ...rest
 }: ChunkyButtonProps) {
   const edge = icon && !iconAfter ? 'start' : iconAfter && !icon ? 'end' : undefined;
+  const compact = iconOnlyOnPhone && (icon || iconAfter) ? true : undefined;
   const props = {
     ...rest,
     type,
     'data-variant': variant,
     'data-size': size,
     'data-icon': variant === 'icon' ? undefined : edge,
+    'data-phone': compact && 'icon',
     children: (
       <>
         {icon && <Icon name={icon} />}
-        {children}
+        {compact ? <span className={styles.words}>{children}</span> : children}
         {iconAfter && <Icon name={iconAfter} />}
       </>
     ),

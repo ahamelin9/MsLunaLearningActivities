@@ -95,6 +95,21 @@
   --button-pad: 0;
 }
 
+// on a phone (DES-32a; index.html marks the page): a header button with an
+// icon shows only that, as a square, so the title has room. The words are
+// clipped away, not removed, so a screen reader still says them
+[data-device='phone'] .root[data-phone='icon'] {
+  --button-pad: 0;
+  padding: 0;
+
+  .words {
+    position: absolute;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}
+
 // the grown-up gate (SET-1): the wrapper is what a screen places, and anchors
 // the note; relative positions place nothing, they only anchor the ring and note
 .hold {

@@ -230,6 +230,17 @@ $text-pairs: (
   @include roles(dark);
 }
 
+// A phone held upright (DES-32a): index.html marks the page
+// data-device="phone", lays it out as an iPad mini and lets the browser scale
+// it to fit, so the small type roles grow to make up for it. Repeated under a
+// themed element, because roles() sets the type roles again there.
+[data-device="phone"],
+[data-device="phone"] [data-theme] {
+  @each $name, $font in p.$type-phone {
+    --text-#{$name}: #{$font};
+  }
+}
+
 // Reduced motion (DES-6): every duration is 0ms and every shared animation is
 // off, so things appear without travelling. Repeated under a themed element,
 // because roles() sets the durations again there.

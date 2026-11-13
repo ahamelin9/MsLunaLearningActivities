@@ -41,16 +41,12 @@ import { fileURLToPath } from 'node:url';
 import puppeteer from 'puppeteer-core';
 import { createServer } from 'vite';
 import { chromePath } from '../chrome-path.cjs';
+import { sizesFrom, viewportFor } from './sizes.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 
-/** The iPads the app has to look right on, landscape and portrait. */
-const VIEWPORTS = [
-  { width: 1180, height: 820 }, // iPad Air / iPad 10th gen, landscape
-  { width: 820, height: 1180 }, // the same, portrait
-  { width: 1024, height: 768 }, // iPad 9th gen, landscape
-  { width: 744, height: 1133 } // iPad mini, portrait
-];
+// The sizes come from scripts/ui/sizes.mjs (DES-32): the four iPads unless
+// `--sizes phone` (or `ipad,phone,big`, …) names others.
 
 // CHROME_PATH, the Mac's Chrome, or a cloud session's Chromium (OPS-10)
 const CHROME_PATH = chromePath();
@@ -94,7 +90,14 @@ function parseArgs(argv) {
   const i = argv.indexOf('--label');
   const label = i === -1 ? (kit ? 'kit' : 'latest') : argv[i + 1];
   if (!label || !name.test(label)) usage();
-  return { mode: kit ? 'kit' : 'shoot', label, reduced, theme };
+  let sizes;
+  try {
+    sizes = sizesFrom(argv);
+  } catch (err) {
+    console.error(err.message);
+    usage();
+  }
+  return { mode: kit ? 'kit' : 'shoot', label, reduced, theme, sizes };
 }
 
 const slug = text =>
@@ -487,7 +490,7 @@ async function shootViewport(browser, url, viewport, outDir, reduced = false, th
 
   const context = await browser.createBrowserContext();
   const page = await context.newPage();
-  await page.setViewport({ ...viewport, deviceScaleFactor: 1, hasTouch: true });
+  await page.setViewport(viewportFor(viewport));
   await page.emulateTimezone('UTC');
   // DES-6: the iPad's own Reduce Motion, so every screen must stand still
   // DES-16: the iPad's own light/dark setting, which the app follows by default
@@ -648,7 +651,7 @@ async function solveLesson(page, { click, waitFor }) {
   throw new Error('the lesson never reached its reward screen');
 }
 
-async function shoot(label, reduced = false, theme = 'light') {
+async function shoot(label, reduced = false, theme = 'light', sizes = sizesFrom([])) {
   const outDir = join(ROOT, 'screenshots', label);
   rmSync(outDir, { recursive: true, force: true });
 
@@ -657,10 +660,10 @@ async function shoot(label, reduced = false, theme = 'light') {
   const url = server.resolvedUrls.local[0];
   const browser = await launchChrome();
 
-  // the four sizes run side by side, each in its own fresh profile
+  // the sizes run side by side, each in its own fresh profile
   const started = Date.now();
   const results = await Promise.allSettled(
-    VIEWPORTS.map(viewport => shootViewport(browser, url, viewport, outDir, reduced, theme))
+    sizes.map(viewport => shootViewport(browser, url, viewport, outDir, reduced, theme))
   );
   await browser.close();
   await server.close();
@@ -790,7 +793,7 @@ async function main() {
   }
   if (args.mode === 'diff') await diff(args.a, args.b);
   else if (args.mode === 'kit') await shootKit(args.label);
-  else await shoot(args.label, args.reduced, args.theme);
+  else await shoot(args.label, args.reduced, args.theme, args.sizes);
   // a puppeteer run can keep the process alive after it's done
   process.exit(0);
 }

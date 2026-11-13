@@ -73,6 +73,11 @@ and `letter-spacing: var(--tracking-tag)`. The families alone are
 (`src/styles/base/_fonts.scss`), and Fraunces is always set soft. The Kit page
 shows every role with `I l 1 · a g`.
 
+On a phone held upright (DES-32a) the page is the iPad mini's, scaled down,
+so `display-m`, `display-s`, `read`, `label`, `label-small` and `tag` are
+1.3× bigger there (`$type-phone` in the primitives, set under
+`[data-device="phone"]` in the roles). Nothing else changes them.
+
 - **Why Andika:** it was made for beginning readers. `I`, `l` and `1` look
   different, and `a` and `g` are single-storey. Fredoka, the old font, drew `I`
   and `l` as the same plain stroke, which made the Letter Jar unfair.
@@ -205,7 +210,16 @@ What the moments look like:
 
 - **The four target sizes:** iPad landscape (1180×820), portrait (820×1180),
   the older iPad (1024×768) and the iPad mini (744×1133). `npm run ui:shots`
-  captures all four.
+  captures all four. Every size set the checks know (phones, a phone turned
+  sideways, laptops and big screens) is in `scripts/ui/sizes.mjs`:
+  `--sizes phone` for the shots, `sizes=phone` for the know-how checks.
+- **Phones held upright** (DES-32a): a script in `index.html` lays the page
+  out 744 wide, as the iPad mini, and the browser scales it to fit; it marks
+  `<html>` with `data-device="phone"`, which grows the small type (see Type)
+  and turns the header's Home, Library and Again into icons alone. It decides
+  "phone" once, from the screen's short side (under 744) and a page that fits
+  that screen, so a narrow window on a computer stays as it is. Sideways
+  phones are DES-32b, laptops and big screens DES-32c.
 - **Breakpoints:** two, settled in DES-10: `narrow` (the portrait iPads, up to
   899px wide) and `short` (the 1024×768 iPad, up to 799px tall). They're
   written once in the tokens and used only through the breakpoint mixin:

@@ -165,7 +165,11 @@ changed screens.
 - `npm run ui:shots -- --reduced-motion`: the same run with Reduce Motion on;
   it fails if any screen keeps moving (DES-6).
 - `npm run ui:shots` at the four iPad sizes, and `--diff` for refactors (from
-  DES-18a).
+  DES-18a). Other sizes come by set name from `scripts/ui/sizes.mjs`:
+  `--sizes phone` (or `phone-landscape`, `big`); `layout-audit.mjs` and
+  `library-fit-check.mjs` take `sizes=phone` the same way (DES-32a). A phone
+  size is shot as a phone (touch, a mobile browser), so `index.html` scales
+  the page and marks it `data-device="phone"` as on a real one.
 - Does Luna's beak move only while a clip plays?
   `node .claude/skills/know-how/luna-talk-check.mjs 5199` (Vite on 5199;
   DES-15). Her moods and blink are in `kit-check.mjs`, and so are the

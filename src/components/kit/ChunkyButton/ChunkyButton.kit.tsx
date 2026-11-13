@@ -1,6 +1,7 @@
 // ChunkyButton on the Kit page (DES-7a): each variant at 48 and 64, idle,
 // pressed (held with data-state) and disabled; the hold mode (SET-1) idle,
-// held part-way, with its note, and one to try.
+// held part-way, with its note, and one to try; a header button with
+// iconOnlyOnPhone, on an iPad and on a phone (DES-32a).
 
 import { useState, type CSSProperties } from 'react';
 import { Specimen, Specimens } from '@/dev/KitPage/Specimen';
@@ -83,6 +84,17 @@ export default function ChunkyButtonKit() {
             <ChunkyButton aria-pressed={label === 'Normal'}>{label}</ChunkyButton>
           </Specimen>
         ))}
+      </Specimens>
+      <Specimens title="iconOnlyOnPhone: a header button, on an iPad and on a phone (DES-32a)">
+        <Specimen label="on an iPad: icon and words">
+          <ChunkyButton icon="home" iconOnlyOnPhone data-shot="kit-phone-off">Home</ChunkyButton>
+        </Specimen>
+        <Specimen label="on a phone: the icon alone, the words for screen readers">
+          {/* index.html marks the whole page on a real phone; here one wrapper stands in */}
+          <div data-device="phone">
+            <ChunkyButton icon="home" iconOnlyOnPhone data-shot="kit-phone-on">Home</ChunkyButton>
+          </div>
+        </Specimen>
       </Specimens>
       <Specimens title="hold: the grown-up gate, a 1.5s press and hold (SET-1)">
         <Specimen label="idle">
