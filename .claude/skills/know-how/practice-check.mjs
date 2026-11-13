@@ -9,8 +9,9 @@
 //     doesn't count, and the 3rd good play opens it;
 //   - 6 plays of any kind open it too, so no child is stuck;
 //   - an older save's finished lessons stay done, and replaying one says so;
-//   - a replay's rounds differ from the play before it, and a round missed comes
-//     back in the next play.
+//   - a play is 20 rounds (CUR-12): every question of the lesson once before any
+//     comes again, never one twice in a row, and a round missed comes back in
+//     the next play (asked twice there, since the lesson holds fewer than 20).
 // It fails on the commit before CUR-6, where one play opened the next lesson.
 
 import puppeteer from 'puppeteer-core';
@@ -48,8 +49,15 @@ async function startFrom(save) {
 
 // every lesson's card label, in path order, across the skills (CUR-7)
 const cards = () => allLessonCards(page, e => e.getAttribute('aria-label'));
+// Lesson n of the first lesson's skill (Letter sounds): since CUR-11 a skill's
+// lessons go 1, 2, 3, and Lesson 1 opens that skill's Lesson 2
+const firstSkill = () =>
+  page.evaluate(async () => {
+    const all = (await import('/src/apps/reading/engine/lessons.ts')).lessonsFor('kindergarten');
+    return all.flatMap((l, i) => (l.lesson.skillId === all[0].lesson.skillId ? [i] : []));
+  });
 const stateOf = async n => {
-  const label = (await cards())[n - 1] ?? '';
+  const label = (await cards())[(await firstSkill())[n - 1]] ?? '';
   return /, done/.test(label) ? 'done' : /, up next/.test(label) ? 'next' : /, locked/.test(label) ? 'locked' : label;
 };
 
@@ -92,7 +100,7 @@ async function play(misses, { number = 1, again = false } = {}) {
   }
   await page.waitForSelector(at('shell-play'));
   const asked = [];
-  for (let r = 0; r < 12 && !(await shown(at('shell-reward'))); r++) {
+  for (let r = 0; r < 25 && !(await shown(at('shell-reward'))); r++) {
     await page.waitForSelector(at('lesson-choice'));
     await wait(700);
     const now = await roundNow();
@@ -146,7 +154,7 @@ ok('the next lesson stays locked after 1 good play', (await stateOf(2)) === 'loc
 ok('the card shows the practice', /practice 1 of 3/.test((await cards())[0]), (await cards())[0]);
 
 const poor = await play(weak);
-ok('a weak play doesn\'t count: still 1 of 3, and it says what a good play is', /1 of 3 good plays/.test(poor.done.practice ?? '') && /A good play is \d of \d first try/.test(poor.done.practice ?? ''), poor.done.practice);
+ok('a weak play doesn\'t count: still 1 of 3, and it says what a good play is', /1 of 3 good plays/.test(poor.done.practice ?? '') && /A good play is \d+ of \d+ first try/.test(poor.done.practice ?? ''), poor.done.practice);
 await back();
 
 const two = await play(clean);
@@ -170,33 +178,35 @@ ok('the 6th play of any kind moves on: "Lesson done!", not "learned", and Lesson
 await back();
 
 // ---- an older save ----
-await startFrom({ completedLessons: ['k-ms-m-s-b-t', 'k-lh-easy'] });
+// Letter sounds' Lessons 1 and 2 done (CUR-11: one skill's lessons in a row)
+const letterSounds = await page.evaluate(async () => {
+  const all = (await import('/src/apps/reading/engine/lessons.ts')).lessonsFor('kindergarten');
+  return all.filter(l => l.lesson.skillId === all[0].lesson.skillId).map(l => l.lesson.id);
+});
+await startFrom({ completedLessons: letterSounds.slice(0, 2) });
 ok('an older save\'s finished lessons stay done, with no practice to do', (await stateOf(1)) === 'done' && (await stateOf(2)) === 'done' && (await stateOf(3)) === 'next');
 const replay = await play(clean);
 ok('replaying one: "Lesson done!", "Play again", no practice bar', replay.done.title === 'Lesson done!' && replay.done.primary === 'Play again' && replay.done.practice === null, JSON.stringify(replay.done));
 await back();
 
-// ---- a replay asks new things, and what was missed comes back ----
-const pools = await page.evaluate(async () => {
+// ---- a play of 20 goes round its lesson, and what was missed comes back (CUR-12) ----
+const lesson1 = await page.evaluate(async () => {
   const { lessonsFor } = await import('/src/apps/reading/engine/lessons.ts');
   const { READING_CURRICULUM } = await import('/src/data/readingCurriculum.ts');
-  const pool = id => READING_CURRICULUM.kindergarten.flatMap(s => s.lessons).find(l => l.id === id).questions.length;
-  return lessonsFor('kindergarten').map(l => ({ id: l.id, pool: pool(l.id), perPlay: l.roundsPerPlay }));
+  const l = lessonsFor('kindergarten')[0];
+  return { perPlay: l.roundsPerPlay, pool: READING_CURRICULUM.kindergarten.flatMap(s => s.lessons).find(x => x.id === l.id).questions.length };
 });
-const big = pools.findIndex(p => p.pool >= p.perPlay * 2);
-ok('a lesson has at least 2 plays\' worth of questions', big >= 0, JSON.stringify(pools[big] ?? pools[0]));
-if (big >= 0) {
-  const done = pools.slice(0, big).map(p => p.id);
-  await startFrom({ completedLessons: done });
-  let missedId = null;
-  const first = await play((id, r) => { if (r === 0) { missedId = id; return 1; } return 0; }, { number: big + 1 });
-  const second = await play(clean, { again: true });
-  ok('the next play asks mostly new things', second.asked.filter(id => !first.asked.includes(id)).length >= second.asked.length - 1, `${first.asked.join(' ')} → ${second.asked.join(' ')}`);
-  ok('the round missed comes back in the next play', second.asked.includes(missedId), `missed ${missedId}`);
-  const third = await play(clean, { again: true });
-  ok('it comes back once: a round got right the next time waits its turn', !third.asked.includes(missedId), third.asked.join(' '));
-  ok('no round twice in a play', new Set(first.asked).size === first.asked.length && new Set(second.asked).size === second.asked.length);
-}
+ok(`a lesson's play is 20 rounds, more than its ${lesson1.pool} questions`, lesson1.perPlay === 20 && lesson1.pool < 20, JSON.stringify(lesson1));
+await startFrom({});
+let missedId = null;
+const first = await play((id, r) => { if (r === 0) { missedId = id; return 1; } return 0; });
+const second = await play(clean, { again: true });
+const onceFirst = p => { const i = p.findIndex((id, n) => p.indexOf(id) !== n); return i === -1 || i >= lesson1.pool; };
+const inARow = p => p.some((id, n) => n > 0 && id === p[n - 1]);
+ok('each play asked 20', first.asked.length === 20 && second.asked.length === 20, `${first.asked.length}, ${second.asked.length}`);
+ok('every question once before any comes again', onceFirst(first.asked) && onceFirst(second.asked), `${first.asked.join(' ')} → ${second.asked.join(' ')}`);
+ok('never the same question twice in a row', !inARow(first.asked) && !inARow(second.asked));
+ok('the round missed comes back in the next play, twice', second.asked.filter(id => id === missedId).length === 2, `missed ${missedId}`);
 
 ok('no error on the page', errors.length === 0, errors[0] ?? '');
 await browser.close();

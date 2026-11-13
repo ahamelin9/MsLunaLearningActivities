@@ -2,8 +2,13 @@
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "mslunalearningactivities",
   "compatibility_date": "2026-09-17",
+  // the password in front of the site (OPS-14): every request meets the Worker
+  // first; the password itself is the secret SITE_PASSWORD (docs/site-password.md)
+  "main": "worker/gate.ts",
   "assets": {
     "directory": "./dist",
-    "not_found_handling": "single-page-application"
+    "binding": "ASSETS",
+    "not_found_handling": "single-page-application",
+    "run_worker_first": true
   }
 }

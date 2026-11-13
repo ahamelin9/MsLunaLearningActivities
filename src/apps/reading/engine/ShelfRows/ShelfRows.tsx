@@ -59,7 +59,7 @@ export const ShelfRows: React.FC<ShelfRowsProps> = ({ owned, size, picked, dots 
                     <SquishyDots
                       className={has ? undefined : styles.noDots}
                       dots={coloursOf(def.kind).map((c, i) => (colours.includes(c) ? c : i === 0 ? 'grey' : '?'))}
-                      label={`${def.name}: ${colours.length} of 3 colours found`}
+                      label={`${def.name}: ${colours.length} of 3 colors found`}
                     />
                   )}
                 </span>

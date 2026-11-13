@@ -9,6 +9,18 @@ the ArtifactData tool). The audit kept Kokoro: it is one of very few good
 voices that takes exact phonemes, which phonics needs, and the problems are
 in how we cut the letter sounds and how it ends a word said alone.
 
+### VOX-6 · Where Luna sounds shaky, "like a demon"
+Bug · P0 · M · needs: — · likely, not reproduced yet
+- **Blocked:** waits for Alex's call on the playback fix below, and the teacher's answer on where she heard it.
+- **Found (2026-11-12):** the clips are clean. `voice-audit/roughscan.py` tracked the pitch of all 11,003 clips (words, lines, names and sounds, at all three speeds): none falls into a creak or growl longer than 110 ms (a phrase's natural end), the wobble is alike at every speed (median 26 to 29 cents), so Beginner speed isn't the cause, and no clip peaks past 85% of full scale. So "sometimes, in certain places" points at playback on the iPad, not at a take. The likely cause there: the app runs two Web Audio contexts (Luna's voice in `pronunciation.ts`, the sound effects in `audio.ts`), and on iPads a context can come up at a different sample rate than the speaker, or come back from an interruption (a call, Siri, the screen locking, another app's sound) that way, which plays everything slowed, deeper and crackly.
+- **Proposed fix (Alex's call):** one audio context for voice and effects, made on the first tap; on an iPad, if it reports a rate other than the speaker's or comes back from an interruption, it's closed and made afresh (decoded clips play in any context). Small (`utils/`), but it can only be proven on her iPad. Until then, closing and reopening the tab gives a fresh one.
+- **Why:** the teacher (2026-11-12): "her voice is a little off, sounds like a demon a bit"; Alex: shaky in certain places. Nobody has said which clips yet. Likely causes, from the audit's notes: a held sound stretched at one flat pitch (PSOLA, which Alex called "robotic"), a line rendered at Beginner speed (Kokoro at 0.75), or a take where her voice drops into a creak or a buzz.
+- **How:**
+  - **Where, first:** ask the teacher which game or lesson, and which voice speed the Teacher's corner was on. Meanwhile, scan every rendered clip for the marks of a rough voice (pitch falling into creak, jitter, a buzz, a sudden drop in pitch) with the audit's tools (`.claude/skills/know-how/voice-audit/`), and put the worst on a page for Alex to hear beside a clean one.
+  - Fix each by its kind: a line or word gets a new take, speed or override (`scripts/voice/overrides.json`); a letter sound goes with VOX-1's picks.
+  - `npm run voice:render`, then `npm run voice:audit`.
+- **Complete when:** the clips the teacher or the scan named are listed, each with its fix; Alex has heard each fixed clip in the app and OKed it; `voice:audit`, build and lint pass.
+
 ### VOX-1 · Letter sounds retuned by ear
 Story · P0 · M · needs: —
 - **Why:** the audit measured today's letter sounds:

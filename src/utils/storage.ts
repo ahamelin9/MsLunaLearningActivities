@@ -314,10 +314,13 @@ class StorageService {
    * Saves how long a play of a lesson or game took (PRG-6), and adds its
    * minutes, as the done screen shows them, to today's. A lesson picked up
    * part-way passes the minutes it already added when it was left (PRG-11),
-   * so they aren't counted twice.
+   * so they aren't counted twice. `rounds` is how many the play dealt: the
+   * estimate averages per round (CUR-12), and times saved before it counted
+   * rounds start their tally afresh.
    */
-  public recordTime(id: string, seconds: number, counted = 0) {
+  public recordTime(id: string, seconds: number, counted = 0, rounds = 0) {
     const was = this.progress.times[id];
+    const tally = was?.rounds ? was : undefined;
     const day = localDay(new Date());
     const today = this.progress.today.day === day ? this.progress.today.minutes : 0;
     this.progress = {
@@ -327,8 +330,9 @@ class StorageService {
         [id]: {
           last: seconds,
           best: was ? Math.min(was.best, seconds) : seconds,
-          plays: (was?.plays ?? 0) + 1,
-          total: (was?.total ?? 0) + seconds
+          plays: (tally?.plays ?? 0) + 1,
+          total: (tally?.total ?? 0) + seconds,
+          rounds: (tally?.rounds ?? 0) + rounds
         }
       },
       today: { day, minutes: today + Math.max(0, minutesOf(seconds) - counted) }

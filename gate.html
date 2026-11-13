@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <!-- Luna on the tab and the home screen (DES-31): made from the kit's drawing by
+         .claude/skills/know-how/icon-make.mjs; the password Worker lets them through. -->
+    <link rel="icon" type="image/svg+xml" href="/icon.svg" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Ms. Luna's Learning Pad · Sign in</title>
+    <!-- The password page (OPS-14): the Worker serves it until a device signs in.
+         Light or dark before the first paint, as index.html does; keep the two alike. -->
+    <script>
+      (function () {
+        var choice = 'match';
+        try {
+          var saved = JSON.parse(localStorage.getItem('ms_luna_learning_progress_v1') || '{}');
+          if (saved.settings && saved.settings.theme) choice = saved.settings.theme;
+        } catch (e) {}
+        var dark = choice === 'dark' || (choice !== 'light' && matchMedia('(prefers-color-scheme: dark)').matches);
+        document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/gate.tsx"></script>
+  </body>
+</html>

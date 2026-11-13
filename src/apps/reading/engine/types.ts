@@ -9,6 +9,8 @@ export interface GameContext {
   difficulty: Difficulty;
   roundIndex: number;
   totalRounds: number;
+  /** the round this play began on: 0, or where a lesson left part-way picks up (PRG-8) */
+  firstRound: number;
 }
 
 /**

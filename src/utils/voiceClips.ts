@@ -26,7 +26,7 @@ const REFRESH_INTERVAL_MS = 5000;
  * than a promise, which would otherwise leave every clip silent on an older
  * iPad — the exact device this app is most likely to run on.
  */
-function decode(ctx: AudioContext, bytes: ArrayBuffer): Promise<AudioBuffer> {
+function decode(ctx: BaseAudioContext, bytes: ArrayBuffer): Promise<AudioBuffer> {
   return new Promise((resolve, reject) => {
     const maybe = ctx.decodeAudioData(bytes, resolve, reject) as
       | Promise<AudioBuffer>
@@ -133,7 +133,7 @@ export class VoiceClipLibrary {
    * is fetched and decoded once, and the second tap does no work at all.
    */
   async get(
-    ctx: AudioContext,
+    ctx: BaseAudioContext,
     voice: string,
     kind: ClipKind,
     value: string,
@@ -152,9 +152,23 @@ export class VoiceClipLibrary {
       return null;
     }
 
+    const buffer = await this.load(ctx, voice, file);
+    if (buffer) return buffer;
+
+    // The clip this copy of the index names is gone: a tab left open (a
+    // classroom whiteboard's, for days) is older than the last render, which
+    // removed it. The fresh index names the clip that replaced it (VOX-6), so
+    // a stale tab keeps Luna's voice rather than dropping to the browser's.
+    const fresh = await this.refresh(voice, manifest);
+    const newer = fresh.clips[key];
+    return newer && newer !== file ? this.load(ctx, voice, newer) : null;
+  }
+
+  /** One clip file, fetched and decoded once, or null if it won't load. */
+  private load(ctx: BaseAudioContext, voice: string, file: string): Promise<AudioBuffer | null> {
     const url = `${this.base}/${voice}/${file}`;
     const cached = this.buffers.get(url);
-    if (cached) return cached;
+    if (cached) return Promise.resolve(cached);
 
     const pending = this.inflight.get(url);
     if (pending) return pending;
@@ -185,7 +199,7 @@ export class VoiceClipLibrary {
    * at startup, and for the words of a lesson as it opens.
    */
   async prefetch(
-    ctx: AudioContext,
+    ctx: BaseAudioContext,
     voice: string,
     bucket: RateBucket,
     parts: Array<{ kind: ClipKind; value: string }>

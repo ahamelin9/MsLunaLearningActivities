@@ -451,7 +451,8 @@ const FIRST_LESSONS: Record<GradeLevel, ReadingSkill[]> = {
               ]
             },
             {
-              id: 'q-k-rh-sun',
+              // its own id: rhymeRounds' sun (sun, bun) is q-k-rh-sun (CUR-12)
+              id: 'q-k-rh-sun-run',
               type: 'rhyme-match',
               prompt: 'Which word rhymes with SUN?',
               speechPrompt: 'Sun! Which picture rhymes with sun?',

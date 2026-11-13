@@ -1,6 +1,10 @@
 // Deck check (GAME-8): does a game keep dealing something new? Plays each of
 // the 8 games at every grade and dial with no browser, reads what each round is
 // about, and fails if anything comes back before its whole pool has been dealt.
+// Then every lesson (CUR-12): 20 rounds a play (a story lesson 2), every
+// question once before any comes again, never the same one twice in a row, a
+// question missed back in the next play, and "about 7 min" (a story's "about
+// 3 min") before any play is timed.
 //
 //   node .claude/skills/know-how/deck-check.mjs            # this tree
 //   node .claude/skills/know-how/deck-check.mjs <src-root> # another copy
@@ -23,6 +27,8 @@ await build({
   stdin: {
     // an old copy has no deck, so nothing to forget between plays
     contents: `export { GAMES } from ${JSON.stringify(join(root, 'src/apps/reading/games/index.ts'))};
+      export { lessonsFor } from ${JSON.stringify(join(root, 'src/apps/reading/engine/lessons.ts'))};
+      export { estimateMinutes } from ${JSON.stringify(join(root, 'src/apps/reading/engine/times.ts'))};
       ${existsSync(deckFile) ? `export { forgetDecks } from ${JSON.stringify(deckFile)};` : 'export const forgetDecks = () => {};'}`,
     resolveDir: repo,
     loader: 'ts'
@@ -44,7 +50,7 @@ globalThis.localStorage = {
   setItem: (k, v) => saved.set(k, v),
   removeItem: k => saved.delete(k)
 };
-const { GAMES, forgetDecks } = await import(pathToFileURL(join(out, 'bundle.mjs')).href);
+const { GAMES, lessonsFor, estimateMinutes, forgetDecks } = await import(pathToFileURL(join(out, 'bundle.mjs')).href);
 rmSync(out, { recursive: true, force: true });
 
 /** What a round is about, by game: its target (several, for a board of pairs). */
@@ -104,6 +110,50 @@ for (const game of GAMES) {
           `${beforeRepeat} dealt before the first repeat, soonest back after ${soonest}${repeated ? `, ${repeated} plays repeated within` : ''}`
       );
     }
+  }
+}
+
+// ---- lessons (CUR-12) ----
+const LESSON_PLAYS = 20;
+for (const grade of GRADES) {
+  for (const lesson of lessonsFor(grade)) {
+    forgetDecks();
+    const story = lesson.makeRounds({ count: 1 })[0]?.type === 'story-read';
+    const want = story ? 2 : 20;
+    const pool = new Set(Array.from({ length: 10 }, () => lesson.makeRounds({ count: 50 }).map(q => q.id)).flat()).size;
+    forgetDecks();
+    const plays = [];
+    let missedBack = true;
+    let sharedIds = false;
+    for (let n = 0; n < LESSON_PLAYS; n++) {
+      const play = lesson.makeRounds({ count: lesson.roundsPerPlay });
+      const ids = play.map(q => q.id);
+      // two questions with one id are one to the deck (k-rh-pairs had two "sun"s)
+      if (new Set(play).size !== new Set(ids).size) sharedIds = true;
+      // the play before missed its first question: it's back, and asked
+      // twice if this play goes round the lesson a second time
+      if (n > 0) {
+        const missed = plays[n - 1][0];
+        const times = ids.filter(id => id === missed).length;
+        if (times < (pool < want ? 2 : 1)) missedBack = false;
+      }
+      lesson.lesson.missed(play[0]);
+      plays.push(ids);
+    }
+    const sizes = new Set(plays.map(p => p.length));
+    const inARow = plays.filter(p => p.some((id, i) => i > 0 && id === p[i - 1])).length;
+    // every question once before any comes twice, within a play
+    const early = plays.filter(p => {
+      const firstTwice = p.findIndex((id, i) => p.indexOf(id) !== i);
+      return firstTwice !== -1 && firstTwice < Math.min(pool, p.length);
+    }).length;
+    const minutes = estimateMinutes(lesson);
+    const ok = lesson.roundsPerPlay === want && sizes.size === 1 && sizes.has(want) && inARow === 0 && early === 0 && missedBack && !sharedIds && minutes === (story ? 3 : 7);
+    if (!ok) failed = true;
+    console.log(
+      `${ok ? '✅' : '❌'} lesson ${lesson.id}: pool ${pool}, ${[...sizes].join('/')} a play (want ${want}), about ${minutes} min` +
+        `${inARow ? `, ${inARow} plays with one twice in a row` : ''}${early ? `, ${early} plays repeating before the lesson ran out` : ''}${missedBack ? '' : ', a missed one not back'}${sharedIds ? ', two questions share an id' : ''}`
+    );
   }
 }
 

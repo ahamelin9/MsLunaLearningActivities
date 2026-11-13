@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
-    "lint": "eslint . && node scripts/design/check.mjs && node scripts/design/contrast.mjs",
+    "lint": "eslint . && node scripts/design/check.mjs && node scripts/design/contrast.mjs && node scripts/spelling-check.mjs",
     "design:status": "node scripts/design/check.mjs --status",
     "preview": "vite preview",
     "voice:render": "node scripts/voice/render.mjs",

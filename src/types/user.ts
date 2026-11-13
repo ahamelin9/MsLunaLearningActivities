@@ -39,8 +39,11 @@ export interface LessonPractice {
 export interface PlayTimes {
   last: number;
   best: number;
+  /** the plays timed, and their seconds and rounds, for "about N min" (times.ts) */
   plays: number;
   total: number;
+  /** missing in times saved before CUR-12, when plays were 5 rounds */
+  rounds?: number;
 }
 
 export interface UserProgress {

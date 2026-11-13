@@ -422,3 +422,4 @@ only record of them. One line each: date, ID, title, and `Done` or
   | Day or night | the page's light or dark |
   | Grade | the library's skills |
   | Reset all progress | clears stars, squishies, finished lessons and what the games have dealt; keeps the settings and this week's words |
+- **2026-11-12** — DES-27 Our own pictures instead of emoji — Won't do: the teacher likes the emoji as they are ("leave the emojis as they are, no need to change them", her try-out). The first sample stays in `.claude/skills/luna-design/pictures/` as a record. Comments that say a picture waits "until DES-27 draws it" (kit `SkillCard`, `shelf-check.mjs`, the know-how) now mean the emoji stay; tidy them when those files are next touched.

@@ -12,7 +12,7 @@ import { pronunciation } from '@/utils/pronunciation';
 import { minutesOf, storageService } from '@/utils/storage';
 import { estimateMinutes } from '../../engine/times';
 import { warmReadingVoice } from '../../engine/warmup';
-import { FINISH_FIRST, lessonStates } from '../../engine/lessons';
+import { FINISH_FIRST, lessonNumbers, lessonStates, skillLessons } from '../../engine/lessons';
 import { bucketsFor } from '../../engine/buckets';
 import { LEARN_RULE } from '../../engine/practice';
 import { GAME_TINTS, GamePicture } from '../../games/shared/GamePicture/GamePicture';
@@ -87,24 +87,30 @@ export const Hub: React.FC<HubProps> = ({
     onPlayGame(game);
   };
 
-  // lessons open in order (PRG-7): a locked one stays shut, and Luna names
-  // the one up next
+  // each skill's lessons open in order (PRG-7, CUR-11): a locked one stays
+  // shut, and Luna names the one up next in its skill, by its number there
   const states = lessonStates(lessons, progress.completedLessons);
-  const finishFirst = () => {
-    const line = FINISH_FIRST[states.indexOf('next') + 1];
+  const numbers = lessonNumbers(lessons);
+  const finishFirst = (i: number) => {
+    const next = skillLessons(lessons, i).find(at => states[at] === 'next');
+    const line = next === undefined ? undefined : FINISH_FIRST[numbers[next]];
     if (!line) return;
     setMood('happy');
     pronunciation.speakSequence([line]);
   };
 
   // the lessons by skill (CUR-7; engine/buckets.ts), each with the places of
-  // its lessons on the path. One skill's lessons show at a time: the one
-  // holding the lesson up next, or the first once every lesson is done
-  // (Alex, 2026-11-08)
+  // its lessons in `lessons`. Every skill is open (CUR-11), and one says "Up
+  // next": the first not finished. One skill's lessons show at a time: the
+  // one holding a lesson that just opened, else the first not finished, or
+  // the first once every lesson is done (Alex, 2026-11-08)
   const buckets = bucketsFor(grade).map(b => ({ ...b, at: b.lessons.map(({ lesson }) => lessons.findIndex(l => l.id === lesson.id)) }));
-  const bucketState = (at: number[]) =>
-    at.every(i => states[i] === 'done') ? 'done' : at.some(i => states[i] === 'next') ? 'next' : at.some(i => states[i] === 'done') ? 'started' : 'waiting';
-  const [openId, setOpenId] = useState(() => (buckets.find(b => b.at.includes(states.indexOf('next'))) ?? buckets[0])?.id);
+  const allDone = (at: number[]) => at.every(i => states[i] === 'done');
+  const upNext = buckets.find(b => !allDone(b.at))?.id;
+  const bucketState = (id: string, at: number[]) => (allDone(at) ? 'done' : id === upNext ? 'next' : 'started');
+  const [openId, setOpenId] = useState(
+    () => (buckets.find(b => b.at.some(i => lessons[i].id === opened)) ?? buckets.find(b => b.id === upNext) ?? buckets[0])?.id
+  );
   const openBucket = buckets.find(b => b.id === openId);
 
   // a late lesson up next can sit below the fold, and it's what the child came for
@@ -256,7 +262,7 @@ export const Hub: React.FC<HubProps> = ({
                 name={b.name}
                 done={b.at.filter(i => states[i] === 'done').length}
                 total={b.at.length}
-                state={bucketState(b.at)}
+                state={bucketState(b.id, b.at)}
                 open={b.id === openId}
                 onClick={() => {
                   soundManager.playPop();
@@ -278,7 +284,7 @@ export const Hub: React.FC<HubProps> = ({
                   {openBucket.at.map(i => [lessons[i], i] as const).map(([lesson, i]) => (
                     <LessonCard
                       key={lesson.id}
-                      number={i + 1}
+                      number={numbers[i]}
                       title={lesson.title}
                       state={states[i]}
                       minutes={timeOf(lesson, states[i] === 'done')}
@@ -292,7 +298,7 @@ export const Hub: React.FC<HubProps> = ({
                       practice={{ done: progress.lessonPractice?.[lesson.id]?.good ?? 0, goal: LEARN_RULE.goodPlays }}
                       opened={lesson.id === opened}
                       data-shot="lesson-tile"
-                      onClick={() => (states[i] === 'locked' ? finishFirst() : startGame(lesson))}
+                      onClick={() => (states[i] === 'locked' ? finishFirst(i) : startGame(lesson))}
                     />
                   ))}
                 </div>

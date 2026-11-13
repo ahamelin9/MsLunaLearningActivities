@@ -111,17 +111,33 @@ const missedIn = (deck: string) => `missed:${deck}`;
 
 /**
  * A lesson's deal (CUR-6): what was missed last time comes back first, once,
- * and the deck fills the rest. A round missed again is noted again.
+ * and the deck fills the rest. A round missed again is noted again. A play
+ * longer than the lesson (CUR-12: 20 rounds, most lessons hold 10 to 16) asks
+ * every question once, then again, the missed ones first, never the same one
+ * twice in a row.
  */
 export function dealMissedFirst<T>(deck: string, pool: T[], count: number, keyOf: (item: T) => string, aboutOf?: (item: T) => string): T[] {
+  if (pool.length === 0 || count <= 0) return [];
   const all = seen();
   const missed = new Set(all[missedIn(deck)] ?? []);
-  const back = spreadOut(shuffle(pool.filter(item => missed.has(keyOf(item)))), aboutOf, []).slice(0, count);
-  const rest = deal(deck, pool.filter(item => !back.includes(item)), count - back.length, keyOf, aboutOf, aboutOf ? back.map(aboutOf) : []);
+  const once = Math.min(count, pool.length);
+  const back = spreadOut(shuffle(pool.filter(item => missed.has(keyOf(item)))), aboutOf, []).slice(0, once);
+  const rest = deal(deck, pool.filter(item => !back.includes(item)), once - back.length, keyOf, aboutOf, aboutOf ? back.map(aboutOf) : []);
   // what was missed but didn't fit this play waits for the next
   all[missedIn(deck)] = [...missed].filter(key => !back.some(item => keyOf(item) === key));
   remember(all);
-  return shuffle([...back, ...rest]);
+  const play = shuffle([...back, ...rest]);
+  while (play.length < count) {
+    const last = play[play.length - 1];
+    // the missed ones first
+    const again = shuffle([...shuffle(back), ...shuffle(rest)].slice(0, count - play.length));
+    // never the same question twice in a row: one that would follow itself
+    // goes later, or, alone, opens the play instead
+    if (again[0] === last && again.length > 1) again.push(again.shift() as T);
+    if (again[0] === last && play.length > 1) play.unshift(again.shift() as T);
+    play.push(...again);
+  }
+  return play;
 }
 
 /** Notes a round missed, so it comes back next play (dealMissedFirst). */

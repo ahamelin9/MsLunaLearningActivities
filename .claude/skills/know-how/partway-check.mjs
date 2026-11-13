@@ -3,14 +3,15 @@
 //
 //   node .claude/skills/know-how/partway-check.mjs [port=5199]
 //   SHOT=<file.png> THEME=dark node …   # also saves the library with the bar
+//   SHOT_PLAY=<file.png> …               # and the play picked up at round 13
 //
 // Needs Vite running on the port. From a fresh save at Kindergarten, playing
 // Lesson 1 for real (each round right first time, the answer read from React):
-//   - leave it after winning 2 rounds: its card shows the thin rounds bar at
-//     2 of N, and opening it again starts on round 3;
+//   - leave it after winning 12 rounds of its 20 (CUR-12): its card shows the
+//     thin rounds bar at 12 of 20, and opening it again starts on round 13;
 //   - the same after a reload;
 //   - finishing it: the bar is gone and the play counts towards learning it
-//     (CUR-6), with 3 stars (the 2 rounds won before count as first time);
+//     (CUR-6), with 3 stars (the 12 rounds won before count as first time);
 //   - "Practice again" on it, and opening it again from the library, start on
 //     round 1; a game always starts on round 1;
 //   - a save from before PRG-8 (no part-way field) loads with no error.
@@ -82,17 +83,19 @@ async function winRound() {
   for (let t = 0; t < 80 && !(await page.$(at('shell-reward'))) && (await pips()) === now; t++) await wait(200);
 }
 
-// ---- 2 rounds, then leave ----
+// ---- 12 rounds of 20, then leave ----
+const LEFT = 12;
 await open('lesson-tile', 'First Letter Sounds');
 const first = await pips();
-await winRound();
-await winRound();
+for (let r = 0; r < LEFT; r++) await winRound();
 const third = await pips();
 await intoLibrary();
-ok('leaving after 2 rounds: the card shows the rounds bar at 2', (await bar()) === '2', `bar ${await bar()}`);
+const barMax = () => page.evaluate(() => document.querySelector('[data-shot="lesson-tile"] [role="progressbar"]')?.getAttribute('aria-valuemax') ?? null);
+ok(`leaving after ${LEFT} rounds: the card shows the rounds bar at ${LEFT} of 20`, (await bar()) === String(LEFT) && (await barMax()) === '20', `bar ${await bar()} of ${await barMax()}`);
 if (process.env.SHOT) await page.screenshot({ path: process.env.SHOT });
 await open('lesson-tile', 'First Letter Sounds');
-ok('opening it again starts on round 3', (await pips()) === third, `${await pips()} (it began on "${first}")`);
+ok(`opening it again starts on round ${LEFT + 1}`, (await pips()) === third && /^Round 13 of 20/.test(third ?? ''), `${await pips()} (it began on "${first}")`);
+if (process.env.SHOT_PLAY) await page.screenshot({ path: process.env.SHOT_PLAY });
 await intoLibrary();
 
 // ---- a reload ----
@@ -100,12 +103,12 @@ await page.reload({ waitUntil: 'networkidle0' });
 await page.click(at('open-reading'));
 await page.waitForSelector(at('hub'));
 await wait(600);
-ok('after a reload the bar is still at 2', (await bar()) === '2', `bar ${await bar()}`);
+ok(`after a reload the bar is still at ${LEFT}`, (await bar()) === String(LEFT), `bar ${await bar()}`);
 await open('lesson-tile', 'First Letter Sounds');
-ok('… and it still starts on round 3', (await pips()) === third, await pips());
+ok(`… and it still starts on round ${LEFT + 1}`, (await pips()) === third, await pips());
 
 // ---- finish it ----
-for (let r = 0; r < 6 && !(await page.$(at('shell-reward'))); r++) await winRound();
+for (let r = 0; r < 25 && !(await page.$(at('shell-reward'))); r++) await winRound();
 await page.waitForSelector(at('shell-reward'), { timeout: 20000 });
 await wait(1200);
 const stars = await page.evaluate(() => document.querySelector('[aria-label$="of 3 stars"]')?.getAttribute('aria-label'));

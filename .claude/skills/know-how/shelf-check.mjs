@@ -82,7 +82,7 @@ const open = async (kind, title) => {
   await page.waitForSelector(at('shell-play'));
 };
 await open('lesson-tile', 'First Letter Sounds');
-for (let r = 0; r < 8 && !(await page.$(at('shell-reward'))); r++) {
+for (let r = 0; r < 25 && !(await page.$(at('shell-reward'))); r++) {
   await page.waitForSelector(at('lesson-choice'));
   await wait(700);
   const now = await round();

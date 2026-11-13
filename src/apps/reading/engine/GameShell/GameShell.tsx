@@ -4,7 +4,7 @@ import type { PartWay, UserProgress } from '@/types/user';
 import type { AnyGameDef, GameApi, GameContext } from '../types';
 import type { Difficulty } from '../content';
 import { lunaSay, moonSay, type LunaMood, type Milestone } from '../luna';
-import { lessonStates } from '../lessons';
+import { lessonNumbers, lessonStates, skillLessons } from '../lessons';
 import { gameMilestones, lessonMilestones, milestoneId } from '../milestones';
 import { SHELF_LINES, SIGNATURE_KIND, SQUISHY_KINDS, kindsFound, nextSquishy, type SquishyAward } from '../squishies';
 import { starsFor, starsWithTime, type TimeStar } from '../stars';
@@ -111,6 +111,8 @@ export const GameShell: React.FC<GameShellProps> = ({
   const [phase, setPhase] = useState<Phase>(autoStart ? 'play' : 'intro');
   const [difficulty, setDifficulty] = useState<Difficulty>(startDifficulty);
   const [roundIndex, setRoundIndex] = useState(0);
+  // where this play began, so a lesson can say its instruction once (CUR-14)
+  const [firstRound, setFirstRound] = useState(0);
   const [attempts, setAttempts] = useState(0);
   const [hintLevel, setHintLevel] = useState<0 | 1 | 2>(0);
   const [hint, setHint] = useState<SpeechPart[] | null>(null);
@@ -243,6 +245,7 @@ export const GameShell: React.FC<GameShellProps> = ({
     ]);
     answeredRef.current = false;
     setRoundIndex(from?.won ?? 0);
+    setFirstRound(from?.won ?? 0);
     setAttempts(0);
     setHintLevel(0);
     setHint(null);
@@ -457,8 +460,8 @@ export const GameShell: React.FC<GameShellProps> = ({
   );
 
   const ctx: GameContext = useMemo(
-    () => ({ grade, difficulty, roundIndex, totalRounds: game.roundsPerPlay }),
-    [grade, difficulty, roundIndex, game.roundsPerPlay]
+    () => ({ grade, difficulty, roundIndex, totalRounds: game.roundsPerPlay, firstRound }),
+    [grade, difficulty, roundIndex, game.roundsPerPlay, firstRound]
   );
 
   const api: GameApi = useMemo(
@@ -486,7 +489,7 @@ export const GameShell: React.FC<GameShellProps> = ({
 
     // how long it took, and today's minutes with it (PRG-6), less those a
     // lesson left part-way already added (PRG-11)
-    storageService.recordTime(game.id, award.seconds, carried.current.counted);
+    storageService.recordTime(game.id, award.seconds, carried.current.counted, game.roundsPerPlay);
 
     let reached: Milestone[];
     if (game.lesson) {
@@ -572,15 +575,18 @@ export const GameShell: React.FC<GameShellProps> = ({
     // a finished lesson's path (DES-22d): its result is saved just after this
     // screen shows, so the bar moves on as it arrives, and the lesson that
     // opened is the one locked as this play began and open now
+    // Since CUR-11 the bar is the lesson's skill, whose lessons go 1, 2, 3.
     let path: LessonPath | undefined;
-    if (game.lesson && lessons?.length) {
+    const at = lessons?.findIndex(l => l.id === game.id) ?? -1;
+    if (game.lesson && lessons?.length && at >= 0) {
       const before = lessonStates(lessons, doneBefore);
       const now = lessonStates(lessons, progress.completedLessons);
-      const opened = now.findIndex((state, i) => state !== 'locked' && before[i] === 'locked');
+      const skill = skillLessons(lessons, at);
+      const opened = skill.find(i => now[i] !== 'locked' && before[i] === 'locked');
       path = {
-        done: now.filter(state => state === 'done').length,
-        total: lessons.length,
-        opened: opened >= 0 ? opened + 1 : undefined
+        done: skill.filter(i => now[i] === 'done').length,
+        total: skill.length,
+        opened: opened === undefined ? undefined : lessonNumbers(lessons)[opened]
       };
     }
     return (

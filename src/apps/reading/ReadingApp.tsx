@@ -11,7 +11,7 @@ import { GradeSelect } from './pages/GradeSelect/GradeSelect';
 import { Hub } from './pages/Hub/Hub';
 import { Shelf } from './pages/Shelf/Shelf';
 import { GameShell } from './engine/GameShell/GameShell';
-import { lessonsFor, lessonStates, type LessonState } from './engine/lessons';
+import { lessonNumbers, lessonsFor, lessonStates, nextInSkill, type LessonState } from './engine/lessons';
 import { surprisePick } from './games';
 
 interface ReadingAppProps {
@@ -85,11 +85,12 @@ export const ReadingApp: React.FC<ReadingAppProps> = ({ progress, onReturnToHome
   // View 1: a lesson or a mini-game, both run by the same shell, which has its own header
   if (activeGame && currentGrade) {
     const { game } = activeGame;
-    // a finished lesson leads on to the next one, if it's open (PRG-7); a
-    // game to one Luna picks
-    const next = lessons.findIndex(l => l.id === game.id) + 1;
-    const nextOpen = lessonStates(lessons, progress.completedLessons)[next] !== 'locked';
-    const nextLesson = game.lesson && nextOpen ? lessons[next] : undefined;
+    // a finished lesson leads on to the next one in its skill, if it's open
+    // (PRG-7, CUR-11); a game to one Luna picks
+    const at = lessons.findIndex(l => l.id === game.id);
+    const next = game.lesson ? nextInSkill(lessons, at) : -1;
+    const nextOpen = next >= 0 && lessonStates(lessons, progress.completedLessons)[next] !== 'locked';
+    const nextLesson = nextOpen ? lessons[next] : undefined;
     return (
       <GameShell
         key={`${game.id}-${activeGame.autoStart}-${activeGame.difficulty}`}
@@ -98,8 +99,8 @@ export const ReadingApp: React.FC<ReadingAppProps> = ({ progress, onReturnToHome
         progress={progress}
         autoStart={activeGame.autoStart}
         startDifficulty={activeGame.difficulty}
-        // the next one's index is this lesson's number on the path
-        lessonNumber={game.lesson ? next : undefined}
+        // its number in its skill (CUR-11)
+        lessonNumber={game.lesson ? lessonNumbers(lessons)[at] : undefined}
         lessons={game.lesson ? lessons : undefined}
         // the lesson up next, left part-way, picks up where it was (PRG-8)
         resume={game.lesson && !progress.completedLessons.includes(game.lesson.id) ? progress.partway?.[game.lesson.id] : undefined}

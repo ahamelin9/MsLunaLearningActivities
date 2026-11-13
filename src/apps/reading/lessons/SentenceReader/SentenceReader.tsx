@@ -5,11 +5,15 @@ import { shuffle } from '../../engine/content';
 import { soundManager } from '@/utils/audio';
 import { pronunciation } from '@/utils/pronunciation';
 import { ChunkyButton, Choice, PaperCard } from '@/components/kit';
-import { choiceState, useAnswer, usePrompt } from '../shared/lessonHooks';
+import { TRY_FIRST, choiceState, useAnswer, usePrompt } from '../shared/lessonHooks';
 import { dataState } from '@/utils/cx';
 import kit from '../shared/LessonKit.module.scss';
 
-/** Read a sentence, any word of it tappable, and find the picture it describes. */
+/**
+ * Read a sentence and find the picture it describes. Once they have answered,
+ * any word of it reads itself on tap; before, a tap gets Luna's nudge to try
+ * first (CUR-14).
+ */
 export const SentenceReader: React.FC<{ question: SentenceComprehensionQuestion; api: GameApi }> = ({
   question,
   api
@@ -18,8 +22,9 @@ export const SentenceReader: React.FC<{ question: SentenceComprehensionQuestion;
   const { solved, tried, wrongId, revealed, choose } = useAnswer(api, question.hint);
   const [active, setActive] = useState<number | null>(null);
 
-  const sayPrompt = () => soundManager.speak(question.speechPrompt ?? question.prompt);
-  usePrompt(sayPrompt, api);
+  const instruction = question.speechPrompt ?? question.prompt;
+  const sayPrompt = () => soundManager.speak(instruction);
+  usePrompt(sayPrompt, api, instruction);
 
   const words = question.sentence.split(' ');
   const keys = new Set((question.highlightWords ?? []).map(w => w.toLowerCase()));
@@ -42,6 +47,7 @@ export const SentenceReader: React.FC<{ question: SentenceComprehensionQuestion;
                 data-state={dataState(keys.has(clean.toLowerCase()) ? 'key' : false, active === i ? 'active' : false)}
                 onClick={() => {
                   soundManager.playPop();
+                  if (!tried) return api.say(TRY_FIRST.text);
                   setActive(i);
                   pronunciation.speakWord(clean, { onEnd: () => setActive(null) });
                 }}

@@ -1485,3 +1485,20 @@ the old version either proves nothing.
   `tests/board.test.tsx` does.
 - **Check:** `claude plugin test .claude/mods/luna-board` passes, and its
   assertions show the README, each linked epic file and the changelog were read.
+
+## `wrangler dev` won't start: "spawn EBADF"
+
+- **Symptom:** `npx wrangler dev` (or the Worker under it) stops at
+  "Starting local server…" with `Error: spawn EBADF` from esbuild, in the
+  background or not, sandboxed or not (OPS-14, 2026-11-12).
+  `ESBUILD_WORKER_THREADS=0` only moves it to `spawnSync … EBADF`.
+- **Cause:** something about the stdio Claude's shell hands a child process;
+  esbuild alone (`require('esbuild').transformSync`) runs fine.
+- **Fix:** don't need wrangler to test the Worker. `password-check.mjs`
+  bundles `worker/gate.ts` with esbuild, imports it, and calls its `fetch`
+  with real `Request`s, the asset server played by `dist/` (Node has
+  `Request`, `Response`, `FormData` and `crypto.subtle`). Alex can still run
+  `wrangler dev` in his own terminal, with a test password in `.dev.vars`.
+- **Check:** `npm run build && node .claude/skills/know-how/password-check.mjs`
+  ends "All passed". It caught an empty password crashing the Worker (an HMAC
+  key can't be empty), which a click-through would likely have missed.

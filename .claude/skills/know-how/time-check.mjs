@@ -17,6 +17,9 @@
 //     picked up and finished after another minute, the done screen and the
 //     card show the whole time (2 min), and Today has gone up by 2 in all,
 //     not 3;
+//   - CUR-12: a lesson not timed yet says "about 7 min" (20 rounds of about
+//     20 s); times saved before CUR-12 (no rounds, 5-round plays) leave it at
+//     that, and 3 plays timed since average per round (15 s: "about 5 min");
 //   - a save from before PRG-6 (no times) loads with no page error and the
 //     estimates showing.
 // It fails on the commit before PRG-6, which kept no times.
@@ -73,6 +76,7 @@ const today = () => page.$eval('[data-shot="hub-today"]', e => Number(e.textCont
 
 let cards = await cardTimes();
 ok('every lesson card shows "about N min"', cards.length > 0 && cards.every(c => /^about \d+ min$/.test(c ?? '')), cards.join(' · '));
+ok('… "about 7 min" for 20 rounds of about 20 seconds (CUR-12)', cards.every(c => c === 'about 7 min'), [...new Set(cards)].join(' · '));
 const tiles = await tileTimes();
 ok('every game tile shows "about N min"', tiles.length > 0 && tiles.every(Boolean), tiles.join(' · '));
 const today0 = await today();
@@ -110,7 +114,7 @@ const solveRound = async () => {
   await page.evaluate(l => [...document.querySelectorAll('[data-shot="lesson-choice"]')].find(e => (e.getAttribute('aria-label') ?? e.textContent).trim() === l)?.click(), right);
   for (let t = 0; t < 80 && !(await page.$(at('shell-reward'))) && (await round()) === now; t++) await wait(200);
 };
-for (let r = 0; r < 12 && !(await page.$(at('shell-reward'))); r++) await solveRound();
+for (let r = 0; r < 25 && !(await page.$(at('shell-reward'))); r++) await solveRound();
 await page.waitForSelector(at('done-time'), { timeout: 20000 });
 const realSeconds = (Date.now() - t0) / 1000;
 const took = await page.$eval(at('done-time'), e => Number(e.textContent.match(/You took (\d+) minute/)?.[1] ?? NaN));
@@ -156,7 +160,7 @@ ok('a lesson left part-way after a minute raises Today by 1', today2 - today1 ==
 await openLesson(1);
 t = Date.now();
 await page.evaluate(() => { window.__skip += 60000; });
-for (let r = 0; r < 12 && !(await page.$(at('shell-reward'))); r++) await solveRound();
+for (let r = 0; r < 25 && !(await page.$(at('shell-reward'))); r++) await solveRound();
 await page.waitForSelector(at('done-time'), { timeout: 20000 });
 const part2 = (Date.now() - t) / 1000;
 const whole = Math.max(1, Math.round((120 + part1 + part2) / 60));
@@ -169,6 +173,25 @@ await wait(600);
 const today3 = await today();
 ok('… Today has the whole time once, not the first minute twice', today3 - today1 === whole, `${today1} → ${today2} → ${today3}`);
 ok('… and the card says it took the whole time', (await cardTimes())[1] === `took ${whole} min`, (await cardTimes())[1]);
+
+// ---- CUR-12: the estimate averages per round ----
+const thirdId = await page.evaluate(async () => (await import('/src/apps/reading/engine/lessons.ts')).lessonsFor('kindergarten')[2].lesson.id);
+const timedAs = async t => {
+  await page.evaluate((key, id, t) => {
+    const saved = JSON.parse(localStorage.getItem(key));
+    saved.times = { ...saved.times, [id]: t };
+    localStorage.setItem(key, JSON.stringify(saved));
+  }, KEY, thirdId, t);
+  await page.reload({ waitUntil: 'networkidle0' });
+  await page.click(at('open-reading'));
+  await page.waitForSelector(at('hub'));
+  await wait(600);
+  return (await cardTimes())[2];
+};
+const oldTimes = await timedAs({ last: 150, best: 120, plays: 4, total: 600 });
+ok('times from 5-round plays (no rounds saved) leave "about 7 min"', oldTimes === 'about 7 min', oldTimes);
+const newTimes = await timedAs({ last: 300, best: 300, plays: 3, total: 900, rounds: 60 });
+ok('3 plays timed at 15 s a round: "about 5 min"', newTimes === 'about 5 min', newTimes);
 
 // ---- a save from before PRG-6 ----
 await page.evaluate(key => {

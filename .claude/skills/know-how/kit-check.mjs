@@ -475,6 +475,28 @@ const rm = [await animOf(talker), await animOf(floater), await animOf(await luna
 ok('reduced motion: no talk, float or blink', rm.every(a => a === 'none'), rm.join(' | '));
 await page.evaluate(() => document.documentElement.removeAttribute('data-reduced-motion'));
 
+// ── TextField (OPS-14) ─────────────────────────────────────────────────────
+ok('a wrong TextField takes the try-again edge, an idle one the plain edge', await page.evaluate(() => {
+  // a role's colour where the field is (the Kit page shows light and dark panels)
+  const probe = (near, role) => {
+    const s = document.createElement('span');
+    s.style.color = `var(${role})`;
+    near.append(s);
+    const c = getComputedStyle(s).color;
+    s.remove();
+    return c;
+  };
+  // the field's own root is the input's parent, holding data-state="wrong" or nothing
+  const fields = [...document.querySelectorAll('input')].filter(i => i.labels?.[0]?.textContent === 'Class password');
+  const wrong = fields.find(i => i.parentElement.getAttribute('data-state') === 'wrong');
+  const idle = fields.find(i => !i.parentElement.hasAttribute('data-state'));
+  return !!wrong && !!idle
+    && getComputedStyle(wrong).borderTopColor === probe(wrong.parentElement, '--try-again-edge')
+    && getComputedStyle(idle).borderTopColor === probe(idle.parentElement, '--edge')
+    && wrong.getAttribute('aria-invalid') === 'true'
+    && document.getElementById(wrong.getAttribute('aria-describedby'))?.getAttribute('role') === 'alert';
+}));
+
 // ── Switch and the picked button (DES-9b) ──────────────────────────────────
 const flip = await page.evaluateHandle(() => document.querySelector('button[role="switch"][aria-label="Try me"]'));
 await flip.evaluate(e => e.scrollIntoView({ block: 'center' }));

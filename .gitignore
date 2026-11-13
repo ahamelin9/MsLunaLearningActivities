@@ -23,6 +23,12 @@ dist-ssr
 *.sln
 *.sw?
 
+# the password page's local test password, and wrangler's own scratch (OPS-14);
+# the real password is a Cloudflare secret, never in this public repo
+.dev.vars*
+.env*
+.wrangler/
+
 # voice rendering scratch
 .voice-tmp/
 

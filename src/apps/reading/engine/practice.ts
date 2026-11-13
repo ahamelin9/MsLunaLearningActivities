@@ -8,13 +8,18 @@ import type { LessonPractice } from '@/types/user';
 /**
  * The rule, in one place: a lesson is learned after `goodPlays` good plays,
  * and a good play has at least `goodShare` of its rounds right the first time
- * (4 of 5, the usual classroom mastery line). So no child is ever stuck,
+ * (16 of 20, the usual classroom mastery line). So no child is ever stuck,
  * `anyPlays` plays of any kind also move the path on.
  */
 export const LEARN_RULE = { goodPlays: 3, goodShare: 0.8, anyPlays: 6 } as const;
 
-/** How many rounds one play of a lesson deals, unless the lesson says otherwise. */
-export const ROUNDS_PER_PLAY = 5;
+/**
+ * How many rounds one play of a lesson deals, unless the lesson says otherwise
+ * (a story lesson deals 2). It was 5 until CUR-12 (the teacher, 2026-11-12:
+ * "maybe more than 5 practice questions would be useful"). A lesson holding
+ * fewer asks its questions again (`dealMissedFirst`, deck.ts).
+ */
+export const ROUNDS_PER_PLAY = 20;
 
 export const NO_PRACTICE: LessonPractice = { good: 0, plays: 0 };
 

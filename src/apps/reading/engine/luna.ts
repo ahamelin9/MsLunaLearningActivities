@@ -98,7 +98,7 @@ export const PER_GAME: Record<string, Partial<Bank>> = {
       { text: 'Crunchy letter. Delicious!', mood: 'cheer' },
       { text: 'Yum! That one tastes like honey.', mood: 'cheer' }
     ],
-    missFirst: [{ text: 'Bleh! That one is the wrong flavour.', mood: 'oops' }]
+    missFirst: [{ text: 'Bleh! That one is the wrong flavor.', mood: 'oops' }]
   },
   'memory-match': {
     correct: [

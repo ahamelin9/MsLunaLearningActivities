@@ -19,6 +19,7 @@ export { Squishy, SquishyDots, type SquishyColour, type SquishyKind, type Squish
 export { PearlMoon } from './PearlMoon/PearlMoon';
 export { Luna, type LunaMood } from './Luna/Luna';
 export { Switch } from './Switch/Switch';
+export { TextField } from './TextField/TextField';
 export { Flower, type FlowerKind } from './Flower/Flower';
 export { Petals } from './Petals/Petals';
 export { MilestoneMoon, type MoonMood } from './MilestoneMoon/MilestoneMoon';

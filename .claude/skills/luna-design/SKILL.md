@@ -178,6 +178,12 @@ changed screens.
   stage's flash: `perch-check.mjs` (DES-22a), which also checks a won
   round's garden and petals (DES-11). Review shots of a win:
   `win-shot.mjs` next to it.
+- Luna's icons (DES-31): `node .claude/skills/know-how/icon-make.mjs 5199 public`
+  makes the tab's `icon.svg` and the home screen PNGs from the kit's Luna
+  (her face, idle, on `--ground`); run it again whenever her drawing or her
+  colours change. `icon-check.mjs 5199` checks both pages link them, the touch
+  icon is 180×180 and Chrome reads the manifest; `password-check.mjs` checks
+  the Worker lets them through without the cookie.
 - Does the grown-up gate hold (SET-1)? `node .claude/skills/know-how/gate-check.mjs 5199`
   (and `--reduced-motion`): a tap or a short hold on the gears or the grade
   opens nothing, a 1.5s hold does.

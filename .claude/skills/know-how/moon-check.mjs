@@ -111,7 +111,7 @@ const toHome = async () => {
 /** taps each round's right answer, after one wrong one when `miss` (the answer read from React) */
 async function playRounds(miss, pieces) {
   const round = () => page.evaluate(() => document.querySelector('[data-shot="round-pips"]')?.getAttribute('aria-label') ?? null);
-  for (let guard = 0; guard < 12 && !(await shown(at('shell-reward'))); guard++) {
+  for (let guard = 0; guard < 25 && !(await shown(at('shell-reward'))); guard++) {
     await page.waitForSelector(pieces, { timeout: 15000 });
     await wait(1200);
     const now = await round();

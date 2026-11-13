@@ -73,16 +73,16 @@ export const Shelf: React.FC<{ progress: UserProgress; onBack: () => void }> = (
           </span>
 
           <PaperCard className={styles.legend}>
-            <h3 className={styles.label}>Colours</h3>
+            <h3 className={styles.label}>Colors</h3>
             <span className={styles.group}>
               <strong>Usual</strong>
-              <SquishyDots dots={['oat', 'cream', 'caramel', 'toffee', 'cocoa']} label="Usual colours" />
+              <SquishyDots dots={['oat', 'cream', 'caramel', 'toffee', 'cocoa']} label="Usual colors" />
             </span>
             <span className={styles.group}>
               <strong className={styles.sparkled}>
                 <Icon name="sparkle" size={16} filled /> Rare
               </strong>
-              <SquishyDots dots={['blush', 'sage', 'sky', 'butter', 'lilac']} label="Rare colours" />
+              <SquishyDots dots={['blush', 'sage', 'sky', 'butter', 'lilac']} label="Rare colors" />
             </span>
             <span className={styles.group}>
               <strong className={styles.sparkled} data-variant="super">
@@ -93,10 +93,10 @@ export const Shelf: React.FC<{ progress: UserProgress; onBack: () => void }> = (
             <div className={styles.still}>
               <h3 className={styles.label}>Still to find</h3>
               <span className={styles.key}>
-                <SquishyDots dots={['grey']} label="A usual colour" /> a usual colour
+                <SquishyDots dots={['grey']} label="A usual color" /> a usual color
               </span>
               <span className={styles.key}>
-                <SquishyDots dots={['?']} label="A rare colour" /> a rare colour
+                <SquishyDots dots={['?']} label="A rare color" /> a rare color
               </span>
               <span className={styles.key}>
                 <span className={styles.ghostMark} aria-hidden="true" /> an easy one, coming soon

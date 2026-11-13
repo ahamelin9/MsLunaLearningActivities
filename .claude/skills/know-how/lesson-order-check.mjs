@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Do lessons open in order? (PRG-7)
+// Do each skill's lessons open in order, 1, 2, 3? (PRG-7, CUR-11)
 //
 //   node .claude/skills/know-how/lesson-order-check.mjs [port=5199]
 //
@@ -112,6 +112,31 @@ const intoLibrary = async () => {
 };
 const lessonIds = grade =>
   page.evaluate(async g => (await import('/src/apps/reading/engine/lessons.ts')).lessonsFor(g).map(l => l.lesson.id), grade);
+const skillIds = grade =>
+  page.evaluate(async g => (await import('/src/apps/reading/engine/lessons.ts')).lessonsFor(g).map(l => l.lesson.skillId), grade);
+/** What each lesson should be with `done` finished: in each skill, done stays done, the first not done is next, the rest locked. */
+const expected = (skills, ids, done) => {
+  const nextFound = new Set();
+  return ids.map((id, i) => {
+    if (done.includes(id)) return 'done';
+    if (nextFound.has(skills[i])) return 'locked';
+    nextFound.add(skills[i]);
+    return 'next';
+  });
+};
+/** Each skill's lesson cards, in the order they show: their numbers ("Lesson N, ..."). */
+const numbersBySkill = async () => {
+  const out = [];
+  for (const skill of await page.$$(at('skill-card'))) {
+    await skill.click();
+    await wait(150);
+    out.push({
+      name: await skill.evaluate(el => el.getAttribute('aria-label').split(',')[0]),
+      numbers: await page.$$eval(at('lesson-tile'), els => els.map(el => Number(/^Lesson (\d+),/.exec(el.getAttribute('aria-label'))?.[1])))
+    });
+  }
+  return out;
+};
 const setDone = ids =>
   page.evaluate((key, list) => {
     const saved = JSON.parse(localStorage.getItem(key));
@@ -143,7 +168,7 @@ const tapLocked = async i => {
   return result;
 };
 
-/** Plays the open lesson card i through to its done screen, trying each choice in turn. */
+/** Plays the open lesson card i through to its done screen, each round's right choice first time. */
 const playLesson = async i => {
   await page.evaluate(() => { window.__barSeen = []; });
   await (await lessonCard(page, i)).click();
@@ -151,21 +176,28 @@ const playLesson = async i => {
   await page.click(at('play'));
   await page.waitForSelector(at('shell-play'));
   const round = () => page.evaluate(() => document.querySelector('[data-shot="round-pips"]')?.getAttribute('aria-label') ?? null);
+  // 20 rounds a play since CUR-12: the right choice is read from React, as
+  // practice-check does, rather than found by trying each (8 s a miss)
   for (let guard = 0; guard < 40; guard++) {
     if (await shown(at('shell-reward'))) return true;
+    await page.waitForSelector(`${at('lesson-choice')}, ${at('shell-reward')}`);
+    if (await shown(at('shell-reward'))) return true;
+    await wait(600);
     const now = await round();
-    const count = (await page.$$(at('lesson-choice'))).length;
-    let moved = false;
-    for (let c = 0; c < count && !moved; c++) {
-      const choice = (await page.$$(at('lesson-choice')))[c];
-      if (!choice) break;
-      await choice.click().catch(() => {});
-      for (let t = 0; t < 40 && !moved; t++) {
-        await wait(200);
-        moved = (await shown(`${at('win-garden')}, ${at('shell-reward')}`)) || (await round()) !== now;
+    await page.evaluate(() => {
+      const el = document.querySelector('[data-shot="lesson-choice"]');
+      const key = Object.keys(el).find(k => k.startsWith('__reactFiber'));
+      for (let f = el[key]; f; f = f.return) {
+        const list = f.memoizedProps?.question?.options;
+        if (Array.isArray(list)) {
+          const o = list.find(x => x.isCorrect ?? x.isRhyme);
+          const label = o.letter ? `letter ${o.letter}` : o.word ?? o.text;
+          [...document.querySelectorAll('[data-shot="lesson-choice"]')].find(e => (e.getAttribute('aria-label') ?? e.textContent).trim() === label)?.click();
+          return;
+        }
       }
-    }
-    for (let t = 0; t < 60 && !(await shown(at('shell-reward'))) && (await round()) === now; t++) await wait(200);
+    });
+    for (let t = 0; t < 80 && !(await shown(at('shell-reward'))) && (await round()) === now; t++) await wait(200);
   }
   return shown(at('shell-reward'));
 };
@@ -189,16 +221,16 @@ const back = async () => {
 
 await page.goto(`http://localhost:${port}/`, { waitUntil: 'networkidle0' });
 
-// ---- every N a grade can need has its line ----
+// ---- every N a skill can need has its line (N is a lesson's number in its skill) ----
 const lines = await page.evaluate(async () => {
-  const { lessonsFor, FINISH_FIRST = {} } = await import('/src/apps/reading/engine/lessons.ts');
+  const { lessonsFor, lessonNumbers, FINISH_FIRST = {} } = await import('/src/apps/reading/engine/lessons.ts');
   return ['kindergarten', 'grade1', 'grade2'].map(g => {
-    const n = lessonsFor(g).length;
+    const n = Math.max(...lessonNumbers(lessonsFor(g)));
     const missing = Array.from({ length: Math.max(0, n - 1) }, (_, i) => i + 1).filter(k => !FINISH_FIRST[k]);
     return { g, n, missing };
   });
 });
-check(`a line for every lesson a grade can have up next (${lines.map(l => `${l.g} ${l.n}`).join(', ')})`, lines.every(l => l.missing.length === 0));
+check(`a line for every lesson a skill can have up next (longest skill: ${lines.map(l => `${l.g} ${l.n}`).join(', ')})`, lines.every(l => l.missing.length === 0));
 
 // ---- a fresh save, each grade ----
 await page.evaluate(() => localStorage.clear());
@@ -209,16 +241,27 @@ await (await page.$$(at('grade-card')))[0].click();
 await page.waitForSelector(at('hub'));
 await hook();
 await wait(600);
-const kFresh = await states();
-check(`fresh save, K: only Lesson 1 open (${kFresh.join(' ')})`, kFresh[0] === 'next' && kFresh.slice(1).every(s => s === 'locked'));
-for (const [i, name] of [[1, '1st'], [2, '2nd']]) {
+const fresh = async (name, grade) => {
+  const s = await states();
+  const want = expected(await skillIds(grade), await lessonIds(grade), []);
+  check(`fresh save, ${name}: each skill's Lesson 1 open, the rest locked (${s.join(' ')})`, s.join(' ') === want.join(' '));
+  const numbers = await numbersBySkill();
+  check(`${name}: each skill's lessons read Lesson 1, 2, 3 in order (${numbers.map(b => `${b.name} ${b.numbers.join(',')}`).join('; ')})`,
+    numbers.every(b => b.numbers.every((n, i) => n === i + 1)));
+  return numbers;
+};
+await fresh('K', 'kindergarten');
+for (const [i, name, grade] of [[1, '1st', 'grade1'], [2, '2nd', 'grade2']]) {
   await hold(at('change-grade'));
   await page.waitForSelector(at('grade-card'));
   await (await page.$$(at('grade-card')))[i].click();
   await page.waitForSelector(at('hub'));
   await wait(600);
-  const s = await states();
-  check(`fresh save, ${name}: only Lesson 1 open (${s.join(' ')})`, s[0] === 'next' && s.slice(1).every(x => x === 'locked'));
+  const numbers = await fresh(name, grade);
+  if (grade === 'grade2') {
+    const vowelTeams = numbers.find(b => b.name === 'Vowel teams');
+    check(`2nd grade's Vowel teams shows its lessons together (${vowelTeams?.numbers.length})`, vowelTeams?.numbers.length === 7);
+  }
 }
 await hold(at('change-grade'));
 await page.waitForSelector(at('grade-card'));
@@ -226,10 +269,13 @@ await (await page.$$(at('grade-card')))[0].click();
 await page.waitForSelector(at('hub'));
 await wait(2500);
 
-// ---- a locked tap ----
-const lockedTap = await tapLocked(2);
+// ---- a locked tap: Letter sounds' Lesson 2 ----
+const ids = await lessonIds('kindergarten');
+const kSkills = await skillIds('kindergarten');
+const inSkill = (n, skill = kSkills[0]) => kSkills.map((s, i) => [s, i]).filter(([s]) => s === skill)[n - 1][1];
+const lockedTap = await tapLocked(inSkill(2));
 check(
-  `tapping locked Lesson 3: not opened, wobbled, Luna says ${JSON.stringify(lockedTap.said)} (${lockedTap.clips} clip)`,
+  `tapping locked Letter sounds Lesson 2: not opened, wobbled, Luna says ${JSON.stringify(lockedTap.said)} (${lockedTap.clips} clip)`,
   !lockedTap.opened && lockedTap.wobbled && lockedTap.said.includes('Let’s finish Lesson 1 first!') && lockedTap.clips >= 1
 );
 
@@ -243,8 +289,7 @@ for (let i = 0; i < games; i++) {
 }
 check(`every game opens (${opened} of ${games})`, opened === games && games === 8);
 
-// ---- finishing Lesson 1 ----
-const ids = await lessonIds('kindergarten');
+// ---- finishing Letter sounds' Lesson 1 ----
 await onLastPlay(ids[0]);
 await page.reload({ waitUntil: 'networkidle0' });
 await intoLibrary();
@@ -254,33 +299,34 @@ const nextOffered = await nextLessonOffered();
 await page.click(at('shell-back'));
 await page.waitForSelector(at('hub'));
 // DES-13: the lesson that just opened pops in once, back on the library (its
-// skill is open, since it holds the lesson up next: CUR-7)
-const pop = await (await lessonCard(page, 1)).evaluate(el =>
+// skill is open, since it holds the lesson that just opened: CUR-11)
+const pop = await (await lessonCard(page, inSkill(2))).evaluate(el =>
   ({ opened: /\bopened\b/.test(el.getAttribute('data-state') ?? ''), motion: getComputedStyle(el).animationName }));
 await wait(600);
 const afterOne = await states();
 check(`back on the library, Lesson 2 pops in once (${JSON.stringify(pop)})`, pop.opened && pop.motion.includes('luna-pop'));
-check(`finishing Lesson 1 offers "Next lesson" and opens Lesson 2 (${finished ? 'done screen' : 'never finished'}; ${afterOne.join(' ')})`,
-  finished && nextOffered && afterOne[0] === 'done' && afterOne[1] === 'next' && afterOne.slice(2).every(s => s === 'locked'));
+check(`finishing Lesson 1 offers "Next lesson" and opens Letter sounds' Lesson 2, nothing else (${finished ? 'done screen' : 'never finished'}; ${afterOne.join(' ')})`,
+  finished && nextOffered && afterOne.join(' ') === expected(kSkills, ids, [ids[0]]).join(' '));
 await wait(1500);
-const lockedTwo = await tapLocked(3);
-check(`then a locked tap names Lesson 2 (${JSON.stringify(lockedTwo.said)})`, !lockedTwo.opened && lockedTwo.said.includes('Let’s finish Lesson 2 first!'));
+const lockedTwo = await tapLocked(inSkill(3));
+check(`then a locked tap on its Lesson 3 names Lesson 2 (${JSON.stringify(lockedTwo.said)})`, !lockedTwo.opened && lockedTwo.said.includes('Let’s finish Lesson 2 first!'));
 
-// ---- an old save, done out of order ----
-await setDone([ids[0], ids[2]]);
+// ---- an old save, done out of order: Letter sounds' Lessons 1 and 3 ----
+const oldDone = [ids[0], ids[inSkill(3)]];
+await setDone(oldDone);
 await page.reload({ waitUntil: 'networkidle0' });
 await intoLibrary();
 const oldSave = await states();
 await page.reload({ waitUntil: 'networkidle0' });
 await intoLibrary();
 const reloaded = await states();
-const want = ['done', 'next', 'done', ...ids.slice(3).map(() => 'locked')].join(' ');
-check(`Lessons 1 and 3 done: ${oldSave.join(' ')}, after a reload ${reloaded.join(' ')}`, oldSave.join(' ') === want && reloaded.join(' ') === want);
-const three = await playLesson(2);
+const want = expected(kSkills, ids, oldDone).join(' ');
+check(`Letter sounds' Lessons 1 and 3 done: ${oldSave.join(' ')}, after a reload ${reloaded.join(' ')}`, oldSave.join(' ') === want && reloaded.join(' ') === want);
+const three = await playLesson(inSkill(3));
 const doneThree = await doneScreen();
 const nextAfterThree = await nextLessonOffered();
-check(`replaying Lesson 3 there: ${three ? 'done screen' : 'never finished'}, no "Next lesson" while Lesson 4 is locked`, three && !nextAfterThree);
-check(`after Lesson 1 the done screen reads "${doneOne.title}", its bar moves on (${doneOne.seen.join(' → ')}) and says "${doneOne.opened}"`,
+check(`replaying Lesson 3 there: ${three ? 'done screen' : 'never finished'}, no "Next lesson" while its Lesson 4 is locked`, three && !nextAfterThree);
+check(`after Lesson 1 the done screen reads "${doneOne.title}", its skill's bar moves on (${doneOne.seen.join(' → ')}) and says "${doneOne.opened}"`,
   /^Lesson 1 · /.test(doneOne.title ?? '') && doneOne.seen.join(' ') === '0 1' && doneOne.opened === 'Lesson 2 is open now');
 check(`replaying Lesson 3, the bar stays (${doneThree.seen.join(' → ')}) and nothing opened (${doneThree.opened})`,
   doneThree.seen.join(' ') === '2' && doneThree.opened === null);
@@ -301,9 +347,9 @@ for (const [width, height] of [[1180, 820], [744, 1133]]) {
 }
 await page.setViewport({ width: 1180, height: 820 });
 
-// ---- which skill opens first (CUR-7; Alex, 2026-11-08) ----
-// the one holding the lesson up next, which says "Up next" too; once every
-// lesson is done, the first
+// ---- which skill opens first (CUR-7, CUR-11) ----
+// the first not finished, which says "Up next" too; once every lesson is
+// done, the first
 await setDone(ids.slice(0, ids.length - 1));
 await page.reload({ waitUntil: 'networkidle0' });
 await intoLibrary();

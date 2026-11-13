@@ -5,7 +5,7 @@ import { shuffle } from '../../engine/content';
 import { soundManager } from '@/utils/audio';
 import { pronunciation } from '@/utils/pronunciation';
 import { ChunkyButton, Choice, PaperCard } from '@/components/kit';
-import { choiceState, useAnswer, usePrompt } from '../shared/lessonHooks';
+import { TRY_FIRST, choiceState, useAnswer, usePrompt } from '../shared/lessonHooks';
 import { cx } from '@/utils/cx';
 import kit from '../shared/LessonKit.module.scss';
 import styles from './StoryReader.module.scss';
@@ -15,8 +15,8 @@ const STORY_HINT = { text: 'Peek back at the story. Tap a line and I will read i
 
 /**
  * Read a short story, then answer one question about it. The child reads it
- * first; once they have answered, any line is read aloud on tap. A single
- * word can be tapped any time.
+ * first; once they have answered, any line or word is read aloud on tap, and
+ * before then a word tapped gets Luna's nudge to try first (CUR-14).
  */
 export const StoryReader: React.FC<{ question: StoryReadQuestion; api: GameApi }> = ({ question, api }) => {
   const quiz = question.comprehensionQuestion;
@@ -28,7 +28,8 @@ export const StoryReader: React.FC<{ question: StoryReadQuestion; api: GameApi }
   const [activeLine, setActiveLine] = useState<number | null>(null);
   const [activeWord, setActiveWord] = useState<string | null>(null);
 
-  usePrompt(() => soundManager.speak(question.speechPrompt ?? question.prompt), api);
+  const instruction = question.speechPrompt ?? question.prompt;
+  usePrompt(() => soundManager.speak(instruction), api, instruction);
 
   const readLine = (index: number) => {
     soundManager.playLetterTap();
@@ -39,6 +40,7 @@ export const StoryReader: React.FC<{ question: StoryReadQuestion; api: GameApi }
 
   const readWord = (word: string, key: string) => {
     soundManager.playPop();
+    if (!tried) return api.say(TRY_FIRST.text);
     setActiveWord(key);
     pronunciation.speakWord(word.replace(/[^a-zA-Z0-9]/g, ''), { onEnd: () => setActiveWord(null) });
   };

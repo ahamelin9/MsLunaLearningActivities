@@ -251,11 +251,11 @@ export const DoneScreen: React.FC<DoneScreenProps> = ({
                 <strong className={styles.rewardName}>{squishy.name}</strong>
                 {squishy.rarity !== 'usual' && (
                   <Chip variant={squishy.rarity} icon="sparkle" shimmer className={styles.rarity}>
-                    {squishy.rarity === 'rare' ? `Rare colour: ${squishy.colour}` : `Super rare: ${squishy.look}`}!
+                    {squishy.rarity === 'rare' ? `Rare color: ${squishy.colour}` : `Super rare: ${squishy.look}`}!
                   </Chip>
                 )}
                 <span className={styles.rewardNote}>
-                  {squishy.rarity === 'rare' && `Only about 1 in ${Math.round(1 / ODDS.rare)} squishies comes in a rare colour. `}
+                  {squishy.rarity === 'rare' && `Only about 1 in ${Math.round(1 / ODDS.rare)} squishies comes in a rare color. `}
                   {squishy.rarity === 'super-rare' && `Only about 1 in ${Math.round(1 / ODDS.superRare)} squishies comes in a super rare ${squishy.look}. `}
                   Tap it to squish.
                 </span>

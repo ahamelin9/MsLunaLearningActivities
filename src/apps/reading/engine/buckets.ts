@@ -1,6 +1,6 @@
 // A grade's lessons in buckets: one per skill, in the order the path first
-// reaches it, each lesson keeping its number on the path. The teacher's cheat
-// sheet shows them (CUR-8), and the library will too (CUR-7).
+// reaches it, each lesson numbered in its skill from 1 (CUR-11). The
+// teacher's cheat sheet shows them (CUR-8), and so does the library (CUR-7).
 
 import type { GradeLevel, Lesson, LessonQuestion } from '../../../types/reading';
 import { READING_CURRICULUM } from '../../../data/readingCurriculum';
@@ -14,21 +14,20 @@ export interface Bucket {
   icon: string;
   /** what it teaches, in plain words */
   description: string;
-  /** its lessons in path order, each with its number on the path (from 1) */
+  /** its lessons in order, each with its number in the skill (from 1) */
   lessons: { number: number; lesson: Lesson }[];
 }
 
-/** A grade's buckets. The lesson numbers match `lessonsFor` (engine/lessons.ts). */
+/** A grade's buckets. The lesson numbers match `lessonNumbers` (engine/lessons.ts). */
 export function bucketsFor(grade: GradeLevel): Bucket[] {
   const buckets: Bucket[] = [];
-  let number = 0;
   for (const skill of READING_CURRICULUM[grade] ?? []) {
     let bucket = buckets.find(b => b.id === skill.id);
     if (!bucket) {
       bucket = { id: skill.id, name: skill.name, said: skill.said, icon: skill.icon, description: skill.description, lessons: [] };
       buckets.push(bucket);
     }
-    for (const lesson of skill.lessons) bucket.lessons.push({ number: ++number, lesson });
+    for (const lesson of skill.lessons) bucket.lessons.push({ number: bucket.lessons.length + 1, lesson });
   }
   return buckets;
 }

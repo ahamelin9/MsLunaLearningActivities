@@ -12,6 +12,7 @@ import { aboutOf } from '../../../data/lessonRounds';
 import { LessonRound } from '../lessons/shared/LessonRound';
 import { dealMissedFirst, noteMissed } from './deck';
 import { ROUNDS_PER_PLAY } from './practice';
+import { ROUND_SECONDS } from './times';
 import type { AnyGameDef, GameDef, SkillArea } from './types';
 import type { SpeechPart } from '../../../utils/pronunciation';
 
@@ -69,7 +70,10 @@ export function lessonGame(lesson: Lesson, skill: ReadingSkill): GameDef<LessonQ
     objective: skill.description,
     skill: SKILL_AREA[lesson.questions[0]?.type] ?? 'reading',
     mission: LUNA_LINES[skill.id] ?? lesson.description,
-    roundsPerPlay: Math.min(lesson.perPlay ?? ROUNDS_PER_PLAY, lesson.questions.length),
+    // 20 a play (CUR-12), asking a lesson's questions again when it holds
+    // fewer; a story lesson deals 2, each round a whole story
+    roundsPerPlay: lesson.perPlay ?? ROUNDS_PER_PLAY,
+    roundSeconds: lesson.questions.every(q => q.type === 'story-read') ? ROUND_SECONDS.story : undefined,
     shape: 'lesson',
     sticker: SIGNATURE_STICKER[skill.id] ?? 'book',
     // a replay asks new things, and what was missed comes back first (CUR-6)
@@ -90,28 +94,57 @@ export function lessonsFor(grade: GradeLevel): AnyGameDef[] {
   return (READING_CURRICULUM[grade] ?? []).flatMap(skill => skill.lessons.map(lesson => lessonGame(lesson, skill)));
 }
 
-/** Where a lesson stands on the path: done, up next (open, not done yet) or locked. */
+/** Where a lesson stands in its skill: done, up next (open, not done yet) or locked. */
 export type LessonState = 'done' | 'next' | 'locked';
 
+/** The skill a lesson belongs to (a game has none). */
+const skillOf = (l: AnyGameDef) => l.lesson?.skillId;
+
 /**
- * Lessons open in order (PRG-7; the teacher, 2026-10-10). Every done lesson
- * stays open to play again, and so does the first one not done yet; the rest
- * wait for it. One lesson is up next at a time, even in an old save with
- * lessons done out of order: those stay done, and only the first gap opens.
- * Games are never locked.
+ * Each skill's lessons open in order, and every skill opens on its own
+ * (CUR-11; the teacher, 2026-11-12: "per area it should go from 1, 2, 3").
+ * Before, one path wove the skills together (PRG-7), so a skill's lessons
+ * were Lesson 1, 4, 6… and Lesson 1 opened another skill's. Now, in each
+ * skill, every done lesson stays open to play again, and so does the first
+ * one not done; the rest wait for it. So each skill not finished has one
+ * lesson up next. An old save with lessons done out of order keeps them done,
+ * and only the first gap in each skill opens. Games are never locked.
  */
 export function lessonStates(lessons: AnyGameDef[], completed: string[]): LessonState[] {
-  let nextFound = false;
+  const nextFound = new Set<string | undefined>();
   return lessons.map(l => {
     if (l.lesson && completed.includes(l.lesson.id)) return 'done';
-    if (nextFound) return 'locked';
-    nextFound = true;
+    if (nextFound.has(skillOf(l))) return 'locked';
+    nextFound.add(skillOf(l));
     return 'next';
   });
 }
 
+/** Each lesson's number in its skill, from 1: what its card, start screen and done screen say. */
+export function lessonNumbers(lessons: AnyGameDef[]): number[] {
+  const seen = new Map<string | undefined, number>();
+  return lessons.map(l => {
+    const n = (seen.get(skillOf(l)) ?? 0) + 1;
+    seen.set(skillOf(l), n);
+    return n;
+  });
+}
+
+/** Where the lessons of lesson `i`'s skill sit in `lessons`, in order. */
+export function skillLessons(lessons: AnyGameDef[], i: number): number[] {
+  const skill = skillOf(lessons[i]);
+  return lessons.flatMap((l, at) => (skillOf(l) === skill ? [at] : []));
+}
+
+/** The lesson after lesson `i` in its skill, or -1 at the skill's end. */
+export function nextInSkill(lessons: AnyGameDef[], i: number): number {
+  const at = skillLessons(lessons, i);
+  return at[at.indexOf(i) + 1] ?? -1;
+}
+
 /**
- * What Luna says when a locked lesson is tapped: N is the lesson up next.
+ * What Luna says when a locked lesson is tapped: N is the lesson up next in
+ * its skill.
  * Written out whole so each is a rendered clip (speech is never built from a
  * template). A grade with more lessons than these needs its lines added here,
  * and lesson-order-check.mjs (know-how) fails until they are.

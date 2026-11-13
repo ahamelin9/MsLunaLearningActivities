@@ -67,22 +67,16 @@ them in.
 - **P0 bugs** can still be pulled in between tickets for a break from styling.
 
 
-### DES-27 · Our own pictures instead of emoji
-Story · P2 · L · needs: — · split into batches before starting
-- **Why:** Alex (2026-10-19): an emoji is drawn by each device's own font, so the app's pictures look like Apple's on the iPads, Google's on a Chromebook and Microsoft's on Windows, in different styles and sometimes colours (a "blue cap" story only matches Apple's 🧢). Apple's emoji can't be shipped to other devices (Apple's license; the repo is public). His call: "make our own emoji system that matches the look and feel of the current app", as Luna, the moon, the cookies and the squishies already are.
-- **How:**
-  - A kit `Picture` component: a picture by name (`<Picture name="cap" />`), drawn as an SVG in the illustration style (`_illustration.scss` colours, the `line` outline, soft and round like the squishies), in light and dark. Until a name is drawn it shows the emoji, so screens move over one picture at a time.
-  - Every picture the app shows goes through it: the word bank, lessons' options, Treasure Path's passages, Story Corner's stories, the game tiles, the library's skill cards and the cheat sheet's skills (the `icon` of each skill in `readingCurriculum.ts`; CUR-7 and CUR-8; `shelf-check` lets only these through on the library until then) (about 200 emoji in `src` today, fewer once the same ones are counted once).
-  - Batches, most-seen first: the word bank's 100 words (every game draws on them), then lessons, then passages and stories. Each batch is its own ticket, and Alex (and the teacher) OK a sample sheet before the batch is drawn.
-  - The content checks learn the names: one picture per word (CNT-4's rule) and each story's picture matching it carry over.
-  - Stopgap if wanted before then: bundle one free emoji set (Microsoft's Fluent Emoji, MIT, the softest style and closest to Apple's; or Google's Noto, OFL), trimmed to the pictures used, so every device matches. **Skipped (Alex, 2026-10-19).**
-  - **Review first in an artifact (Alex, 2026-10-19):** before anything goes into the app, build each batch as a page he reviews: each picture as Apple's and Google's emoji, an arrow, and our drawing in the design system. Only OKed drawings go into the kit. Start with the word bank's 100 words, after the squishies (PRG-5a).
-- **Where it stands (2026-10-19):** a first sample of 12 (cat, dog, frog, sun, moon, apple, cake, cup, tree, boat, igloo, mug) is up for Alex's review: <https://claude.ai/artifact/TaRumwLfd1KAkqgvSkJiJp>. Each row shows his device's emoji, Google's (Noto Color Emoji from Google Fonts), an arrow and ours, in light and dark. Three show why: today "cup" is a soda cup, "igloo" a hut (no emoji draws an igloo) and "mug" hot coffee. Source: `.claude/skills/luna-design/pictures/sample-1.html` (its drawings are inline SVG in the illustration colours), shots with `shoot.cjs` next to it. Waits for his notes on the style before the 100 are drawn.
-- **Complete when:** no screen shows a system emoji; every picture is a kit `Picture` that looks the same on an iPad, a Chromebook and Windows (shots from Chrome and Safari match); the Kit page shows them all in light and dark; the teacher has OKed the look.
+### DES-31 · Luna on the browser tab and the home screen
+Story · P2 · S · needs: —
+- **Why:** Alex (2026-11-12): the tab still shows Vite's default icon (`public/vite.svg`, named in `index.html` and `gate.html`); it should show the moon or the owl, so the app looks like itself in a tab and on an iPad's home screen.
+- **How:** Luna's face from the kit's drawing (the owl in her round black frames), as `public/icon.svg` for the tab, with PNGs for an iPad's and a Chromebook's home screen (`apple-touch-icon` 180 px, and 192/512 px), in her illustration colours on the light ground so it reads on any wallpaper. Both pages point at it; the password Worker lets the icons through, as it does `vite.svg`. Last of the teacher's try-out tickets (Alex).
+- **Complete when:** the tab shows Luna on the app and the password page; "Add to Home Screen" on an iPad shows her (the touch icon is served, 180×180); `vite.svg` is gone; build and lint pass; Alex OKs the look.
+- **Blocked (2026-11-12):** built, waits for Alex's OK on the look (`screenshots/review/des31-luna-icon.png`). Her face, not the whole owl: the whole owl was too small to read at a tab's 16 px. A small `manifest.webmanifest` (`display: browser`, so nothing else changes) lists the 192 and 512 px icons for a Chromebook's shortcut. `icon-check.mjs` and the Worker's lines in `password-check.mjs` fail on the old files. A real iPad's "Add to Home Screen" is still to see once it's live.
 
 ### DES-28 · Works on a Chromebook
 Story · P1 · M · needs: —
-- **Why:** Alex (2026-11-08): the class will use iPads and Chromebooks, shared between children. Everything is built and checked for iPads: the layout checks run at four iPad sizes, and play is by touch. A Chromebook screen is wide and short (often 1366×768, so about 1366×650 for the page once the browser's bars are counted), shorter than any iPad, and most are driven by a trackpad. Its emoji are Google's too (DES-27).
+- **Why:** Alex (2026-11-08): the class will use iPads and Chromebooks, shared between children. Everything is built and checked for iPads: the layout checks run at four iPad sizes, and play is by touch. A Chromebook screen is wide and short (often 1366×768, so about 1366×650 for the page once the browser's bars are counted), shorter than any iPad, and most are driven by a trackpad. Its emoji are Google's too, and they stay: the teacher likes the emoji as they are (2026-11-12).
 - **How:**
   - Alex names the Chromebooks (model or screen size, and whether they have touch).
   - Their page sizes join `layout-audit`, `fit-check` and `ui:shots`; whatever doesn't fit is fixed within the two breakpoints (DES-10) where possible.

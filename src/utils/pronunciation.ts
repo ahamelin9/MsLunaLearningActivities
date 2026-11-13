@@ -14,6 +14,7 @@
 
 import { carrierFor, letterNameOf, phonicsFor } from './phonics';
 import { splitPhonics, type SpeechPart } from './speechParts';
+import { audioEngine } from './audioEngine';
 import { voiceClips } from './voiceClips';
 import { bucketFor, type ClipKind, type RateBucket } from './voiceKeys';
 
@@ -87,7 +88,6 @@ class PronunciationService {
   private speakingListeners = new Set<(speaking: boolean) => void>();
   private speaking = false;
 
-  private ctx: AudioContext | null = null;
   private currentSource: AudioBufferSourceNode | null = null;
 
   /** bumped whenever speech is interrupted, so late clips stay silent */
@@ -214,17 +214,17 @@ class PronunciationService {
 
   // ---------- engine ----------
 
-  private getContext(): AudioContext | null {
-    if (typeof window === 'undefined') return null;
-    if (!this.ctx) {
-      const Ctor =
-        window.AudioContext ||
-        (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
-      if (!Ctor) return null;
-      this.ctx = new Ctor();
-    }
-    if (this.ctx.state === 'suspended') void this.ctx.resume().catch(() => {});
-    return this.ctx;
+  // Playback runs on the one shared audio engine (VOX-6), made fresh at a tap
+  // whenever it may have been left at the wrong rate; clips decode on its
+  // offline context, so loading them never fixes the playing context's rate.
+
+  /**
+   * A number that changes whenever speech is interrupted. A chain of lines
+   * said one after another (each `interrupt: false`) stops when it changes,
+   * so it never talks on under what interrupted it.
+   */
+  speechTurn(): number {
+    return this.generation;
   }
 
   /**
@@ -282,25 +282,36 @@ class PronunciationService {
 
   /** The decoded clip for this request, or null if it was never rendered. */
   private async fetchClip(req: ClipRequest): Promise<AudioBuffer | null> {
-    const ctx = this.getContext();
-    if (!ctx) return null;
-    return voiceClips.get(ctx, this.voiceId, req.kind, req.value, req.bucket);
+    const decoder = audioEngine.decodeContext();
+    if (!decoder) return null;
+    return voiceClips.get(decoder, this.voiceId, req.kind, req.value, req.bucket);
   }
 
   private playBuffer(buffer: AudioBuffer, onEnd?: () => void): boolean {
-    const ctx = this.getContext();
-    if (!ctx) {
+    const engine = audioEngine.get();
+    if (!engine) {
       onEnd?.();
       return false;
     }
+    const { ctx, out } = engine;
     try {
+      // one of Luna's clips at a time (VOX-6): two at once, a few
+      // milliseconds apart, sound like a shaky double voice
+      const playing = this.currentSource;
+      this.currentSource = null;
+      try {
+        playing?.stop();
+      } catch {
+        // already finished
+      }
+
       const source = ctx.createBufferSource();
       source.buffer = buffer;
 
       const gain = ctx.createGain();
       gain.gain.value = 1;
       source.connect(gain);
-      gain.connect(ctx.destination);
+      gain.connect(out);
 
       // `onended` is the normal signal, but a backup timer tied to the clip's
       // own length guarantees the caller is always released.
@@ -346,14 +357,19 @@ class PronunciationService {
       utterance.pitch = 1;
       utterance.lang = this.currentLanguage();
 
+      // a woman's voice wherever the device has one (VOX-6): a Windows
+      // whiteboard's first US voice is a man's, deep and nothing like Luna
       const preferred = [
         'Samantha (Enhanced)', 'Ava (Premium)', 'Ava', 'Samantha', 'Google US English',
-        'Microsoft Aria Online (Natural)', 'Victoria', 'Karen'
+        'Microsoft Aria Online (Natural)', 'Microsoft Jenny', 'Microsoft Aria', 'Microsoft Zira',
+        'Victoria', 'Karen'
       ];
+      const man = /\b(David|Mark|Guy|Fred|Alex|Daniel|Tom|Aaron|Arthur|Gordon|Ralph|Eddy|Reed|Rocko|Grandpa|Male)\b/i;
       const voices = this.browserVoices.length ? this.browserVoices : window.speechSynthesis.getVoices();
       const match =
         preferred.map(n => voices.find(v => v.name.includes(n) && v.lang.startsWith('en'))).find(Boolean) ??
-        voices.find(v => v.lang === this.currentLanguage()) ??
+        voices.find(v => v.lang === this.currentLanguage() && !man.test(v.name)) ??
+        voices.find(v => v.lang.startsWith('en') && !man.test(v.name)) ??
         voices.find(v => v.lang.startsWith('en'));
       if (match) utterance.voice = match;
 
@@ -715,7 +731,7 @@ class PronunciationService {
    */
   warm(parts: SpeechPart[], rate?: number) {
     if (!this.ready) return;
-    const ctx = this.getContext();
+    const ctx = audioEngine.decodeContext();
     if (!ctx) return;
 
     const bucket = bucketFor(rate ?? this.rate);
@@ -740,7 +756,7 @@ class PronunciationService {
     if (!this.ready) await this.init();
     if (!this.ready) return;
 
-    const ctx = this.getContext();
+    const ctx = audioEngine.decodeContext();
     if (!ctx) return;
 
     const bucket = bucketFor(this.rate);

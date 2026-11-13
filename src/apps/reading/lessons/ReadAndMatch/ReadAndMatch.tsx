@@ -14,8 +14,10 @@ export const ReadAndMatch: React.FC<{ question: ReadAndMatchQuestion; api: GameA
   const { solved, wrongId, revealed, choose } = useAnswer(api, question.hint);
 
   // the word is the child's to read: Luna never says it until it is found
-  const sayPrompt = () => soundManager.speak(question.speechPrompt ?? 'Read the word, then find its picture.');
-  usePrompt(sayPrompt, api);
+  const instruction = question.speechPrompt ?? 'Read the word, then find its picture.';
+  const sayPrompt = () => soundManager.speak(instruction);
+  // the same each round: said on the play's first, and when it changes (CUR-14)
+  usePrompt(sayPrompt, api, instruction);
 
   return (
     <div className={kit.lesson}>

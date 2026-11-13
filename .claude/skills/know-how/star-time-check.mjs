@@ -6,9 +6,9 @@
 //
 // Needs Vite running on the port. First the rule itself, from the page's own
 // `engine/stars.ts`, at its edges. Then Lesson 1 played three times from a
-// fresh save, each with one miss in round 1 (4 of 5 first try: 2 stars by
-// PRG-1), with the clock moved on (`window.__skip`, as in time-check.mjs):
-//   - fast (inside its "about N min"): 3 stars, "Quick and careful: a star!";
+// fresh save, each with one miss in round 1 (19 of 20 first try since CUR-12:
+// 2 stars by PRG-1), with the clock moved on (`window.__skip`, as in time-check.mjs):
+//   - fast (inside its "about 7 min"): 3 stars, "Quick and careful: a star!";
 //   - normal (past it, under 3 times it): 2 stars, nothing said;
 //   - very slow (over 3 times it): 1 star, "A very long time: one star less".
 // The estimate stays the default for all three: it averages only from the
@@ -91,12 +91,12 @@ const play = async (skipMinutes, name) => {
   await page.click(at('play'));
   await page.waitForSelector(at('lesson-choice'));
   await page.evaluate(m => { window.__skip += m * 60000; }, skipMinutes);
-  for (let r = 0; r < 12 && !(await page.$(at('shell-reward'))); r++) {
+  for (let r = 0; r < 25 && !(await page.$(at('shell-reward'))); r++) {
     await page.waitForSelector(at('lesson-choice'));
     await wait(800);
     const now = await round();
     const a = await answers();
-    if (r === 0) { await tap(a.wrong); await wait(2500); } // one miss: 4 of 5 first try
+    if (r === 0) { await tap(a.wrong); await wait(2500); } // one miss: 19 of 20 first try
     await tap(a.right);
     for (let t = 0; t < 80 && !(await page.$(at('shell-reward'))) && (await round()) === now; t++) await wait(200);
   }
@@ -117,11 +117,11 @@ const play = async (skipMinutes, name) => {
 };
 
 let d = await play(0, 'fast');
-ok('fast: 3 stars, "Quick and careful: a star!"', d.firstTry === '4 of 5 first try' && d.stars === 3 && d.said === 'Quick and careful: a star!', JSON.stringify(d));
-d = await play(6, 'normal');
-ok('normal: 2 stars, nothing said', d.firstTry === '4 of 5 first try' && d.stars === 2 && d.said === '', JSON.stringify(d));
-d = await play(16, 'slow'); // over 3 times its "about 5 min"
-ok('very slow: 1 star, "A very long time: one star less"', d.firstTry === '4 of 5 first try' && d.stars === 1 && d.said === 'A very long time: one star less', JSON.stringify(d));
+ok('fast: 3 stars, "Quick and careful: a star!"', d.firstTry === '19 of 20 first try' && d.stars === 3 && d.said === 'Quick and careful: a star!', JSON.stringify(d));
+d = await play(8, 'normal'); // past its "about 7 min"
+ok('normal: 2 stars, nothing said', d.firstTry === '19 of 20 first try' && d.stars === 2 && d.said === '', JSON.stringify(d));
+d = await play(23, 'slow'); // over 3 times its "about 7 min"
+ok('very slow: 1 star, "A very long time: one star less"', d.firstTry === '19 of 20 first try' && d.stars === 1 && d.said === 'A very long time: one star less', JSON.stringify(d));
 
 await browser.close();
 const passed = results.every(Boolean);

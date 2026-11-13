@@ -123,7 +123,7 @@ async function backToLibrary() {
 
 async function lessonPlay(missesByRound) {
   await openTile('lesson-tile', 'First Letter Sounds');
-  for (let r = 0; r < 12 && !(await shown(at('shell-reward'))); r++) await playLessonRound(missesByRound(r));
+  for (let r = 0; r < 25 && !(await shown(at('shell-reward'))); r++) await playLessonRound(missesByRound(r));
   return backToLibrary();
 }
 
@@ -152,16 +152,16 @@ async function cookiesPlay(misses) {
 const t0 = await total();
 const clean = await lessonPlay(() => 0);
 const t1 = await total();
-ok('Lesson 1, every round right first time: 3 stars', clean === '3 of 3 stars, 5 of 5 first try' && t1 - t0 === 3, `${clean}; total ${t0} → ${t1}`);
+ok('Lesson 1, every round right first time: 3 stars', clean === '3 of 3 stars, 20 of 20 first try' && t1 - t0 === 3, `${clean}; total ${t0} → ${t1}`);
 
 const oneMiss = await lessonPlay(r => (r === 0 ? 1 : 0));
 const t2 = await total();
 // quick and careful lifts it to 3 (PRG-10; star-time-check holds the time rule)
-ok('Lesson 1 again, one round missed, quickly: lifted to 3, and no more in the total', oneMiss === '3 of 3 stars, 4 of 5 first try' && t2 === t1, `${oneMiss}; total ${t1} → ${t2}`);
+ok('Lesson 1 again, one round missed, quickly: lifted to 3, and no more in the total', oneMiss === '3 of 3 stars, 19 of 20 first try' && t2 === t1, `${oneMiss}; total ${t1} → ${t2}`);
 
 const allMissed = await lessonPlay(() => 1);
 const t3 = await total();
-ok('Lesson 1 again, a miss every round: 1 star, the total still put', allMissed === '1 of 3 stars, 0 of 5 first try' && t3 === t1, `${allMissed}; total ${t2} → ${t3}`);
+ok('Lesson 1 again, a miss every round: 1 star, the total still put', allMissed === '1 of 3 stars, 0 of 20 first try' && t3 === t1, `${allMissed}; total ${t2} → ${t3}`);
 
 const gameMissy = await cookiesPlay(true);
 const t4 = await total();

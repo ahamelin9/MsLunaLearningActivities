@@ -2,26 +2,16 @@
 // Speech is NOT handled here — it belongs to the pronunciation service,
 // which knows the difference between a letter's name and its sound.
 
+import { audioEngine } from './audioEngine';
 import { pronunciation, type SpeakOptions } from './pronunciation';
 
 class SoundManager {
-  private audioCtx: AudioContext | null = null;
   private isMuted: boolean = false;
 
-  private getAudioContext(): AudioContext | null {
-    if (typeof window === 'undefined') return null;
-    if (!this.audioCtx) {
-      const AudioContextClass = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
-      if (AudioContextClass) {
-        this.audioCtx = new AudioContextClass();
-      }
-    }
-    if (this.audioCtx && this.audioCtx.state === 'suspended') {
-      this.audioCtx.resume().catch(() => {
-        // audio context resume error
-      });
-    }
-    return this.audioCtx;
+  // the same audio engine as Luna's voice (VOX-6): one context, so the two
+  // can never run at different rates, made fresh when it may have drifted
+  private engine() {
+    return audioEngine.get();
   }
 
   public setMuted(muted: boolean) {
@@ -40,8 +30,9 @@ class SoundManager {
 
   public playPop() {
     if (this.isMuted) return;
-    const ctx = this.getAudioContext();
-    if (!ctx) return;
+    const engine = this.engine();
+    if (!engine) return;
+    const { ctx, out } = engine;
 
     try {
       const osc = ctx.createOscillator();
@@ -56,7 +47,7 @@ class SoundManager {
       gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
 
       osc.connect(gain);
-      gain.connect(ctx.destination);
+      gain.connect(out);
 
       osc.start(now);
       osc.stop(now + 0.08);
@@ -67,8 +58,9 @@ class SoundManager {
 
   public playLetterTap() {
     if (this.isMuted) return;
-    const ctx = this.getAudioContext();
-    if (!ctx) return;
+    const engine = this.engine();
+    if (!engine) return;
+    const { ctx, out } = engine;
 
     try {
       const osc = ctx.createOscillator();
@@ -83,7 +75,7 @@ class SoundManager {
       gain.gain.exponentialRampToValueAtTime(0.001, now + 0.06);
 
       osc.connect(gain);
-      gain.connect(ctx.destination);
+      gain.connect(out);
 
       osc.start(now);
       osc.stop(now + 0.06);
@@ -94,8 +86,9 @@ class SoundManager {
 
   public playLetterSnap() {
     if (this.isMuted) return;
-    const ctx = this.getAudioContext();
-    if (!ctx) return;
+    const engine = this.engine();
+    if (!engine) return;
+    const { ctx, out } = engine;
 
     try {
       const osc = ctx.createOscillator();
@@ -110,7 +103,7 @@ class SoundManager {
       gain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
 
       osc.connect(gain);
-      gain.connect(ctx.destination);
+      gain.connect(out);
 
       osc.start(now);
       osc.stop(now + 0.05);
@@ -121,8 +114,9 @@ class SoundManager {
 
   public playCorrect() {
     if (this.isMuted) return;
-    const ctx = this.getAudioContext();
-    if (!ctx) return;
+    const engine = this.engine();
+    if (!engine) return;
+    const { ctx, out } = engine;
 
     try {
       const now = ctx.currentTime;
@@ -141,7 +135,7 @@ class SoundManager {
         gain.gain.exponentialRampToValueAtTime(0.001, start + dur);
 
         osc.connect(gain);
-        gain.connect(ctx.destination);
+        gain.connect(out);
 
         osc.start(start);
         osc.stop(start + dur);
@@ -153,8 +147,9 @@ class SoundManager {
 
   public playStarChime() {
     if (this.isMuted) return;
-    const ctx = this.getAudioContext();
-    if (!ctx) return;
+    const engine = this.engine();
+    if (!engine) return;
+    const { ctx, out } = engine;
 
     try {
       const now = ctx.currentTime;
@@ -172,7 +167,7 @@ class SoundManager {
         gain.gain.exponentialRampToValueAtTime(0.001, start + dur);
 
         osc.connect(gain);
-        gain.connect(ctx.destination);
+        gain.connect(out);
 
         osc.start(start);
         osc.stop(start + dur);
@@ -184,8 +179,9 @@ class SoundManager {
 
   public playFanfare() {
     if (this.isMuted) return;
-    const ctx = this.getAudioContext();
-    if (!ctx) return;
+    const engine = this.engine();
+    if (!engine) return;
+    const { ctx, out } = engine;
 
     try {
       const now = ctx.currentTime;
@@ -210,7 +206,7 @@ class SoundManager {
         gain.gain.exponentialRampToValueAtTime(0.001, tStart + dur);
 
         osc.connect(gain);
-        gain.connect(ctx.destination);
+        gain.connect(out);
 
         osc.start(tStart);
         osc.stop(tStart + dur);
@@ -222,8 +218,9 @@ class SoundManager {
 
   public playTryAgain() {
     if (this.isMuted) return;
-    const ctx = this.getAudioContext();
-    if (!ctx) return;
+    const engine = this.engine();
+    if (!engine) return;
+    const { ctx, out } = engine;
 
     try {
       const now = ctx.currentTime;
@@ -244,7 +241,7 @@ class SoundManager {
         gain.gain.exponentialRampToValueAtTime(0.001, tStart + dur);
 
         osc.connect(gain);
-        gain.connect(ctx.destination);
+        gain.connect(out);
 
         osc.start(tStart);
         osc.stop(tStart + dur);
@@ -256,8 +253,9 @@ class SoundManager {
 
   public playAppLaunch() {
     if (this.isMuted) return;
-    const ctx = this.getAudioContext();
-    if (!ctx) return;
+    const engine = this.engine();
+    if (!engine) return;
+    const { ctx, out } = engine;
 
     try {
       const now = ctx.currentTime;
@@ -272,7 +270,7 @@ class SoundManager {
       gain.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
 
       osc.connect(gain);
-      gain.connect(ctx.destination);
+      gain.connect(out);
 
       osc.start(now);
       osc.stop(now + 0.2);

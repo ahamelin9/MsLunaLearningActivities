@@ -8,7 +8,7 @@
 // learn" (data-shot open-teaches), and checks:
 //   - the sheet opens on the grade being played;
 //   - at each grade, every lesson of the path (lessonsFor, engine/lessons.ts)
-//     is on it once and nothing else is, numbered as on the path, in its own
+//     is on it once and nothing else is, numbered in its skill (CUR-11), in its own
 //     skill's row, with its title and what it covers (lessonCovers,
 //     engine/buckets.ts), which is never empty;
 //   - each skill's row shows its name and line from the data, and a bar of its
@@ -95,11 +95,13 @@ for (const grade of data.grades) {
 
   const wrong = grade.lessons.filter(l => {
     const shown = on.find(x => x.id === l.id);
-    const number = grade.path.indexOf(l.id) + 1;
-    return !shown || shown.row !== l.skill || !l.covers || !shown.text.includes(`Lesson ${number}`)
+    // its number in its skill, from 1, in path order (CUR-11)
+    const skillOf = id => grade.lessons.find(x => x.id === id)?.skill;
+    const number = grade.path.filter(id => skillOf(id) === l.skill).indexOf(l.id) + 1;
+    return !shown || shown.row !== l.skill || !l.covers || !new RegExp(`Lesson ${number}(?!\\d)`).test(shown.text)
       || !shown.text.includes(l.title) || !shown.text.includes(l.covers);
   }).map(l => l.id);
-  ok(`${grade.title}: each with its number on the path, its title and what it covers, under its skill`, wrong.length === 0, wrong.join(', '));
+  ok(`${grade.title}: each with its number in its skill, its title and what it covers, under its skill`, wrong.length === 0, wrong.join(', '));
 
   const badSkills = grade.skills.filter(s => {
     const row = rows.find(r => r.skill === s.id);

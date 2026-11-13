@@ -9,10 +9,12 @@
  *         open: its lessons are the ones showing (aria-expanded)
  *         onClick · data-shot (for the screenshots and checks) · className is
  *         layout only
- * States: done (every lesson done: a check badge) · next (holds the lesson up
- *         next: a glowing action border and a centred "Up next" tag, as the
- *         LessonCard's) · started (some done, none up next: plain) · waiting
- *         (none open yet: dashed on the well) · open (the shelves' soil, its
+ * States: done (every lesson done: a check badge) · next (the first skill not
+ *         finished, since each skill's lessons open on their own, CUR-11: a
+ *         glowing action border and a centred "Up next" tag, as the
+ *         LessonCard's) · started (some done, not the first unfinished: plain) ·
+ *         waiting (none open yet: dashed on the well; the library has none
+ *         since CUR-11, as every skill's Lesson 1 is open) · open (the shelves' soil, its
  *         count in the main ink; the library's tray shares the fill) ·
  *         pressed (:active)
  * Tokens: --skill-bg, --skill-border, --skill-border-width,

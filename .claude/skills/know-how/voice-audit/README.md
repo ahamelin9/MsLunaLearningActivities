@@ -57,6 +57,7 @@ Added by the second pass of 2026-10-29 (same notes, "Second pass" section):
 | `cutword.py` | Cuts a word out of a carrier phrase ("Say bed again.") using the aligner's spans. |
 | `pack4.mjs`, `pack5.mjs` | Add the second pass's groups (round 3 candidates; the voice-blend test) to the Sound Check page's Research tab and rewrite the page's `RESEARCH` data in place. |
 | `wscore.py` | Counts the words Whisper understood in `hear.py words` output, per voice (keys `<voice>:<word>`), accepting digits for numbers and homophones ("right" for "write"). Run as `python wscore.py <heard.json>...`. On the research run: Luna 360 of 450, Luna/Kore 50/50 393 (a stricter count gave 355 and 388 earlier). |
+| `roughscan.py` | VOX-6: every rendered clip's pitch, tracked by autocorrelation (numpy and the repo's ffmpeg-static only, no conda env): how long it falls into a creak or growl, its wobble in cents, and pitch jumps, worst first. Run from the repo root as `python3 .claude/skills/know-how/voice-audit/roughscan.py <out.json> [normal,slow,quick] [text,word,name,sound]` (about a minute for all 11,000). On 2026-11-12 it found every clip clean: no low run past 110 ms, the same wobble at all three speeds. |
 | `blend-render.mjs` | Renders text in a weighted blend of Kokoro voices (`{ af_heart: 0.7, af_kore: 0.3 }`) by averaging their style vectors and handing the result to the model directly; nothing in `node_modules` changes. At `{ af_heart: 1 }` it matches kokoro-js's own render sample for sample. |
 
 Things learned:

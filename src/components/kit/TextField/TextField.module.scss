@@ -1,0 +1,47 @@
+// TextField (OPS-14): component tokens first; the wrong state swaps only these.
+// The box is a well, like a Switch's track: something to put a thing into.
+
+@use 'styles/mixins' as *;
+
+.root {
+  --field-bg: var(--well);
+  --field-edge: var(--edge);
+  --field-ink: var(--ink);
+  --field-note: var(--ink-soft);
+
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.root[data-state='wrong'] {
+  --field-bg: var(--try-again-soft);
+  --field-edge: var(--try-again-edge);
+  --field-note: var(--try-again-text);
+}
+
+.label {
+  font: var(--text-label);
+  color: var(--ink);
+}
+
+.input {
+  min-height: var(--target-chrome);
+  padding: var(--space-2) var(--space-4);
+  border: var(--border-regular) solid var(--field-edge);
+  border-radius: var(--radius-tile);
+  background: var(--field-bg);
+  color: var(--field-ink);
+  font: var(--text-read);
+
+  &:focus-visible {
+    outline: none;
+    @include focus-ring;
+  }
+}
+
+.note {
+  margin: 0;
+  font: var(--text-label-small);
+  color: var(--field-note);
+}

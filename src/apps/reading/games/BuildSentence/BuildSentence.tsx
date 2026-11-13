@@ -76,7 +76,14 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
 
   const readAloud = (words: string[], onDone?: () => void) => {
     let i = 0;
+    // anything that interrupts the read-back ends it, so it never reads on
+    // under the line that cut in (VOX-6: two Lunas at once)
+    const turn = pronunciation.speechTurn();
     const step = () => {
+      if (pronunciation.speechTurn() !== turn) {
+        setReadingIndex(-1);
+        return;
+      }
       if (i >= words.length) {
         setReadingIndex(-1);
         onDone?.();

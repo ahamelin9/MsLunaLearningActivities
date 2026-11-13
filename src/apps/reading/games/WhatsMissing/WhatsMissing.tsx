@@ -117,7 +117,7 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
 
       {phase === 'look' && (
         <div className={styles.timer}>
-          <span className={styles.label}>Memorise!</span>
+          <span className={styles.label}>Memorize!</span>
           {/* a fresh key each second, so the count pops as it changes */}
           <span key={countdown} className={styles.count}>{Math.max(1, countdown)}</span>
         </div>
@@ -156,7 +156,7 @@ export const whatsMissing: GameDef<Round> = {
   id: 'whats-missing',
   title: 'What’s Missing?',
   emoji: '🔦',
-  tagline: 'Memorise Luna’s desk. She takes one thing away.',
+  tagline: 'Memorize Luna’s desk. She takes one thing away.',
   objective: 'New words: remembers the pictures on Luna’s desk with their words, then finds the one she took away.',
   skill: 'vocabulary',
   mission: 'Look hard at my desk… I am about to take something!',
