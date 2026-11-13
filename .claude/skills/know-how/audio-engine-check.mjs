@@ -31,7 +31,20 @@ const ok = (what, pass, got = '') => {
   if (!pass) failed += 1;
 };
 
-const browser = await puppeteer.launch({ executablePath: chromePath(), headless: true, args: ['--mute-audio', '--autoplay-policy=no-user-gesture-required'] });
+// browser=firefox runs it in Gecko too (Firefox installed in /Applications, or
+// FIREFOX=<path>): another engine's Web Audio, as on a whiteboard's own PC
+const firefox = process.argv.includes('browser=firefox');
+const browser = firefox
+  ? await puppeteer.launch({
+      browser: 'firefox',
+      executablePath: process.env.FIREFOX ?? '/Applications/Firefox.app/Contents/MacOS/firefox',
+      headless: true,
+      // without it, a Firefox already open hands the launch to itself and exits
+      args: ['--no-remote'],
+      extraPrefsFirefox: { 'media.autoplay.default': 0, 'media.autoplay.blocking_policy': 0, 'media.volume_scale': '0.0' }
+    })
+  : await puppeteer.launch({ executablePath: chromePath(), headless: true, args: ['--mute-audio', '--autoplay-policy=no-user-gesture-required'] });
+console.log(`in ${firefox ? 'Firefox' : 'Chrome'} ${await browser.version()}`);
 const page = await browser.newPage();
 await page.setViewport({ width: 1180, height: 820 });
 const errors = [];
@@ -44,6 +57,8 @@ await page.evaluateOnNewDocument(() => {
   const Real = window.AudioContext;
   window.AudioContext = class extends Real {
     constructor(...args) {
+      // an iPad allows only a few contexts: the check can make it refuse one
+      if (window.__refuse) throw new Error('refused');
       super(...args);
       window.__made.push({ ctx: this, options: args[0] ?? null });
     }
@@ -67,7 +82,14 @@ await page.evaluateOnNewDocument(() => {
     let done = false;
     const end = () => { if (!done) { done = true; window.__live -= 1; } };
     this.addEventListener('ended', end);
+    // a stopped clip reports its end a moment later: it's over when stop() is called
+    this.__end = end;
     return start.apply(this, a);
+  };
+  const stop = AudioBufferSourceNode.prototype.stop;
+  AudioBufferSourceNode.prototype.stop = function (...a) {
+    this.__end?.();
+    return stop.apply(this, a);
   };
 });
 
@@ -144,18 +166,48 @@ await tapLuna();
 let after = await engineState();
 ok('a clock at the right speed leaves the engine alone', after.contexts === before.contexts, JSON.stringify({ before, after }));
 
+/** the newest context's clock, made to run at `speed` from now on, measured from now */
+const clockAt = speed => page.evaluate(async speed => {
+  const src = performance.getEntriesByType('resource').map(e => e.name).find(n => n.includes('/src/utils/audioEngine.ts')) ?? '/src/utils/audioEngine.ts';
+  (await import(src)).audioEngine.clock = null;
+  const ctx = window.__made[window.__made.length - 1].ctx;
+  const t0 = performance.now();
+  const c0 = ctx.currentTime;
+  ctx.getOutputTimestamp = () => {
+    const wall = performance.now();
+    return { contextTime: c0 + ((wall - t0) / 1000) * speed, performanceTime: wall };
+  };
+}, speed);
+
+// a clock that stopped (the machine slept) is not a wrong rate
+before = await engineState();
+await clockAt(0.02);
+await pop(); await wait(3300); await pop();
+await tapLuna();
+after = await engineState();
+ok('a clock that stopped (the machine slept) leaves the engine alone', after.contexts === before.contexts, JSON.stringify({ before, after }));
+
 await freshAfter('its clock runs 8% slow', 'clock', async () => {
-  await page.evaluate(() => {
-    const ctx = window.__made[window.__made.length - 1].ctx;
-    const t0 = performance.now();
-    const c0 = ctx.currentTime;
-    ctx.getOutputTimestamp = () => {
-      const wall = performance.now();
-      return { contextTime: c0 + ((wall - t0) / 1000) * (44100 / 48000), performanceTime: wall };
-    };
-  });
+  await clockAt(44100 / 48000);
   await pop(); await wait(3300); await pop();
 });
+
+// a clock that's always off makes a fresh one at most once a minute, not every tap
+before = await engineState();
+await clockAt(44100 / 48000);
+await pop(); await wait(3300); await pop();
+await tapLuna();
+after = await engineState();
+ok('a clock still off right after: no second fresh one within the minute', after.contexts === before.contexts, JSON.stringify({ before, after }));
+
+// a browser that refuses a new context keeps the old one playing
+before = await engineState();
+await page.evaluate(() => { window.__refuse = true; navigator.mediaDevices.dispatchEvent(new Event('devicechange')); });
+await tapLuna();
+await page.evaluate(() => { window.__refuse = false; });
+after = await engineState();
+const keptOld = await page.evaluate(() => window.__made[window.__made.length - 1].ctx.state !== 'closed');
+ok('a browser that refuses a new context keeps the old one, and Luna still talks', after.contexts === before.contexts && keptOld && await lastSoundIsOnNewest(), JSON.stringify({ before, after, keptOld }));
 
 // ── one clip at a time ──
 await wait(2500);
@@ -219,7 +271,6 @@ if (opened) {
   }
   // the read-back starts 650 ms after the last word; let one word play, then cut in
   await page.waitForFunction(n => window.__said.filter(s => s.startsWith('word:')).length >= n + 1, { timeout: 8000 }, words?.length ?? 0).catch(() => {});
-  console.log('   words:', JSON.stringify(words), 'said so far:', JSON.stringify(await page.evaluate(() => window.__said)));
   await wait(150);
   await page.evaluate(() => { window.__cut = window.__said.length; });
   const hear = await page.$$('[data-shot="stage"] button');

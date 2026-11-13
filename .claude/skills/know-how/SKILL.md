@@ -187,6 +187,53 @@ build, or a tool that misbehaved. Skip routine fixes.
   screen (it's heard). A check reads it from React: from a tile button up the
   fiber (`__reactFiber…`, then `.return`) to the props holding `round.words`.
   Starting from the stage walks the wrong way: the game is below it.
+- **Pitfall, a chain of lines** (*2026-11-12, VOX-6*): lines said one after
+  another with `interrupt: false`, each from the last one's `onEnd`, carry on
+  after something interrupts them, because a stopped clip still calls its
+  `onEnd`. Words Off the Page's word-by-word read-back read on under the
+  sentence that cut in: two Lunas at once. A chain takes
+  `pronunciation.speechTurn()` when it starts and stops when it changes; and
+  since VOX-6 a new clip stops any clip still playing, so two never sound
+  together (`audio-engine-check.mjs`).
+
+## Luna sounds deep, slow or shaky on one screen (a whiteboard, a TV)
+
+*2026-11-12 · VOX-6*
+
+- **Symptom:** the teacher heard Luna "like a demon" on her classroom
+  whiteboard, while the clips themselves are clean
+  (`voice-audit/roughscan.py`).
+- **Cause, likely (it needs her whiteboard to reproduce):** a Web Audio
+  context keeps the sample rate the speakers had when it was made, and some
+  browsers (Safari above all) keep rendering at it after the sound moves to
+  another output or comes back from an interruption: slow, low and crackly.
+  The app made two contexts at page load, before any tap. Other ways the voice
+  could come out wrong there: two clips at once, a voice and a cheer clipping
+  a loud speaker, a slow machine's audio stuttering, and, in a tab left open
+  past a voice render, the browser's own voice (on Windows, a deep man's).
+- **Fix:** `src/utils/audioEngine.ts`, one engine for voice and effects. Clips
+  decode on an offline context, and the playing context is made at the first
+  tap. It's made fresh at the next tap after a device change, a return to the
+  page, a system suspension, or a clock running at the wrong speed against
+  the page's (`getOutputTimestamp`). Also: `latencyHint: 'playback'`, a
+  limiter in front of the speakers, one clip at a time, a removed clip found
+  through a fresh index, and a woman's voice for the fallback.
+- **Check:** `audio-engine-check.mjs` (Vite on 5199) fakes each trigger (a
+  `devicechange` event, `visibilitychange`, `ctx.suspend()`, a
+  `getOutputTimestamp` running 8% slow, a refused constructor) and counts
+  contexts, which context each sound is made on, and clips playing at once.
+  It failed 13 times on the code before. Add `browser=firefox` to run it in
+  Firefox (Gecko) as well; the launch passes `--no-remote`, without which a
+  Firefox Alex has open takes over the launch and puppeteer gets "Failed to
+  launch the browser process: Code: 0".
+- **Pitfall, the voice audit runs in Node:** `npm run voice:audit` bundles the
+  app's voice modules and loads them with a pretend browser (a `window`,
+  a bare `AudioContext`, no `document`). A module that touches `document`, or
+  anything else that pretend browser lacks, when it loads stops the audit with
+  `ReferenceError: document is not defined`. The engine's first version did
+  this, and the browser checks never showed it. Guard such a use
+  (`typeof document !== 'undefined'`), wrap optional nodes (the limiter) in a
+  `try`, and run `voice:audit` after any change to `src/utils/` audio code.
 
 ## Proving a fix in a real browser, silently
 
@@ -254,6 +301,16 @@ runs once on the whole string, every `cp` fails, and the check quietly runs
 on the new code (PRG-1, 2026-10-19). Use an array,
 `files=(a b c); for f in "${files[@]}"`, and confirm the swap before
 trusting a pass.
+
+- **Pitfall, Vite stopped seeing edits** (*2026-11-12, VOX-6*): after a long
+  session the 5199 server went on serving a file's old transform, so the old
+  code "passed" the new check. Confirm the swap from the server itself before
+  trusting any run: `curl -s localhost:5199/src/utils/pronunciation.ts | grep
+  -c <something only the fix has>`. If it doesn't change, kill and restart
+  Vite on 5199.
+- **Pitfall, the fix is already in HEAD:** Alex sometimes commits the whole
+  tree, work in progress included, so `git show HEAD:<file>` is the fix
+  itself. Swap in the commit before it (`git log --oneline -3`).
 
 To check the app still works offline (fonts and all, as on a classroom iPad
 with no Wi-Fi), run `offline-check.mjs` from this folder (DES-4): it blocks

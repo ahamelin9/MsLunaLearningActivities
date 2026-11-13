@@ -423,3 +423,28 @@ only record of them. One line each: date, ID, title, and `Done` or
   | Grade | the library's skills |
   | Reset all progress | clears stars, squishies, finished lessons and what the games have dealt; keeps the settings and this week's words |
 - **2026-11-12** — DES-27 Our own pictures instead of emoji — Won't do: the teacher likes the emoji as they are ("leave the emojis as they are, no need to change them", her try-out). The first sample stays in `.claude/skills/luna-design/pictures/` as a record. Comments that say a picture waits "until DES-27 draws it" (kit `SkillCard`, `shelf-check.mjs`, the know-how) now mean the emoji stay; tidy them when those files are next touched.
+- **2026-11-12** — OPS-14 A password on the site — Done. The teacher asked for "a regular password", so people can't take her site. A Cloudflare Worker (`worker/gate.ts`, `run_worker_first` in `wrangler.jsonc`) stands in front of every file. Until a device signs in, any page is the password page (`gate.html`, built from the kit: Luna, a PaperCard and the new kit TextField). The right password sets a 400-day cookie holding an HMAC keyed by the password, so each device signs in about once a year and a new password signs everyone out; a wrong one waits a second and says so. The password is only the Cloudflare secret `SITE_PASSWORD`, never in the repo; how to set or change it is in `docs/site-password.md`. `password-check.mjs` plays the Worker against the built site, and Alex tried it on the live site.
+  | Before signing in | Answers |
+  |---|---|
+  | any page | the password page |
+  | the password page's script, styles and fonts; Luna's icons and the manifest (DES-31) | as normal |
+  | a voice clip, `index.html`, anything else | 401 |
+- **2026-11-12** — BUG-31 American spelling: "Memorize", "color" — Done. What the screens show and Luna says is in American spelling: What's Missing?'s "Memorize!", the done screen's and the shelf's "color", and Luna's "the wrong flavor" (re-rendered). `scripts/spelling-check.mjs`, part of `npm run lint`, fails on a British spelling in what a screen shows or Luna says; names in the code (`colour` props, `'grey'`) stay.
+- **2026-11-12** — CUR-11 Each skill's lessons in order: 1, 2, 3 — Done. The teacher saw a skill's lessons jump about ("1, 3, 8, 10… it jumps around to Magic E"), because the path wove the skills together. Every skill now opens on its own (option (a)), with its lessons numbered 1, 2, 3 inside it on the cards, the done screen and the cheat sheet; 2nd grade's Vowel teams shows its 7 together. Checked by `lesson-order-check.mjs`, `cheatsheet-check.mjs` and `practice-check.mjs`.
+  | What | Rule |
+  |---|---|
+  | In a skill | its done lessons and the first not done are open; the rest are locked, and a locked tap says "Let's finish Lesson N first!" |
+  | The library opens on | the first skill with a lesson not done |
+  | "Next lesson" on the done screen | the next lesson in the same skill |
+  | An old save | keeps every lesson it finished (they're saved by id) |
+- **2026-11-12** — CUR-12 About 20 questions a play, about 20 seconds each — Done. The teacher wanted more than 5 questions and kept "3 times to pass". A lesson with fewer than 20 questions deals them all before any comes again, never one twice in a row, with missed ones back first (`dealMissedFirst`). Times are averaged per round, so the 5-round plays timed before don't shorten the estimate. Found on the way: two Rhyme Matcher questions shared an id, and `deck-check.mjs` now fails on that. Checked by `deck-check`, `practice-check`, `partway-check`, `time-check`, `star-time-check` and `stars-check`.
+  | | Questions a play | Seconds each | An untimed card says |
+  |---|---|---|---|
+  | A lesson | 20 | 20 | about 7 min |
+  | A story lesson | 2 | 90 | about 3 min |
+  | A game | its own, as before | 40, as before | as before |
+
+  Learned stays 3 good plays; a good play is 16 of 20 right the first time.
+- **2026-11-12** — CUR-14 The child reads first, then Luna helps — Done. The teacher found some lessons "too easy with Ms. Luna reading it all the time". In the reading lessons (Sentences, Little stories, Storybooks, and the Read and Match lessons: Magic E, Vowel teams, Vowels with R, Compound words), a word tapped before the first answer isn't read: Luna says "Try reading it first!" (rendered); after a wrong answer every word can be heard. Those lessons say their instruction on a play's first round only, and the speaker button still says it. Listening lessons (Letter sounds, Letter shapes, Sight words, Rhymes) say their question every round, since it is the question. Checked by `read-first-check.mjs`.
+- **2026-11-12** — DES-31 Luna on the browser tab and the home screen — Done. Luna's face, from the kit's own drawing (idle, in her frames, on the page's light ground), is the icon on the app's and the password page's tabs, on an iPad's home screen (`apple-touch-icon.png`, 180 px) and on a Chromebook's shortcut (192 and 512 px, from a small `manifest.webmanifest` with `display: browser`). Vite's logo is gone. Her face, not the whole owl, which was too small to read at 16 px. `icon-make.mjs` makes them again if her drawing or colors change; `icon-check.mjs` and `password-check.mjs` check them.
+- **2026-11-12** — Epic BUG complete (bugs): BUG-31 was its last open bug. The next bug starts `epics/BUG.md` again.

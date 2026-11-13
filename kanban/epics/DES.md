@@ -66,19 +66,32 @@ them in.
 - **DES-14** (P2) redraws Letter Cookies' cookies, whose folder DES-22b put on the kit, so it can slot in any time.
 - **P0 bugs** can still be pulled in between tickets for a break from styling.
 
-
-### DES-31 · Luna on the browser tab and the home screen
-Story · P2 · S · needs: —
-- **Why:** Alex (2026-11-12): the tab still shows Vite's default icon (`public/vite.svg`, named in `index.html` and `gate.html`); it should show the moon or the owl, so the app looks like itself in a tab and on an iPad's home screen.
-- **How:** Luna's face from the kit's drawing (the owl in her round black frames), as `public/icon.svg` for the tab, with PNGs for an iPad's and a Chromebook's home screen (`apple-touch-icon` 180 px, and 192/512 px), in her illustration colours on the light ground so it reads on any wallpaper. Both pages point at it; the password Worker lets the icons through, as it does `vite.svg`. Last of the teacher's try-out tickets (Alex).
-- **Complete when:** the tab shows Luna on the app and the password page; "Add to Home Screen" on an iPad shows her (the touch icon is served, 180×180); `vite.svg` is gone; build and lint pass; Alex OKs the look.
-- **Blocked (2026-11-12):** built, waits for Alex's OK on the look (`screenshots/review/des31-luna-icon.png`). Her face, not the whole owl: the whole owl was too small to read at a tab's 16 px. A small `manifest.webmanifest` (`display: browser`, so nothing else changes) lists the 192 and 512 px icons for a Chromebook's shortcut. `icon-check.mjs` and the Worker's lines in `password-check.mjs` fail on the old files. A real iPad's "Add to Home Screen" is still to see once it's live.
+### DES-32 · Works at any screen size: phones to the whiteboard
+Story · P1 · L · needs: — · split by what the first audit finds, before building
+- **Why:** Alex (2026-11-12): on a phone "everything is overlapping and doesn't look great, some things are not even shown, like the next button when you complete a game". It should work well "no matter the ratio or resolution (within reason)". Reported, not reproduced yet. Every layout is drawn and checked at the four iPad sizes only (`foundations.md`, Layout: 1180×820, 820×1180, 1024×768, 744×1133), with two breakpoints (`narrow` up to 899 wide, `short` up to 799 tall; DES-10). The class also has Chromebooks (DES-28), and the teacher puts it on her classroom whiteboard.
+- **How:**
+  - **Alex's call first, the sizes "within reason"**, as page sizes with the browser's bars taken off. Recommended:
+    - phones in portrait: 360×640, 390×660 and 430×750;
+    - a Chromebook or small laptop: 1366×650;
+    - a Windows laptop at 125%: 1536×730;
+    - a whiteboard or TV: 1920×970;
+    - the four iPads, as now;
+    - phones in landscape (about 850×330) only as "nothing is cut off, and it may scroll": a round can't fit 330 px tall.
+  - **Measure first:** the sizes go in one list the checks share (`layout-audit`, `library-fit-check`, `fit-check`, `ui:shots`). `layout-audit` also learns to fail a screen whose main action (Start, the answers, Next, Again, the done screen's buttons) isn't on screen without scrolling. Its first run at the new sizes, all three grades, is the list of what breaks, and the ticket splits by it (e.g. DES-32a phones, DES-32b big screens), each with its own Complete when.
+  - **Fix within the system** (luna-design): new breakpoints, such as a `phone` one, go in the tokens and the breakpoint mixin (a token change: Alex's OK, per `fitting-in.md`). Screens use the kit and the roles, and touch targets stay at least 48 px. A big screen shows the app at a size a room can read, not small in a corner. The round 2 boards were drawn for iPads, so a phone layout is new and goes on a review sheet first.
+  - The iPads stay as they are: `ui:shots --diff` at the four iPad sizes shows only changes the ticket means.
+- **Complete when:**
+  - the sizes Alex OKs are in the shared list; `layout-audit` (each grade), `library-fit-check` and `fit-check` pass at every one;
+  - every screen's main action is on screen without scrolling at each size (phones in landscape: reachable by scrolling, nothing cut off);
+  - at the four iPad sizes, `ui:shots --diff` shows no change the ticket didn't mean;
+  - shots at each size in light and dark; build and lint pass; Alex has tried it on his phone and OKs it.
 
 ### DES-28 · Works on a Chromebook
 Story · P1 · M · needs: —
 - **Why:** Alex (2026-11-08): the class will use iPads and Chromebooks, shared between children. Everything is built and checked for iPads: the layout checks run at four iPad sizes, and play is by touch. A Chromebook screen is wide and short (often 1366×768, so about 1366×650 for the page once the browser's bars are counted), shorter than any iPad, and most are driven by a trackpad. Its emoji are Google's too, and they stay: the teacher likes the emoji as they are (2026-11-12).
 - **How:**
   - Alex names the Chromebooks (model or screen size, and whether they have touch).
+  - Sizes: DES-32 (any screen size, 2026-11-12) brings in a Chromebook's usual 1366×650, so here the real models' sizes are only checked against its list.
   - Their page sizes join `layout-audit`, `fit-check` and `ui:shots`; whatever doesn't fit is fixed within the two breakpoints (DES-10) where possible.
   - Mouse and trackpad: every target works with a click, the grown-up gate's 1.5s hold works as a held click, nothing stays stuck in a hover look, and Luna's voice starts on the first click.
 - **Complete when:** `layout-audit` and `fit-check` pass at the Chromebook sizes; `gate-check` passes with a mouse; a browser check with no touch plays each game and a lesson by clicks alone; Alex or the teacher has tried it on a real Chromebook.

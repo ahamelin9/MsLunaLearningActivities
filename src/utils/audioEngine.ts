@@ -24,6 +24,14 @@ type Ctor = typeof AudioContext;
 const CLOCK_WINDOW_S = 3;
 /** A context whose clock runs this far off the page's is at the wrong rate (44.1 against 48 kHz is 8%). */
 const CLOCK_TOLERANCE = 0.04;
+/**
+ * A clock running under a quarter of the page's speed has stopped (the machine
+ * slept, or a browser idled its audio while nothing played), not drifted to a
+ * wrong rate: leave it.
+ */
+const CLOCK_STALLED = 0.25;
+/** At most one fresh context for the clock this often, so a clock that is always off can't make one every tap. */
+const CLOCK_RETRY_MS = 60000;
 /** The rate clips are decoded at, before any context plays them. */
 const DECODE_RATE = 48000;
 
@@ -49,6 +57,8 @@ class AudioEngine {
   /** how many contexts this page has made, and why the last was made */
   made = 0;
   lastReason: FreshReason | null = null;
+  /** when the clock last asked for a fresh context */
+  private clockFreshAt = -Infinity;
 
   constructor() {
     if (typeof window === 'undefined') return;
@@ -57,10 +67,13 @@ class AudioEngine {
       window.addEventListener(type, this.onGesture, { capture: true, passive: true });
     }
     navigator.mediaDevices?.addEventListener?.('devicechange', () => this.markSuspect('device'));
-    document.addEventListener('visibilitychange', () => {
-      this.clock = null;
-      if (document.visibilityState === 'visible') this.markSuspect('returned');
-    });
+    // (the voice audit loads this module in Node, with a window but no document)
+    if (typeof document !== 'undefined') {
+      document.addEventListener('visibilitychange', () => {
+        this.clock = null;
+        if (document.visibilityState === 'visible') this.markSuspect('returned');
+      });
+    }
     window.addEventListener('pageshow', event => {
       if (event.persisted) this.markSuspect('returned');
     });
@@ -115,12 +128,11 @@ class AudioEngine {
 
   private fresh(reason: FreshReason) {
     const old = this.ctx;
-    this.ctx = null;
-    this.out = null;
     this.clock = null;
     this.suspect = null;
-    if (old && old.state !== 'closed') void old.close().catch(() => {});
 
+    // the new one first: a browser that refuses another context (an iPad
+    // allows only a few) keeps the old one playing rather than none
     const Context: Ctor | undefined =
       window.AudioContext || (window as unknown as { webkitAudioContext?: Ctor }).webkitAudioContext;
     if (!Context) return;
@@ -134,6 +146,8 @@ class AudioEngine {
         return;
       }
     }
+    if (old && old.state !== 'closed') void old.close().catch(() => {});
+    if (reason === 'clock') this.clockFreshAt = performance.now();
 
     // a limiter in front of the speakers: catches the peaks only, so a cheer
     // over a line never clips into crackle on a loud room speaker
@@ -192,7 +206,10 @@ class AudioEngine {
     if (wall < CLOCK_WINDOW_S) return;
     const speed = (now.ctx - this.clock.ctx) / wall;
     this.clock = now;
-    if (Math.abs(speed - 1) > CLOCK_TOLERANCE) this.markSuspect('clock');
+    const off = Math.abs(speed - 1);
+    if (off > CLOCK_TOLERANCE && speed > CLOCK_STALLED && performance.now() - this.clockFreshAt > CLOCK_RETRY_MS) {
+      this.markSuspect('clock');
+    }
   }
 }
 

@@ -72,8 +72,8 @@ be pulled into Phase 1 for a break from styling.
 
 ### Now / Next
 
-- **Now:** the teacher's notes from her try-out (2026-11-12). Built and waiting for Alex's OK and commits (`screenshots/review/HANDOVER.md`): OPS-14, BUG-31, CUR-11, CUR-12, CUR-14 and DES-31. VOX-6 waits for his call on the playback fix (one audio engine, restarted after an iPad interruption); the clips themselves scan clean. Then CUR-13 (every lesson holds 20, split by grade), content for Alex to review. DES-27 is dropped: she likes the emoji. She also wants no per-child sign-in: one save per device stays.
-- **Next:** still waiting on Alex: DES-28 (which Chromebooks the class has), SAY-1 (his recordings), and his Sound Check picks for VOX-1, with VOX-4 alongside it; VOX-5 (the Luna/Kore blend for single words; his call first: lines too?), then VOX-2, then VOX-3. The Writing app (WRT) after Phase 7. OPS-11 stays parked.
+- **Now:** the teacher's notes from her try-out (2026-11-12) are done and live, but one: the password, American spelling, lessons 1, 2, 3 in each skill, 20 questions a play, reading first, and Luna on the tab. VOX-6 (Luna "like a demon" on her classroom whiteboard) is Blocked: one audio engine for voice and effects, made fresh after anything that can leave it at the wrong rate; its hardening is one more commit (`screenshots/review/HANDOVER.md`), and her ear on the whiteboard decides it. Then CUR-13 (every lesson holds 20, split by grade), content for Alex to review. She likes the emoji (DES-27 dropped) and wants no per-child sign-in: one save per device stays.
+- **Next:** DES-32 (any screen size, phones to the whiteboard; Alex's report, 2026-11-12) once Alex OKs its list of sizes; it's L, so its first audit splits it. Still waiting on Alex: DES-28 (which Chromebooks the class has), SAY-1 (his recordings), and his Sound Check picks for VOX-1, with VOX-4 alongside it; VOX-5 (the Luna/Kore blend for single words; his call first: lines too?), then VOX-2, then VOX-3. The Writing app (WRT) after Phase 7. OPS-11 stays parked.
 
 ## Epics
 
@@ -84,7 +84,6 @@ In board order. A new epic gets its file in `epics/` first, then a link here
 - [CUR — Curriculum: the teacher's try-out](epics/CUR.md) · from her notes, 2026-11-12
 - [SAY — Reading aloud, checked by ear](epics/SAY.md) · not in the roadmap yet: a test first
 - [DES — Design system & layout](epics/DES.md) · Phase 1
-- [BUG — Bugs](epics/BUG.md) · P0/P1 in Phase 2, P2 anytime
 - [LVL — Difficulty](epics/LVL.md) · Phase 4
 - [WRT — Writing & grammar app](epics/WRT.md) · Phase 8
 - [OPS — Housekeeping](epics/OPS.md) · anytime
@@ -94,29 +93,23 @@ In board order. A new epic gets its file in `epics/` first, then a link here
 | ID | Title | Type | P | Size | Status |
 |---|---|---|---|---|---|
 | **VOX** | **Luna's voice: letter sounds and words** | Epic | **P0** | | |
-| VOX-6 | Where Luna sounds shaky, "like a demon" | Bug | P0 | M | In progress |
+| VOX-6 | Where Luna sounds shaky, "like a demon" | Bug | P0 | M | Blocked |
 | VOX-1 | Letter sounds retuned by ear | Story | P0 | M | Todo |
 | VOX-5 | Single words in a blend of Luna and Kore | Story | P1 | M | Todo |
 | VOX-2 | Words said alone end cleanly | Story | P1 | S | Todo |
 | VOX-4 | A sound check that can fail | Task | P1 | S | Todo |
 | VOX-3 | Words and lines in Kokoro's own phoneme spelling, as far as it helps | Story | P2 | M | Todo |
 | **CUR** | **Curriculum: the teacher's try-out** | Epic | **P0** | | |
-| CUR-11 | Each skill's lessons in order: 1, 2, 3 | Story | P0 | M | Blocked |
-| CUR-12 | About 20 questions a play, about 20 seconds each | Story | P0 | M | Blocked |
-| CUR-14 | The child reads first, then Luna helps | Story | P1 | M | Blocked |
 | CUR-13 | Every lesson holds at least 20 of its own | Story | P1 | L | Todo |
 | **SAY** | **Reading aloud, checked by ear** | Epic | **P1** | | |
 | SAY-1 | Can a machine tell a right sound from a wrong one? A test on Alex's recordings | Task | P1 | M | Todo |
 | **DES** | **Design system & layout** | Epic | **P0** | | |
+| DES-32 | Works at any screen size: phones to the whiteboard | Story | P1 | L | Todo |
 | DES-28 | Works on a Chromebook | Story | P1 | M | Todo |
-| DES-31 | Luna on the browser tab and the home screen | Story | P2 | S | Blocked |
-| **BUG** | **Bugs** | | | | |
-| BUG-31 | American spelling: "Memorize", "color" | Bug | P1 | S | Blocked |
 | **LVL** | **Difficulty** | Epic | **P0** | | |
 | LVL-3 | Adaptive difficulty from skill mastery | Story | P2 | L | Todo |
 | **WRT** | **Writing & grammar app** | Epic | **P1** | | |
 | WRT-1 | Writing app on the home screen | Story | P1 | M | Todo |
 | WRT-2 | Punctuation game: where does the mark go? | Story | P1 | L | Todo |
 | **OPS** | **Housekeeping** | Epic | **P2** | | |
-| OPS-14 | A password on the site | Story | P0 | M | Blocked |
 | OPS-11 | A first cloud session (parked) | Task | P2 | M | Todo |
