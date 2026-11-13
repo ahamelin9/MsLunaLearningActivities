@@ -74,7 +74,7 @@ const playCookies = async () => {
   for (const t of await page.$$(at('game-tile'))) if ((await t.evaluate(e => e.textContent)).includes('Letter Cookies')) { await t.click(); break; }
   await page.waitForSelector(at('play'));
   await page.click(at('play'));
-  for (let r = 0; r < 8 && !(await page.$(at('shell-reward'))); r++) {
+  for (let r = 0; r < 25 && !(await page.$(at('shell-reward'))); r++) {
     await page.waitForSelector(at('cookie'));
     await wait(1000);
     const now = await round();

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import type { GameApi, GameDef } from '../../engine/types';
 import { shuffle, tierFor, wordsUpTo, type WordItem } from '../../engine/content';
 import { dealWeekFirst } from '../../engine/deck';
+import { ROUNDS_PER_PLAY } from '../../engine/practice';
 import { isWeekWord } from '../../engine/weekWords';
 import { distinctByEmoji, pickWrong, wordChoice } from '../../engine/distractors';
 import { soundManager } from '@/utils/audio';
@@ -48,6 +49,8 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
   const [wrong, setWrong] = useState<string | null>(null);
   // "show me" (FB-2): the missing one glows from the third miss
   const [shown, setShown] = useState(false);
+  // stable, so the round's timers aren't set again on a render
+  const { asking } = api;
 
   useEffect(() => {
     pronunciation.speakText('Look carefully at my desk...');
@@ -57,6 +60,8 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
       setPhase('guess');
       soundManager.playPop();
       pronunciation.speakText('What is missing?');
+      // the round's countdown starts now (CUR-16), after its question
+      asking();
     }, round.lookSeconds * 1000 + 1100);
 
     return () => {
@@ -64,7 +69,7 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
       window.clearTimeout(toCurtain);
       window.clearTimeout(toGuess);
     };
-  }, [round.lookSeconds]);
+  }, [round.lookSeconds, asking]);
 
   const guess = (item: WordItem) => {
     if (api.locked || phase !== 'guess' || found) return;
@@ -160,8 +165,15 @@ export const whatsMissing: GameDef<Round> = {
   objective: 'New words: remembers the pictures on Luna’s desk with their words, then finds the one she took away.',
   skill: 'vocabulary',
   mission: 'Look hard at my desk… I am about to take something!',
-  roundsPerPlay: 4,
+  // about 20 a play, as a lesson (CUR-15)
+  roundsPerPlay: ROUNDS_PER_PLAY,
+  // a few seconds to look, then one to find (CUR-15's first guess, until real plays are timed)
+  roundSeconds: 15,
   shape: 'desk',
+  // the missing one to find, against the clock at 1st and 2nd grade (CUR-16),
+  // from when the desk is hidden: the looking has its own count
+  timer: () => 'listen',
+  waitsToAsk: true,
   sticker: 'lamp',
   makeRounds: ({ grade, difficulty, count }) => {
     const tier = tierFor(grade, difficulty);

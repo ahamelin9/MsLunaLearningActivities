@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import type { GameApi, GameDef } from '../../engine/types';
 import { lettersFor, pick, shuffle, tierFor } from '../../engine/content';
 import { deal } from '../../engine/deck';
+import { ROUNDS_PER_PLAY } from '../../engine/practice';
 import { pickWrong, textChoice } from '../../engine/distractors';
 import { soundManager } from '@/utils/audio';
 import { pronunciation } from '@/utils/pronunciation';
@@ -246,8 +247,13 @@ export const letterHunt: GameDef<Round> = {
   objective: 'Letter names: hears a letter’s name and finds it among letters that look alike.',
   skill: 'letters',
   mission: 'They wriggled out of the jar again. Catch them all!',
-  roundsPerPlay: 4,
+  // about 20 a play, as a lesson (CUR-15): a hunt is one question
+  roundsPerPlay: ROUNDS_PER_PLAY,
+  // a hunt for 3 to 5 bugs (CUR-15's first guess, until real plays are timed)
+  roundSeconds: 20,
   shape: 'jar',
+  // every bug with the letter, against the clock at 1st and 2nd grade (CUR-16)
+  timer: () => 'find',
   sticker: 'jar',
   makeRounds: ({ grade, difficulty, count }) => {
     const tier = tierFor(grade, difficulty);

@@ -438,6 +438,32 @@ export const SENTENCES: SentenceItem[] = [
     emoji: '🌧️',
     tier: 1,
   },
+  // CUR-15: 20 a play, so each tier holds 20 or more
+  {
+    text: 'The fox is red.',
+    emoji: '🦊',
+    tier: 1,
+  },
+  {
+    text: 'A duck can swim.',
+    emoji: '🦆',
+    tier: 1,
+  },
+  {
+    text: 'I have a kite.',
+    emoji: '🪁',
+    tier: 1,
+  },
+  {
+    text: 'The box is big.',
+    emoji: '📦',
+    tier: 1,
+  },
+  {
+    text: 'I hug my mom.',
+    emoji: '🤗',
+    tier: 1,
+  },
   // tier 2 — 5 to 6 words
   {
     text: 'The little cat is sleeping.',
@@ -524,6 +550,27 @@ export const SENTENCES: SentenceItem[] = [
   {
     text: "Fish swim in the deep sea.",
     emoji: '🐠',
+    tier: 2,
+  },
+  // CUR-15
+  {
+    text: 'The dog digs in the sand.',
+    emoji: '🐶',
+    tier: 2,
+  },
+  {
+    text: 'We eat lunch at school.',
+    emoji: '🥪',
+    tier: 2,
+  },
+  {
+    text: 'A big whale swims by.',
+    emoji: '🐋',
+    tier: 2,
+  },
+  {
+    text: 'My sister rides a bike.',
+    emoji: '🚲',
     tier: 2,
   },
   // tier 3 — 7+ words
@@ -625,6 +672,31 @@ export const SENTENCES: SentenceItem[] = [
     text: "The kind nurse puts a bandage on my knee.",
     emoji: '🩹',
     tier: 3,
+  },
+  // CUR-15
+  {
+    text: 'Dad reads me a story before bed.',
+    emoji: '📖',
+    tier: 3,
+    alsoFits: ['quickly'],
+  },
+  {
+    text: 'The yellow bus takes us to school.',
+    emoji: '🚌',
+    tier: 3,
+    alsoFits: ['purple'],
+  },
+  {
+    text: 'My grandpa grows red tomatoes in his garden.',
+    emoji: '🍅',
+    tier: 3,
+    alsoFits: ['purple', 'seven'],
+  },
+  {
+    text: 'Mom cuts the cake for my birthday.',
+    emoji: '🎂',
+    tier: 3,
+    alsoFits: ['banana'],
   }
 ];
 

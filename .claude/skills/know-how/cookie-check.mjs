@@ -43,7 +43,7 @@ for (const grade of [0, 1, 2]) {
   await page.waitForSelector(at('stage'));
 
   const plates = [];
-  for (let r = 0; r < 12 && !(await page.$(at('shell-reward'))); r++) {
+  for (let r = 0; r < 25 && !(await page.$(at('shell-reward'))); r++) {
     await page.waitForSelector(COOKIE, { timeout: 8000 }).catch(() => {});
     await wait(800);
     const plate = await page.$$eval(COOKIE, els => els.map(el => {

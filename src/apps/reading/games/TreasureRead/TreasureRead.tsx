@@ -11,6 +11,7 @@ import {
   type PassageItem
 } from '../../engine/content';
 import { dealWeekFirst } from '../../engine/deck';
+import { ROUNDS_PER_PLAY } from '../../engine/practice';
 import { mentionsWeekWord } from '../../engine/weekWords';
 import { pickWrong, textChoice } from '../../engine/distractors';
 import { pronunciation, type SpeechPart } from '@/utils/pronunciation';
@@ -34,6 +35,9 @@ interface Round {
   /** and once it is solved */
   readAfter: SpeechPart[];
 }
+
+/** The questions each stone asks about its passage (CUR-15): true or false, then the missing word. */
+const ASKS_PER_STONE = 2;
 
 function buildRound(passage: PassageItem, kind: Round['kind']): Round {
   const lines: SpeechPart[] = passage.lines.map(text => ({ text }));
@@ -81,8 +85,9 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
   const [wrong, setWrong] = useState<string | null>(null);
   // "show me" (FB-2): the right stone glows from the third miss
   const [shown, setShown] = useState(false);
-  const step = api.ctx.roundIndex;
-  const total = api.ctx.totalRounds;
+  // a stone is a passage, with two questions about it (CUR-15)
+  const step = Math.floor(api.ctx.roundIndex / ASKS_PER_STONE);
+  const total = Math.ceil(api.ctx.totalRounds / ASKS_PER_STONE);
   // Kindergarten is a read-along. From 1st grade the passage is the child's
   // to read first, as in the lessons: it stays silent until they have
   // answered once, and a wrong answer unlocks "Read it to me".
@@ -128,7 +133,7 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
     }
   };
 
-  const open = solved && step === total - 1;
+  const open = solved && api.ctx.roundIndex === api.ctx.totalRounds - 1;
 
   return (
     <GameSurface>
@@ -222,23 +227,23 @@ export const treasureRead: GameDef<Round> = {
   objective: 'Reading a story: reads a short story, says whether a sentence is true or false, and fills in a missing word.',
   skill: 'reading',
   mission: 'Read every stone carefully or we will never reach the treasure!',
-  roundsPerPlay: 5,
-  // a passage to read each stone (PRG-6's first guess)
-  roundSeconds: 60,
+  // about 20 a play, as a lesson (CUR-15): two questions about each passage,
+  // so a play reads 10 of them
+  roundsPerPlay: ROUNDS_PER_PLAY,
+  // a passage to read, then a second question about it (CUR-15's first guess)
+  roundSeconds: 40,
   shape: 'map',
+  // a passage to read and a question, against the clock at 1st and 2nd grade (CUR-16)
+  timer: () => 'passage',
   sticker: 'chest',
   // Passages are written per grade, so the grade picks them; the dial doesn't
   // change them yet (LVL-1 sets what it does).
   makeRounds: ({ grade, count }) => {
     // a passage with one of this week's words in it comes first (CUR-9)
-    const passages = dealWeekFirst('treasure-read', passagesFor(grade), count, p => p.id, p => mentionsWeekWord(p.lines));
-    // every play has both kinds: one of each, then either at random
-    const kinds = shuffle(
-      passages.map((_, i): Round['kind'] =>
-        i === 0 ? 'cloze' : i === 1 ? 'truefalse' : Math.random() < 0.5 ? 'cloze' : 'truefalse'
-      )
-    );
-    return passages.map((passage, i) => buildRound(passage, kinds[i]));
+    const passages = dealWeekFirst('treasure-read', passagesFor(grade), Math.ceil(count / ASKS_PER_STONE), p => p.id, p => mentionsWeekWord(p.lines));
+    // each stone asks both kinds about its passage (CUR-15): is it true, which
+    // reads the whole story first, then the missing word
+    return passages.flatMap(passage => [buildRound(passage, 'truefalse'), buildRound(passage, 'cloze')]).slice(0, count);
   },
   Play
 };

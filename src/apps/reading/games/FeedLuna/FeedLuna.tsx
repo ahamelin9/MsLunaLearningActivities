@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import type { GameApi, GameDef } from '../../engine/types';
 import { lettersFor, pick, shuffle, tierFor, wordsUpTo, type LetterItem, type WordItem } from '../../engine/content';
 import { deal } from '../../engine/deck';
+import { ROUNDS_PER_PLAY } from '../../engine/practice';
 import { isWeekWord } from '../../engine/weekWords';
 import { pickWrong, textChoice } from '../../engine/distractors';
 import { Icon, ListenCue, Luna } from '@/components/kit';
@@ -313,8 +314,13 @@ export const feedLuna: GameDef<Round> = {
   objective: 'Big and little letters: hears a letter’s name, its sound or a word, and finds that letter.',
   skill: 'letters',
   mission: 'I am SO hungry. Feed me the right letter cookie!',
-  roundsPerPlay: 5,
+  // about 20 a play, as a lesson (CUR-15)
+  roundsPerPlay: ROUNDS_PER_PLAY,
+  // one cookie to pick (CUR-15's first guess, until real plays are timed)
+  roundSeconds: 15,
   shape: 'plate',
+  // hear it, feed it, against the clock at 1st and 2nd grade (CUR-16)
+  timer: () => 'listen',
   ownLuna: true,
   sticker: 'cookie',
   makeRounds: ({ grade, difficulty, count }) => {

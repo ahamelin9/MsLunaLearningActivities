@@ -129,7 +129,7 @@ async function lessonPlay(missesByRound) {
 
 async function cookiesPlay(misses) {
   await openTile('game-tile', 'Letter Cookies');
-  for (let r = 0; r < 12 && !(await shown(at('shell-reward'))); r++) {
+  for (let r = 0; r < 25 && !(await shown(at('shell-reward'))); r++) {
     await page.waitForSelector(at('cookie'));
     await wait(1200);
     const now = await round();

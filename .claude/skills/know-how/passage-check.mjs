@@ -16,8 +16,9 @@
 //   the answer can't be found by matching text ("a ___ flower" against
 //   "a yellow flower").
 // And for the rounds the game builds:
-// - every play has both kinds of question and no passage twice, all of them
-//   from the play's grade;
+// - every play has both kinds of question, each stone asks both about one
+//   passage, true or false first (CUR-15), and no passage is on two stones,
+//   all of them from the play's grade;
 // - a fill-in-the-blank can't be solved by matching the words beside its gap
 //   against the passage, and a claim copies no 4 words in a row;
 // - "Read it to me" never says the missing word before the round is solved.
@@ -143,7 +144,15 @@ function playBreaks(rounds) {
   const breaks = [];
   const kinds = new Set(rounds.map(r => r.kind));
   if (rounds.length > 1 && kinds.size < 2) breaks.push(`one kind only: every round is ${[...kinds][0]}`);
-  const ids = rounds.map(r => r.passage?.id);
+  // each stone asks two questions about its passage (CUR-15): is it true,
+  // then its missing word; and no passage is on two stones
+  const ids = [];
+  rounds.forEach((r, i) => {
+    if (i % 2 === 0) ids.push(r.passage?.id);
+    else if (r.passage?.id !== rounds[i - 1].passage?.id || rounds[i - 1].kind !== 'truefalse' || r.kind !== 'cloze') {
+      breaks.push(`a stone not true-or-false then the missing word of one passage: ${rounds[i - 1].passage?.id} ${rounds[i - 1].kind}, ${r.passage?.id} ${r.kind}`);
+    }
+  });
   const twice = ids.filter((id, i) => ids.indexOf(id) !== i);
   if (twice.length > 0) breaks.push(`passage twice: ${[...new Set(twice)].join(', ')}`);
   return breaks;
@@ -188,7 +197,8 @@ const plantedRounds = [
 ];
 const plantedPlays = [
   ['one kind only', [tf, { ...tf, passage: other }]],
-  ['passage twice', [tf, cloze]]
+  ['passage twice', [tf, cloze, tf, cloze]],
+  ['a stone not', [tf, { ...cloze, passage: other }]]
 ];
 const selfTest = [
   ...plantedRounds
@@ -196,7 +206,7 @@ const selfTest = [
     .map(([rule]) => `missed a planted "${rule}" round`),
   ...plantedPlays.filter(([rule, play]) => !playBreaks(play).some(b => b.startsWith(rule))).map(([rule]) => `missed a planted "${rule}" play`),
   ...[tf, cloze].flatMap(r => roundBreaks(r, 'kindergarten')).map(b => `flagged a fair round: ${b}`),
-  ...playBreaks([tf, { ...cloze, passage: other }]).map(b => `flagged a fair play: ${b}`),
+  ...playBreaks([tf, cloze, { ...tf, passage: other }, { ...cloze, passage: other }]).map(b => `flagged a fair play: ${b}`),
   ...planted.filter(([rule, p]) => !passageBreaks(p).some(b => b.startsWith(rule))).map(([rule]) => `missed a planted "${rule}"`),
   ...passageBreaks(good).map(b => `flagged a fair passage: ${b}`)
 ];

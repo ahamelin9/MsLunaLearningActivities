@@ -188,6 +188,9 @@ changed screens.
   colours change. `icon-check.mjs 5199` checks both pages link them, the touch
   icon is 180×180 and Chrome reads the manifest; `password-check.mjs` checks
   the Worker lets them through without the cookie.
+- Does a round's countdown pie run, hold and run out right at 1st and 2nd
+  grade (CUR-16)? `node .claude/skills/know-how/timer-check.mjs 5199`; review
+  shots of it in play: `timer-shot.mjs` (ui:shots plays at Kindergarten).
 - Does the grown-up gate hold (SET-1)? `node .claude/skills/know-how/gate-check.mjs 5199`
   (and `--reduced-motion`): a tap or a short hold on the gears or the grade
   opens nothing, a 1.5s hold does.

@@ -138,7 +138,7 @@ for (const t of await page.$$(at('game-tile'))) if ((await t.evaluate(e => e.tex
 await page.waitForSelector(at('play'));
 await page.click(at('play'));
 const round = () => page.evaluate(() => document.querySelector('[data-shot="round-pips"]')?.getAttribute('aria-label') ?? null);
-for (let r = 0; r < 8 && !(await page.$(at('shell-reward'))); r++) {
+for (let r = 0; r < 25 && !(await page.$(at('shell-reward'))); r++) {
   await page.waitForSelector(at('cookie'));
   await wait(1000);
   const now = await round();

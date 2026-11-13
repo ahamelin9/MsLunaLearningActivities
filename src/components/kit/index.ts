@@ -13,6 +13,7 @@ export { ListenCue } from './ListenCue/ListenCue';
 export { SpeechBubble } from './SpeechBubble/SpeechBubble';
 export { StarRow } from './StarRow/StarRow';
 export { ProgressBar } from './ProgressBar/ProgressBar';
+export { CountdownPie } from './CountdownPie/CountdownPie';
 export { LessonCard } from './LessonCard/LessonCard';
 export { SkillCard } from './SkillCard/SkillCard';
 export { Squishy, SquishyDots, type SquishyColour, type SquishyKind, type SquishyLook } from './Squishy/Squishy';

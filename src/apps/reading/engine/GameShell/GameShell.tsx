@@ -10,6 +10,7 @@ import { SHELF_LINES, SIGNATURE_KIND, SQUISHY_KINDS, kindsFound, nextSquishy, ty
 import { starsFor, starsWithTime, type TimeStar } from '../stars';
 import { isGoodPlay, outcomeOf, practiceLine, type PlayOutcome } from '../practice';
 import { estimateMinutes } from '../times';
+import { roundSecondsLimit } from '../timer';
 import { soundManager } from '@/utils/audio';
 import { pronunciation, type SpeechPart } from '@/utils/pronunciation';
 import { warmGameIntro } from '../warmup';
@@ -18,6 +19,7 @@ import { Chip, ChunkyButton, Flower, Luna, Petals, SpeechBubble } from '@/compon
 import { AppHeader } from '@/components/os/AppHeader/AppHeader';
 import { GAME_TINTS, GamePicture } from '../../games/shared/GamePicture/GamePicture';
 import { DoneScreen, type LessonPath } from '../DoneScreen/DoneScreen';
+import { RoundTimer } from './RoundTimer';
 import { cx } from '@/utils/cx';
 import styles from './GameShell.module.scss';
 
@@ -126,6 +128,11 @@ export const GameShell: React.FC<GameShellProps> = ({
   // counts this play's wins, so each one drops a fresh fall of petals that
   // keeps falling into the next round (DES-11)
   const [petalFalls, setPetalFalls] = useState(0);
+  // counts plays, so a round's countdown starts afresh on "Again" (CUR-16)
+  const [playCount, setPlayCount] = useState(0);
+  // the round has started asking, for a game whose countdown waits (CUR-16)
+  const [asked, setAsked] = useState(false);
+  const asking = useCallback(() => setAsked(true), []);
 
   // dealt as a play starts, not as its start screen opens: a deal uses up what
   // it deals (GAME-8), and the dial may still change. Luna's Pick starts at once
@@ -244,6 +251,8 @@ export const GameShell: React.FC<GameShellProps> = ({
       ...game.makeRounds({ grade, difficulty: level, count: game.roundsPerPlay - won })
     ]);
     answeredRef.current = false;
+    setAsked(false);
+    setPlayCount(n => n + 1);
     setRoundIndex(from?.won ?? 0);
     setFirstRound(from?.won ?? 0);
     setAttempts(0);
@@ -308,6 +317,7 @@ export const GameShell: React.FC<GameShellProps> = ({
         storageService.setPartway(game.lesson.id, wonRef.current, cleanRef.current, carried.current);
       }
       answeredRef.current = false;
+      setAsked(false);
       setRoundIndex(roundIndex + 1);
     }
   }, [game, progress.completedLessons, progress.lessonPractice, progress.stickers, progress.times, roundIndex]);
@@ -383,6 +393,19 @@ export const GameShell: React.FC<GameShellProps> = ({
     },
     [attempts, game.id, game.lesson, hiddenAt, later, roundIndex, rounds, speak]
   );
+
+  /**
+   * The round's countdown ran out (CUR-16): a miss with its own line. The
+   * round isn't right the first time any more, a lesson brings it back next
+   * play, and the next miss gets the spoken clue; the child still answers it.
+   */
+  const handleTimeUp = useCallback(() => {
+    setAttempts(a => Math.max(a, 1));
+    game.lesson?.missed?.(rounds[roundIndex]);
+    setWinStreak(0);
+    // the round is still unsolved: her line never has its word (BUG-27)
+    speak(lunaSay('timeUp', game.id, hiddenAt(roundIndex)).text, 'surprise');
+  }, [game, hiddenAt, roundIndex, rounds, speak]);
 
   // An answer is being said (FB-1): input waits, and Luna with it.
   const [answering, setAnswering] = useState(false);
@@ -473,9 +496,10 @@ export const GameShell: React.FC<GameShellProps> = ({
       answered,
       answer: handleAnswer,
       tick: handleTick,
-      say: (text: string, m: LunaMood = 'happy') => speak(text, m)
+      say: (text: string, m: LunaMood = 'happy') => speak(text, m),
+      asking
     }),
-    [ctx, attempts, hintLevel, flash, answering, answered, handleAnswer, handleTick, speak]
+    [ctx, attempts, hintLevel, flash, answering, answered, handleAnswer, handleTick, speak, asking]
   );
 
   // The done screen's side effects: save progress, the fanfare, Luna's
@@ -530,7 +554,7 @@ export const GameShell: React.FC<GameShellProps> = ({
 
     soundManager.playFanfare();
     later(closing, 700);
-  }, [phase, award, game.id, game.lesson, later, speak, lessons, doneBefore, grade]);
+  }, [phase, award, game.id, game.lesson, game.roundsPerPlay, later, speak, lessons, doneBefore, grade]);
 
   // the one header (DES-8): back to the library and the game's name; in play,
   // the rounds and Again too, as on the round 2 Round and Done boards
@@ -548,6 +572,23 @@ export const GameShell: React.FC<GameShellProps> = ({
     }
     onExit();
   };
+
+  // The round's countdown at 1st and 2nd grade (CUR-16): while it is still
+  // on its first try, and, for a game that waits, once it has started asking.
+  // A miss, running out, or the win takes it away; the next round brings a
+  // fresh one.
+  const round = rounds[roundIndex];
+  const timerSeconds =
+    phase === 'play' && round !== undefined ? roundSecondsLimit(grade, game.timer?.(round)) : undefined;
+  const timer =
+    timerSeconds !== undefined && attempts === 0 && flash !== 'win' && (!game.waitsToAsk || asked) ? (
+      <RoundTimer
+        key={`${playCount}:${roundIndex}`}
+        seconds={timerSeconds}
+        running={!answering}
+        onTimeUp={handleTimeUp}
+      />
+    ) : null;
 
   const header = (inPlay = false, title = game.title) => (
     <AppHeader
@@ -568,6 +609,8 @@ export const GameShell: React.FC<GameShellProps> = ({
           Again
         </ChunkyButton>
       )}
+      {/* the round's countdown, in the top corner (CUR-16) */}
+      {inPlay && timer}
     </AppHeader>
   );
 
@@ -623,7 +666,6 @@ export const GameShell: React.FC<GameShellProps> = ({
   // again. On the start screen she isn't on the stage yet, so she perches.
   const owlOnStage = inPlay && Boolean(game.ownLuna);
   const PlayComponent = game.Play;
-  const round = rounds[roundIndex];
 
   return (
     <>

@@ -3,6 +3,7 @@ import type { GradeLevel } from '../../../types/reading';
 import type { Difficulty } from './content';
 import type { LunaMood } from './luna';
 import type { SpeechPart } from '../../../utils/pronunciation';
+import type { TimerKind } from './timer';
 
 export interface GameContext {
   grade: GradeLevel;
@@ -60,6 +61,11 @@ export interface GameApi {
   tick: (opts?: { lunaLine?: string; say?: SpeechPart[] }) => void;
   /** let Luna speak out of turn */
   say: (text: string, mood?: LunaMood) => void;
+  /**
+   * The round starts asking now (CUR-16), for a game whose `waitsToAsk`: its
+   * countdown waits for this (What's Missing, once the desk is hidden).
+   */
+  asking: () => void;
 }
 
 /** How the game's entry looks in Luna's library — deliberately not all cards. */
@@ -100,6 +106,14 @@ export interface GameDef<TRound = never> {
    * shows her line without its owl: one Luna per screen (DES-12).
    */
   ownLuna?: boolean;
+  /**
+   * What a round asks, for its countdown at 1st and 2nd grade (CUR-16,
+   * engine/timer.ts). Left out, or undefined for a round, it isn't timed: a
+   * round that is long by nature, or already a race (Bubble Sounds).
+   */
+  timer?: (round: TRound) => TimerKind | undefined;
+  /** the countdown waits until the round calls `api.asking()` (CUR-16) */
+  waitsToAsk?: boolean;
   /** its signature reward: the squishy kind it brings first (SIGNATURE_KIND in squishies.ts, PRG-5a) */
   sticker: string;
   /** built once per play so rounds never repeat within a session */

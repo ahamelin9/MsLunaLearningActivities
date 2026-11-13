@@ -52,6 +52,12 @@ export const GENERAL: Bank = {
     { text: 'This one fools me too. Look here…', mood: 'think' },
     { text: 'Let me shine my lamp on it for you.', mood: 'think' }
   ],
+  // the round's countdown ran out (CUR-16): it counts as a miss, and the
+  // child can still answer it
+  timeUp: [
+    { text: 'Time’s up! You can still answer it.', mood: 'surprise' },
+    { text: 'Oh, the time ran out! Keep trying.', mood: 'surprise' }
+  ],
   reveal: [
     { text: 'There it is! Sneaky thing.', mood: 'surprise' },
     { text: 'Aha — it was hiding right there.', mood: 'surprise' },

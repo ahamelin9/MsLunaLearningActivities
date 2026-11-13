@@ -255,7 +255,8 @@ export const memoryMatch: GameDef<Round> = {
   objective: 'Pairs, from memory: matches a big letter with its little one, or a picture with its word.',
   skill: 'vocabulary',
   mission: 'I dropped my card box. Find the pairs before I panic!',
-  roundsPerPlay: 2,
+  // a board holds 4 to 6 pairs, so 4 boards are about 20 a play (CUR-15)
+  roundsPerPlay: 4,
   // a whole board of pairs a round (PRG-6's first guess)
   roundSeconds: 75,
   shape: 'cards',

@@ -274,7 +274,9 @@ export const storyTime: GameDef<Round> = {
   objective: 'Reading a story: reads a tiny story, finds a word in it, and answers one question about it.',
   skill: 'reading',
   mission: 'Snuggle in. This one is short, I promise.',
-  roundsPerPlay: 2,
+  // each story asks two things, a word to find and a question, so 9 stories
+  // are about 20 a play (CUR-15): Kindergarten's 9, none of them twice
+  roundsPerPlay: 9,
   // a story read line by line, a word hunt and a question (PRG-6's first guess)
   roundSeconds: 90,
   shape: 'book',

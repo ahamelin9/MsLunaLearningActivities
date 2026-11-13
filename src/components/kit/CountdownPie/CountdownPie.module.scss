@@ -1,0 +1,41 @@
+// CountdownPie (CUR-16): component tokens first. The pie is the time left,
+// from the top round clockwise, set by share (0–1) from the data; the face
+// in its middle holds the number.
+
+.root {
+  --pie-size: var(--target-chrome);
+  --pie-fill: var(--accent);
+  --pie-track: var(--well);
+  --pie-edge: var(--edge);
+  --pie-face: var(--card);
+  --pie-ring: var(--space-2);
+
+  flex: none;
+  display: grid;
+  place-items: center;
+  box-sizing: border-box;
+  width: var(--pie-size);
+  height: var(--pie-size);
+  padding: var(--pie-ring);
+  border: var(--border-regular) solid var(--pie-edge);
+  border-radius: var(--radius-chip);
+  background: conic-gradient(var(--pie-fill) calc(var(--share) * 1turn), var(--pie-track) 0);
+}
+
+.face {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  border-radius: var(--radius-chip);
+  background: var(--pie-face);
+  color: var(--ink);
+  font: var(--text-label);
+  font-variant-numeric: tabular-nums;
+}
+
+// on a phone (DES-32a; index.html marks the page) the label is 1.3× and "44"
+// would touch the ring, so the ring is thinner and the face wider
+[data-device='phone'] .root {
+  --pie-ring: var(--space-1);
+}

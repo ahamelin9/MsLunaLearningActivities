@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import type { GameApi, GameDef } from '../../engine/types';
 import { lettersFor, pick, sample, shuffle, tierFor, type LetterItem } from '../../engine/content';
 import { deal } from '../../engine/deck';
+import { ROUNDS_PER_PLAY } from '../../engine/practice';
 import { pickWrong, textChoice } from '../../engine/distractors';
 import { soundManager } from '@/utils/audio';
 import { pronunciation } from '@/utils/pronunciation';
@@ -306,16 +307,20 @@ export const bubbleSounds: GameDef<Round> = {
   objective: 'Letter sounds, quickly: hears a sound and pops the bubbles with its letter before they float away.',
   skill: 'phonics',
   mission: 'Quick! Pop the bubbles with that sound before they float away!',
-  roundsPerPlay: 4,
+  // about 20 a play, as a lesson (CUR-15): a sound to pop is one question
+  roundsPerPlay: ROUNDS_PER_PLAY,
+  // 3 or 4 bubbles to wait for and pop (CUR-15's first guess, until real plays are timed)
+  roundSeconds: 25,
   shape: 'bubbles',
   sticker: 'bubble',
   makeRounds: ({ grade, difficulty, count }) => {
     const tier = tierFor(grade, difficulty);
     const pool = lettersFor(tier);
     const rounds: Round[] = [];
-    // any letter in the tier's pool, none twice in a play (BUG-21: slots i*3
-    // to i*3+2 only ever reached the pool's first 12), and none again until
-    // the rest have had their turn (GAME-8)
+    // any letter in the tier's pool (BUG-21: slots i*3 to i*3+2 only ever
+    // reached the pool's first 12), and none again until the rest have had
+    // their turn (GAME-8). Kindergarten's 14 letters are fewer than a play's
+    // 20 (CUR-15), so 6 come round a second time, after all the others
     const letters = deal('bubble-sounds', pool, count, l => l.letter);
 
     for (let i = 0; i < count; i++) {

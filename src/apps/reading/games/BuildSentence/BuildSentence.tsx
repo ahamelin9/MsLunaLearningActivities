@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import type { GameApi, GameDef } from '../../engine/types';
 import { sentencesFor, shuffle, tierFor, type SentenceItem } from '../../engine/content';
 import { dealWeekFirst } from '../../engine/deck';
+import { ROUNDS_PER_PLAY } from '../../engine/practice';
 import { mentionsWeekWord } from '../../engine/weekWords';
 import { pickWrong, textChoice } from '../../engine/distractors';
 import { soundManager } from '@/utils/audio';
@@ -220,8 +221,13 @@ export const buildSentence: GameDef<Round> = {
   objective: 'Word order: puts a sentence’s words back in the right order.',
   skill: 'reading',
   mission: 'Oh no, the words slid right off the page. Put them back!',
-  roundsPerPlay: 4,
+  // about 20 a play, as a lesson (CUR-15)
+  roundsPerPlay: ROUNDS_PER_PLAY,
+  // a sentence's words put back in order (CUR-15's first guess, until real plays are timed)
+  roundSeconds: 25,
   shape: 'page',
+  // a sentence to read and put back, against the clock at 1st and 2nd grade (CUR-16)
+  timer: () => 'read',
   sticker: 'quill',
   makeRounds: ({ grade, difficulty, count }) => {
     const tier = tierFor(grade, difficulty);

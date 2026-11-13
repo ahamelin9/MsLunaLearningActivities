@@ -22,8 +22,11 @@
 // its pool at that grade, or a sentence, story or passage with one in it,
 // counted here by this check's own rule) must open its deal with as many as
 // fit; one that can't (letters only, or none at that grade) is named. After
-// "Clear", a play of each game deals nothing its last play dealt, so nothing
-// is held back for the cleared words. It fails with the games dealing as
+// "Clear", a play of each game deals what its last play didn't before anything
+// comes back, so nothing is held back for the cleared words: since plays are
+// 20 (CUR-15), a pool of 21 sentences has to bring 19 back, so what comes back
+// must have nothing new left in its pool (a Letter Cookies word, its letter's
+// words). It fails with the games dealing as
 // before: 9 ❌ with dealWeekFirst returning `deal`'s deal, and Letter
 // Cookies' ❌ with its weekWordsFor returning none (CUR-9).
 
@@ -133,8 +136,19 @@ async function usable(grade) {
     const has = text => words.some(w => new RegExp(`\\b${w}(?:e?s)?\\b`, 'i').test(text));
     const inPool = c.wordsUpTo(tier).filter(w => words.includes(w.word)).map(w => w.word);
     const singles = c.lettersFor(tier).filter(l => l.letter.length === 1).map(l => l.letter.toLowerCase());
+    const cookieWords = c.wordsUpTo(tier).filter(w => w.initial.length === 1 && singles.includes(w.initial));
     return {
       tier,
+      // each deck's pool, as groups a deal draws one from (CUR-15): a Letter
+      // Cookies plate takes a word for its own letter
+      pools: {
+        'whats-missing': [c.wordsUpTo(tier).map(w => w.word)],
+        'memory-match-words': [c.wordsUpTo(tier).map(w => w.word)],
+        'feed-luna-words': singles.map(l => cookieWords.filter(w => w.initial === l).map(w => w.word)),
+        'build-sentence': [c.sentencesFor(tier).map(s => s.text)],
+        'story-time': [c.MINI_STORIES.filter(s => s.tier <= tier).map(s => s.id)],
+        'treasure-read': [c.passagesFor(grade).map(p => p.id)]
+      },
       'whats-missing': inPool,
       // word boards from tier 2; tier 1's boards are letters
       'memory-match-words': tier >= 2 ? inPool : [],
@@ -258,15 +272,28 @@ const savedAfterClear = await page.evaluate(key => JSON.parse(localStorage.getIt
 ok('… and saves that', Array.isArray(savedAfterClear) && savedAfterClear.length === 0);
 
 console.log('\ngrade2, after "Clear":');
+const { pools } = await usable('grade2');
+let planted = null;
 for (const title of ALL_GAMES) {
   const deck = DECK[title];
   if (!deck) continue;
   const dealt = await play(title);
   const got = (dealt?.rounds ?? []).flat().filter(Boolean);
   const last = firstPlays[`grade2:${title}`].flat().filter(Boolean);
-  const back = got.filter(k => last.includes(k));
-  ok(`${title}: nothing from its last play comes back`, back.length === 0, back.length ? `back: ${back.join(' | ')}` : `${got.length} new`);
+  const back = [...new Set(got.filter(k => last.includes(k)))];
+  // back too soon: something in its pool was in neither play, so it was there to deal
+  const dealtOnce = new Set([...last, ...got]);
+  const tooSoon = back.filter(k => (pools[deck].find(g => g.includes(k)) ?? []).some(o => !dealtOnce.has(o)));
+  const fresh = new Set(got.filter(k => !last.includes(k))).size;
+  if (deck === 'build-sentence') planted = { back, dealtOnce, pool: [...pools[deck][0], 'A sentence no play dealt.'] };
+  ok(`${title}: what its last play dealt comes back only once its pool has nothing new`, tooSoon.length === 0,
+    tooSoon.length ? `back too soon: ${tooSoon.join(' | ')}` : back.length ? `${fresh} new, then ${back.length} back with nothing new left` : `${got.length} new`);
 }
+// the rule can fail: with a sentence planted in Words Off the Page's pool that
+// neither play dealt, everything that came back was too soon
+ok('… and that rule fails a planted pool: a sentence neither play dealt makes what came back too soon',
+  planted?.back.length > 0 && planted.back.every(k => planted.pool.some(o => !planted.dealtOnce.has(o))),
+  planted ? `${planted.back.length} back` : 'Words Off the Page not played');
 
 await browser.close();
 const failed = results.filter(r => !r).length;

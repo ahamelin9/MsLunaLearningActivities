@@ -1,4 +1,5 @@
-// Deck check (GAME-8): does a game keep dealing something new? Plays each of
+// Deck check (GAME-8): does a game keep dealing something new, about 20
+// answers a play (CUR-15)? Plays each of
 // the 8 games at every grade and dial with no browser, reads what each round is
 // about, and fails if anything comes back before its whole pool has been dealt.
 // Then every lesson (CUR-12): 20 rounds a play (a story lesson 2), every
@@ -61,12 +62,24 @@ const TARGETS = {
   'memory-match': r => [...new Set(r.cards.map(c => c.pair))],
   'build-sentence': r => [r.sentence.text],
   'whats-missing': r => [r.missing.word],
-  'treasure-read': r => [r.passage.id],
+  // each stone asks two questions about one passage (CUR-15): the passage
+  // counts once, on its first question
+  'treasure-read': r => (r.kind === 'truefalse' ? [r.passage.id] : []),
   'story-time': r => [r.story.id]
 };
 const GRADES = ['kindergarten', 'grade1', 'grade2'];
 const PLAYS = 60;
 let failed = false;
+
+/**
+ * How many answers a round asks for (CUR-15: about 20 a play, as a lesson): a
+ * board's pairs, a story's word hunt and question; one for the rest.
+ */
+const ANSWERS = {
+  'memory-match': r => r.pairCount,
+  'story-time': () => 2
+};
+const ABOUT_20 = [16, 24];
 
 for (const game of GAMES) {
   const targets = TARGETS[game.id];
@@ -103,11 +116,20 @@ for (const game of GAMES) {
       const firstRepeat = flat.findIndex((t, i) => flat.indexOf(t) !== i);
       const beforeRepeat = firstRepeat === -1 ? flat.length : firstRepeat;
       const whole = beforeRepeat >= Math.min(pool.size - perPlay, flat.length);
-      const ok = repeated === 0 && soonest >= fair && whole;
+      // about 20 answers a play (CUR-15)
+      const rounds = game.makeRounds({ grade, difficulty, count: game.roundsPerPlay });
+      const answers = rounds.reduce((n, r) => n + (ANSWERS[game.id]?.(r) ?? 1), 0);
+      const long = answers >= ABOUT_20[0] && answers <= ABOUT_20[1];
+      // Treasure Path's stones: each passage asked true-or-false, then its missing word
+      const stones =
+        game.id !== 'treasure-read' ||
+        rounds.every((r, i) => r.kind === (i % 2 ? 'cloze' : 'truefalse') && (i % 2 === 0 || r.passage.id === rounds[i - 1].passage.id));
+      const ok = repeated === 0 && soonest >= fair && whole && long && stones;
       if (!ok) failed = true;
       console.log(
         `${ok ? '✅' : '❌'} ${game.id}, ${grade}, dial ${difficulty}: pool ${pool.size}, ${perPlay} a play, ` +
-          `${beforeRepeat} dealt before the first repeat, soonest back after ${soonest}${repeated ? `, ${repeated} plays repeated within` : ''}`
+          `${beforeRepeat} dealt before the first repeat, soonest back after ${soonest}${repeated ? `, ${repeated} plays repeated within` : ''}, ` +
+          `${answers} answers${long ? '' : ` (want ${ABOUT_20.join(' to ')})`}${stones ? '' : ', a stone not asked twice about one passage'}`
       );
     }
   }

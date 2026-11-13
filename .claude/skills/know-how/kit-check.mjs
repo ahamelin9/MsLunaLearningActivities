@@ -854,6 +854,67 @@ const phoneTile = await page.$eval('[data-shot="kit-phone-tile"]', t => {
 });
 ok('a Tile\'s time on a phone fits the tile, "about" kept for screen readers', phoneTile.inside && phoneTile.words === 'about 3 min', JSON.stringify(phoneTile));
 
+// ── CountdownPie (CUR-16) ──────────────────────────────────────────────────
+// five specimens of 15 seconds: 15, 11.5, 7.5, 3.2 and 0.4 left (the phone's is apart)
+const pieFacts = p =>
+  p.$$eval('[data-shot^="kit-pie-"]:not([data-shot="kit-pie-phone"]) [data-shot="countdown-pie"]', ps => {
+    // read beside the pie, so a dark page's roles are the ones resolved
+    const colour = (value, beside) => {
+      const probe = document.createElement('span');
+      probe.style.color = value;
+      beside.append(probe);
+      const c = getComputedStyle(probe).color;
+      probe.remove();
+      return c;
+    };
+    return ps.map(el => {
+      const cs = getComputedStyle(el);
+      const r = el.getBoundingClientRect();
+      const f = el.firstElementChild.getBoundingClientRect();
+      // the pie's edge, where the time left ends: its first colour stop
+      const stop = cs.backgroundImage.match(/\) (-?[\d.]+)(turn|deg)/);
+      return {
+        label: el.getAttribute('aria-label'),
+        role: el.getAttribute('role'),
+        number: el.textContent.trim(),
+        turn: stop ? Number(stop[1]) / (stop[2] === 'deg' ? 360 : 1) : null,
+        fill: cs.backgroundImage.includes(colour('var(--accent)', el.parentElement)),
+        track: cs.backgroundImage.includes(colour('var(--well)', el.parentElement)),
+        size: [Math.round(r.width), Math.round(r.height)],
+        centred: Math.abs(f.left + f.width / 2 - (r.left + r.width / 2)) <= 1 && Math.abs(f.top + f.height / 2 - (r.top + r.height / 2)) <= 1,
+        flat: cs.boxShadow === 'none' && el.tagName === 'SPAN' && el.tabIndex === -1,
+        image: cs.backgroundImage
+      };
+    });
+  });
+const pies = await pieFacts(page);
+ok('CountdownPie: its number counts whole seconds up, and a screen reader hears it as a timer',
+  pies.map(p => p.number).join(',') === '15,12,8,4,1' && pies.every(p => p.role === 'timer') && pies[0].label === '15 seconds left' && pies[4].label === '1 second left',
+  pies.map(p => `${p.number} "${p.label}"`).join(', '));
+const turns = pies.map(p => (p.turn === null ? null : Math.round(p.turn * 100) / 100));
+ok('… its pie is the time left, from full to nearly empty', turns.join(',') === '1,0.77,0.5,0.21,0.03', turns.join(', '));
+ok('… in the accent, on the well', pies.every(p => p.fill && p.track), pies[2].image);
+ok('… the size of a header button (48px), the number in its middle', pies.every(p => p.size.join('x') === '48x48' && p.centred), pies.map(p => p.size.join('x')).join(', '));
+ok('… and it isn\'t a button: no ledge, no tab stop', pies.every(p => p.flat));
+// on a phone the label is 1.3× (DES-32a): "44" stays inside the face, off the ring
+const phonePie = await page.$eval('[data-shot="kit-pie-phone"] [data-shot="countdown-pie"]', el => {
+  const face = el.firstElementChild;
+  const range = document.createRange();
+  range.selectNodeContents(face);
+  const text = range.getBoundingClientRect();
+  const f = face.getBoundingClientRect();
+  return { number: face.textContent, text: Math.round(text.width), face: Math.round(f.width), inside: text.left >= f.left + 2 && text.right <= f.right - 2 };
+});
+ok('… on a phone, "44" in the bigger label stays inside the face', phonePie.number === '44' && phonePie.inside, JSON.stringify(phonePie));
+{
+  const dark = await browser.newPage();
+  await dark.setViewport({ width: 1180, height: 820 });
+  await dark.goto(URL.replace('mode=light', 'mode=dark'), { waitUntil: 'networkidle0' });
+  const darkPies = await pieFacts(dark);
+  ok('… in dark, its own dark colours from the same roles', darkPies[2].image !== pies[2].image && darkPies.every(p => p.fill && p.track), darkPies[2].image);
+  await dark.close();
+}
+
 // ── MilestoneMoon (DES-17) ─────────────────────────────────────────────────
 // her specimens, found by their captions; her parts by what they animate
 const moonIn = l => page.evaluateHandle(l => [...document.querySelectorAll('figure')].find(f => f.textContent.includes(l))?.querySelector('[data-mood]'), l);
