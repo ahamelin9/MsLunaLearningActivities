@@ -39,6 +39,12 @@ export default function TileKit() {
         <Specimen label="no minutes: none" wide>
           <Tile name="Bubble Sounds" tint={2} picture={<Icon name="ear" size={32} />} style={{ flex: 1 }} />
         </Specimen>
+        <Specimen label="on a phone, a Play Shelf tile's width: &quot;3 min&quot;, the &quot;about&quot; still read out (DES-32a)">
+          {/* index.html marks the whole page on a real phone; here one wrapper stands in */}
+          <div data-device="phone" style={{ width: 'calc(var(--space-16) * 2.5)' }}>
+            <Tile name="Bubble Sounds" tint={2} minutes={3} picture={<Icon name="ear" size={32} />} data-shot="kit-phone-tile" />
+          </div>
+        </Specimen>
       </Specimens>
       <Specimens title="a pick-one set: the picked one is aria-pressed (DES-9c)">
         {(['Kindergarten', '1st Grade', '2nd Grade'] as const).map((name, i) => (

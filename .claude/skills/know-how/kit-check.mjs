@@ -33,7 +33,8 @@
 // note only after a quick tap, and a press held 2s (not 1s) opening, with
 // the same wait and a filling ring under reduced motion.
 // DES-32a: iconOnlyOnPhone, a square with the icon alone on a phone page,
-// still named for a screen reader.
+// still named for a screen reader; the longest prompt wrapping on a phone;
+// a Tile's time fitting a Play Shelf tile on a phone ("3 min").
 // Start Vite on 5199 first, then from the repo root:
 //   node .claude/skills/know-how/kit-check.mjs
 // Exits 1 on any ❌.
@@ -836,6 +837,22 @@ const phoneBtn = await phoneButton('kit-phone-on');
 ok('iconOnlyOnPhone off a phone: the icon and the words show', ipadBtn.w > ipadBtn.h && !ipadBtn.wordsHidden && ipadBtn.name === 'Home', JSON.stringify(ipadBtn));
 ok('… on a phone: a square with the icon alone, in the middle', phoneBtn.w === phoneBtn.h && phoneBtn.wordsHidden && phoneBtn.iconOffCentre <= 1, JSON.stringify(phoneBtn));
 ok('… and a screen reader still hears "Home"', phoneBtn.name === 'Home', phoneBtn.name);
+// the longest prompt, 1.3× on a phone, wraps inside its box instead of running off it
+const phonePrompt = await page.$eval('[data-shot="kit-phone-prompt"]', b => {
+  const r = b.getBoundingClientRect();
+  const box = b.parentElement.getBoundingClientRect();
+  return { inside: r.left >= box.left - 1 && r.right <= box.right + 1, h: Math.round(r.height), w: Math.round(r.width), box: Math.round(box.width) };
+});
+ok('a prompt on a phone: the longest wraps inside its box', phonePrompt.inside && phonePrompt.h > 48, JSON.stringify(phonePrompt));
+// a Play Shelf tile on a phone: "3 min", inside the tile, and "about" still in its words
+const phoneTile = await page.$eval('[data-shot="kit-phone-tile"]', t => {
+  const chip = [...t.querySelectorAll('span')].find(s => /^about \d+ min$/.test(s.textContent.trim()) && s.querySelector('svg'));
+  const c = chip.getBoundingClientRect();
+  // the room it's given, as a Play Shelf column: the tile grows to fit what won't
+  const room = t.parentElement.getBoundingClientRect();
+  return { inside: c.right <= room.right + 1 && t.getBoundingClientRect().right <= room.right + 1, chip: Math.round(c.width), room: Math.round(room.width), words: chip.textContent.trim() };
+});
+ok('a Tile\'s time on a phone fits the tile, "about" kept for screen readers', phoneTile.inside && phoneTile.words === 'about 3 min', JSON.stringify(phoneTile));
 
 // ── MilestoneMoon (DES-17) ─────────────────────────────────────────────────
 // her specimens, found by their captions; her parts by what they animate

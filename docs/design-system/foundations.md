@@ -218,8 +218,12 @@ What the moments look like:
   `<html>` with `data-device="phone"`, which grows the small type (see Type)
   and turns the header's Home, Library and Again into icons alone. It decides
   "phone" once, from the screen's short side (under 744) and a page that fits
-  that screen, so a narrow window on a computer stays as it is. Sideways
-  phones are DES-32b, laptops and big screens DES-32c.
+  that screen, so a narrow window on a computer stays as it is. There a
+  Play Shelf tile's time drops its "about", a prompt pill may wrap, and taps
+  skip the double-tap-zoom wait (`touch-action: manipulation`, in
+  `base/_reset.scss`): a page wider than its screen made Safari hold each tap,
+  and drop it if the piece under the finger moved. Sideways phones are
+  DES-32b, laptops and big screens DES-32c.
 - **Breakpoints:** two, settled in DES-10: `narrow` (the portrait iPads, up to
   899px wide) and `short` (the 1024×768 iPad, up to 799px tall). They're
   written once in the tokens and used only through the breakpoint mixin:

@@ -9,7 +9,8 @@
  *         chip on a well (a locked lesson) turns card so it still shows
  *         className is layout only
  *         TimeChip: minutes · took? (default false) · highlight? (the accent
- *         look, for the lesson that's up next) · ground
+ *         look, for the lesson that's up next) · ground · shortOnPhone? (on a
+ *         phone page, "about" is clipped but still read out; DES-32a)
  * States: none; the variant is its job. Shimmer sits on a ::after.
  * Tokens: --chip-bg, --chip-ink, --chip-ring, --chip-icon, --chip-font,
  *         --chip-pad; sets --icon-fill for a filled icon
@@ -59,15 +60,25 @@ export function Chip({ variant = 'time', icon, shimmer = false, ground = 'card',
   );
 }
 
-/** A lesson's time: "about 5 min" before it, "took 4 min" after. */
-export function TimeChip({ minutes, took = false, highlight = false, ground, className }: {
+/**
+ * A lesson's time: "about 5 min" before it, "took 4 min" after. shortOnPhone
+ * (DES-32a): on a page marked data-device="phone", "about" is clipped away
+ * (a screen reader still says it), for a chip in a narrow tile.
+ */
+export function TimeChip({ minutes, took = false, highlight = false, shortOnPhone = false, ground, className }: {
   minutes: number;
   took?: boolean;
   highlight?: boolean;
+  shortOnPhone?: boolean;
   ground?: Ground;
   className?: string;
 }) {
   const n = Math.max(1, Math.round(minutes));
   if (took) return <Chip variant="took" icon="check" ground={ground} className={className}>took {n} min</Chip>;
-  return <Chip variant={highlight ? 'accent' : 'time'} icon="clock" ground={ground} className={className}>about {n} min</Chip>;
+  return (
+    <Chip variant={highlight ? 'accent' : 'time'} icon="clock" ground={ground} className={className}>
+      {/* one span, so the words stay one flex item and "about" keeps its space */}
+      {shortOnPhone ? <span><span className={styles.about}>about </span>{n} min</span> : <>about {n} min</>}
+    </Chip>
+  );
 }

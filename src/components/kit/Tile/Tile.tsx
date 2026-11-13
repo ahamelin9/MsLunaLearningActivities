@@ -5,7 +5,8 @@
  *         (each game draws its own: games/shared/GamePicture, DES-21)
  *         · tint: 1–5, the picture area's
  *         soft colour (default 1) · minutes?: "about N min" under the name
- *         (a game's time, PRG-6; left out, none) · plus any <button>
+ *         (a game's time, PRG-6; left out, none; "N min" on a phone, where
+ *         the tile is too narrow for "about", DES-32a) · plus any <button>
  *         attribute (onClick, data-shot); className is layout only
  * States: idle · pressed (:active, sinks onto its ledge) · picked:
  *         aria-pressed="true" takes the action look, for a pick-one set
@@ -40,7 +41,8 @@ export function Tile({ name, picture, tint = 1, minutes, type = 'button', classN
       <span className={styles.picture} aria-hidden="true">{picture}</span>
       <span className={styles.words}>
         <span className={styles.name} data-shot="tile-title">{name}</span>
-        {minutes !== undefined && <TimeChip minutes={minutes} />}
+        {/* a tile is narrow: on a phone its chip is "3 min" (DES-32a) */}
+        {minutes !== undefined && <TimeChip minutes={minutes} shortOnPhone />}
       </span>
     </button>
   );

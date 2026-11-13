@@ -279,7 +279,12 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
               className={styles.bubble}
               // a game piece in the one answer language (components.md)
               data-state={b.popped ? (b.isTarget ? 'right' : 'wrong') : shown && b.isTarget ? 'revealed' : undefined}
-              onClick={e => pop(b, e.timeStamp)}
+              // a bubble pops as a finger lands on it (DES-32a): a phone's
+              // browser can hold a tap's click until after the bubble has risen
+              // from under the finger, and then drops it. onClick is only the
+              // keyboard's (detail 0), so a tap never pops twice (BUG-2)
+              onPointerDown={e => e.button === 0 && pop(b, e.timeStamp)}
+              onClick={e => e.detail === 0 && pop(b, e.timeStamp)}
               aria-label={`bubble ${b.char}`}
             >
               <span className={styles.char}>{b.char}</span>

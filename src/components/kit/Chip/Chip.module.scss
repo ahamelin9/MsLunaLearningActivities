@@ -25,6 +25,15 @@
   color: var(--chip-icon);
 }
 
+// a TimeChip's "about", on a phone (DES-32a; index.html marks the page):
+// clipped away for a narrow tile, not removed, so a screen reader still says it
+[data-device='phone'] .about {
+  position: absolute;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
 // a time chip on a well (a locked lesson) sits on card, so it still shows
 .root[data-ground='well'] {
   --chip-bg: var(--card);

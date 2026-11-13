@@ -38,6 +38,16 @@ body {
   -webkit-tap-highlight-color: transparent;
 }
 
+// a phone (DES-32a) shows a page wider than its screen, so Safari holds each
+// tap to see whether a second one follows to zoom in, and drops the tap if what
+// was under the finger moved meanwhile. No zooming by double tap there, so
+// every tap goes straight through. On every element, since a scrolling box
+// starts the rule afresh; :where() keeps it weakest, so a piece that sets its
+// own (a drag, a hold) still wins.
+:where([data-device='phone'], [data-device='phone'] *) {
+  touch-action: manipulation;
+}
+
 #root {
   min-height: 100vh;
   min-height: 100dvh;

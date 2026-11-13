@@ -181,3 +181,13 @@
   --button-radius: var(--radius-chip);
   --button-font: var(--text-read);
 }
+
+// on a phone (DES-32a) the reading type is 1.3×, and the longest prompt ("Read
+// the sentence and find the matching picture!") no longer fits one line: it
+// wraps, centred, with room above and below
+[data-device='phone'] .root[data-variant='prompt'] {
+  max-width: 100%;
+  padding-block: var(--space-2);
+  text-align: center;
+  white-space: normal;
+}

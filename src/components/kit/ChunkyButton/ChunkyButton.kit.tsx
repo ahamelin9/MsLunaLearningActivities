@@ -1,7 +1,8 @@
 // ChunkyButton on the Kit page (DES-7a): each variant at 48 and 64, idle,
 // pressed (held with data-state) and disabled; the hold mode (SET-1) idle,
 // held part-way, with its note, and one to try; a header button with
-// iconOnlyOnPhone, on an iPad and on a phone (DES-32a).
+// iconOnlyOnPhone, on an iPad and on a phone, and a long prompt wrapping on a
+// phone (DES-32a).
 
 import { useState, type CSSProperties } from 'react';
 import { Specimen, Specimens } from '@/dev/KitPage/Specimen';
@@ -93,6 +94,13 @@ export default function ChunkyButtonKit() {
           {/* index.html marks the whole page on a real phone; here one wrapper stands in */}
           <div data-device="phone">
             <ChunkyButton icon="home" iconOnlyOnPhone data-shot="kit-phone-on">Home</ChunkyButton>
+          </div>
+        </Specimen>
+        <Specimen label="a prompt on a phone: the longest wraps (DES-32a)">
+          <div data-device="phone" style={{ width: 'calc(var(--space-16) * 6)' }}>
+            <ChunkyButton variant="prompt" icon="speaker" data-shot="kit-phone-prompt">
+              Read the sentence and find the matching picture!
+            </ChunkyButton>
           </div>
         </Specimen>
       </Specimens>

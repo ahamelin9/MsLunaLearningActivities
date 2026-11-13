@@ -16,6 +16,8 @@
 //     it was: at the default dial (tier 1 at K, aiming at 1 in 3; tier 3 at
 //     2nd, aiming at 1 in 5), no more than 12 points over the aim, the most
 //     `bubble-share-sim.mjs` finds in any 20 s stretch.
+// On a phone (DES-32a): taps aren't held for a double-tap zoom, a bubble pops
+// as a finger lands on it, one tap counts once, and Enter still pops one.
 // It fails on the commit before GAME-3, where bubbles moved by a state update
 // every 60 ms, could overlap and hide one another, and about half were the
 // answer.
@@ -112,6 +114,64 @@ for (const [w, h] of [[1180, 820], [744, 1133]]) {
     ok(`${where}: the answer is clearly fewer of the bubbles (GAME-7)`, r.answers / r.seen <= aim + 0.12, `${Math.round((r.answers / r.seen) * 100)}% of those on screen, aim ${Math.round(aim * 100)}%`);
     await page.close();
   }
+}
+
+// ── on a phone (DES-32a): a bubble pops as a finger lands on it ──
+// Safari on a phone (the page laid out wider than the screen) held a tap's
+// click until the bubble had risen from under the finger, then dropped it.
+// So a bubble pops on the pointer going down, and its click is the
+// keyboard's alone. Chrome doesn't hold taps, so the check is the finger
+// down with no lift yet: the old onClick never saw that.
+{
+  const page = await browser.newPage();
+  await page.setViewport({ width: 390, height: 660, isMobile: true, hasTouch: true, deviceScaleFactor: 2 });
+  await page.evaluateOnNewDocument(() => { window.speechSynthesis.speak = () => {}; });
+  await page.goto(`http://localhost:${port}/`, { waitUntil: 'networkidle0' });
+  await page.evaluate(() => { localStorage.clear(); localStorage.setItem('ms_luna_learning_progress_v1', JSON.stringify({ selectedGrade: 'kindergarten', completedLessons: [] })); });
+  await page.reload({ waitUntil: 'networkidle0' });
+  await page.click(at('open-reading'));
+  await page.waitForSelector(at('hub'));
+  for (const t of await page.$$(at('game-tile'))) {
+    if ((await t.evaluate(e => e.textContent)).includes('Bubble Sounds')) { await t.evaluate(e => e.click()); break; }
+  }
+  await page.waitForSelector(at('play'));
+  await page.click(at('play'));
+  await page.waitForSelector('[aria-label^="bubble "]');
+  await wait(2000);
+  // a bubble of the round's sound, well inside the water; and the tally
+  const aim = () => page.evaluate(() => {
+    const first = document.querySelector('[aria-label^="bubble "]');
+    const key = Object.keys(first).find(k => k.startsWith('__reactFiber'));
+    let target = null;
+    for (let f = first[key]; f; f = f.return) if (f.memoizedProps?.round?.letter) { target = f.memoizedProps.round.letter.letter; break; }
+    const b = [...document.querySelectorAll(`[aria-label="bubble ${target}"]`)].find(e => !e.dataset.state && parseFloat(getComputedStyle(e.parentElement).opacity) > 0.9);
+    if (!b) return null;
+    b.dataset.aim = String(performance.now());
+    const r = b.getBoundingClientRect();
+    return { x: r.x + r.width / 2, y: r.y + r.height / 2, id: b.dataset.aim, action: getComputedStyle(b).touchAction };
+  });
+  const tally = () => page.evaluate(() => Number(document.querySelector('[aria-label$=" popped"]')?.getAttribute('aria-label').match(/^\d+/)?.[0] ?? -1));
+  const stateOf = id => page.evaluate(id => document.querySelector(`[data-aim="${id}"]`)?.dataset.state ?? 'none', id);
+  const cdp = await page.createCDPSession();
+
+  const one = await aim();
+  ok('phone: taps aren\'t held for a double-tap zoom (touch-action)', one?.action === 'manipulation', one?.action);
+  const before = await tally();
+  await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x: one.x, y: one.y }] });
+  await wait(150);
+  const downState = await stateOf(one.id);
+  await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+  await wait(400);
+  ok('phone: a bubble pops as the finger lands, before it lifts', downState === 'right', `state while held: ${downState}`);
+  ok('… and one tap counts once', (await tally()) === before + 1, `${before} → ${await tally()} popped`);
+
+  const two = await aim();
+  await page.evaluate(id => document.querySelector(`[data-aim="${id}"]`).focus(), two.id);
+  const beforeKey = await tally();
+  await page.keyboard.press('Enter');
+  await wait(400);
+  ok('… and Enter still pops a bubble, once', (await stateOf(two.id)) === 'right' && (await tally()) === beforeKey + 1, `${beforeKey} → ${await tally()}`);
+  await page.close();
 }
 
 await browser.close();
