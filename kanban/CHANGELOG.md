@@ -457,3 +457,21 @@ only record of them. One line each: date, ID, title, and `Done` or
   | there | the small type roles are 1.3× (`$type-phone`); the header's Home, Library and Again show their icon alone; a Play Shelf tile's time is "3 min"; a prompt pill may wrap; taps skip the double-tap-zoom wait |
   | every device | a Bubble Sounds bubble pops as the finger lands (`pointerdown`); Enter still pops one |
   | a phone sideways, a laptop, the big screen | as before: DES-32b and DES-32c |
+- **2026-11-13** — CUR-15 Every game deals about 20 a play — Done. The teacher showed more children, who all loved it, and wanted "ALL of the games and lessons and stuff to be at 20 or so". The games dealt 2 to 5 rounds; each now deals about 20 answers a play, as lessons have since CUR-12. Treasure Path asks two stones about each passage (true or false, then the missing word), so its 20 stones read 10 passages. Words Off the Page gained 13 sentences (21 per tier, rendered), so a play repeats none. Kindergarten's letter games have 14 letters, so 6 come round a second time. The Play Shelf's "about N min" follows the new lengths. Checked by `deck-check` (about 20 answers a play at every grade and dial; it fails on the old counts) and `passage-check`. Found on the way: every check that plays a game to its done screen stopped at the old length (now 25 rounds), and the next play brings back most of a pool that holds barely one play (Words Off the Page, Treasure Path, Kindergarten's Story Corner), logged as CUR-17. The rule:
+
+  | Game | A play deals |
+  |---|---|
+  | The Letter Jar, Bubble Sounds, Letter Cookies, Words Off the Page, What's Missing? | 20 rounds (`ROUNDS_PER_PLAY`) |
+  | Treasure Path | 20 stones: 10 passages, two questions each |
+  | Luna's Muddled Cards | 4 boards of 4 to 6 pairs (16 to 24) |
+  | Story Corner | 9 stories, a word hunt and a question each (18) |
+  | every lesson | 20 (CUR-12) |
+- **2026-11-13** — CUR-16 A countdown pie for 1st and 2nd grade — Done. The teacher wanted some pressure to answer in time, with less time in 2nd grade; Alex asked for a pie in the top corner with the number counting down inside. The kit's `CountdownPie` sits at the end of the game's header, after Again. It counts only while the child can answer: it holds while Luna talks or an answer is said, while the tab is hidden, and in What's Missing until the desk is hidden. When it runs out, Luna says "Time's up! You can still answer it." (rendered). The round is then no longer right the first time (a lesson brings it back next play), and the next miss gets the spoken clue; the child still answers. A miss before then takes the pie away. On a phone its ring is thinner, so two digits fit. Checked by `timer-check` (it fails 10 lines with the timer off) and `kit-check`. The rule (`engine/timer.ts`):
+
+  | Kind of round | 1st grade | 2nd grade | Where |
+  |---|---|---|---|
+  | hear it, tap it | 15 s | 10 s | Letter Cookies, What's Missing?; the listening lessons (letter sounds and shapes, rhymes, sight words) |
+  | find several | 25 s | 20 s | The Letter Jar |
+  | read a word or a sentence | 30 s | 20 s | Words Off the Page; the reading lessons (blending, read and match, sentences) |
+  | read a passage | 45 s | 30 s | Treasure Path |
+  | no timer | | | Kindergarten; Bubble Sounds (already a race), Luna's Muddled Cards, Story Corner and the story lessons |

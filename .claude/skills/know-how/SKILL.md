@@ -955,7 +955,57 @@ Pitfalls that cost time:
 - **Fix:** ask the deck for it, one item at a time if need be. A lesson also passes
   what each round is about (`aboutOf`), so a play asks each letter once first.
 - **Check:** `node .claude/skills/know-how/deck-check.mjs` plays all 8 games at every
-  grade and dial, with no browser. Run it again after adding content.
+  grade and dial, with no browser. Run it again after adding content. Since
+  CUR-15 it also fails a game whose play isn't about 20 answers (16 to 24: a
+  Muddled Cards board counts its pairs, a Story Corner story 2), and a Treasure
+  Path stone that isn't true-or-false then the missing word of one passage.
+- **Pitfall, a game's play grows:** a round that asks twice about one thing
+  (Treasure Path's stone) looks like a repeat to every check that counts
+  repeats. Both `deck-check.mjs` and `passage-check.mjs` (in `voice:audit`) had
+  to learn the stone, with a planted bad play each (CUR-15, 2026-11-13). A
+  path or row drawn one piece per round (the stones) runs off a portrait iPad
+  at 20: draw a piece per passage instead. And every browser check that plays
+  a game to its done screen had a loop capped at the old length (8 or 12
+  rounds): `stars-check` timed out waiting for the done screen. Those loops now
+  stop at 25; when a play grows again, grep the checks for `shell-reward'))); r++`.
+  A rule like "nothing from the last play comes back" stops holding once a
+  play is nearly its pool (21 sentences, 20 a play): `week-words-check` now
+  asks that what comes back has nothing new left in its pool, with a planted
+  pool to prove it can fail.
+
+## Does the round's countdown work? (CUR-16)
+
+*2026-11-13 · CUR-16*
+
+- **What it is:** at 1st and 2nd grade the shell's `RoundTimer` puts a kit
+  `CountdownPie` at the end of the game's header, for every round of a game
+  or lesson with a `timer` kind; the seconds are in `engine/timer.ts`. It
+  counts only while the child can answer (not while Luna talks, an answer is
+  said or the tab is hidden), and What's Missing holds it until
+  `api.asking()`. Running out is a miss with Luna's `timeUp` line.
+- **Check:** `node .claude/skills/know-how/timer-check.mjs 5199`: the 15
+  seconds at 1st grade and 10 at 2nd, the hold while Luna talks, the count,
+  a hidden tab, running out (the line, then a wrong answer gets the clue, so
+  it was the first miss), a miss taking the pie away, none at Kindergarten or
+  in the untimed games, What's Missing waiting, and a lesson noting the
+  question missed and scoring 19 of 20 first try. It fails 10 lines with the
+  table off. `kit-check.mjs` has the pie itself (light and dark), and
+  `timer-shot.mjs` shoots it in play for a review sheet (`ui:shots` plays at
+  Kindergarten, so it never shows the pie).
+- **Pitfall, moving the clock:** a jump of `window.__skip` can bring Luna's
+  own nudge too, and while she says it the pie rightly waits, so a check of
+  "it counts down" read 15 after a 6 s jump. Time the counting in real
+  seconds, and keep the jump for running out.
+- **Pitfall, the kit page in dark:** a colour probe appended to `body` reads
+  the light roles; append it beside the specimen.
+- **Pitfall, a stale handle:** a lesson's choices render again after each
+  answer, so click by index inside `page.$$eval` rather than holding handles.
+- **Pitfall, a number in a small piece on a phone:** the phone's 1.3× label
+  (DES-32a) put Treasure Path's "44" on the pie's ring, seen only in the phone
+  review shot. The pie's ring is thinner there (`--pie-ring`), and
+  `kit-check.mjs` measures the number inside the face on a `data-device="phone"`
+  specimen (it fails with the old ring: 28px of number in a 28px face). Any
+  new small piece holding text wants the same phone specimen.
 
 ## Do this week's words come first? (CUR-9)
 

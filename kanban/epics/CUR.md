@@ -14,3 +14,12 @@ Story · P1 · L · needs: — · split by grade before starting
   - Split into one ticket per grade (CUR-13a Kindergarten, CUR-13b 1st grade, CUR-13c 2nd grade), each written for Alex to review at once, as CUR-4b was, smallest lessons first.
   - Render the new words and lines (`npm run voice:render`, `npm run voice:audit`).
 - **Complete when:** every lesson but the stories holds 20 questions or more; the content checks pass, covering the new items; `voice:audit`, build and lint pass; Alex has OKed each grade's list.
+
+### CUR-17 · Every game holds two plays of its own
+Story · P1 · L · needs: — · split by game before starting
+- **Why:** at about 20 a play (CUR-15), three games' pools hold barely one play, so the next play brings most of it back (found by `week-words-check`, 2026-11-13). Words Off the Page has 21 sentences per tier, so a second play repeats 19 of its 20. Treasure Path has 18 passages per grade and a play reads 10. Story Corner has 9 stories at Kindergarten and a play tells 9, so every Kindergarten play is the same 9 stories. Practice should keep dealing new things (Alex: practice until learned; content is a baseline).
+- **How:**
+  - Grow each pool to at least two plays: Words Off the Page to 40 sentences per tier, Treasure Path to 20 passages per grade, and Story Corner to 18 stories at Kindergarten. 1st and 2nd grade's Story Corner already reach 18 and 27, counting the tiers below.
+  - Content follows CNT's rules: words from the bank, a picture that shows it, everyday sense, look-alikes apart. Passages and stories keep `passage-check`'s and `story-check`'s rules.
+  - Split into one ticket per game, each written for Alex to review at once, as CUR-4b was. Render the new lines (`npm run voice:render`, `npm run voice:audit`).
+- **Complete when:** Words Off the Page holds 40 sentences per tier, Treasure Path 20 passages per grade, and Story Corner 18 stories at Kindergarten; `deck-check`, `passage-check`, `story-check` and `week-words-check` pass, covering the new items; `voice:audit`, build and lint pass; Alex has OKed each game's list.
