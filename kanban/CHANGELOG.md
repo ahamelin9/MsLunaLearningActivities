@@ -475,3 +475,11 @@ only record of them. One line each: date, ID, title, and `Done` or
   | read a word or a sentence | 30 s | 20 s | Words Off the Page; the reading lessons (blending, read and match, sentences) |
   | read a passage | 45 s | 30 s | Treasure Path |
   | no timer | | | Kindergarten; Bubble Sounds (already a race), Luna's Muddled Cards, Story Corner and the story lessons |
+- **2026-11-13** — CUR-18 The countdown starts with the round — Done. Alex: "we should have the timer start right away and not after the owl is done talking". The pie no longer holds while Luna talks: it counts from the moment the round's pieces show, while she still asks its question (her question took about a second, so a 1st grade round now has about 13 seconds left when she stops, not 15). It still holds while an answer is said and while the tab is hidden or the iPad sleeps. What's Missing still waits for the desk to hide, since there's nothing to answer while the child memorizes, and starts as Luna asks "What is missing?". The seconds are unchanged. Checked by `timer-check`, which reads the pie's exact fill against Luna's talking time and fails 2 lines on the code before.
+- **2026-11-13** — CUR-19 What's Missing sometimes offers a word that starts the same — Done. Alex: "make some of the answers start with the same letter so like ship and shoe or something to trip them up sometimes". Half of a play's rounds now offer a wrong choice that begins like the missing word, so remembering its first letter isn't enough. Rounds are built in a random order, and one whose word has nothing fair that starts like it passes its turn on, so every play gets its 10. Checked by `distractor-check` over 2,700 plays: 10 of every 20 rounds, 98% of them by the beginning sound (the rest by the letter, where the bank had nothing closer). It fails every play on the code before, and fails a copy that picks by the letter first. The rule:
+
+  | Rounds a play | A wrong choice that starts alike | Example |
+  |---|---|---|
+  | 10 of 20, spread at random | the same beginning sound where the bank has a fair one | glove, globe · spoon, spider |
+  | | else the same first letter | game, grape |
+  | the other 10 | any fair word, as before | bag, rock, crown |

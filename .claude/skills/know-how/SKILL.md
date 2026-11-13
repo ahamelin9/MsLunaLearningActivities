@@ -975,16 +975,18 @@ Pitfalls that cost time:
 
 ## Does the round's countdown work? (CUR-16)
 
-*2026-11-13 · CUR-16*
+*2026-11-13 · CUR-16, CUR-18*
 
 - **What it is:** at 1st and 2nd grade the shell's `RoundTimer` puts a kit
   `CountdownPie` at the end of the game's header, for every round of a game
   or lesson with a `timer` kind; the seconds are in `engine/timer.ts`. It
-  counts only while the child can answer (not while Luna talks, an answer is
-  said or the tab is hidden), and What's Missing holds it until
-  `api.asking()`. Running out is a miss with Luna's `timeUp` line.
+  starts with the round, while Luna still asks its question (CUR-18: Alex
+  wanted it "right away"), and waits only while an answer is said or the tab
+  is hidden. What's Missing holds it until `api.asking()`, as the desk hides.
+  Running out is a miss with Luna's `timeUp` line.
 - **Check:** `node .claude/skills/know-how/timer-check.mjs 5199`: the 15
-  seconds at 1st grade and 10 at 2nd, the hold while Luna talks, the count,
+  seconds at 1st grade and 10 at 2nd, the pie counting down while Luna asks
+  (read from its `--share`, held to her talking time in real seconds), the count,
   a hidden tab, running out (the line, then a wrong answer gets the clue, so
   it was the first miss), a miss taking the pie away, none at Kindergarten or
   in the untimed games, What's Missing waiting, and a lesson noting the
@@ -993,8 +995,8 @@ Pitfalls that cost time:
   `timer-shot.mjs` shoots it in play for a review sheet (`ui:shots` plays at
   Kindergarten, so it never shows the pie).
 - **Pitfall, moving the clock:** a jump of `window.__skip` can bring Luna's
-  own nudge too, and while she says it the pie rightly waits, so a check of
-  "it counts down" read 15 after a 6 s jump. Time the counting in real
+  own nudge too (while the pie still held for her, before CUR-18, a check of
+  "it counts down" read 15 after a 6 s jump). Time the counting in real
   seconds, and keep the jump for running out.
 - **Pitfall, the kit page in dark:** a colour probe appended to `body` reads
   the light roles; append it beside the specimen.
@@ -1535,6 +1537,15 @@ the old version either proves nothing.
   takes a `<src-root>` the same way. Writing a blank, the easy trap is "the":
   "in the ___" beside "in the garden" gives the answer away, so put a
   different word next to the gap ("in her ___", "Luna's ___").
+- **A share of rounds with a kind of wrong choice** (*CUR-19*): What's
+  Missing offers a wrong word that starts like the missing one in 10 of a
+  play's 20 rounds. Picking the 10 rounds first fell short in 324 of 2,700
+  plays (7 to 9 of 20): some words have nothing fair that starts like them.
+  Build the rounds in a random order and let a round that can't do it pass
+  its turn on. The check counts the share per play from the choices
+  themselves, not the round's flag, so the old code fails every play (2.5 of
+  20 by chance). To prove the "sound before letter" line, a scratch copy that
+  picks by the letter first fails it.
 
 ## A page of raw code pops up in Alex's browser
 
