@@ -1212,6 +1212,33 @@ Pitfalls that cost time:
   four iPads' shots with `--diff` against a "before", which must show 0
   changed. To see what a page decided: `document.documentElement.dataset.device`
   and the viewport meta's `content`.
+- **Pitfall, a tap that does nothing on a phone** (Alex's iPhone, 2026-11-12):
+  Bubble Sounds wouldn't pop a single bubble, while everything else tapped
+  fine. Chrome's phone emulation popped every one, held 0, 60 or 150 ms, so
+  it isn't touch in general: it's Safari. A page laid out wider than the
+  screen can be zoomed, so Safari holds each tap to see whether a second one
+  follows, and drops it if what was under the finger has moved by then (a
+  rising bubble always has). Fixes: `touch-action: manipulation` on every
+  element of a phone page (`base/_reset.scss`; on every element, because a
+  scrolling box starts the rule afresh, inside `:where()` so a drag's or a
+  hold's own rule still wins), and a bubble pops on `pointerdown`, with its
+  `onClick` the keyboard's alone (`e.detail === 0`, as BUG-2). A moving
+  piece should always answer to the touch, not the click after it. Check:
+  `bubble-check.mjs`'s phone lines put a finger down without lifting it (the
+  old `onClick` never saw that), and read the bubble's `touch-action`. No iOS
+  Simulator runtime is installed here, so the iPhone itself is Alex's check.
+- **Pitfall, words 1.3× bigger in a box drawn for the iPad:** "about 3 min"
+  ran out of its Play Shelf tile, and the longest prompt pill off the page.
+  The layout audit listed the pill only as a "(stage)" line, so read those
+  too after a type change; the chip it never saw (its overflow was inside
+  the tile). TimeChip's `shortOnPhone` and a phone-only wrap for the prompt
+  fixed them; `kit-check.mjs` has both at a phone's width.
+- **Pitfall, the audit takes an hour:** it plays each grade's Lesson 1 to its
+  done screen (20 questions since CUR-12), about 7 minutes a size, and it
+  prints a size only once it's done (a clean screen prints nothing). Run the
+  three grades side by side, each its own `node … layout-audit.mjs` with its
+  own log. A `ui:shots` run started beside them can die with "Connection
+  closed" partway; run it again on its own.
 
 ## A card's row of pictures is squeezed, or slides under its buttons (PRG-5a)
 

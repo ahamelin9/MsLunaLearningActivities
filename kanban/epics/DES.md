@@ -66,32 +66,8 @@ them in.
 - **DES-14** (P2) redraws Letter Cookies' cookies, whose folder DES-22b put on the kit, so it can slot in any time.
 - **P0 bugs** can still be pulled in between tickets for a break from styling.
 
-### DES-32a · Phones held upright: the iPad layout scaled to fit, with bigger words
-Story · P1 · M · needs: —
-- **Blocked (2026-11-12):** built; waits for Alex to try it on his phone and OK it (`screenshots/review/des32a-phones.png`, HANDOVER). Met: reading text 15.2px at 390 wide; Home, Library and Again show only their icon, still named for screen readers (`kit-check.mjs`); the four iPads 0 of 27 screens changed (`ui:shots --diff des32-ipad-before des32-ipad-after`); all 27 screens shot at the three phone sizes in light and dark; build and lint pass. The phone layout audit was still running at handover: grade K passed at 360 and 390.
-- **Why:** Alex (2026-11-12): on a phone "everything is overlapping… some things are not even shown, like the next button when you complete a game". He wants to check the app on his phone, and show it to the teacher without it looking odd. Found (`screenshots/des32-before/`, light and dark):
-  - at 360 and 390 wide, the header runs off the right edge, so its apple (the Teacher's corner) can't be reached;
-  - the library's rows run off the screen, and the lesson cards' time chips overlap;
-  - at 430 wide, the play header's buttons and title overlap, and the done screen's buttons sit far below the fold.
-
-  Every screen is drawn for 744 px wide and up. Split from DES-32 (2026-11-12).
-- **Decided (Alex, 2026-11-12):** option 2 of `screenshots/review/des32-phone-options.png` ("2 looks best"), plus "if mobile some things should reduce to just their icon… free up some room". The three were previewed at 390 wide without app code:
-  - option 1, shrinking the iPad layout to fit, gave 11.5 px reading text;
-  - option 2 adds 1.3× words, for 15 px;
-  - option 3 shrank less (640 wide), which broke the library's top row, a lesson's answers and the done screen.
-- **How:**
-  - **Scale:** a phone held upright lays the page out at 744 wide, and the browser scales it to fit. A phone is a device whose short side is under 744 px, the iPad mini's width. A small script in `index.html` sets the viewport tag, marks the page `data-device="phone"`, and redoes both when the phone turns. iPads, Chromebooks and computers are untouched.
-  - **Bigger words:** under `[data-device="phone"]`, the small text roles are 1.3×: reading, labels, small labels, tags and the two small titles. This is a token change in `$type-phone`, beside `$type` in the primitives, which Alex OKed with his pick. The big letters, answers and titles stay as they are.
-  - **Icons alone:** on a phone, the app header's buttons that have an icon (Home, Library, Again) show only the icon and keep their name for screen readers, so the title has room.
-  - **Checks:** `layout-audit sizes=phone` and `library-fit-check sizes=phone`; for the iPads, `ui:shots --diff` against `des32-ipad-before`.
-- **Complete when:**
-  - at 360×640, 390×660 and 430×750, for each grade, `layout-audit` passes: nothing runs off the side, and every screen's main action (Start, the done screen's buttons) is on screen without scrolling. `library-fit-check` passes too;
-  - on a 390-wide phone, reading text measures at least 15 px, and the header's Home, Library and Again show only their icon, with their name kept for screen readers;
-  - at the four iPad sizes, `ui:shots --diff` shows 0 changed screens;
-  - shots at the phone sizes in light and dark; build and lint pass; Alex tries it on his phone and OKs it.
-
 ### DES-32b · Phones turned sideways
-Story · P2 · S · needs: DES-32a
+Story · P2 · S · needs: —
 - **Why:** a phone turned sideways leaves about 850×330 for the page, and no round fits that short. DES-32a leaves a sideways phone as it is today. Split from DES-32 (2026-11-12).
 - **How:** Alex's call first: scale it as DES-32a does upright (everything small), or let the screen scroll with nothing cut off. Checked with `layout-audit sizes=phone-landscape`, which lists scrolling there rather than failing it.
 - **Complete when:** at 850×330, `layout-audit sizes=phone-landscape` finds nothing cut off, and every main action can be reached; shots in light and dark; build and lint pass; Alex OKs it on his phone.

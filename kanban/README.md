@@ -73,7 +73,7 @@ be pulled into Phase 1 for a break from styling.
 ### Now / Next
 
 - **Now:** the teacher's notes from her try-out (2026-11-12) are done and live, but one: the password, American spelling, lessons 1, 2, 3 in each skill, 20 questions a play, reading first, and Luna on the tab. VOX-6 (Luna "like a demon" on her classroom whiteboard) is Blocked: one audio engine for voice and effects, made fresh after anything that can leave it at the wrong rate; its hardening is live too (`921ddad`), and her ear on the whiteboard decides it. Then CUR-13 (every lesson holds 20, split by grade), content for Alex to review. She likes the emoji (DES-27 dropped) and wants no per-child sign-in: one save per device stays.
-- **Next:** DES-32a (phones held upright: the iPad layout scaled to fit, with bigger words and icon-only header buttons; Alex's pick, 2026-11-12) is built and Blocked until he tries it on his phone; then DES-32c (laptops and the classroom's big screen) and DES-32b (phones turned sideways). Still waiting on Alex: DES-28 (which Chromebooks the class has), SAY-1 (his recordings), and his Sound Check picks for VOX-1, with VOX-4 alongside it; VOX-5 (the Luna/Kore blend for single words; his call first: lines too?), then VOX-2, then VOX-3. The Writing app (WRT) after Phase 7. OPS-11 stays parked.
+- **Next:** phones held upright work (DES-32a, done 2026-11-12); next DES-32c (laptops and the classroom's big screen), then DES-32b (phones turned sideways: Alex's call first, scale or scroll). Still waiting on Alex: DES-28 (which Chromebooks the class has), SAY-1 (his recordings), and his Sound Check picks for VOX-1, with VOX-4 alongside it; VOX-5 (the Luna/Kore blend for single words; his call first: lines too?), then VOX-2, then VOX-3. The Writing app (WRT) after Phase 7. OPS-11 stays parked.
 
 ## Epics
 
@@ -104,7 +104,6 @@ In board order. A new epic gets its file in `epics/` first, then a link here
 | **SAY** | **Reading aloud, checked by ear** | Epic | **P1** | | |
 | SAY-1 | Can a machine tell a right sound from a wrong one? A test on Alex's recordings | Task | P1 | M | Todo |
 | **DES** | **Design system & layout** | Epic | **P0** | | |
-| DES-32a | Phones held upright: the iPad layout scaled to fit, with bigger words | Story | P1 | M | Blocked |
 | DES-32c | Laptops and the classroom's big screen | Story | P1 | M | Todo |
 | DES-32b | Phones turned sideways | Story | P2 | S | Todo |
 | DES-28 | Works on a Chromebook | Story | P1 | M | Todo |
