@@ -3,10 +3,11 @@
 // less time in 2nd grade). Alex: a pie in the top corner, counting down with
 // the number inside (kit CountdownPie). The shell runs it; this is the table.
 //
-// The time counts only while the child can answer: it waits while Luna talks
-// (the round's question too), while an answer is being said and while the tab
-// is hidden. Running out is a miss with its own line: the round isn't right
-// the first time any more, and the child still answers it.
+// The time starts with the round, while Luna still asks its question (CUR-18;
+// Alex: "start right away and not after the owl is done talking"). It waits
+// only while an answer is being said and while the tab is hidden. Running out
+// is a miss with its own line: the round isn't right the first time any more,
+// and the child still answers it.
 
 import type { GradeLevel } from '@/types/reading';
 

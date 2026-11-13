@@ -6,16 +6,17 @@
 // Needs Vite on the port. The page's Date.now can be moved on (window.__skip)
 // and its tab hidden (window.__hidden), as in time-check.mjs, so 15 seconds
 // pass in a moment. From a fresh save each time it checks:
-//   - 1st grade, Letter Cookies: the pie shows the round's 15 seconds, holds
-//     while Luna talks, counts down while she's quiet, and not while the tab
-//     is hidden; running out takes it away, Luna says time's up, and it was
-//     the round's first miss: the next wrong answer gets the spoken clue;
+//   - 1st grade, Letter Cookies: the pie shows the round's 15 seconds and
+//     starts with the round, counting down while Luna says its question too
+//     (CUR-18), counts down while she's quiet, and not while the tab is
+//     hidden; running out takes it away, Luna says time's up, and it was the
+//     round's first miss: the next wrong answer gets the spoken clue;
 //   - a wrong answer before then takes the pie away too;
 //   - 2nd grade has less time than 1st for every kind (10 here), and
 //     Kindergarten none; no pie in Bubble Sounds, Muddled Cards or Story
 //     Corner;
 //   - What's Missing shows no pie while the desk is looked at, and its full
-//     15 once it asks;
+//     15 once it asks, counting down while Luna asks (CUR-18);
 //   - a lesson: running out notes the question missed, to come back next
 //     play, and the play's last round, run out then answered, isn't counted
 //     right the first time ("19 of 20 first try").
@@ -79,6 +80,25 @@ async function game(grade, title) {
 }
 
 const pie = page => page.$eval(at('countdown-pie'), e => Number(e.getAttribute('aria-label').match(/\d+/)[0])).catch(() => null);
+/** How full the pie is, 1 to 0 (its `--share`), to the tenth of a second. */
+const share = page => page.$eval(at('countdown-pie'), e => Number(e.style.getPropertyValue('--share'))).catch(() => null);
+/**
+ * Reads the pie while Luna talks, from the moment she starts: how long she
+ * talked and how many seconds the pie lost meanwhile (CUR-18: the pie doesn't
+ * wait for her).
+ */
+async function whileTalking(page, total) {
+  const heard = await until(() => talking(page), 4000);
+  const first = { at: Date.now(), share: await share(page) };
+  let last = first;
+  while (heard && (await talking(page)) && Date.now() - first.at < 12000) {
+    await wait(100);
+    last = { at: Date.now(), share: await share(page) };
+  }
+  const talked = (last.at - first.at) / 1000;
+  const lost = first.share !== null && last.share !== null ? (first.share - last.share) * total : 0;
+  return { heard, talked, lost, text: `${talked.toFixed(1)} s talking, the pie lost ${lost.toFixed(1)} s` };
+}
 const talking = page => page.$('[data-mood][data-state="talking"]').then(Boolean);
 const skip = (page, ms) => page.evaluate(n => (window.__skip += n), ms);
 const hide = (page, hidden) =>
@@ -113,19 +133,12 @@ const clue = page => page.$$eval('button', bs => bs.some(b => /clue/i.test(b.tex
   await until(async () => (await pie(page)) !== null);
   ok('1st grade: a pie in the header, full at 15 seconds', (await pie(page)) === 15, await pie(page));
   ok('… it sits in the header, beside Again', await page.$eval(at('countdown-pie'), e => Boolean(e.closest('header'))).catch(() => false));
-  // real seconds here: a jump of the clock can also bring Luna's own nudge,
-  // and while she says it the pie rightly waits
-  const heard = await until(() => talking(page), 4000);
-  // every reading while she says the round's question, a second or more of it
-  const whileTalking = [];
-  for (let t = 0; t < 12000 && (await talking(page)); t += 100) {
-    whileTalking.push(await pie(page));
-    await wait(100);
-  }
+  // real seconds here, so the pie's loss can be held to Luna's talking time
+  const asked = await whileTalking(page, 15);
   ok(
-    '… it holds while Luna talks (the round’s question)',
-    heard && whileTalking.length >= 8 && whileTalking.every(n => n === 15),
-    `${whileTalking.length / 10} s talking, ${[...new Set(whileTalking)].join('/')}`
+    '… it starts with the round: it counts down while Luna says the round’s question (CUR-18)',
+    asked.heard && asked.talked >= 0.6 && asked.lost >= asked.talked * 0.7 && asked.lost <= asked.talked + 0.5,
+    asked.text
   );
   await quiet(page);
   await wait(300);
@@ -211,6 +224,12 @@ for (const title of ['Bubble Sounds', 'Muddled Cards', 'Story Corner']) {
   ok('What’s Missing: no pie while the desk is looked at', (await bodyText(page)).includes('Memorize') && (await pie(page)) === null);
   await until(async () => (await pie(page)) !== null, 12000);
   ok('… and its full 15 seconds once it asks', (await pie(page)) === 15, await pie(page));
+  const asked = await whileTalking(page, 15);
+  ok(
+    '… counting down while Luna asks what is missing (CUR-18)',
+    asked.heard && asked.talked >= 0.6 && asked.lost >= asked.talked * 0.7 && asked.lost <= asked.talked + 0.5,
+    asked.text
+  );
   await page.close();
 }
 

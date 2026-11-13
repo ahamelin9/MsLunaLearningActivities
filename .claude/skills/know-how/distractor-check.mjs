@@ -2,7 +2,9 @@
 // difficulty many times, reads every lesson question and every
 // fill-in-the-blank item in the content, and holds each set of choices to the
 // rules in src/apps/reading/engine/distractors.ts (ruleBreaks). Exits 1 if any
-// rule is broken anywhere.
+// rule is broken anywhere. It also counts What's Missing's rounds whose wrong
+// choice starts like the missing word: half of every play, by the beginning
+// sound wherever the bank has a fair one (CUR-19).
 //
 //   node .claude/skills/know-how/distractor-check.mjs            # this tree
 //   node .claude/skills/know-how/distractor-check.mjs <src-root> # another copy
@@ -115,12 +117,14 @@ const GAME_CHOICES = {
     }));
     return [{ target: faces[0], wrong: faces.slice(1) }];
   },
-  // the desk shows everything except the missing thing
+  // the desk shows everything except the missing thing; in half the rounds a
+  // wrong choice starts like it (CUR-19), held to the first-letter rule
   'whats-missing': r => [
     {
       target: word(r.missing),
       wrong: r.options.filter(o => o.word !== r.missing.word).map(word),
-      onScreen: r.items.filter(i => i.word !== r.missing.word).map(word)
+      onScreen: r.items.filter(i => i.word !== r.missing.word).map(word),
+      targetKnown: r.startsAlike === true
     }
   ],
   // the extra tile must not be one of the sentence's own words, nor make it
@@ -235,6 +239,58 @@ for (const grade of GRADES) {
       }
     }
   }
+}
+
+// ---- What's Missing: half a play's rounds offer a wrong choice that starts
+// like the missing word, by its beginning sound where the bank has a fair one
+// (CUR-19; Alex: "ship and shoe") ----
+
+{
+  const missingGame = GAMES.find(g => g.id === 'whats-missing');
+  const first = w => w.word.charAt(0).toLowerCase();
+  const alikeOf = r => r.options.filter(o => o.word !== r.missing.word && first(o) === first(r.missing));
+  const tally = { plays: 0, rounds: 0, alike: 0, sound: 0, letter: 0 };
+  for (const grade of GRADES) {
+    for (const difficulty of DIFFICULTIES) {
+      const tier = content.tierFor(grade, difficulty);
+      const where = `whats-missing (${grade}, dial ${difficulty})`;
+      for (let play = 0; play < PLAYS; play++) {
+        const rounds = missingGame.makeRounds({ grade, difficulty, count: missingGame.roundsPerPlay });
+        const alike = rounds.filter(r => alikeOf(r).length > 0).length;
+        tally.plays++;
+        tally.rounds += rounds.length;
+        tally.alike += alike;
+        if (alike < Math.floor(rounds.length / 2)) {
+          const e = found.get(`${where} · too few start alike`) ?? { count: 0, examples: new Set() };
+          e.count++;
+          e.examples.add(`${alike} of ${rounds.length} rounds offer a wrong choice that starts like the missing word`);
+          found.set(`${where} · too few start alike`, e);
+        }
+        for (const r of rounds.filter(r => r.startsAlike)) {
+          if (alikeOf(r).some(o => o.initial === r.missing.initial)) {
+            tally.sound++;
+            continue;
+          }
+          tally.letter++;
+          // only the same letter: the bank must have had no fair word with the same beginning sound
+          const desk = r.items.filter(i => i.word !== r.missing.word).map(word);
+          const fair = content
+            .wordsUpTo(tier)
+            .find(w => w.word !== r.missing.word && w.initial === r.missing.initial && ruleBreaks({ target: word(r.missing), wrong: [word(w)], onScreen: desk }).length === 0);
+          if (fair) {
+            const e = found.get(`${where} · same letter, not sound`) ?? { count: 0, examples: new Set() };
+            e.count++;
+            e.examples.add(`${r.missing.word}: offered ${alikeOf(r).map(o => o.word).join(', ')} where ${fair.word} starts the same way`);
+            found.set(`${where} · same letter, not sound`, e);
+          }
+        }
+      }
+    }
+  }
+  console.log(
+    `What's Missing: ${(tally.alike / tally.plays).toFixed(1)} of ${tally.rounds / tally.plays} rounds a play offer a wrong choice that starts alike;` +
+      ` of the rounds dealt for it, ${tally.sound} by the beginning sound and ${tally.letter} by the letter only.`
+  );
 }
 
 // ---- every fill-in-the-blank item, played or not: its list, and its own wrong words ----

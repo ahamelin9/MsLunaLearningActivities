@@ -21,24 +21,40 @@ interface Round {
   /** show words instead of pictures in the answer row */
   wordChoices: boolean;
   lookSeconds: number;
+  /**
+   * one wrong choice begins as the missing word does (CUR-19), so its first
+   * letter alone doesn't give it away
+   */
+  startsAlike: boolean;
 }
 
-function buildRound(tier: 1 | 2 | 3, missing: WordItem): Round {
+const firstLetter = (w: WordItem) => w.word.charAt(0).toLowerCase();
+
+function buildRound(tier: 1 | 2 | 3, missing: WordItem, startsAlike: boolean): Round {
   const count = tier === 1 ? 4 : tier === 2 ? 5 : 6;
   // the one that goes missing has its turn (GAME-8); the desk fills in around it
   const items = shuffle(distinctByEmoji(wordsUpTo(tier), count, [], [missing]));
+  const pool = wordsUpTo(tier);
   // never something still on the desk, or the answer is just "the one I can't see"
-  const distractors = pickWrong(missing, wordsUpTo(tier), 2, {
-    as: wordChoice,
-    onScreen: items.filter(i => i.word !== missing.word)
-  });
+  const opts = { as: wordChoice, onScreen: items.filter(i => i.word !== missing.word) };
+
+  // Alex (2026-11-13): "ship and shoe or something to trip them up sometimes".
+  // The same beginning sound where the bank has a fair one, else the same letter
+  let alike: WordItem[] = [];
+  if (startsAlike) {
+    alike = pickWrong(missing, pool.filter(w => w.initial === missing.initial), 1, opts);
+    if (alike.length === 0) alike = pickWrong(missing, pool.filter(w => firstLetter(w) === firstLetter(missing)), 1, opts);
+  }
+  // the rest from anywhere, fair beside the one that starts alike
+  const rest = pickWrong(missing, pool, 2 - alike.length, { ...opts, onScreen: [...opts.onScreen, ...alike] });
 
   return {
     items,
     missing,
-    options: shuffle([missing, ...distractors]),
+    options: shuffle([missing, ...alike, ...rest]),
     wordChoices: tier >= 2,
-    lookSeconds: tier === 1 ? 5 : tier === 2 ? 4 : 3
+    lookSeconds: tier === 1 ? 5 : tier === 2 ? 4 : 3,
+    startsAlike: alike.length > 0
   };
 }
 
@@ -60,7 +76,7 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
       setPhase('guess');
       soundManager.playPop();
       pronunciation.speakText('What is missing?');
-      // the round's countdown starts now (CUR-16), after its question
+      // the round's countdown starts now (CUR-16), with its question (CUR-18)
       asking();
     }, round.lookSeconds * 1000 + 1100);
 
@@ -178,7 +194,17 @@ export const whatsMissing: GameDef<Round> = {
   makeRounds: ({ grade, difficulty, count }) => {
     const tier = tierFor(grade, difficulty);
     // this week's words go missing first (CUR-9)
-    return dealWeekFirst('whats-missing', wordsUpTo(tier), count, w => w.word, w => isWeekWord(w.word)).map(w => buildRound(tier, w));
+    const missing = dealWeekFirst('whats-missing', wordsUpTo(tier), count, w => w.word, w => isWeekWord(w.word));
+    // half the rounds offer a wrong choice that starts alike, spread through
+    // the play (CUR-19). Rounds are built in a random order, and one whose
+    // word has nothing fair that starts like it passes its turn on
+    const rounds: Round[] = [];
+    let alikeLeft = Math.floor(missing.length / 2);
+    for (const i of shuffle(missing.map((_, i) => i))) {
+      rounds[i] = buildRound(tier, missing[i], alikeLeft > 0);
+      if (rounds[i].startsAlike) alikeLeft--;
+    }
+    return rounds;
   },
   Play
 };
