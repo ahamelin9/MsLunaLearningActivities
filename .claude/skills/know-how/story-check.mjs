@@ -6,7 +6,8 @@
 //   node .claude/skills/know-how/story-check.mjs <src-root> # another copy
 //
 // The rules:
-// - at least 9 stories per tier (GAME-9);
+// - at least 9 stories per tier (GAME-9), and 18 at or below every tier, so a
+//   play of 9 has a second play of its own (CUR-17c: Kindergarten had 9);
 // - every story has a title, a picture, 2–4 lines and a question with exactly
 //   one right answer among different answers;
 // - the right answer never repeats 3 words in a row from a line of its story
@@ -46,6 +47,8 @@ const { MINI_STORIES, GAMES, tierFor } = await import(pathToFileURL(join(out, 'b
 rmSync(out, { recursive: true, force: true });
 
 const PER_TIER = 9;
+// two plays of 9 (CUR-17c): a play draws on its tier and the ones below
+const TWO_PLAYS = 18;
 const COPY_RUN = 3;
 const PLAYS = 300;
 const words = text => text.toLowerCase().replace(/[’']/g, "'").replace(/[^a-z'\s]/g, ' ').split(/\s+/).filter(Boolean);
@@ -57,6 +60,8 @@ function storyProblems(stories) {
   for (const tier of [1, 2, 3]) {
     const n = stories.filter(s => s.tier === tier).length;
     if (n < PER_TIER) problems.push(`tier ${tier} has ${n} stories, needs ${PER_TIER}`);
+    const upTo = stories.filter(s => s.tier <= tier).length;
+    if (upTo < TWO_PLAYS) problems.push(`tier ${tier} and below hold ${upTo} stories, two plays need ${TWO_PLAYS}`);
   }
   for (const s of stories) {
     if (!s.title || !s.emoji) problems.push(`${s.id}: no title or picture`);
@@ -111,9 +116,11 @@ const planted = [
 ];
 const selfTest = [
   storyProblems([...MINI_STORIES, ...planted]).some(p => p.startsWith('planted-copy')),
-  storyProblems(MINI_STORIES.filter(s => s.tier !== 3 || s.id === MINI_STORIES.find(x => x.tier === 3).id)).some(p => p.startsWith('tier 3 has 1'))
+  storyProblems(MINI_STORIES.filter(s => s.tier !== 3 || s.id === MINI_STORIES.find(x => x.tier === 3).id)).some(p => p.startsWith('tier 3 has 1')),
+  // a tier 1 of nine stories has only one play of its own
+  storyProblems(MINI_STORIES.filter(s => s.tier !== 1 || MINI_STORIES.filter(x => x.tier === 1).indexOf(s) < 9)).some(p => p.startsWith('tier 1 and below hold 9'))
 ];
-report('self-test: a planted copy and a short tier are both caught', selfTest.every(Boolean) ? [] : ['a planted break went through']);
+report('self-test: a planted copy, a short tier and a tier of one play are all caught', selfTest.every(Boolean) ? [] : ['a planted break went through']);
 
 report(`${MINI_STORIES.length} stories keep the rules`, storyProblems(MINI_STORIES));
 report(`${PLAYS} plays per grade and dial: no story twice in a play (BUG-9), none above its tier`, game ? playProblems(game, MINI_STORIES) : ['no story-time game']);

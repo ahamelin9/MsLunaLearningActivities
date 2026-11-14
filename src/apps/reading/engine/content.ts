@@ -464,6 +464,26 @@ export const SENTENCES: SentenceItem[] = [
     emoji: '🤗',
     tier: 1,
   },
+  // two plays of its own, 40 a tier (CUR-17a)
+  { text: 'A hen lays eggs.', emoji: '🐔', tier: 1 },
+  { text: 'I like red apples.', emoji: '🍎', tier: 1 },
+  { text: 'The bus is yellow.', emoji: '🚌', tier: 1 },
+  { text: 'The tree is tall.', emoji: '🌳', tier: 1 },
+  { text: 'The mouse is small.', emoji: '🐭', tier: 1 },
+  { text: 'My cap is blue.', emoji: '🧢', tier: 1 },
+  { text: 'I drink my milk.', emoji: '🥛', tier: 1 },
+  { text: 'The lion can roar.', emoji: '🦁', tier: 1 },
+  { text: 'I smell a flower.', emoji: '🌷', tier: 1 },
+  { text: 'We bake cookies.', emoji: '🍪', tier: 1 },
+  { text: 'A horse eats hay.', emoji: '🐴', tier: 1 },
+  { text: 'A balloon can pop.', emoji: '🎈', tier: 1 },
+  { text: 'I see a star.', emoji: '⭐', tier: 1 },
+  { text: 'I take a bath.', emoji: '🛁', tier: 1 },
+  { text: 'We eat pizza.', emoji: '🍕', tier: 1 },
+  { text: 'Dad has a car.', emoji: '🚗', tier: 1 },
+  { text: 'Sheep eat green grass.', emoji: '🐑', tier: 1 },
+  { text: 'I brush my teeth.', emoji: '🪥', tier: 1 },
+  { text: 'I tie my shoe.', emoji: '👟', tier: 1 },
   // tier 2 — 5 to 6 words
   {
     text: 'The little cat is sleeping.',
@@ -573,6 +593,26 @@ export const SENTENCES: SentenceItem[] = [
     emoji: '🚲',
     tier: 2,
   },
+  // two plays of its own, 40 a tier (CUR-17a)
+  { text: 'A zebra has black stripes.', emoji: '🦓', tier: 2 },
+  { text: 'The turtle hides in its shell.', emoji: '🐢', tier: 2 },
+  { text: 'Ice cream melts in the sun.', emoji: '🍦', tier: 2 },
+  { text: 'A squirrel climbs the tree.', emoji: '🐿️', tier: 2 },
+  { text: 'A butterfly sits on a flower.', emoji: '🦋', tier: 2 },
+  { text: 'The rocket flies to the moon.', emoji: '🚀', tier: 2 },
+  { text: 'An octopus has eight arms.', emoji: '🐙', tier: 2 },
+  { text: 'Mom sweeps the kitchen floor.', emoji: '🧹', tier: 2 },
+  { text: 'My umbrella keeps me dry.', emoji: '☂️', tier: 2 },
+  { text: 'She opens a big gift.', emoji: '🎁', tier: 2 },
+  { text: 'Dad cooks eggs for breakfast.', emoji: '🍳', tier: 2 },
+  { text: 'We finish the puzzle together.', emoji: '🧩', tier: 2 },
+  { text: 'The train goes down the track.', emoji: '🚂', tier: 2 },
+  { text: 'We live in a blue house.', emoji: '🏠', tier: 2 },
+  { text: 'Grandma bakes cupcakes for us.', emoji: '🧁', tier: 2 },
+  { text: 'Brown leaves fall from trees.', emoji: '🍂', tier: 2 },
+  { text: 'The monkey swings from a branch.', emoji: '🐒', tier: 2 },
+  { text: 'A crab walks on the beach.', emoji: '🦀', tier: 2 },
+  { text: 'She paints a pretty picture.', emoji: '🎨', tier: 2 },
   // tier 3 — 7+ words
   {
     text: 'The little cat is sleeping under the table.',
@@ -697,7 +737,29 @@ export const SENTENCES: SentenceItem[] = [
     emoji: '🎂',
     tier: 3,
     alsoFits: ['banana'],
-  }
+  },
+  // two plays of its own, 40 a tier (CUR-17a). alsoFits: the extra tiles
+  // (jumped, purple, banana, quickly, seven, window) that could stand in for
+  // one of its words and still be true
+  { text: 'The tall sunflower turns to face the sun.', emoji: '🌻', tier: 3, alsoFits: ['window'] },
+  { text: 'The farmer drives a green tractor across the field.', emoji: '🚜', tier: 3, alsoFits: ['purple'] },
+  { text: 'We bake cookies with chocolate chips on Sunday.', emoji: '🍪', tier: 3, alsoFits: ['seven', 'banana'] },
+  { text: 'My sister builds a sandcastle at the beach.', emoji: '🏰', tier: 3 },
+  { text: 'A giant whale splashes its tail in the ocean.', emoji: '🐳', tier: 3 },
+  { text: 'I put my lunch inside my backpack.', emoji: '🎒', tier: 3, alsoFits: ['banana'] },
+  { text: 'The dentist checks my teeth every six months.', emoji: '🦷', tier: 3, alsoFits: ['seven'] },
+  { text: 'We eat cold watermelon on hot summer days.', emoji: '🍉', tier: 3, alsoFits: ['banana'] },
+  { text: 'A tiny spider spins a web in the corner.', emoji: '🕷️', tier: 3, alsoFits: ['window', 'purple'] },
+  { text: 'The cook stirs the soup in a big pot.', emoji: '🍲', tier: 3, alsoFits: ['purple'] },
+  { text: 'The airplane flies high above the white clouds.', emoji: '✈️', tier: 3, alsoFits: ['purple', 'quickly'] },
+  { text: 'My puppy wags his tail when I come home.', emoji: '🐕', tier: 3, alsoFits: ['quickly'] },
+  { text: 'Ice cubes melt quickly in a warm drink.', emoji: '🧊', tier: 3, alsoFits: ['seven', 'purple'] },
+  { text: 'Our team plays basketball in the big gym.', emoji: '🏀', tier: 3, alsoFits: ['purple'] },
+  { text: 'The white rabbit hops across the green grass.', emoji: '🐇', tier: 3, alsoFits: ['jumped'] },
+  { text: 'We carve a funny face on our pumpkin.', emoji: '🎃', tier: 3, alsoFits: ['purple'] },
+  { text: 'My little brother sleeps with his teddy bear.', emoji: '🧸', tier: 3, alsoFits: ['purple'] },
+  { text: 'A kangaroo carries her baby in a pouch.', emoji: '🦘', tier: 3 },
+  { text: 'The moon shines brightly over the quiet town.', emoji: '🌙', tier: 3, alsoFits: ['purple'] }
 ];
 
 /** A fill-in-the-blank statement about a passage: `key` is the word in `text` the child fills in. */
@@ -1053,6 +1115,49 @@ export const PASSAGES: PassageItem[] = [
         key: 'bright',
         decoys: ['dark', 'wet', 'sad'],
         alsoFits: ['big', 'pretty', 'white', 'little', 'shiny', 'far', 'up', 'out', 'yellow', 'high']
+      }
+    ]
+  },
+  // two plays of its own, 20 a grade (CUR-17b)
+  {
+    id: 'k-snowman-hat',
+    grade: 'kindergarten',
+    emoji: '⛄',
+    lines: [
+      "Luna makes a snowman.",
+      "She gives it her red hat."
+    ],
+    truth: [
+      { claim: "The snowman has a hat.", isTrue: true },
+      { claim: "Luna keeps her hat.", isTrue: false }
+    ],
+    blanks: [
+      {
+        text: "The snowman's hat is red.",
+        key: 'red',
+        decoys: ['blue', 'green', 'black'],
+        alsoFits: ['big', 'warm', 'soft', 'new', 'nice', 'pretty', 'old']
+      }
+    ]
+  },
+  {
+    id: 'k-pond-frog',
+    grade: 'kindergarten',
+    emoji: '🐸',
+    lines: [
+      "Pip finds a little frog.",
+      "It hops into the pond."
+    ],
+    truth: [
+      { claim: "The frog goes into the water.", isTrue: true },
+      { claim: "Pip finds a fish.", isTrue: false }
+    ],
+    blanks: [
+      {
+        text: "Pip's frog jumps in a pond.",
+        key: 'pond',
+        decoys: ['bed', 'car', 'cup'],
+        alsoFits: ['lake', 'puddle', 'river', 'stream']
       }
     ]
   },
@@ -1429,6 +1534,53 @@ export const PASSAGES: PassageItem[] = [
         key: 'birthday',
         decoys: ['lunch', 'bath', 'nap'],
         alsoFits: ['party', 'friend', 'day']
+      }
+    ]
+  },
+  // two plays of its own, 20 a grade (CUR-17b)
+  {
+    id: 'g1-fruit-salad',
+    grade: 'grade1',
+    emoji: '🍓',
+    lines: [
+      "Luna cuts up apples and grapes.",
+      "Pip adds some red berries.",
+      "They share a big bowl of fruit salad."
+    ],
+    truth: [
+      { claim: "Luna and Pip make food together.", isTrue: true },
+      { claim: "Pip adds green beans.", isTrue: false },
+      { claim: "They each eat alone.", isTrue: false }
+    ],
+    blanks: [
+      {
+        text: "They eat the salad from one bowl.",
+        key: 'bowl',
+        decoys: ['shoe', 'hat', 'sock'],
+        alsoFits: ['dish', 'plate', 'cup']
+      }
+    ]
+  },
+  {
+    id: 'g1-orange-carrot',
+    grade: 'grade1',
+    emoji: '🥕',
+    lines: [
+      "Pip pulls a carrot from the ground.",
+      "It is long and orange.",
+      "He washes it and eats it for a snack."
+    ],
+    truth: [
+      { claim: "Pip eats a carrot.", isTrue: true },
+      { claim: "The carrot is purple.", isTrue: false },
+      { claim: "Pip gives the carrot to a horse.", isTrue: false }
+    ],
+    blanks: [
+      {
+        text: "Pip cleans the carrot before he eats it.",
+        key: 'carrot',
+        decoys: ['sock', 'rock', 'shoe'],
+        alsoFits: ['snack', 'veggie', 'vegetable', 'food']
       }
     ]
   },
@@ -1897,6 +2049,55 @@ export const PASSAGES: PassageItem[] = [
         alsoFits: ['scared', 'afraid', 'worried', 'shaky']
       }
     ]
+  },
+  // two plays of its own, 20 a grade (CUR-17b)
+  {
+    id: 'g2-shed-kitten',
+    grade: 'grade2',
+    emoji: '🐈',
+    lines: [
+      "Luna heard a soft meow coming from the garden shed.",
+      "Inside, a small gray kitten was stuck behind a box.",
+      "Pip held the door open while Luna moved the box.",
+      "The kitten ran out and purred against Pip's leg."
+    ],
+    truth: [
+      { claim: "Luna and Pip helped a kitten get free.", isTrue: true },
+      { claim: "The kitten was up in a tree.", isTrue: false },
+      { claim: "Pip moved the box by himself.", isTrue: false }
+    ],
+    blanks: [
+      {
+        text: "The kitten in the shed was gray.",
+        key: 'gray',
+        decoys: ['orange', 'black', 'white'],
+        alsoFits: ['small', 'little', 'tiny', 'young', 'scared', 'stuck', 'soft', 'hungry']
+      }
+    ]
+  },
+  {
+    id: 'g2-paper-boats',
+    grade: 'grade2',
+    emoji: '⛵',
+    lines: [
+      "After the rain, a stream of water ran down the street.",
+      "Luna and Pip folded boats out of old paper.",
+      "They raced the boats all the way to the corner.",
+      "Pip's boat won, but Luna's boat sank in a puddle."
+    ],
+    truth: [
+      { claim: "Pip's boat was the winner.", isTrue: true },
+      { claim: "The race was in a bathtub.", isTrue: false },
+      { claim: "It had not rained that day.", isTrue: false }
+    ],
+    blanks: [
+      {
+        text: "Their little boats were made from paper.",
+        key: 'paper',
+        decoys: ['glass', 'rock', 'metal'],
+        alsoFits: ['newspaper']
+      }
+    ]
   }
 ];
 
@@ -2060,6 +2261,124 @@ export const MINI_STORIES: MiniStory[] = [
       { text: 'She saw his cap', correct: true },
       { text: 'He called her name', correct: false },
       { text: 'She heard him sing', correct: false }
+    ]
+  },
+  // two plays of its own at Kindergarten, 18 at tier 1 (CUR-17c)
+  {
+    id: 'story-ice-cream',
+    title: 'The Melting Ice Cream',
+    emoji: '🍦',
+    tier: 1,
+    lines: ['Pip got an ice cream.', 'The sun was hot. Drip, drip!', 'He ate it fast.'],
+    question: 'Why did Pip eat so fast?',
+    answers: [
+      { text: 'His ice cream was melting', correct: true },
+      { text: 'He was late for school', correct: false },
+      { text: 'He did not like it', correct: false }
+    ]
+  },
+  {
+    id: 'story-picnic-ants',
+    title: 'Ants at the Picnic',
+    emoji: '🐜',
+    tier: 1,
+    lines: ['Luna and Pip had a picnic.', 'Little ants came too.', 'They wanted the jam!'],
+    question: 'Why did the ants come?',
+    answers: [
+      { text: 'To eat the sweet jam', correct: true },
+      { text: 'To take a nap', correct: false },
+      { text: 'To play a game', correct: false }
+    ]
+  },
+  {
+    id: 'story-block-tower',
+    title: 'Crash!',
+    emoji: '🧱',
+    tier: 1,
+    lines: ['Pip made a tall tower of blocks.', 'The cat ran by.', 'Crash! The blocks fell down.'],
+    question: 'Why did the tower fall?',
+    answers: [
+      { text: 'The cat bumped it', correct: true },
+      { text: 'Pip kicked it', correct: false },
+      { text: 'The wind blew it', correct: false }
+    ]
+  },
+  {
+    id: 'story-rainbow',
+    title: 'After the Rain',
+    emoji: '🌈',
+    tier: 1,
+    lines: ['It rained all day.', 'Then the sun came out.', 'Luna saw a big rainbow!'],
+    question: 'When did Luna see the rainbow?',
+    answers: [
+      { text: 'When the rain stopped', correct: true },
+      { text: 'At night in her bed', correct: false },
+      { text: 'Before it rained', correct: false }
+    ]
+  },
+  {
+    id: 'story-spilled-juice',
+    title: 'Oops, Juice!',
+    emoji: '🧃',
+    tier: 1,
+    lines: ['Luna spilled her juice.', 'It went all over the floor.', 'Pip got a towel to help.'],
+    question: 'How did Pip help?',
+    answers: [
+      { text: 'He wiped up the mess', correct: true },
+      { text: 'He drank the juice', correct: false },
+      { text: 'He went to sleep', correct: false }
+    ]
+  },
+  {
+    id: 'story-slow-snail',
+    title: 'The Slow Snail',
+    emoji: '🐌',
+    tier: 1,
+    lines: ['A snail wanted to see the pond.', 'It went slow, slow, slow.', 'At night, it got there!'],
+    question: 'Did the snail get to the pond?',
+    answers: [
+      { text: 'Yes, but it took a long time', correct: true },
+      { text: 'No, it went home', correct: false },
+      { text: 'Yes, it ran there fast', correct: false }
+    ]
+  },
+  {
+    id: 'story-pizza',
+    title: 'Pizza for Two',
+    emoji: '🍕',
+    tier: 1,
+    lines: ['Luna made a pizza.', 'Pip came to visit.', 'She cut it in half for them.'],
+    question: 'Why did Luna cut the pizza in half?',
+    answers: [
+      { text: 'So she and Pip could share', correct: true },
+      { text: 'Because it was too cold', correct: false },
+      { text: 'To give it all to the cat', correct: false }
+    ]
+  },
+  {
+    id: 'story-bubble-bath',
+    title: 'Bubble Bath',
+    emoji: '🛁',
+    tier: 1,
+    lines: ['Pip got in the bath.', 'It had lots of bubbles.', 'Now Pip has a bubble beard!'],
+    question: 'What is on Pip’s face?',
+    answers: [
+      { text: 'Bubbles from his bath', correct: true },
+      { text: 'Jam from lunch', correct: false },
+      { text: 'Paint from art class', correct: false }
+    ]
+  },
+  {
+    id: 'story-leaf-pile',
+    title: 'The Leaf Pile',
+    emoji: '🍂',
+    tier: 1,
+    lines: ['Luna made a big pile of leaves.', 'Pip jumped in it.', 'Now the leaves are all over!'],
+    question: 'Why are the leaves all over?',
+    answers: [
+      { text: 'Pip jumped into the pile', correct: true },
+      { text: 'It started to snow', correct: false },
+      { text: 'Luna went to sleep', correct: false }
     ]
   },
   // ---- tier 2 ----

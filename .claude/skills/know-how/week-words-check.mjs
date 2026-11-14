@@ -26,7 +26,8 @@
 // comes back, so nothing is held back for the cleared words: since plays are
 // 20 (CUR-15), a pool of 21 sentences has to bring 19 back, so what comes back
 // must have nothing new left in its pool (a Letter Cookies word, its letter's
-// words). It fails with the games dealing as
+// words; since CUR-17a a tier holds 40, so a second play brings none back, and a
+// planted repeat proves the rule still catches one). It fails with the games dealing as
 // before: 9 ❌ with dealWeekFirst returning `deal`'s deal, and Letter
 // Cookies' ❌ with its weekWordsFor returning none (CUR-9).
 
@@ -273,6 +274,8 @@ ok('… and saves that', Array.isArray(savedAfterClear) && savedAfterClear.lengt
 
 console.log('\ngrade2, after "Clear":');
 const { pools } = await usable('grade2');
+// back too soon: something in its pool was in neither play, so it was there to deal
+const tooSoonOf = (back, dealtOnce, groups) => back.filter(k => (groups.find(g => g.includes(k)) ?? []).some(o => !dealtOnce.has(o)));
 let planted = null;
 for (const title of ALL_GAMES) {
   const deck = DECK[title];
@@ -281,19 +284,20 @@ for (const title of ALL_GAMES) {
   const got = (dealt?.rounds ?? []).flat().filter(Boolean);
   const last = firstPlays[`grade2:${title}`].flat().filter(Boolean);
   const back = [...new Set(got.filter(k => last.includes(k)))];
-  // back too soon: something in its pool was in neither play, so it was there to deal
   const dealtOnce = new Set([...last, ...got]);
-  const tooSoon = back.filter(k => (pools[deck].find(g => g.includes(k)) ?? []).some(o => !dealtOnce.has(o)));
+  const tooSoon = tooSoonOf(back, dealtOnce, pools[deck]);
   const fresh = new Set(got.filter(k => !last.includes(k))).size;
-  if (deck === 'build-sentence') planted = { back, dealtOnce, pool: [...pools[deck][0], 'A sentence no play dealt.'] };
+  // since CUR-17a its pool holds two plays, so nothing need come back: the
+  // plant pretends the last play's first sentence did, beside a sentence no
+  // play dealt
+  if (deck === 'build-sentence') planted = tooSoonOf([last[0]], dealtOnce, [[...pools[deck][0], 'A sentence no play dealt.']]);
   ok(`${title}: what its last play dealt comes back only once its pool has nothing new`, tooSoon.length === 0,
     tooSoon.length ? `back too soon: ${tooSoon.join(' | ')}` : back.length ? `${fresh} new, then ${back.length} back with nothing new left` : `${got.length} new`);
 }
-// the rule can fail: with a sentence planted in Words Off the Page's pool that
-// neither play dealt, everything that came back was too soon
-ok('… and that rule fails a planted pool: a sentence neither play dealt makes what came back too soon',
-  planted?.back.length > 0 && planted.back.every(k => planted.pool.some(o => !planted.dealtOnce.has(o))),
-  planted ? `${planted.back.length} back` : 'Words Off the Page not played');
+// the rule can fail: a sentence back while one in its pool was never dealt is too soon
+ok('… and that rule fails a planted pool: a sentence back while one no play dealt waits is too soon',
+  planted?.length === 1,
+  planted ? `${planted.length} caught` : 'Words Off the Page not played');
 
 await browser.close();
 const failed = results.filter(r => !r).length;

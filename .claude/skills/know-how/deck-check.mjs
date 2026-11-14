@@ -2,6 +2,8 @@
 // answers a play (CUR-15)? Plays each of
 // the 8 games at every grade and dial with no browser, reads what each round is
 // about, and fails if anything comes back before its whole pool has been dealt.
+// Words Off the Page, Treasure Path and Story Corner hold two plays of their
+// own, so the next play is all new (CUR-17a–c).
 // Then every lesson (CUR-12): 20 rounds a play (a story lesson 2), every
 // question once before any comes again, never the same one twice in a row, a
 // question missed back in the next play, and "about 7 min" (a story's "about
@@ -80,6 +82,12 @@ const ANSWERS = {
   'story-time': () => 2
 };
 const ABOUT_20 = [16, 24];
+/**
+ * Games whose pool holds two plays of its own at every grade and dial, so the
+ * next play is all new (CUR-17a–c): Words Off the Page 40 sentences a tier,
+ * Treasure Path 20 passages a grade, Story Corner 18 stories at a tier and below.
+ */
+const TWO_PLAYS = ['build-sentence', 'treasure-read', 'story-time'];
 
 for (const game of GAMES) {
   const targets = TARGETS[game.id];
@@ -124,12 +132,15 @@ for (const game of GAMES) {
       const stones =
         game.id !== 'treasure-read' ||
         rounds.every((r, i) => r.kind === (i % 2 ? 'cloze' : 'truefalse') && (i % 2 === 0 || r.passage.id === rounds[i - 1].passage.id));
-      const ok = repeated === 0 && soonest >= fair && whole && long && stones;
+      // two plays of its own: the next play is all new (CUR-17a–c)
+      const roomy = !TWO_PLAYS.includes(game.id) || pool.size >= 2 * perPlay;
+      const ok = repeated === 0 && soonest >= fair && whole && long && stones && roomy;
       if (!ok) failed = true;
       console.log(
         `${ok ? '✅' : '❌'} ${game.id}, ${grade}, dial ${difficulty}: pool ${pool.size}, ${perPlay} a play, ` +
           `${beforeRepeat} dealt before the first repeat, soonest back after ${soonest}${repeated ? `, ${repeated} plays repeated within` : ''}, ` +
-          `${answers} answers${long ? '' : ` (want ${ABOUT_20.join(' to ')})`}${stones ? '' : ', a stone not asked twice about one passage'}`
+          `${answers} answers${long ? '' : ` (want ${ABOUT_20.join(' to ')})`}${stones ? '' : ', a stone not asked twice about one passage'}` +
+          `${roomy ? '' : ` (want a pool of two plays, ${2 * perPlay})`}`
       );
     }
   }

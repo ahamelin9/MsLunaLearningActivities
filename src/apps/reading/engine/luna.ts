@@ -125,7 +125,8 @@ export const PER_GAME: Record<string, Partial<Bank>> = {
       { text: 'You spotted it! Nothing gets past you.', mood: 'cheer' },
       { text: 'Correct! I’ll put it back. Probably.', mood: 'happy' }
     ],
-    missFirst: [{ text: 'That one is still on the desk. Look again!', mood: 'think' }]
+    // a wrong choice was never on the desk (BUG-33): the game offers none that is
+    missFirst: [{ text: 'That one was not on my desk. Look again!', mood: 'think' }]
   },
   'treasure-read': {
     correct: [

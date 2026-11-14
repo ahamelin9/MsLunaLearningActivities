@@ -6,7 +6,9 @@
 // Needs Vite running on the port. Marks Kindergarten's lessons done so
 // "Starter Sight Words" opens (as lesson-shot.mjs does), plays its rounds,
 // reading each round's question from React, and checks:
-//   - its words are the, see, like, I and a, one round each;
+//   - a play's first five rounds ask the, see, like, I and a, once each, before
+//     any comes again (BUG-32: a play is 20 since CUR-12, and its shuffle had
+//     undone the spread);
 //   - each wrong answer is a different real word;
 //   - the word is on screen only as one of the answers until it's found: not
 //     in the cue ("?"), the prompt, or Luna's line on her perch, read at the
@@ -75,7 +77,7 @@ async function play(run) {
   await page.click(at('play'));
 
   const words = [];
-  for (let round = 0; round < 8; round++) {
+  for (let round = 0; round < 5; round++) {
     const live = await page.waitForSelector(at('lesson-choice'), { timeout: 8000 }).catch(() => null);
     if (!live) break;
     await wait(900);
@@ -113,7 +115,7 @@ async function play(run) {
     if (await page.$(at('shell-reward'))) break;
   }
   const want = ['the', 'see', 'like', 'i', 'a'];
-  ok(`${tag}the lesson teaches the, see, like, I and a, one round each`, words.length === 5 && want.every(w => words.map(x => x.toLowerCase()).includes(w)), words.join(', '));
+  ok(`${tag}its first five rounds ask the, see, like, I and a, once each`, words.length === 5 && want.every(w => words.map(x => x.toLowerCase()).includes(w)), words.join(', '));
   await page.close();
 }
 

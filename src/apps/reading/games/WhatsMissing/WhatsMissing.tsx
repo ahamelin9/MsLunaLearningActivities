@@ -102,7 +102,8 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
         correct: false,
         say: [{ word: item.word }],
         reveal: () => setShown(true),
-        hint: [{ word: item.word }, { text: 'is still on the desk. Which one is not there any more?' }]
+        // true of every wrong choice: none was on the desk (BUG-33)
+        hint: [{ word: item.word }, { text: 'was not on my desk. Which one did I take away?' }]
       });
     }
   };

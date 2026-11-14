@@ -7,7 +7,7 @@
 //   node .claude/skills/know-how/passage-check.mjs <src-root> # another copy
 //
 // The rules:
-// - at least 18 passages per grade (GAME-9), of that grade's length in sentences;
+// - at least 20 passages per grade (GAME-9; CUR-17b: a play reads 10, so two plays), of that grade's length in sentences;
 // - each passage has at least one true/false and one fill-in-the-blank;
 // - no statement copies 4 or more words in a row from its passage;
 // - every blank has its list of words that also fit (CNT-1b), its key is a
@@ -56,7 +56,7 @@ await build({
 const { PASSAGES, GAMES } = await import(pathToFileURL(join(out, 'bundle.mjs')).href);
 rmSync(out, { recursive: true, force: true });
 
-const PER_GRADE = 18;
+const PER_GRADE = 20;
 const PLAYS = 300;
 const GAP = '_____';
 const LENGTH = { kindergarten: [2, 2], grade1: [3, 3], grade2: [4, 5] };

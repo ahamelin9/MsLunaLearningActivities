@@ -174,27 +174,30 @@ for (const [W, H] of SIZES) {
     if (wants('passages')) {
       await hold('PASSAGES');
       for (const i of await indexes('PASSAGES', 'grade', g)) {
-        // its longest of each kind; a twin, so a play deals both kinds. Which
-        // comes first is random, so it opens until it has met each.
-        const id = await page.evaluate((a, n) => {
+        // its longest of each kind, and a twin so a play has two passages. A
+        // stone asks true or false first, then the missing word, about one
+        // passage (CUR-15): it answers the claim to reach the gap
+        const { id, answer } = await page.evaluate((a, n) => {
           const p = window.__keep[a][n];
           const longest = (list, of) => [...list].sort((x, y) => of(y).length - of(x).length)[0];
           const one = { ...p, truth: [longest(p.truth, t => t.claim)], blanks: [longest(p.blanks, b => b.text)] };
           window.__content[a].splice(0, window.__content[a].length, one, { ...one, id: `${p.id}-twin` });
-          return p.id;
+          return { id: p.id, answer: one.truth[0].isTrue ? 'True' : 'False' };
         }, 'PASSAGES', i);
-        const met = new Set();
-        for (let tries = 0; tries < 12 && met.size < 2; tries++) {
-          await page.evaluate(() => localStorage.removeItem('ms_luna_seen_v1'));
-          await open(await gameTile('Treasure Path'));
-          const kind = await page.evaluate(() => (document.querySelector('[data-shot="treasure-claim"]') ? 'true or false' : 'fill the gap'));
-          if (!met.has(kind)) {
-            met.add(kind);
-            await judge(`Treasure Path "${id}", ${kind}`, W, H);
-          }
-          await back();
+        await page.evaluate(() => localStorage.removeItem('ms_luna_seen_v1'));
+        await open(await gameTile('Treasure Path'));
+        if (!(await page.$('[data-shot="treasure-claim"]'))) throw new Error(`Treasure Path "${id}" didn't open on its true or false`);
+        await judge(`Treasure Path "${id}", true or false`, W, H);
+        let gap = null;
+        // a tap while the claim is still read out is ignored, so it tries again
+        for (let tries = 0; tries < 8 && !gap; tries++) {
+          await page.$$eval('[data-shot="stage"] button[aria-label]', (bs, l) => bs.find(b => b.getAttribute('aria-label') === l)?.click(), answer);
+          gap = await page.waitForSelector('[data-shot="treasure-sentence"]', { timeout: 2500 }).catch(() => null);
         }
-        if (met.size < 2) throw new Error(`Treasure Path "${id}" never dealt both kinds`);
+        if (!gap) throw new Error(`Treasure Path "${id}" never reached its missing word`);
+        await wait(600);
+        await judge(`Treasure Path "${id}", fill the gap`, W, H);
+        await back();
       }
       await release('PASSAGES');
     }

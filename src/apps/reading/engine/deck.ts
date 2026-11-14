@@ -126,7 +126,9 @@ export function dealMissedFirst<T>(deck: string, pool: T[], count: number, keyOf
   // what was missed but didn't fit this play waits for the next
   all[missedIn(deck)] = [...missed].filter(key => !back.some(item => keyOf(item) === key));
   remember(all);
-  const play = shuffle([...back, ...rest]);
+  // the missed ones and the rest mix, but each thing is asked once before any
+  // comes again (CUR-6; BUG-32: a shuffle alone undid the spread)
+  const play = spreadOut(shuffle([...back, ...rest]), aboutOf, []);
   while (play.length < count) {
     const last = play[play.length - 1];
     // the missed ones first
