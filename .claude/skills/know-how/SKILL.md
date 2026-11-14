@@ -757,6 +757,36 @@ Pitfalls that cost time:
   every one-shot animation before a shot, never shows the done screen's
   petals.
 
+## Luna's clue says something that isn't true (BUG-33)
+
+*2026-11-13 · BUG-33*
+
+- **Symptom:** in What's Missing?, a wrong pick got "That one is still on the
+  desk", and the clue "[word] is still on the desk", but no wrong choice was
+  ever on the desk: the game offers only things that weren't there (since
+  CUR-19, look-alikes among them).
+- **Cause:** the game's `missFirst` line and its `hint` were written for an
+  older round, and nothing checked them against what the game deals.
+- **Fix:** both say what is true of every wrong choice: "That one was not on
+  my desk. Look again!" (`PER_GAME['whats-missing']` in `engine/luna.ts`) and
+  "[word] was not on my desk. Which one did I take away?" (the hint in
+  `WhatsMissing.tsx`). When a game's rounds change, read its lines in
+  `luna.ts` and its `hint` against them.
+- **Check:** with Vite on 5199, `node .claude/skills/know-how/missing-lines-check.mjs 5199`
+  reads the bank's lines, then plays 3 Kindergarten rounds, misses twice with
+  choices it saw weren't on the desk, and asks that the clue names one of them
+  with "was not on my desk". All 4 fail on the old lines.
+- **Pitfall, a random line:** her first-miss line is picked at random from the
+  game's own lines and the general ones (`lunaSay`), so a check that reads her
+  bubble after one miss passes or fails by luck. Check the bank's lines
+  directly, and what she says from the second miss (`missAgain` plus the
+  hint), logged by patching `pronunciation.speakSequence` and
+  `soundManager.speak`. Her bubble's words are in `[data-variant] p`, not
+  `document.body.innerText`.
+- **Pitfall, an ignored tap:** an answer tapped while she still speaks is
+  dropped, so the round never moves on. Tap again until the stage takes a
+  `data-flash` (`miss` or `win`).
+
 ## Do lessons open in order?
 
 *2026-10-12 · PRG-7*
@@ -972,6 +1002,21 @@ Pitfalls that cost time:
   play is nearly its pool (21 sentences, 20 a play): `week-words-check` now
   asks that what comes back has nothing new left in its pool, with a planted
   pool to prove it can fail.
+- **Pitfall, a shuffle after the spread** (*2026-11-13, BUG-32*): a lesson's
+  deal (`dealMissedFirst`) put each thing once before any came again, then
+  shuffled the missed ones in with the rest, which undid it: Starter Sight
+  Words asked "like" twice in its first five. The spread now runs after the
+  shuffle. `sight-check.mjs` asks that a play's first five rounds are the, see,
+  like, I and a, once each (`--runs 20`; every run fails on the old deal).
+- **Two plays of its own** (*2026-11-13, CUR-17a–c*): Words Off the Page,
+  Treasure Path and Story Corner each hold two plays at every tier, so the
+  next play is all new. `deck-check.mjs` fails one whose pool is under two
+  plays (`TWO_PLAYS`), `passage-check.mjs` wants 20 passages a grade and
+  `story-check.mjs` 18 stories at or below each tier, with a planted short
+  tier. When content is cut or a play grows, these say what to write. With
+  two plays nothing comes back on the second, so `week-words-check`'s planted
+  pool, which judged what came back, had nothing to judge and failed: it now
+  pretends one sentence came back.
 
 ## Does the round's countdown work? (CUR-16)
 
@@ -1214,6 +1259,10 @@ Pitfalls that cost time:
   app's own module instance, so it reads it from `performance.getEntriesByType('resource')`.
   What overflows is usually answers, not lines: the three stories it caught had
   the longest answers in the app, one wrapping to two lines (26 characters or more).
+  Its passages part waited for a stone of each kind, and since CUR-15 a stone
+  always opens on its true or false, so it threw "never dealt both kinds"
+  (found 2026-11-13, CUR-17b). It now answers the claim (retrying, as a tap
+  while the claim is read is dropped) and judges the missing word after it.
 - **Pitfall, "nothing scrolls" isn't "it fits"** (*2026-11-07, PRG-5b*): on a
   1024 iPad six squishies ran past the end of their plank and poked out of the
   shelf, while every fit measure stayed empty: the row overflowed its own box,

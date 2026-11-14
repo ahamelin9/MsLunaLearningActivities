@@ -72,7 +72,7 @@ be pulled into Phase 1 for a break from styling.
 
 ### Now / Next
 
-- **Now:** she showed more children and they all love it (2026-11-13). Her two asks are done: every game deals about 20 a play (CUR-15), and a countdown pie times each round at 1st and 2nd grade, with less time in 2nd (CUR-16). Alex's follow-ups are done and live: the pie starts with the round, while Luna still asks (CUR-18), and half of What's Missing's rounds offer a wrong word that starts like the missing one (CUR-19). Found on the way: BUG-33 (its miss lines say a wrong word "is still on the desk"; new words for Alex to pick). The phonics are what's left to fix: VOX-1 next. The Sound Check page has had no picks since 2026-10-29, so the picks so far go in, and B, D, G, TH, voiced TH, NG, W and OO get a fourth round of takes for Alex's ear. CUR-17 (more sentences, passages and Kindergarten stories, so a game's next play is new) is content for Alex to review, like CUR-13. Her try-out notes (2026-11-12) are done and live, but one: the password, American spelling, lessons 1, 2, 3 in each skill, 20 questions a play, reading first, and Luna on the tab. VOX-6 (Luna "like a demon" on her classroom whiteboard) is Blocked: one audio engine for voice and effects, made fresh after anything that can leave it at the wrong rate; its hardening is live too (`921ddad`), and her ear on the whiteboard decides it. Then CUR-13 (every lesson holds 20, split by grade), content for Alex to review. She likes the emoji (DES-27 dropped) and wants no per-child sign-in: one save per device stays.
+- **Now:** she showed more children and they all love it (2026-11-13). Her two asks are done: every game deals about 20 a play (CUR-15), and a countdown pie times each round at 1st and 2nd grade, with less time in 2nd (CUR-16). Alex's follow-ups are done and live: the pie starts with the round, while Luna still asks (CUR-18), and half of What's Missing's rounds offer a wrong word that starts like the missing one (CUR-19). Also done and live: What's Missing's miss lines say a wrong word "was not on my desk" (BUG-33), a lesson asks each of its words once before any comes again (BUG-32), and Words Off the Page, Treasure Path and Kindergarten's Story Corner each hold two plays, so the next play is new (CUR-17a–c). The phonics are what's left to fix: VOX-1 next. The Sound Check page has had no picks since 2026-10-29, so the picks so far go in, and B, D, G, TH, voiced TH, NG, W and OO get a fourth round of takes for Alex's ear. Her try-out notes (2026-11-12) are done and live, but one: the password, American spelling, lessons 1, 2, 3 in each skill, 20 questions a play, reading first, and Luna on the tab. VOX-6 (Luna "like a demon" on her classroom whiteboard) is Blocked: one audio engine for voice and effects, made fresh after anything that can leave it at the wrong rate; its hardening is live too (`921ddad`), and her ear on the whiteboard decides it. Then CUR-13 (every lesson holds 20, split by grade), content for Alex to review. She likes the emoji (DES-27 dropped) and wants no per-child sign-in: one save per device stays.
 - **Next:** phones held upright work (DES-32a, done 2026-11-12); next DES-32c (laptops and the classroom's big screen), then DES-32b (phones turned sideways: Alex's call first, scale or scroll). Still waiting on Alex: DES-28 (which Chromebooks the class has), SAY-1 (his recordings), and his Sound Check picks for VOX-1, with VOX-4 alongside it; VOX-5 (the Luna/Kore blend for single words; his call first: lines too?), then VOX-2, then VOX-3. The Writing app (WRT) after Phase 7. OPS-11 stays parked.
 
 ## Epics
@@ -84,7 +84,6 @@ In board order. A new epic gets its file in `epics/` first, then a link here
 - [CUR — Curriculum: the teacher's try-out](epics/CUR.md) · from her notes, 2026-11-12
 - [SAY — Reading aloud, checked by ear](epics/SAY.md) · not in the roadmap yet: a test first
 - [DES — Design system & layout](epics/DES.md) · Phase 1
-- [BUG — Bugs](epics/BUG.md) · P0/P1 in Phase 2, P2 anytime
 - [LVL — Difficulty](epics/LVL.md) · Phase 4
 - [WRT — Writing & grammar app](epics/WRT.md) · Phase 8
 - [OPS — Housekeeping](epics/OPS.md) · anytime
@@ -102,16 +101,12 @@ In board order. A new epic gets its file in `epics/` first, then a link here
 | VOX-3 | Words and lines in Kokoro's own phoneme spelling, as far as it helps | Story | P2 | M | Todo |
 | **CUR** | **Curriculum: the teacher's try-out** | Epic | **P0** | | |
 | CUR-13 | Every lesson holds at least 20 of its own | Story | P1 | L | Todo |
-| CUR-17 | Every game holds two plays of its own | Story | P1 | L | Todo |
 | **SAY** | **Reading aloud, checked by ear** | Epic | **P1** | | |
 | SAY-1 | Can a machine tell a right sound from a wrong one? A test on Alex's recordings | Task | P1 | M | Todo |
 | **DES** | **Design system & layout** | Epic | **P0** | | |
 | DES-32c | Laptops and the classroom's big screen | Story | P1 | M | Todo |
 | DES-32b | Phones turned sideways | Story | P2 | S | Todo |
 | DES-28 | Works on a Chromebook | Story | P1 | M | Todo |
-| **BUG** | **Bugs** | | | | |
-| BUG-33 | What's Missing tells a child a wrong word "is still on the desk" | Bug | P1 | S | Todo |
-| BUG-32 | A lesson asks a word again before every word has had a turn | Bug | P2 | S | Todo |
 | **LVL** | **Difficulty** | Epic | **P0** | | |
 | LVL-3 | Adaptive difficulty from skill mastery | Story | P2 | L | Todo |
 | **WRT** | **Writing & grammar app** | Epic | **P1** | | |
