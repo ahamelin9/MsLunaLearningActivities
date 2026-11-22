@@ -300,7 +300,9 @@ shell here is zsh, which doesn't split `$FILES` into words: a loop over it
 runs once on the whole string, every `cp` fails, and the check quietly runs
 on the new code (PRG-1, 2026-10-19). Use an array,
 `files=(a b c); for f in "${files[@]}"`, and confirm the swap before
-trusting a pass.
+trusting a pass. It caught "before" shots too (CUR-28, 2026-11-21: four
+"before" shots were of the new code): after the swap, `grep -c` the new
+code in each file and expect 0.
 
 - **Pitfall, Vite stopped seeing edits** (*2026-11-12, VOX-6*): after a long
   session the 5199 server went on serving a file's old transform, so the old
@@ -1020,25 +1022,29 @@ Pitfalls that cost time:
 
 ## Does the round's countdown work? (CUR-16)
 
-*2026-11-13 · CUR-16, CUR-18*
+*2026-11-13 · CUR-16, CUR-18, CUR-24*
 
 - **What it is:** at 1st and 2nd grade the shell's `RoundTimer` puts a kit
   `CountdownPie` at the end of the game's header, for every round of a game
-  or lesson with a `timer` kind; the seconds are in `engine/timer.ts`. It
+  with a `timer` kind; the seconds are in `engine/timer.ts` (30 a round since
+  CUR-24, a 1st-grade passage 45). Lessons have none since CUR-24 (the
+  teacher: "timer only on games, not lessons"): `lessonGame` gives no `timer`. It
   starts with the round, while Luna still asks its question (CUR-18: Alex
   wanted it "right away"), and waits only while an answer is said or the tab
   is hidden. What's Missing holds it until `api.asking()`, as the desk hides.
   Running out is a miss with Luna's `timeUp` line.
-- **Check:** `node .claude/skills/know-how/timer-check.mjs 5199`: the 15
-  seconds at 1st grade and 10 at 2nd, the pie counting down while Luna asks
+- **Check:** `node .claude/skills/know-how/timer-check.mjs 5199`: the 30
+  seconds at both grades (the table: 45 for a 1st-grade passage), the pie counting down while Luna asks
   (read from its `--share`, held to her talking time in real seconds), the count,
   a hidden tab, running out (the line, then a wrong answer gets the clue, so
   it was the first miss), a miss taking the pie away, none at Kindergarten or
-  in the untimed games, What's Missing waiting, and a lesson noting the
-  question missed and scoring 19 of 20 first try. It fails 10 lines with the
-  table off. `kit-check.mjs` has the pie itself (light and dark), and
+  in the untimed games, What's Missing waiting, and no pie in any lesson at
+  1st or 2nd grade (each one opened). It fails 8 lines on the code before
+  CUR-24. `kit-check.mjs` has the pie itself (light and dark), and
   `timer-shot.mjs` shoots it in play for a review sheet (`ui:shots` plays at
-  Kindergarten, so it never shows the pie).
+  Kindergarten, so it never shows the pie). `round-shot.mjs` shoots the first
+  round of any game or lesson at any grade, light or dark (`--dark`), for a
+  review sheet.
 - **Pitfall, moving the clock:** a jump of `window.__skip` can bring Luna's
   own nudge too (while the pie still held for her, before CUR-18, a check of
   "it counts down" read 15 after a 6 s jump). Time the counting in real
@@ -1195,6 +1201,71 @@ Pitfalls that cost time:
   SVG markup, where every pose lives, and fails when happy is made the same
   as idle.
 
+## Checking a drafted content list before Alex reads it
+
+*2026-11-21 · CUR-22a/b, CUR-27a–c*
+
+- **Symptom:** a list for his OK (`screenshots/review/cur…md`) is too long to
+  proofread by eye: 100+ questions or words.
+- **Fix:** `story-copy-check.py <list>` fails a right answer that copies
+  three words in a row from its story (it reads an existing story's lines
+  from `src/data` by its title). `sight-list-check.py <lists>` fails a
+  sight-word row without two look-alikes, two sentences holding the word, an
+  owl emoji (DES-12), or a word twice. The first draft of CUR-22b had two
+  copies ("crown and a", "water and seeds"); CUR-27b had an owl.
+- **The game's own rules come later, so bring them forward:** the OKed Dolch
+  lists passed, then `distractor-check.mjs` failed 46 built questions: 21
+  words whose look-alikes all started with another letter (all: ball, tall),
+  so the first sound gave the word away. `sight-list-check.py` now fails such
+  a row too. When a built content check fails on a list Alex OKed, change
+  the list file as well as `src`, and say which rows changed.
+- **The story answers have to fit too:** `fit-check.mjs` (`only=<lesson>`,
+  each size) is the last word on a long answer; CUR-22b's "The boats got home
+  safely · … · Mr. Grant went to sleep" ran 54px past the stage at 1024×768.
+- **Check:** both exit 1 on a problem; run them after every change to a list.
+
+## A voice render stopped part way starts over
+
+*2026-11-21 · CUR-27*
+
+- **Symptom:** `voice:render` was stopped at 900 of 6,486 clips to take in a
+  few more lines; the next run needed 6,516.
+- **Cause:** `scripts/voice/render.mjs` writes `.fingerprints.json`, its
+  record of what's rendered, only at the end, so a stopped run keeps nothing.
+- **Fix:** don't stop a long render for a late change: let it finish, then
+  render again for the few new lines (a short run).
+
+## Words in a sentence look oddly spaced ("weird spacing")
+
+*2026-11-21 · CUR-26, BUG-34*
+
+- **Symptom:** the teacher sees "weird spacing in sentences": some words far
+  apart, or a highlighted word touching the next one.
+- **Cause:** two different ones. In the lessons (CUR-26), every word was a
+  48px-wide box, so "a" and "is" sat in wide gaps. In Story Corner (BUG-34),
+  each word's span held its own trailing space (`{word}{' '}`); the found
+  word turns `inline-block`, and an inline-block drops the space at the end
+  of its text, so its highlight touched the next word.
+- **Fix:** a word is only as wide as its letters, with the 48px tap area an
+  invisible `::before` around it (`LessonKit.module.scss`); the space between
+  words sits outside every word's box (`StoryTime.tsx`).
+- **Check:** `word-space-check.mjs` (the lessons: even gaps, letter to
+  letter, measured with a `Range` because padding is inside a box) and
+  `story-found-space-check.mjs` (the found word's highlight to the next
+  word's first letter: about a space, not 0).
+
+## Don't run prettier here
+
+*2026-11-21*
+
+- **Symptom:** `npx prettier --write` on one file changed 167 lines: double
+  quotes, 80-column wraps.
+- **Cause:** the repo has no prettier config, so prettier uses its own
+  defaults, which aren't the code's style. eslint (`npm run lint`) is the
+  only checker.
+- **Fix:** indent by hand. To undo it, rebuild the file from
+  `git show HEAD:<file>` plus the real changes, with exact replacements.
+
 ## Does every screen fit on every iPad?
 
 *2026-10-11 · DES-10*
@@ -1263,6 +1334,11 @@ Pitfalls that cost time:
   always opens on its true or false, so it threw "never dealt both kinds"
   (found 2026-11-13, CUR-17b). It now answers the claim (retrying, as a tap
   while the claim is read is dropped) and judges the missing word after it.
+  Its stories part measures a story's **opening page** only, never its
+  question, where the answers (and since CUR-23 "Hear the answers") sit:
+  `story-answers-check.mjs [port] [grades=0,1,2] --fit` plays each story to
+  its question at the four sizes (about 1 minute a story at all four). Both
+  measure with `fit-measure.mjs`, the one rule for "fits" (*2026-11-21*).
 - **Pitfall, "nothing scrolls" isn't "it fits"** (*2026-11-07, PRG-5b*): on a
   1024 iPad six squishies ran past the end of their plank and poked out of the
   shelf, while every fit measure stayed empty: the row overflowed its own box,
@@ -1734,3 +1810,43 @@ the old version either proves nothing.
 - **Check:** `npm run build && node .claude/skills/know-how/password-check.mjs`
   ends "All passed". It caught an empty password crashing the Worker (an HMAC
   key can't be empty), which a click-through would likely have missed.
+
+## Sounded-out words sound too far apart to blend
+
+*2026-11-21 · CUR-25*
+
+- **Symptom:** the teacher: "blends is too far apart". /b/ … /a/ … /t/ comes
+  out as three separate sounds, not a word being blended.
+- **Cause:** the wait between two sounds, 260 ms, set twice in
+  `utils/pronunciation.ts` (`soundOutWord`, and `playSequence` for a sound
+  after a sound, which is what a round's line and "Hear the sounds in a row"
+  use). The clips themselves were fine.
+- **Fix:** one value, `SOUND_GAP_MS` (100 ms), used in both places.
+- **Check:** `node .claude/skills/know-how/blend-gap-check.mjs 5199` times
+  each clip in a Kindergarten blend lesson (102 ms; 262 on the code before).
+  For an ear check, `python3 .claude/skills/know-how/blend-sample.py <out.wav>
+  260 100` strings Luna's own clips together at each gap.
+- **Pitfall:** after editing `pronunciation.ts` with Vite running, the check
+  labelled every clip "?": its `import('/src/utils/pronunciation.ts')` got a
+  fresh module, not the hot-reloaded one the app uses (see "a stale tab" above
+  for `?t=`). Restart Vite before a check that patches the app's modules.
+
+## The bar says fewer than a play really asks ("only 2, some are 4")
+
+*2026-11-21 · CUR-20, CUR-21*
+
+- **Symptom:** the teacher reads the bar's "Round 1 of N" as how many
+  questions a play has. Muddled Cards said "of 4" (4 boards of pairs) and
+  Story Corner "of 9" (each story a word hunt and a question).
+- **Cause:** the bar counted rounds, and a round there is several answers.
+- **Fix:** `GameDef.steps(round)`: the bar counts steps across the play, a
+  round's `tick`s and then its win (GameShell's `bar`). Muddled Cards counts
+  its pairs (4 boards of 20 pairs, `BOARDS` by level), Story Corner 2 a story,
+  10 stories a play.
+- **Check:** `twenty-check.mjs` (every game and lesson's bar, every grade),
+  `muddled-twenty-check.mjs` and `story-bar-check.mjs` (played: one step per
+  pair, per answer).
+- **Pitfall:** Kindergarten's Muddled Cards letters are only 14 (tier 1 of
+  `lettersFor`), so a play of more than 14 pairs brings letters back on a
+  later board; `deal` runs on round the deck. Story Corner's words are
+  `span`s, not buttons: a check taps them through `p span`.
