@@ -67,7 +67,6 @@ const SPOKEN_KEYS = new Set([
   'sentence',
   'text',
   'explanation',
-  'comprehensionQuestion',
   // a story question's answers, a bare string[] said when tapped (a lesson's
   // other options are objects, whose own fields are walked instead)
   'options',

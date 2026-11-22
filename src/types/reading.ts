@@ -115,12 +115,16 @@ export interface StoryReadQuestion extends BaseQuestion {
   title: string;
   sentences: StorySentence[];
   imageEmoji: string;
-  comprehensionQuestion: {
-    question: string;
-    options: string[];
-    correctIndex: number;
-    explanation: string;
-  };
+  /** asked one after another once the story is read, the bar counting each (CUR-22a) */
+  questions: StoryQuiz[];
+}
+
+/** One question about a story: its options, the right one, and Luna's "because". */
+export interface StoryQuiz {
+  question: string;
+  options: string[];
+  correctIndex: number;
+  explanation: string;
 }
 
 export type LessonQuestion =

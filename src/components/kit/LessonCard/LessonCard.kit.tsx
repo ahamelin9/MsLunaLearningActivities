@@ -1,5 +1,6 @@
 // LessonCard on the Kit page (DES-7c): done, up next (before and after it's
-// started), locked, with no time (DES-13), just opened, and pressed. Tap a
+// started), locked, with no time (DES-13), just opened, done as a chip
+// (CUR-28), and pressed. Tap a
 // locked card to see it wobble.
 
 import type { ReactNode } from 'react';
@@ -29,6 +30,11 @@ export default function LessonCardKit() {
       </Specimens>
       <Specimens title="Just opened: pops in once, then glows (reload to see it; none with reduced motion)">
         <Specimen label="up next, just opened"><Column><LessonCard number={2} title="Find A, M, S & B" state="next" opened /></Column></Specimen>
+      </Specimens>
+      <Specimens title="Done, as a chip: a skill's lessons done, in a row of these over its cards (CUR-28)">
+        <Specimen label="done, compact"><LessonCard compact number={7} title="Sight Words 7" state="done" minutes={4} /></Specimen>
+        <Specimen label="done, compact, two digits"><LessonCard compact number={12} title="Sight Words 12" state="done" /></Specimen>
+        <Specimen label="done, compact, pressed"><LessonCard compact number={7} title="Sight Words 7" state="done" data-state="pressed" /></Specimen>
       </Specimens>
       <Specimens title="Pressed">
         <Specimen label="done, pressed"><Column><LessonCard number={1} title="Sounds for M, S, B & T" state="done" minutes={4} data-state="pressed" /></Column></Specimen>

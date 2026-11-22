@@ -288,6 +288,15 @@ $skill-columns-narrow: 3;
 
 // six across, as on the board, so every card is one size at every grade;
 // three on a portrait iPad, where six would squeeze the titles
+// a skill's lessons done, as number chips in a row (CUR-28); the badges
+// overhang their top, as the cards' do
+.lesson-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4) var(--space-3);
+  padding-top: var(--space-2);
+}
+
 .lesson-cards {
   display: grid;
   grid-template-columns: repeat(6, minmax(0, 1fr));

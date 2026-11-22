@@ -19,6 +19,7 @@
 import puppeteer from 'puppeteer-core';
 import { chromePath } from '../../../scripts/chrome-path.cjs';
 import { lessonCard } from './library.mjs';
+import { measure } from './fit-measure.mjs';
 
 const args = process.argv.slice(2);
 const port = args.find(a => /^\d+$/.test(a)) ?? '5199';
@@ -30,29 +31,6 @@ const GRADES = ['kindergarten', 'grade1', 'grade2'];
 const wants = part => what === 'all' || what === part;
 // only=<words>: only the lessons whose title has these words, for trying a fix
 const only = args.find(a => a.startsWith('only='))?.slice(5);
-
-/** In the page: what scrolls, or runs past the screen or the stage. */
-function measure() {
-  const H = innerHeight;
-  const W = innerWidth;
-  const out = [];
-  for (const el of document.querySelectorAll('*')) {
-    if (/(auto|scroll)/.test(getComputedStyle(el).overflowY) && el.scrollHeight > el.clientHeight + 1) out.push(`scrolls by ${el.scrollHeight - el.clientHeight}px`);
-  }
-  if (document.scrollingElement.scrollHeight > H + 1) out.push(`the page scrolls by ${document.scrollingElement.scrollHeight - H}px`);
-  const stage = document.querySelector('[data-shot="stage"]');
-  if (!stage) return ['no stage'];
-  const box = stage.getBoundingClientRect();
-  if (box.bottom > H + 1) out.push(`the stage runs ${Math.round(box.bottom - H)}px past the screen`);
-  for (const el of stage.querySelectorAll('button, p, h2, h3')) {
-    const b = el.getBoundingClientRect();
-    if (b.width === 0 || b.height === 0) continue;
-    const said = (el.getAttribute('aria-label') ?? el.textContent).trim().slice(0, 24);
-    if (b.bottom > box.bottom + 1 || b.bottom > H + 1) { out.push(`"${said}" runs ${Math.round(Math.max(b.bottom - box.bottom, b.bottom - H))}px past the stage`); break; }
-    if (b.right > W + 1) { out.push(`"${said}" runs past the side`); break; }
-  }
-  return [...new Set(out)];
-}
 
 const browser = await puppeteer.launch({ executablePath: chromePath(), headless: true, args: ['--mute-audio'] });
 const page = await browser.newPage();
@@ -135,7 +113,10 @@ for (const [W, H] of SIZES) {
         window.__curriculum[gr].flatMap(s => s.lessons).map(l => {
           const long = l.questions.filter(q => /^(story|sentence)/.test(q.type));
           const rest = l.questions.filter(q => !long.includes(q)).sort((a, b) => JSON.stringify(b).length - JSON.stringify(a).length);
-          return { id: l.id, title: l.title, rounds: [...long, ...rest.slice(0, 1)].map(q => q.id) };
+          // a story asks its questions in turn (CUR-22a), each with its own
+          // answers under the story: every one is judged, as id#n
+          const ids = q => (q.type === 'story-read' ? q.questions.map((_, n) => `${q.id}#${n}`) : [q.id]);
+          return { id: l.id, title: l.title, rounds: [...long, ...rest.slice(0, 1)].flatMap(ids) };
         }), g);
       for (const [i, lesson] of lessons.entries()) {
         if (only && !lesson.title.includes(only)) continue;
@@ -143,7 +124,8 @@ for (const [W, H] of SIZES) {
           await page.evaluate((gr, l, q) => {
             const it = window.__curriculum[gr].flatMap(s => s.lessons).find(x => x.id === l);
             it.__all = it.__all ?? it.questions;
-            it.questions = it.__all.filter(x => x.id === q);
+            const [id, n] = q.split('#');
+            it.questions = it.__all.filter(x => x.id === id).map(x => (n === undefined ? x : { ...x, questions: [x.questions[Number(n)]] }));
           }, g, lesson.id, id);
           // its skill first: the library shows one skill's lessons at a time (CUR-7)
           await open(await lessonCard(page, i));

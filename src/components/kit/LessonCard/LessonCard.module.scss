@@ -87,6 +87,29 @@
   }
 }
 
+// a done lesson as a chip (CUR-28): a round button the size of the smallest
+// answer, its number in the middle and the check badge over its shoulder
+.root[data-variant='chip'] {
+  justify-content: center;
+  width: var(--target-answer);
+  height: var(--target-answer);
+  min-height: 0;
+  padding: 0;
+  border-radius: var(--radius-chip);
+
+  .badge {
+    top: calc(var(--space-2) * -1);
+    right: calc(var(--space-2) * -1);
+    width: var(--space-6);
+    height: var(--space-6);
+  }
+}
+
+.digit {
+  font: var(--text-display-s);
+  color: var(--right-text);
+}
+
 // ── states ─────────────────────────────────────────────────────────────────
 .root[data-state~='done'] {
   --lesson-number: var(--right-text);

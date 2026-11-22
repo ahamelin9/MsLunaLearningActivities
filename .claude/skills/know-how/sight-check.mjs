@@ -6,7 +6,8 @@
 // Needs Vite running on the port. Marks Kindergarten's lessons done so
 // "Starter Sight Words" opens (as lesson-shot.mjs does), plays its rounds,
 // reading each round's question from React, and checks:
-//   - a play's first five rounds ask the, see, like, I and a, once each, before
+//   - a play's first ten rounds ask the lesson's ten words (Dolch 1–10 since
+//     CUR-27a; the, see, like, I and a before), once each, before
 //     any comes again (BUG-32: a play is 20 since CUR-12, and its shuffle had
 //     undone the spread);
 //   - each wrong answer is a different real word;
@@ -76,8 +77,10 @@ async function play(run) {
   await page.waitForSelector(at('play'));
   await page.click(at('play'));
 
+  // the lesson's words, from its list (Dolch 1–10, CUR-27a)
+  const want = await page.evaluate(async () => (await import('/src/data/lessons/dolch.ts')).K_DOLCH[0].map(([w]) => w.toLowerCase()));
   const words = [];
-  for (let round = 0; round < 5; round++) {
+  for (let round = 0; round < want.length; round++) {
     const live = await page.waitForSelector(at('lesson-choice'), { timeout: 8000 }).catch(() => null);
     if (!live) break;
     await wait(900);
@@ -114,8 +117,7 @@ async function play(run) {
     }, { timeout: 15000 }, r.pips).catch(() => {});
     if (await page.$(at('shell-reward'))) break;
   }
-  const want = ['the', 'see', 'like', 'i', 'a'];
-  ok(`${tag}its first five rounds ask the, see, like, I and a, once each`, words.length === 5 && want.every(w => words.map(x => x.toLowerCase()).includes(w)), words.join(', '));
+  ok(`${tag}its first ${want.length} rounds ask its ${want.length} words, once each`, words.length === want.length && want.every(w => words.map(x => x.toLowerCase()).includes(w)), words.join(', '));
   await page.close();
 }
 

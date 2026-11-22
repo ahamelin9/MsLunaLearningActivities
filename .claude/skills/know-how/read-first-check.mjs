@@ -60,7 +60,8 @@ const question = () => page.evaluate(() => {
     const q = f.memoizedProps?.question;
     if (q) {
       const options = q.options?.map(o => ({ label: o.letter ? `letter ${o.letter}` : o.word ?? o.text, right: Boolean(o.isCorrect ?? o.isRhyme) }))
-        ?? q.comprehensionQuestion.options.map((text, i) => ({ label: text, right: i === q.comprehensionQuestion.correctIndex }));
+        // a story's first question (CUR-22a: a story asks 4, in turn)
+        ?? q.questions[0].options.map((text, i) => ({ label: text, right: i === q.questions[0].correctIndex }));
       return { instruction: q.speechPrompt ?? q.prompt, prompt: q.prompt, options, sentence: q.sentence ?? q.sentences?.[0]?.text };
     }
   }

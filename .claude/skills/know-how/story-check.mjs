@@ -6,8 +6,8 @@
 //   node .claude/skills/know-how/story-check.mjs <src-root> # another copy
 //
 // The rules:
-// - at least 9 stories per tier (GAME-9), and 18 at or below every tier, so a
-//   play of 9 has a second play of its own (CUR-17c: Kindergarten had 9);
+// - at least 9 stories per tier (GAME-9), and 20 at or below every tier, so a
+//   play of 10 has a second play of its own (CUR-17c, CUR-21);
 // - every story has a title, a picture, 2–4 lines and a question with exactly
 //   one right answer among different answers;
 // - the right answer never repeats 3 words in a row from a line of its story
@@ -47,8 +47,8 @@ const { MINI_STORIES, GAMES, tierFor } = await import(pathToFileURL(join(out, 'b
 rmSync(out, { recursive: true, force: true });
 
 const PER_TIER = 9;
-// two plays of 9 (CUR-17c): a play draws on its tier and the ones below
-const TWO_PLAYS = 18;
+// two plays of 10 (CUR-17c, CUR-21): a play draws on its tier and the ones below
+const TWO_PLAYS = 20;
 const COPY_RUN = 3;
 const PLAYS = 300;
 const words = text => text.toLowerCase().replace(/[’']/g, "'").replace(/[^a-z'\s]/g, ' ').split(/\s+/).filter(Boolean);

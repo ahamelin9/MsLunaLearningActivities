@@ -280,8 +280,30 @@ export const Hub: React.FC<HubProps> = ({
                   <span aria-hidden="true">{openBucket.icon}</span> {openBucket.name}{' '}
                   <span className={styles.count}>{openBucket.at.length === 1 ? '1 lesson' : `${openBucket.at.length} lessons`}</span>
                 </h3>
+                {/* the lessons done, as a row of number chips, so a skill of many
+                    lessons stays short (CUR-28) */}
+                {openBucket.at.some(i => states[i] === 'done') && (
+                  <div className={styles.lessonChips}>
+                    {openBucket.at
+                      .filter(i => states[i] === 'done')
+                      .map(i => (
+                        <LessonCard
+                          key={lessons[i].id}
+                          compact
+                          number={numbers[i]}
+                          title={lessons[i].title}
+                          state="done"
+                          // not shown on the chip, but said in its label
+                          minutes={timeOf(lessons[i], true)}
+                          opened={lessons[i].id === opened}
+                          data-shot="lesson-tile"
+                          onClick={() => startGame(lessons[i])}
+                        />
+                      ))}
+                  </div>
+                )}
                 <div className={styles.lessonCards} ref={lessonCards}>
-                  {openBucket.at.map(i => [lessons[i], i] as const).map(([lesson, i]) => (
+                  {openBucket.at.filter(i => states[i] !== 'done').map(i => [lessons[i], i] as const).map(([lesson, i]) => (
                     <LessonCard
                       key={lesson.id}
                       number={numbers[i]}

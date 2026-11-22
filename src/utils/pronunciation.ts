@@ -65,6 +65,13 @@ export const LUNA_VOICES: LunaVoice[] = [
 
 export const DEFAULT_VOICE_ID = 'af_heart';
 
+/**
+ * The wait between one sound and the next when a word is sounded out
+ * (/b/ /a/ /t/). It was 260 ms, and the teacher heard the sounds "too far
+ * apart" to blend (2026-11-21; CUR-25).
+ */
+export const SOUND_GAP_MS = 100;
+
 
 /**
  * What to play, in the terms the rendered library is indexed by. The kind
@@ -596,7 +603,7 @@ class PronunciationService {
     handlers?: { onChunk?: (index: number) => void; onEnd?: () => void; gapMs?: number }
   ) {
     this.lastRequest = () => this.soundOutWord(chunks, wholeWord, handlers);
-    const gap = handlers?.gapMs ?? 260;
+    const gap = handlers?.gapMs ?? SOUND_GAP_MS;
     // generate the whole run up front so the blending is not stop-start
     this.prefetch([...chunks.map(c => ({ sound: c })), { word: wholeWord }]);
 
@@ -684,9 +691,9 @@ class PronunciationService {
       }
       const part = parts[index];
       index += 1;
-      // sound after sound is a word being sounded out: give each one the
-      // same room soundOutWord does, so /p/ /i/ /g/ does not run together
-      const gap = part.sound && parts[index]?.sound ? 260 : 120;
+      // sound after sound is a word being sounded out: the same short room
+      // soundOutWord gives, close enough to blend (CUR-25)
+      const gap = part.sound && parts[index]?.sound ? SOUND_GAP_MS : 120;
       const guard = this.once(() => window.setTimeout(next, gap));
       const step: SpeakOptions = { interrupt: false, rate: options?.rate, onEnd: guard.done };
 

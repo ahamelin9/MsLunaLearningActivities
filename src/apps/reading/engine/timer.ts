@@ -21,12 +21,14 @@ import type { GradeLevel } from '@/types/reading';
 export type TimerKind = 'listen' | 'find' | 'read' | 'passage';
 
 /**
- * Seconds for a round, by grade. Kindergarten has none. 2nd grade has less
- * time than 1st for every kind (the teacher).
+ * Seconds for a game's round, by grade; lessons have no countdown (CUR-24).
+ * Kindergarten has none. The teacher (2026-11-21): "too fast, make 30
+ * seconds", so every round has 30, and a Treasure Path passage keeps its 45
+ * in 1st grade.
  */
 export const ANSWER_SECONDS: Partial<Record<GradeLevel, Record<TimerKind, number>>> = {
-  grade1: { listen: 15, find: 25, read: 30, passage: 45 },
-  grade2: { listen: 10, find: 20, read: 20, passage: 30 }
+  grade1: { listen: 30, find: 30, read: 30, passage: 45 },
+  grade2: { listen: 30, find: 30, read: 30, passage: 30 }
 };
 
 /** The seconds a round has at this grade, or undefined when it isn't timed. */

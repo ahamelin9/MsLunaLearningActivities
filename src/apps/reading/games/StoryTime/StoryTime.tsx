@@ -190,25 +190,29 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
                 const clean = word.replace(/[^a-zA-Z]/g, '').toLowerCase();
                 const isFound = foundWord && clean === round.hunt;
                 const isShown = shown && phase === 'hunt' && clean === round.hunt;
+                // the space after a word sits outside it: the found word
+                // turns inline-block, which drops a space inside it, and its
+                // highlight touched the next word (BUG-34)
                 return (
-                  <span
-                    key={wi}
-                    className={styles.word}
-                    // the found word, in the one answer language (components.md)
-                    data-state={isFound ? 'right' : isShown ? 'revealed' : undefined}
-                    onClick={e => {
-                      if (phase === 'hunt') {
-                        e.stopPropagation();
-                        tapWord(word);
-                      } else if (!canHearLines) {
-                        // the line is still the child's to read; one word is fine
-                        e.stopPropagation();
-                        pronunciation.speakWord(word.replace(/[^a-zA-Z']/g, ''));
-                      }
-                    }}
-                  >
-                    {word}{' '}
-                  </span>
+                  <React.Fragment key={wi}>
+                    <span
+                      className={styles.word}
+                      // the found word, in the one answer language (components.md)
+                      data-state={isFound ? 'right' : isShown ? 'revealed' : undefined}
+                      onClick={e => {
+                        if (phase === 'hunt') {
+                          e.stopPropagation();
+                          tapWord(word);
+                        } else if (!canHearLines) {
+                          // the line is still the child's to read; one word is fine
+                          e.stopPropagation();
+                          pronunciation.speakWord(word.replace(/[^a-zA-Z']/g, ''));
+                        }
+                      }}
+                    >
+                      {word}
+                    </span>{' '}
+                  </React.Fragment>
                 );
               })}
             </p>
@@ -260,6 +264,21 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
               </Choice>
             ))}
           </div>
+          {/* the teacher (2026-11-18): "an option to read the answers" (CUR-23).
+              Each answer is its own clip, in the order shown; it waits for a
+              first try from 1st grade, like "Read me the story" */}
+          <ChunkyButton
+            variant="prompt"
+            icon="speaker"
+            disabled={!canHearLines}
+            title={canHearLines ? 'Hear the answers' : 'Try it first!'}
+            onClick={() => {
+              soundManager.playLetterTap();
+              pronunciation.speakSequence(answers.map(a => ({ text: a.text })));
+            }}
+          >
+            Hear the answers
+          </ChunkyButton>
         </div>
       )}
     </GameSurface>
@@ -274,9 +293,11 @@ export const storyTime: GameDef<Round> = {
   objective: 'Reading a story: reads a tiny story, finds a word in it, and answers one question about it.',
   skill: 'reading',
   mission: 'Snuggle in. This one is short, I promise.',
-  // each story asks two things, a word to find and a question, so 9 stories
-  // are about 20 a play (CUR-15): Kindergarten's 9, none of them twice
-  roundsPerPlay: 9,
+  // each story asks two things, a word to find and a question, so 10 stories
+  // are 20 a play (CUR-15, CUR-21), none of them twice
+  roundsPerPlay: 10,
+  // the bar counts both, the word found and the question: 20, not 10 (CUR-21)
+  steps: () => 2,
   // a story read line by line, a word hunt and a question (PRG-6's first guess)
   roundSeconds: 90,
   shape: 'book',

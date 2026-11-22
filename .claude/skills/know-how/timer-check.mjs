@@ -4,22 +4,21 @@
 //   node .claude/skills/know-how/timer-check.mjs [port=5199]
 //
 // Needs Vite on the port. The page's Date.now can be moved on (window.__skip)
-// and its tab hidden (window.__hidden), as in time-check.mjs, so 15 seconds
+// and its tab hidden (window.__hidden), as in time-check.mjs, so 30 seconds
 // pass in a moment. From a fresh save each time it checks:
-//   - 1st grade, Letter Cookies: the pie shows the round's 15 seconds and
+//   - 1st grade, Letter Cookies: the pie shows the round's 30 seconds and
 //     starts with the round, counting down while Luna says its question too
 //     (CUR-18), counts down while she's quiet, and not while the tab is
 //     hidden; running out takes it away, Luna says time's up, and it was the
 //     round's first miss: the next wrong answer gets the spoken clue;
 //   - a wrong answer before then takes the pie away too;
-//   - 2nd grade has less time than 1st for every kind (10 here), and
-//     Kindergarten none; no pie in Bubble Sounds, Muddled Cards or Story
-//     Corner;
+//   - every game round has 30 seconds at 1st and 2nd grade, a Treasure Path
+//     passage 45 in 1st grade (CUR-24), and Kindergarten none; no pie in
+//     Bubble Sounds, Muddled Cards or Story Corner;
 //   - What's Missing shows no pie while the desk is looked at, and its full
-//     15 once it asks, counting down while Luna asks (CUR-18);
-//   - a lesson: running out notes the question missed, to come back next
-//     play, and the play's last round, run out then answered, isn't counted
-//     right the first time ("19 of 20 first try").
+//     30 once it asks, counting down while Luna asks (CUR-18);
+//   - no lesson at 1st or 2nd grade shows a pie (the teacher: "timer only
+//     on games, not lessons"; CUR-24).
 // It fails with the timer off (no pie at all).
 
 import puppeteer from 'puppeteer-core';
@@ -131,10 +130,10 @@ const clue = page => page.$$eval('button', bs => bs.some(b => /clue/i.test(b.tex
 {
   const page = await game(1, 'Letter Cookies');
   await until(async () => (await pie(page)) !== null);
-  ok('1st grade: a pie in the header, full at 15 seconds', (await pie(page)) === 15, await pie(page));
+  ok('1st grade: a pie in the header, full at 30 seconds', (await pie(page)) === 30, await pie(page));
   ok('… it sits in the header, beside Again', await page.$eval(at('countdown-pie'), e => Boolean(e.closest('header'))).catch(() => false));
   // real seconds here, so the pie's loss can be held to Luna's talking time
-  const asked = await whileTalking(page, 15);
+  const asked = await whileTalking(page, 30);
   ok(
     '… it starts with the round: it counts down while Luna says the round’s question (CUR-18)',
     asked.heard && asked.talked >= 0.6 && asked.lost >= asked.talked * 0.7 && asked.lost <= asked.talked + 0.5,
@@ -151,7 +150,7 @@ const clue = page => page.$$eval('button', bs => bs.some(b => /clue/i.test(b.tex
   await hide(page, false);
   const hidden = await pie(page);
   ok('… not while the tab is hidden', hidden !== null && after - hidden <= 1, `${after} → ${hidden} in 3 s hidden`);
-  await skip(page, 20000);
+  await skip(page, 35000);
   await wait(800);
   ok('running out takes the pie away', (await pie(page)) === null, await pie(page));
   const said = await bodyText(page);
@@ -180,7 +179,7 @@ const clue = page => page.$$eval('button', bs => bs.some(b => /clue/i.test(b.tex
       gone = (await pie(page)) === null;
     } else {
       // right: the next round brings a fresh pie
-      await until(async () => (await pie(page)) === 15, 8000);
+      await until(async () => (await pie(page)) === 30, 8000);
     }
   }
   ok('a wrong answer takes the pie away (the round is off its first try)', gone === true, gone);
@@ -191,15 +190,16 @@ const clue = page => page.$$eval('button', bs => bs.some(b => /clue/i.test(b.tex
 {
   const page = await game(2, 'Letter Cookies');
   await until(async () => (await pie(page)) !== null);
-  ok('2nd grade: Letter Cookies has 10 seconds', (await pie(page)) === 10, await pie(page));
+  ok('2nd grade: Letter Cookies has 30 seconds', (await pie(page)) === 30, await pie(page));
   const table = await page.evaluate(async () => {
     const { ANSWER_SECONDS } = await import('/src/apps/reading/engine/timer.ts');
     return ANSWER_SECONDS;
   });
   const kinds = Object.keys(table.grade1 ?? {});
+  const want = (g, k) => (g === 'grade1' && k === 'passage' ? 45 : 30);
   ok(
-    '… less than 1st grade for every kind, and Kindergarten has none',
-    kinds.length === 4 && kinds.every(k => table.grade2[k] < table.grade1[k]) && !table.kindergarten,
+    '… every kind 30 seconds at both grades, a 1st-grade passage 45, and Kindergarten none (CUR-24)',
+    kinds.length === 4 && ['grade1', 'grade2'].every(g => kinds.every(k => table[g][k] === want(g, k))) && !table.kindergarten,
     kinds.map(k => `${k} ${table.grade1[k]}/${table.grade2[k]}`).join(', ')
   );
   await page.close();
@@ -223,8 +223,8 @@ for (const title of ['Bubble Sounds', 'Muddled Cards', 'Story Corner']) {
   await wait(1200);
   ok('What’s Missing: no pie while the desk is looked at', (await bodyText(page)).includes('Memorize') && (await pie(page)) === null);
   await until(async () => (await pie(page)) !== null, 12000);
-  ok('… and its full 15 seconds once it asks', (await pie(page)) === 15, await pie(page));
-  const asked = await whileTalking(page, 15);
+  ok('… and its full 30 seconds once it asks', (await pie(page)) === 30, await pie(page));
+  const asked = await whileTalking(page, 30);
   ok(
     '… counting down while Luna asks what is missing (CUR-18)',
     asked.heard && asked.talked >= 0.6 && asked.lost >= asked.talked * 0.7 && asked.lost <= asked.talked + 0.5,
@@ -233,43 +233,36 @@ for (const title of ['Bubble Sounds', 'Muddled Cards', 'Story Corner']) {
   await page.close();
 }
 
-// ---- a lesson: running out brings the question back, and isn't first try ----
-{
-  const page = await library(1);
-  const lesson = await page.evaluate(async key => {
+// ---- no lesson has a countdown (CUR-24) ----
+for (const grade of [1, 2]) {
+  const page = await library(grade);
+  const g = grade === 1 ? 'grade1' : 'grade2';
+  // every lesson open, so each card can be played
+  await page.evaluate(async (key, g) => {
     const { lessonsFor } = await import('/src/apps/reading/engine/lessons.ts');
-    const first = lessonsFor('grade1')[0];
-    // the last round to play: 19 won, all right the first time (PRG-8's part-way)
     const saved = JSON.parse(localStorage.getItem(key));
-    saved.partway = { [first.lesson.id]: { won: 19, clean: 19, seconds: 0, counted: 0 } };
+    saved.completedLessons = lessonsFor(g).map(l => l.lesson.id);
     localStorage.setItem(key, JSON.stringify(saved));
-    return first.lesson.id;
-  }, KEY);
+  }, KEY, g);
   await page.reload({ waitUntil: 'networkidle0' });
   await page.click(at('open-reading'));
   await page.waitForSelector(at('hub'));
-  await (await lessonCard(page, 0)).click();
-  await page.waitForSelector(at('play'));
-  await page.click(at('play'));
-  await page.waitForSelector(at('stage'));
-  await until(async () => (await pie(page)) !== null);
-  await quiet(page);
-  await wait(300);
-  await skip(page, 60000);
-  await wait(800);
-  const missed = await page.evaluate(id => JSON.parse(localStorage.getItem('ms_luna_seen_v1') ?? '{}')[`missed:${id}`] ?? [], lesson);
-  ok('a lesson: running out notes the question missed, to come back next play', missed.length === 1, JSON.stringify(missed));
-  await quiet(page);
-  // each choice in turn (a wrong one wobbles and clears), until it's won
-  for (let i = 0; i < 8 && !(await page.$(at('shell-reward'))); i++) {
-    await page.$$eval(`${at('stage')} button[data-kind]`, (bs, n) => bs[n % Math.max(1, bs.length)]?.click(), i);
-    await wait(300);
-    await quiet(page);
-    await wait(300);
+  const count = await page.evaluate(async g => (await import('/src/apps/reading/engine/lessons.ts')).lessonsFor(g).length, g);
+  const timed = [];
+  for (let i = 0; i < count; i++) {
+    const card = await lessonCard(page, i);
+    await card.evaluate(e => e.scrollIntoView({ block: 'center' }));
+    await card.click();
+    await page.waitForSelector(at('play'));
+    await page.click(at('play'));
+    await page.waitForSelector(at('stage'));
+    await wait(1200);
+    if ((await pie(page)) !== null) timed.push(i + 1);
+    await page.click(at('shell-back'));
+    await page.waitForSelector(at('hub'));
+    await wait(150);
   }
-  await page.waitForSelector(at('shell-reward'), { timeout: 15000 }).catch(() => {});
-  const done = await bodyText(page);
-  ok('… and the round isn’t right the first time: 19 of 20', /19 of 20 first try/.test(done), done.match(/\d+ of \d+ first try/)?.[0] ?? 'no done screen');
+  ok(`${grade === 1 ? '1st' : '2nd'} grade: none of its ${count} lessons shows a pie`, count > 0 && timed.length === 0, timed.length ? `timed: lessons ${timed.join(', ')}` : '');
   await page.close();
 }
 

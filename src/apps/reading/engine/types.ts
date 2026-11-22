@@ -95,6 +95,13 @@ export interface GameDef<TRound = never> {
   mission: string;
   roundsPerPlay: number;
   /**
+   * When a round is several things to do, how many the bar counts for it
+   * (CUR-20): the bar then counts these steps across the play, a round's
+   * `tick`s and then its win, instead of rounds ("1 of 20" pairs, not "1 of
+   * 4" boards). Left out, the bar counts rounds.
+   */
+  steps?: (round: TRound) => number;
+  /**
    * A first guess at one round in seconds, for "about N min" before real
    * plays are timed (PRG-6), when this game's rounds run long; else
    * `engine/times.ts`' typical round

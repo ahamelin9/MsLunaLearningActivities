@@ -49,9 +49,11 @@ export const TRY_FIRST = { text: 'Try reading it first!' };
  * aloud first — "letter D", "dog" — and only then does the shell cheer or
  * console, so neither cuts the other off. Taps while that plays are ignored.
  * The question's own hint is what Luna says from the second miss on, and from
- * the third the right choice is revealed (FB-2).
+ * the third the right choice is revealed (FB-2). `onRight`: a right answer
+ * goes there instead of winning the round, for a round that asks several
+ * questions (a story's, CUR-22a).
  */
-export function useAnswer(api: GameApi, hint?: string) {
+export function useAnswer(api: GameApi, hint?: string, onRight?: (say: SpeechPart[]) => void) {
   const [solved, setSolved] = useState(false);
   const [wrongId, setWrongId] = useState<string | null>(null);
   // "show me" (FB-2): the shell asks for it from the third miss
@@ -71,6 +73,9 @@ export function useAnswer(api: GameApi, hint?: string) {
       setWrongId(id);
       afterMotion('emphasis', () => setWrongId(null));
     }
+    // a round of several questions (a story's, CUR-22a): a right answer
+    // before the last is a step on the bar, not the round's win
+    if (correct && onRight) return onRight(say);
     api.answer({
       correct,
       say,

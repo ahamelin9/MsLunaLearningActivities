@@ -3,6 +3,8 @@
  * locked (PRG-7, DES-13).
  *
  * Props:  number · title · state: 'done' | 'next' | 'locked'
+ *         compact?: a done lesson is a round chip, just its number and the
+ *         check, so a skill of many lessons stays short (CUR-28)
  *         minutes?: "took N min" when done, "about N min" otherwise; left
  *         out, the card shows no time (until PRG-6 measures them; DES-13)
  *         rounds?: { done, total }: up next, once started, shows a thin rounds
@@ -13,7 +15,7 @@
  *         onClick: a done or up-next card opens the lesson; a locked one
  *         wobbles first, and the screen has Luna say to finish the open one
  *         data-shot (for the screenshots and checks) · className is layout only
- * States: done (a check badge, "took N min") · next (a glowing action border,
+ * States: done (a check badge, "took N min"; compact: a chip, no time) · next (a glowing action border,
  *         an "Up next" tag that stays centred under reduced motion, "about N
  *         min", the rounds bar once started) · locked (dashed on the well, a
  *         lock badge, "about N min", a wobble on tap) · opened (the shared pop,
@@ -50,6 +52,8 @@ interface LessonCardProps {
   rounds?: { done: number; total: number };
   practice?: { done: number; goal: number };
   opened?: boolean;
+  /** A done lesson as a small round chip, its number and a check (CUR-28). */
+  compact?: boolean;
   onClick?: () => void;
   className?: string;
   'data-shot'?: string;
@@ -65,6 +69,7 @@ export function LessonCard({
   rounds,
   practice,
   opened = false,
+  compact = false,
   onClick,
   className,
   'data-shot': shot,
@@ -88,6 +93,26 @@ export function LessonCard({
   const practiceSaid = practiced ? `, practice ${practice.done} of ${practice.goal}` : '';
   const said = `Lesson ${number}, ${title}, ${state === 'done' ? 'done' : state === 'next' ? 'up next' : 'locked'}${practiceSaid}${time}`;
   const started = state === 'next' && rounds && rounds.done > 0;
+
+  // done, in a tray of many: a chip with its number, so a long skill stays short
+  if (compact && state === 'done') {
+    return (
+      <button
+        type="button"
+        className={cx(styles.root, className)}
+        data-variant="chip"
+        data-state={dataState(state, opened && 'opened', held)}
+        data-shot={shot}
+        aria-label={said}
+        onClick={tap}
+      >
+        <span className={styles.badge} data-variant="done" aria-hidden="true">
+          <Icon name="check" size={16} />
+        </span>
+        <span className={styles.digit} aria-hidden="true">{number}</span>
+      </button>
+    );
+  }
 
   return (
     <button

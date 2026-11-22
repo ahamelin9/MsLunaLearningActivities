@@ -73,11 +73,16 @@ button.card {
   // each word's own padding spaces them, about as far apart as in a book
   gap: 0;
   font: var(--text-read);
+  // the words' tap areas (below) sit under the words, above the card
+  isolation: isolate;
 }
 
-// a 48px target however short the word ("a", "of"), so a small finger finds it
+// a word only as wide as itself, so the spaces stay even (CUR-26: "a" in a
+// 48px box left wide gaps around it), with a 48px target however short the
+// word ("a", "of"): an invisible area reaching past it on each side, under
+// the words, so a tap on a word is always that word's
 .word {
-  min-width: var(--target-chrome);
+  position: relative;
   min-height: var(--target-chrome);
   padding: 0 var(--space-1);
   border: none;
@@ -87,6 +92,16 @@ button.card {
   font: inherit;
   cursor: pointer;
   transition: background-color var(--dur-quick) var(--ease-standard);
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset-block: 0;
+    left: 50%;
+    z-index: -1;
+    width: max(100%, var(--target-chrome));
+    transform: translateX(-50%);
+  }
 
   &:focus-visible {
     @include focus-ring;

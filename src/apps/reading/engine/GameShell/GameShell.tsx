@@ -119,6 +119,8 @@ export const GameShell: React.FC<GameShellProps> = ({
   const [hintLevel, setHintLevel] = useState<0 | 1 | 2>(0);
   const [hint, setHint] = useState<SpeechPart[] | null>(null);
   const [roundsWon, setRoundsWon] = useState(0);
+  // the steps this round has made, for a game whose bar counts steps (CUR-20)
+  const [stepsDone, setStepsDone] = useState(0);
   // the lessons done as this play began, to see what finishing it opened (DES-22d)
   const [doneBefore, setDoneBefore] = useState<string[]>(() => progress.completedLessons);
   const [flash, setFlash] = useState<'win' | 'miss' | null>(null);
@@ -259,6 +261,7 @@ export const GameShell: React.FC<GameShellProps> = ({
     setHintLevel(0);
     setHint(null);
     setRoundsWon(from?.won ?? 0);
+    setStepsDone(0);
     setDoneBefore(progress.completedLessons);
     setWinStreak(0);
     setPetalFalls(0);
@@ -275,6 +278,7 @@ export const GameShell: React.FC<GameShellProps> = ({
 
   const goToNextRound = useCallback(() => {
     setFlash(null);
+    setStepsDone(0);
     setAttempts(0);
     setHintLevel(0);
     setHint(null);
@@ -475,12 +479,27 @@ export const GameShell: React.FC<GameShellProps> = ({
     (opts?: { lunaLine?: string; say?: SpeechPart[] }) => {
       answeredRef.current = true;
       soundManager.playLetterSnap();
+      setStepsDone(n => n + 1);
       sayThen(opts?.say, ANSWER_WATCHDOG_WRONG_MS, () => {
         if (opts?.lunaLine) speak(opts.lunaLine, 'happy');
       });
     },
     [sayThen, speak]
   );
+
+  // What the bar counts: rounds, or a game's steps (CUR-20: Muddled Cards'
+  // pairs, so the teacher reads 20, not 4 boards). A round's steps before its
+  // last are its ticks; winning it fills the rest.
+  const bar = useMemo(() => {
+    if (!game.steps) return { won: roundsWon, current: roundIndex + 1, total: game.roundsPerPlay };
+    const size = (i: number) => (rounds[i] === undefined ? 0 : game.steps!(rounds[i]));
+    let total = 0;
+    for (let i = 0; i < rounds.length; i++) total += size(i);
+    let won = 0;
+    for (let i = 0; i < roundsWon; i++) won += size(i);
+    if (roundsWon <= roundIndex) won += Math.min(stepsDone, Math.max(0, size(roundIndex) - 1));
+    return { won, current: Math.min(won + 1, total), total };
+  }, [game, rounds, roundsWon, roundIndex, stepsDone]);
 
   const ctx: GameContext = useMemo(
     () => ({ grade, difficulty, roundIndex, totalRounds: game.roundsPerPlay, firstRound }),
@@ -595,7 +614,7 @@ export const GameShell: React.FC<GameShellProps> = ({
       back="library"
       onBack={leave}
       title={title}
-      rounds={inPlay ? { won: roundsWon, current: roundIndex + 1, total: game.roundsPerPlay } : undefined}
+      rounds={inPlay ? bar : undefined}
     >
       {inPlay && (
         <ChunkyButton

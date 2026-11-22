@@ -11,6 +11,7 @@
 // and a selected ChunkyButton (aria-pressed) takes the action colour.
 // DES-9c: a picked Tile (aria-pressed) takes the action colour too.
 // CUR-9: a pick-many set of Tiles, and a disabled one faded and still.
+// CUR-28: a done LessonCard as a chip, round and 64px, its number alone.
 // DES-13: a LessonCard with no time shows none, and the one that just opened
 // pops then glows (no pop under reduced motion).
 // CUR-7: SkillCard's states: up next glows with a centred tag, done has a
@@ -254,6 +255,19 @@ ok('the lesson that just opened pops, then glows', (await anim(opened)) === 'lun
 await page.evaluate(() => document.documentElement.setAttribute('data-reduced-motion', ''));
 ok('reduced motion: it opens with no pop', /^none(, none)?$/.test(await anim(opened)), await anim(opened));
 await page.evaluate(() => document.documentElement.removeAttribute('data-reduced-motion'));
+
+// CUR-28: a done lesson as a chip: round, a child's tap wide, just its number
+// and the check, its time said in its label only; it sinks when pressed
+const chip = await page.evaluateHandle(() => [...document.querySelectorAll('button[data-variant="chip"]')].find(b => !b.dataset.state.includes('pressed')));
+const chipLook = await chip.evaluate(b => {
+  const s = getComputedStyle(b);
+  const r = b.getBoundingClientRect();
+  return { w: Math.round(r.width), h: Math.round(r.height), round: s.borderRadius, text: b.textContent, label: b.getAttribute('aria-label'), check: !!b.querySelector('svg') };
+});
+ok('a done chip is round and 64px, with just its number and the check', chipLook.w === 64 && chipLook.h === 64 && parseFloat(chipLook.round) >= 32 && chipLook.text === '7' && chipLook.check, JSON.stringify(chipLook));
+ok('a done chip says its lesson and time in its label', chipLook.label === 'Lesson 7, Sight Words 7, done, took 4 minutes', chipLook.label);
+const pressedChip = await page.$('button[data-variant="chip"][data-state~="pressed"]');
+ok('a pressed chip sinks', (await pressedChip.evaluate(e => getComputedStyle(e).transform)) !== 'none');
 
 // CUR-7: SkillCard, a skill on the library. Found by its name and whether it's open
 const skill = (name, open) => page.evaluateHandle((n, o) =>

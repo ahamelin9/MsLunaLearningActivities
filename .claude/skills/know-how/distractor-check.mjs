@@ -188,10 +188,12 @@ const LESSON_CHOICES = {
     onScreen: [{ text: q.targetWord, picture: q.targetEmoji }]
   }),
   'sentence-comprehension': q => ({ target: picture(right(q.options)), wrong: wrongOf(q.options).map(picture) }),
-  'story-read': q => ({
-    target: text(q.comprehensionQuestion.options[q.comprehensionQuestion.correctIndex]),
-    wrong: q.comprehensionQuestion.options.filter((_, i) => i !== q.comprehensionQuestion.correctIndex).map(text)
-  })
+  // each of a story's questions (CUR-22a), so an adapter may give a list
+  'story-read': q =>
+    q.questions.map(z => ({
+      target: text(z.options[z.correctIndex]),
+      wrong: z.options.filter((_, i) => i !== z.correctIndex).map(text)
+    }))
 };
 
 // ---- run ----
@@ -235,7 +237,7 @@ for (const grade of GRADES) {
       for (const q of lesson.questions) {
         const adapter = LESSON_CHOICES[q.type];
         if (!adapter) found.set(`${q.id} · no adapter`, { count: 1, examples: new Set([`add "${q.type}" to LESSON_CHOICES`]) });
-        else note(`lesson ${lesson.id} ${q.id}`, adapter(q));
+        else for (const set of [adapter(q)].flat()) note(`lesson ${lesson.id} ${q.id}`, set);
       }
     }
   }

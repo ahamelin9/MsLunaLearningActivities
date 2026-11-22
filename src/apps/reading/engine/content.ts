@@ -2381,6 +2381,33 @@ export const MINI_STORIES: MiniStory[] = [
       { text: 'Luna went to sleep', correct: false }
     ]
   },
+  // two more for two plays of 10 (CUR-21)
+  {
+    id: 'story-puddle-day',
+    title: 'Puddle Day',
+    emoji: '☔',
+    tier: 1,
+    lines: ['It rained all day.', 'Pip put on his boots.', 'He jumped in every puddle!'],
+    question: 'What did Pip do in the rain?',
+    answers: [
+      { text: 'He splashed in the puddles', correct: true },
+      { text: 'He went to sleep', correct: false },
+      { text: 'He read a book', correct: false }
+    ]
+  },
+  {
+    id: 'story-lost-ball',
+    title: 'The Lost Ball',
+    emoji: '⚽',
+    tier: 1,
+    lines: ['Pip lost his ball.', 'Luna looked under the bench.', 'There was the ball!'],
+    question: 'Where was the ball?',
+    answers: [
+      { text: 'Under a bench', correct: true },
+      { text: 'In the fridge', correct: false },
+      { text: 'Up in the sky', correct: false }
+    ]
+  },
   // ---- tier 2 ----
   {
     id: 'story-moon-snack',

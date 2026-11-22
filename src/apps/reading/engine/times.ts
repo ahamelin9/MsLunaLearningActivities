@@ -10,9 +10,10 @@ import type { AnyGameDef } from './types';
 /**
  * A first guess at one round, in seconds, until real plays take over. A
  * lesson's round was 60 until CUR-12 (Alex, 2026-11-12: "about 20 seconds per
- * question"); a story lesson's round is a whole story, as Story Corner's.
+ * question"); a story lesson's round is a whole story and its 4 questions
+ * (CUR-22a: a minute to read, 20 seconds a question).
  */
-export const ROUND_SECONDS = { lesson: 20, story: 90, game: 40 } as const;
+export const ROUND_SECONDS = { lesson: 20, story: 150, game: 40 } as const;
 
 /** Plays timed before the estimate is their average. */
 export const AVERAGE_AFTER = 3;

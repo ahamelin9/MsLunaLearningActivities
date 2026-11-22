@@ -13,7 +13,6 @@ import { LessonRound } from '../lessons/shared/LessonRound';
 import { dealMissedFirst, noteMissed } from './deck';
 import { ROUNDS_PER_PLAY } from './practice';
 import { ROUND_SECONDS } from './times';
-import type { TimerKind } from './timer';
 import type { AnyGameDef, GameDef, SkillArea } from './types';
 import type { SpeechPart } from '../../../utils/pronunciation';
 
@@ -27,22 +26,6 @@ const SKILL_AREA: Record<QuestionType, SkillArea> = {
   'sight-word-reader': 'reading',
   'sentence-comprehension': 'reading',
   'story-read': 'reading'
-};
-
-/**
- * What each kind of question asks of a child, for its countdown at 1st and 2nd
- * grade (CUR-16): hear it and tap it, or read it first. A story isn't timed:
- * its round is a whole story.
- */
-const TIMER: Record<QuestionType, TimerKind | undefined> = {
-  'sound-to-letter': 'listen',
-  'find-letter': 'listen',
-  'blend-and-read': 'read',
-  'rhyme-match': 'listen',
-  'read-and-match': 'read',
-  'sight-word-reader': 'listen',
-  'sentence-comprehension': 'read',
-  'story-read': undefined
 };
 
 /**
@@ -62,10 +45,10 @@ const LUNA_LINES: Record<string, string> = {
   'g1-sentences': 'Read the sentence, then find the picture that shows it.',
   'g2-vowel-teams': 'When two vowels go walking, the first one does the talking!',
   'g2-compounds': 'Two little words can join up to make one big word!',
-  'g2-storybooks': 'Story time! Read it yourself, then answer my question.',
+  'g2-storybooks': 'Story time! Read it yourself, then answer my questions.',
   'g1-rhymes': 'Rhyming words end with the same sound. Listen closely!',
   'g1-sight-words': 'Some words we just know by heart. Let’s find them!',
-  'g1-stories': 'Story time! Read it yourself, then answer my question.',
+  'g1-stories': 'Story time! Read it yourself, then answer my questions.',
   'g2-sight-words': 'Some words we just know by heart. Let’s find them!',
   'g2-r-vowels': 'When R comes after a vowel, it changes the sound. Let’s read!'
 };
@@ -88,11 +71,13 @@ export function lessonGame(lesson: Lesson, skill: ReadingSkill): GameDef<LessonQ
     skill: SKILL_AREA[lesson.questions[0]?.type] ?? 'reading',
     mission: LUNA_LINES[skill.id] ?? lesson.description,
     // 20 a play (CUR-12), asking a lesson's questions again when it holds
-    // fewer; a story lesson deals 2, each round a whole story
+    // fewer; a story lesson deals 5, each round a whole story
     roundsPerPlay: lesson.perPlay ?? ROUNDS_PER_PLAY,
+    // the bar counts a story's questions, 4 each, so 5 stories are 20 (CUR-22a)
+    steps: lesson.questions.some(q => q.type === 'story-read') ? q => (q.type === 'story-read' ? q.questions.length : 1) : undefined,
     roundSeconds: lesson.questions.every(q => q.type === 'story-read') ? ROUND_SECONDS.story : undefined,
     shape: 'lesson',
-    timer: q => TIMER[q.type],
+    // no countdown in a lesson, only in the games (the teacher, 2026-11-21; CUR-24)
     sticker: SIGNATURE_STICKER[skill.id] ?? 'book',
     // a replay asks new things, and what was missed comes back first (CUR-6)
     makeRounds: ({ count }) => dealMissedFirst(lesson.id, lesson.questions, count, q => q.id, aboutOf),

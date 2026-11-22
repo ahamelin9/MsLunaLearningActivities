@@ -45,23 +45,32 @@ function cardParts(card: Card): SpeechPart[] {
   return [card.caseLabel === 'big' ? { text: 'big' } : { text: 'little' }, { name: card.label }];
 }
 
-const pairsAt = (tier: 1 | 2 | 3) => (tier === 1 ? 4 : tier === 2 ? 5 : 6);
+/**
+ * A play's 4 boards, in pairs: 20 at every level, so the bar says 20 (CUR-20).
+ * A board is about 4 pairs at the first level, 5 at the second and 6 at the
+ * third, as before, smallest first.
+ */
+const BOARDS: Record<1 | 2 | 3, number[]> = { 1: [4, 5, 5, 6], 2: [5, 5, 5, 5], 3: [4, 4, 6, 6] };
 
 /**
  * A play's boards, each from what hasn't been dealt yet (GAME-8). Dealt whole,
  * so no letter or word is on two boards of one play either.
  */
 function buildRounds(tier: 1 | 2 | 3, count: number): Round[] {
-  const pairCount = pairsAt(tier);
+  const sizes = Array.from({ length: count }, (_, i) => BOARDS[tier][i % BOARDS[tier].length]);
+  const all = sizes.reduce((a, b) => a + b, 0);
   if (tier === 1) {
-    const letters = deal('memory-match-letters', lettersFor(1).filter(l => l.letter.length === 1), pairCount * count, l => l.letter);
-    return Array.from({ length: count }, (_, i) => letterRound(letters.slice(i * pairCount, (i + 1) * pairCount)));
+    // the first level has 14 letters, so a play of 20 pairs brings 6 back on
+    // a later board (the deal runs on round the deck), never twice on one (CUR-20)
+    const letters = deal('memory-match-letters', lettersFor(1).filter(l => l.letter.length === 1), all, l => l.letter);
+    let from = 0;
+    return sizes.map(n => letterRound(letters.slice(from, (from += n))));
   }
   const words = wordsUpTo(tier);
   // this week's words are dealt first (CUR-9), and each board takes what's left of them before the rest
-  const dealt = dealWeekFirst('memory-match-words', words, pairCount * count, w => w.word, w => isWeekWord(w.word));
+  const dealt = dealWeekFirst('memory-match-words', words, all, w => w.word, w => isWeekWord(w.word));
   const used = new Set<WordItem>();
-  return Array.from({ length: count }, () => {
+  return sizes.map(pairCount => {
     const left = dealt.filter(w => !used.has(w));
     let chosen = distinctByEmoji(left, pairCount, [], distinctByEmoji(left.filter(w => isWeekWord(w.word)), pairCount));
     // two words that look alike can't share a board: the deck gives a spare,
@@ -255,8 +264,10 @@ export const memoryMatch: GameDef<Round> = {
   objective: 'Pairs, from memory: matches a big letter with its little one, or a picture with its word.',
   skill: 'vocabulary',
   mission: 'I dropped my card box. Find the pairs before I panic!',
-  // a board holds 4 to 6 pairs, so 4 boards are about 20 a play (CUR-15)
+  // 4 boards of 4 to 6 pairs, 20 pairs a play (CUR-15, CUR-20)
   roundsPerPlay: 4,
+  // the bar counts pairs, not boards: the teacher reads it as the play's 20 (CUR-20)
+  steps: round => round.pairCount,
   // a whole board of pairs a round (PRG-6's first guess)
   roundSeconds: 75,
   shape: 'cards',

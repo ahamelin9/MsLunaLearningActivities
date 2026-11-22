@@ -2,16 +2,17 @@ import type { GradeInfo, GradeLevel, Lesson, ReadingSkill } from '../types/readi
 import { phraseChoice, pictureChoice, pictureOf, rhymeChoice } from './lessonChoices';
 import {
   K_HUNT_2, K_HUNT_3, K_MORE_ROUNDS, K_RHYME_2, K_SHORT_A, K_SHORT_E_U, K_SHORT_I_O, K_SIGHT_2, K_SIGHT_3, K_SIGHT_4,
-  K_SOUNDS_2, K_SOUNDS_3, K_SOUNDS_4, K_SOUNDS_5
+  K_SIGHT_5, K_SOUNDS_2, K_SOUNDS_3, K_SOUNDS_4, K_SOUNDS_5
 } from './lessons/kindergarten';
 import {
   G1_L_BLENDS, G1_MAGIC_A, G1_MAGIC_I_O, G1_MORE_ROUNDS, G1_R_BLENDS, G1_RHYMES, G1_S_BLENDS, G1_SENTENCES_2, G1_SENTENCES_3,
-  G1_SH_CH, G1_SIGHT_1, G1_SIGHT_2, G1_SIGHT_3, G1_STORIES_1, G1_STORIES_2, G1_TH_WH
+  G1_SH_CH, G1_SIGHT_1, G1_SIGHT_2, G1_SIGHT_3, G1_SIGHT_MORE, G1_STORIES_1, G1_STORIES_2, G1_TH_WH
 } from './lessons/grade1';
 import {
   G2_AI_AY, G2_AR, G2_COMPOUNDS_2, G2_EE_EA, G2_ER_IR_UR, G2_IGH, G2_MORE_ROUNDS, G2_OA_OW, G2_OO, G2_OR, G2_OU_OW,
-  G2_SIGHT_1, G2_SIGHT_2, G2_SIGHT_3, G2_STORIES_2, G2_STORIES_3
+  G2_SIGHT_1, G2_SIGHT_2, G2_SIGHT_3, G2_SIGHT_MORE, G2_STORIES_2, G2_STORIES_3
 } from './lessons/grade2';
+import { K_DOLCH, sightLesson } from './lessons/dolch';
 
 export const GRADES: GradeInfo[] = [
   { id: 'kindergarten', title: 'Kindergarten' },
@@ -335,87 +336,8 @@ const FIRST_LESSONS: Record<GradeLevel, ReadingSkill[]> = {
           icon: '👀',
           difficulty: 1,
           starsToEarn: 3,
-          questions: [
-            {
-              id: 'q-k-sw-see',
-              type: 'sight-word-reader',
-              // none of the lesson's words on screen, not even "the" (CUR-3)
-              prompt: 'Which word does Ms. Luna say?',
-              speechPrompt: 'Find the sight word SEE: "I see a smiling star!"',
-              word: 'see',
-              exampleSentence: 'I see a smiling star! ⭐',
-              hint: 'Listen closely: see. I see with my eyes!',
-              options: [
-                { id: 'opt-see', word: 'see', isCorrect: true },
-                { id: 'opt-sun', word: 'sun', isCorrect: false },
-                { id: 'opt-she', word: 'she', isCorrect: false }
-              ]
-            },
-            // the, like, I and a, which can't be sounded out the way "big"
-            // and "can" could (CUR-3); each against two real look-alikes,
-            // never a word that sounds the same
-            {
-              id: 'q-k-sw-the',
-              type: 'sight-word-reader',
-              // none of the lesson's words on screen, not even "the" (CUR-3)
-              prompt: 'Which word does Ms. Luna say?',
-              speechPrompt: 'Find the sight word THE: "The moon is up!"',
-              word: 'the',
-              exampleSentence: 'The moon is up! 🌙',
-              hint: 'Listen closely: the. The moon is up!',
-              options: [
-                { id: 'opt-she', word: 'she', isCorrect: false },
-                { id: 'opt-the', word: 'the', isCorrect: true },
-                { id: 'opt-then', word: 'then', isCorrect: false }
-              ]
-            },
-            {
-              id: 'q-k-sw-like',
-              type: 'sight-word-reader',
-              // none of the lesson's words on screen, not even "the" (CUR-3)
-              prompt: 'Which word does Ms. Luna say?',
-              speechPrompt: 'Find the sight word LIKE: "I like red apples!"',
-              word: 'like',
-              exampleSentence: 'I like red apples! 🍎',
-              hint: 'Listen closely: like. I like red apples!',
-              options: [
-                { id: 'opt-lake', word: 'lake', isCorrect: false },
-                { id: 'opt-bike', word: 'bike', isCorrect: false },
-                { id: 'opt-like', word: 'like', isCorrect: true }
-              ]
-            },
-            {
-              id: 'q-k-sw-i',
-              type: 'sight-word-reader',
-              // none of the lesson's words on screen, not even "the" (CUR-3)
-              prompt: 'Which word does Ms. Luna say?',
-              speechPrompt: 'Find the sight word I: "I can hop!"',
-              word: 'I',
-              exampleSentence: 'I can hop! 🐰',
-              hint: 'Listen closely: I. I can hop!',
-              options: [
-                { id: 'opt-i', word: 'I', isCorrect: true },
-                { id: 'opt-it', word: 'it', isCorrect: false },
-                { id: 'opt-in', word: 'in', isCorrect: false }
-              ]
-            },
-            {
-              id: 'q-k-sw-a',
-              type: 'sight-word-reader',
-              // none of the lesson's words on screen, not even "the" (CUR-3)
-              prompt: 'Which word does Ms. Luna say?',
-              speechPrompt: 'Find the sight word A: "I see a bug!"',
-              word: 'a',
-              exampleSentence: 'I see a bug! 🐞',
-              hint: 'Listen closely: a. I see a bug!',
-              options: [
-                { id: 'opt-at', word: 'at', isCorrect: false },
-                { id: 'opt-a', word: 'a', isCorrect: true },
-                { id: 'opt-an', word: 'an', isCorrect: false }
-              ]
-            },
-            ...K_MORE_ROUNDS['k-sw-starter']
-          ]
+          // Dolch 1–10 (CUR-27a)
+          questions: sightLesson('k-sw', K_DOLCH[0])
         }
       ]
     },
@@ -790,7 +712,7 @@ const FIRST_LESSONS: Record<GradeLevel, ReadingSkill[]> = {
       name: 'Storybooks',
       said: { text: 'Storybooks!' },
       icon: '📖',
-      description: 'Reads a longer story alone, then answers a question about it.',
+      description: 'Reads a longer story alone, then answers some questions about it.',
       lessons: [
         {
           id: 'g2-story-luna-space',
@@ -800,7 +722,8 @@ const FIRST_LESSONS: Record<GradeLevel, ReadingSkill[]> = {
           description: 'Read about Ms. Luna flying past shiny stars and moons.',
           icon: '🚀',
           difficulty: 3,
-          perPlay: 2,
+          // 5 stories of 4 questions: 20 a play (CUR-22b)
+          perPlay: 5,
           // 3, as every lesson, for its one story (CUR-1; it paid 5); PRG-1
           // makes every lesson's stars follow how it was played
           starsToEarn: 3,
@@ -808,8 +731,8 @@ const FIRST_LESSONS: Record<GradeLevel, ReadingSkill[]> = {
             {
               id: 'q-g2-story-1',
               type: 'story-read',
-              prompt: 'Read the story, then answer the question!',
-              speechPrompt: 'Read the story yourself first, then answer my question. If you get stuck, I can help!',
+              prompt: 'Read the story, then answer the questions!',
+              speechPrompt: 'Read the story yourself first, then answer my questions. If you get stuck, I can help!',
               title: 'Luna’s Rocket Adventure',
               imageEmoji: '🚀',
               sentences: [
@@ -818,12 +741,22 @@ const FIRST_LESSONS: Record<GradeLevel, ReadingSkill[]> = {
                 { id: 's3', text: 'She visited a friendly glowing moon made of soft yellow cheese.' },
                 { id: 's4', text: 'Luna waved to the sparkling stars before flying safely home.' }
               ],
-              comprehensionQuestion: {
-                question: 'Where did Ms. Luna zoom in her shiny rocket?',
-                options: ['Up into space', 'Under the sea', 'To the store'],
-                correctIndex: 0,
-                explanation: 'Yes! The rocket zoomed into the starry night sky, way up in space!'
-              }
+              questions: [
+                {
+                  question: 'Where did Ms. Luna zoom in her shiny rocket?',
+                  options: ['Up into space', 'Under the sea', 'To the store'],
+                  correctIndex: 0,
+                  explanation: 'Yes! The rocket zoomed into the starry night sky, way up in space!'
+                },
+                { question: 'What color is Luna’s rocket?', options: ['Silver', 'Red', 'Green'], correctIndex: 0, explanation: 'Yes! She has a shiny silver rocket.' },
+                { question: 'What was the moon made of?', options: ['Cheese', 'Ice', 'Cake'], correctIndex: 0, explanation: 'That’s right! It was a moon of soft yellow cheese.' },
+                {
+                  question: 'What did Luna do before she flew home?',
+                  options: ['She said goodbye to the stars', 'She ate the moon', 'She fell asleep'],
+                  correctIndex: 0,
+                  explanation: 'Yes! She waved to the stars, then flew home.'
+                }
+              ]
             },
             ...G2_MORE_ROUNDS['g2-story-luna-space']
           ]
@@ -837,7 +770,7 @@ const FIRST_LESSONS: Record<GradeLevel, ReadingSkill[]> = {
 const LATER_SKILLS: Omit<ReadingSkill, 'lessons'>[] = [
   { id: 'g1-rhymes', name: 'Rhymes', said: { text: 'Rhymes!' }, icon: '🎵', description: 'Hears which words end with the same sound.' },
   { id: 'g1-sight-words', name: 'Sight words', said: { text: 'Sight words!' }, icon: '⚡', description: 'Hears a common word and finds it written, without sounding it out.' },
-  { id: 'g1-stories', name: 'Little stories', said: { text: 'Little stories!' }, icon: '📖', description: 'Reads a little story alone, then answers a question about it.' },
+  { id: 'g1-stories', name: 'Little stories', said: { text: 'Little stories!' }, icon: '📖', description: 'Reads a little story alone, then answers some questions about it.' },
   { id: 'g2-sight-words', name: 'Sight words', said: { text: 'Sight words!' }, icon: '⚡', description: 'Hears a common word and finds it written, without sounding it out.' },
   { id: 'g2-r-vowels', name: 'Vowels with R', said: { text: 'Vowels with R!' }, icon: '🚗', description: 'Reads AR, OR, ER, IR and UR, where the R changes the vowel’s sound.' }
 ];
@@ -852,6 +785,16 @@ function thenOn(grade: GradeLevel, lessons: Lesson[]): ReadingSkill[] {
   });
 }
 
+/** One of each in turn, then whatever is left of either: a grade's sight lessons spread along its path. */
+function weave(others: Lesson[], sights: Lesson[]): Lesson[] {
+  const out: Lesson[] = [];
+  for (let i = 0; i < Math.max(others.length, sights.length); i++) {
+    if (others[i]) out.push(others[i]);
+    if (sights[i]) out.push(sights[i]);
+  }
+  return out;
+}
+
 /**
  * Each grade's lessons, in the order they open: new letters, then words that
  * use them, with sight words and rhymes in between. A grade's first lessons
@@ -862,21 +805,27 @@ export const READING_CURRICULUM: Record<GradeLevel, ReadingSkill[]> = {
     ...FIRST_LESSONS.kindergarten,
     ...thenOn('kindergarten', [
       K_SOUNDS_2, K_HUNT_2, K_SHORT_A, K_SIGHT_2, K_SOUNDS_3, K_SHORT_I_O, K_HUNT_3, K_SIGHT_3, K_RHYME_2,
-      K_SOUNDS_4, K_SHORT_E_U, K_SIGHT_4, K_SOUNDS_5
+      K_SOUNDS_4, K_SHORT_E_U, K_SIGHT_4, K_SOUNDS_5, K_SIGHT_5
     ])
   ],
   grade1: [
     ...FIRST_LESSONS.grade1,
     ...thenOn('grade1', [
-      G1_SH_CH, G1_SIGHT_1, G1_TH_WH, G1_L_BLENDS, G1_STORIES_1, G1_R_BLENDS, G1_SIGHT_2, G1_S_BLENDS, G1_SENTENCES_2,
-      G1_MAGIC_A, G1_RHYMES, G1_MAGIC_I_O, G1_SIGHT_3, G1_SENTENCES_3, G1_STORIES_2
+      // a sight lesson after each other lesson, Dolch 1–100 in order (CUR-27b)
+      ...weave(
+        [G1_SH_CH, G1_TH_WH, G1_L_BLENDS, G1_STORIES_1, G1_R_BLENDS, G1_S_BLENDS, G1_SENTENCES_2, G1_MAGIC_A, G1_RHYMES, G1_MAGIC_I_O, G1_SENTENCES_3, G1_STORIES_2],
+        [G1_SIGHT_1, G1_SIGHT_2, G1_SIGHT_3, ...G1_SIGHT_MORE]
+      )
     ])
   ],
   grade2: [
     ...FIRST_LESSONS.grade2,
     ...thenOn('grade2', [
-      G2_AI_AY, G2_SIGHT_1, G2_EE_EA, G2_STORIES_2, G2_OA_OW, G2_IGH, G2_SIGHT_2, G2_OO, G2_OU_OW, G2_STORIES_3,
-      G2_AR, G2_OR, G2_SIGHT_3, G2_ER_IR_UR, G2_COMPOUNDS_2
+      // a sight lesson after each other lesson, Dolch 101–220 in order (CUR-27c)
+      ...weave(
+        [G2_AI_AY, G2_EE_EA, G2_STORIES_2, G2_OA_OW, G2_IGH, G2_OO, G2_OU_OW, G2_STORIES_3, G2_AR, G2_OR, G2_ER_IR_UR, G2_COMPOUNDS_2],
+        [G2_SIGHT_1, G2_SIGHT_2, G2_SIGHT_3, ...G2_SIGHT_MORE]
+      )
     ])
   ]
 };

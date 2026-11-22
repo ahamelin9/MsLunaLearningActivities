@@ -70,7 +70,9 @@ await page.waitForSelector(at('hub'));
 await wait(600);
 
 // every lesson card's time, in path order, across the skills (CUR-7)
-const cardTimes = () => allLessonCards(page, t => t.textContent.match(/(about|took) \d+ min/)?.[0] ?? null);
+// a done lesson is a chip with no time on it since CUR-28: its label says it
+const cardTimes = () =>
+  allLessonCards(page, t => t.textContent.match(/(about|took) \d+ min/)?.[0] ?? t.getAttribute('aria-label').match(/took \d+ min/)?.[0] ?? null);
 const tileTimes = () => page.$$eval('[data-shot="game-tile"]', ts => ts.map(t => t.textContent.match(/about \d+ min/)?.[0] ?? null));
 const today = () => page.$eval('[data-shot="hub-today"]', e => Number(e.textContent.match(/(\d+)\s*min reading/)?.[1] ?? NaN)).catch(() => NaN);
 

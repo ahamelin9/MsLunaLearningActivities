@@ -195,7 +195,7 @@ export function huntRounds(lesson: string, rows: [letter: string, looks: string,
  */
 export function sightRounds(lesson: string, word: string, lookAlikes: string[], sentences: [line: string, picture: string][]): SightWordReaderQuestion[] {
   return sentences.map(([line, picture], i) => {
-    const inLine = line.split(/\s+/).some(token => token.replace(/[^a-zA-Z']/g, '').toLowerCase() === word.toLowerCase());
+    const inLine = line.split(/\s+/).some(token => token.replace(/[^a-zA-Z'\u2019]/g, '').toLowerCase() === word.toLowerCase());
     if (!inLine) throw new Error('Sight word "' + word + '" is not in "' + line + '"');
     return {
       id: 'q-' + lesson + '-' + word.toLowerCase() + '-' + (i + 1),
@@ -229,6 +229,11 @@ export interface StoryRow {
   title: string;
   picture: string;
   lines: string[];
+  /** asked in this order once the story is read: 4 a story, so 5 stories are 20 (CUR-22a) */
+  questions: StoryRowQuestion[];
+}
+
+export interface StoryRowQuestion {
   question: string;
   /** the right answer first; the screen shuffles them */
   answers: [string, string, string];
@@ -241,17 +246,12 @@ export function storyRounds(lesson: string, stories: StoryRow[]): StoryReadQuest
   return stories.map((story, i) => ({
     id: 'q-' + lesson + '-' + (i + 1),
     type: 'story-read',
-    prompt: 'Read the story, then answer the question!',
-    speechPrompt: 'Read the story yourself first, then answer my question. If you get stuck, I can help!',
+    prompt: 'Read the story, then answer the questions!',
+    speechPrompt: 'Read the story yourself first, then answer my questions. If you get stuck, I can help!',
     title: story.title,
     imageEmoji: story.picture,
     sentences: story.lines.map((text, n) => ({ id: 's' + (n + 1), text })),
-    comprehensionQuestion: {
-      question: story.question,
-      options: [...story.answers],
-      correctIndex: 0,
-      explanation: story.because
-    }
+    questions: story.questions.map(q => ({ question: q.question, options: [...q.answers], correctIndex: 0, explanation: q.because }))
   }));
 }
 

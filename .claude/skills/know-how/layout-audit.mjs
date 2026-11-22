@@ -103,7 +103,10 @@ function audit({ screen, midRound, scrolls = false, within = null, must = null, 
     const b = el.getBoundingClientRect();
     const answer = el.matches('[data-shot="lesson-choice"]');
     const min = answer ? 64 : 48;
-    if (b.width < min - 0.5 || b.height < min - 0.5)
+    // a word in a sentence is only as wide as itself, its tap area an
+    // invisible ::before reaching past it (CUR-26): the target is the wider
+    const reach = parseFloat(getComputedStyle(el, '::before').width) || 0;
+    if (Math.max(b.width, reach) < min - 0.5 || b.height < min - 0.5)
       add(el, `small: ${name(el)} ${Math.round(b.width)}×${Math.round(b.height)}${answer ? ' (an answer)' : ''}`);
     // only what's wholly on screen: a list running off the bottom isn't hugging the edge
     if (!el.closest('header') && b.bottom <= H && (b.left < 16 || b.right > W - 16 || (!scrolls && b.bottom > H - 16)))

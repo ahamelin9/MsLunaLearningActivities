@@ -3,7 +3,8 @@
 // rhymes. Written for Alex to review all at once.
 
 import type { Lesson, LessonQuestion } from '../../types/reading';
-import { blendRounds, huntRounds, rhymeRounds, sightRounds, soundRounds } from '../lessonRounds';
+import { blendRounds, huntRounds, rhymeRounds, soundRounds } from '../lessonRounds';
+import { K_DOLCH, sightLesson } from './dolch';
 
 const SOUND_OUT = 'Sound out';
 
@@ -35,13 +36,6 @@ export const K_MORE_ROUNDS: Record<string, LessonQuestion[]> = {
     SOUND_OUT,
     { lesson: 'k-bw', tier: 1, wrong: 3 }
   ),
-  'k-sw-starter': [
-    ...sightRounds('k-sw', 'see', ['sun', 'she'], [['I see a red ball.', '⚽']]),
-    ...sightRounds('k-sw', 'the', ['she', 'then'], [['The cat is on the bed.', '🐱']]),
-    ...sightRounds('k-sw', 'like', ['lake', 'bike'], [['I like my blue hat.', '🎩']]),
-    ...sightRounds('k-sw', 'I', ['it', 'in'], [['I can see a frog.', '🐸']]),
-    ...sightRounds('k-sw', 'a', ['at', 'an'], [['A bird can sing.', '🐦']])
-  ],
   'k-rh-pairs': rhymeRounds(
     [['bat', 'rat', 'hat'], ['bun', 'sun'], ['dog', 'log'], ['bug', 'mug'], ['hen', 'pen', 'ten'], ['map', 'cap']],
     'k-rh'
@@ -149,33 +143,15 @@ export const K_SHORT_E_U = lesson('k-bw-short-e-u', 'k-blend-words', 'Short E & 
   { lesson: 'k-seu', tier: 1, wrong: 3 }
 ));
 
-// none of a sight lesson's words in its title or on Luna's perch (CUR-3)
-export const K_SIGHT_2 = lesson('k-sw-second', 'k-sight-words', 'Sight Words 2', 'Hear a word, then find it among look-alikes.', '👀', [
-  ...sightRounds('k-sw2', 'is', ['in', 'as'], [['The sun is hot.', '☀️'], ['My dog is big.', '🐶']]),
-  ...sightRounds('k-sw2', 'it', ['is', 'at'], [['I can see it.', '👀'], ['It is a fun game.', '🎮']]),
-  ...sightRounds('k-sw2', 'in', ['is', 'on'], [['The fish is in the bowl.', '🐟'], ['The bird is in the tree.', '🐦']]),
-  ...sightRounds('k-sw2', 'at', ['it', 'an'], [['Look at the moon.', '🌙'], ['We play at the park.', '🛝']]),
-  ...sightRounds('k-sw2', 'my', ['me', 'by'], [['This is my cat.', '🐱'], ['I love my mom.', '🥰']]),
-  ...sightRounds('k-sw2', 'you', ['your', 'yes'], [['I see you!', '👋'], ['You can jump high.', '🐸']])
-]);
+// Dolch 1–50, 10 words a lesson (CUR-27a); none of a sight lesson's words
+// in its title or on Luna's perch (CUR-3)
+export const K_SIGHT_2 = lesson('k-sw-second', 'k-sight-words', 'Sight Words 2', 'Hear a word, then find it among look-alikes.', '👀', sightLesson('k-sw2', K_DOLCH[1]));
 
-export const K_SIGHT_3 = lesson('k-sw-third', 'k-sight-words', 'Sight Words 3', 'Hear a word, then find it among look-alikes.', '👀', [
-  ...sightRounds('k-sw3', 'we', ['wet', 'me'], [['We can run fast.', '🏃'], ['We go to school.', '🏫']]),
-  ...sightRounds('k-sw3', 'can', ['cat', 'man'], [['I can hop.', '🐰'], ['A bird can fly.', '🐦']]),
-  ...sightRounds('k-sw3', 'he', ['she', 'her'], [['He has a red cap.', '🧢'], ['He can kick the ball.', '⚽']]),
-  ...sightRounds('k-sw3', 'she', ['he', 'see'], [['She has a pet dog.', '🐶'], ['She can swim fast.', '🏊']]),
-  ...sightRounds('k-sw3', 'me', ['my', 'we'], [['Come with me.', '🤝'], ['Look at me!', '😀']]),
-  ...sightRounds('k-sw3', 'to', ['top', 'do'], [['We go to the zoo.', '🦁'], ['I go to bed.', '🛏️']])
-]);
+export const K_SIGHT_3 = lesson('k-sw-third', 'k-sight-words', 'Sight Words 3', 'Hear a word, then find it among look-alikes.', '👀', sightLesson('k-sw3', K_DOLCH[2]));
 
-export const K_SIGHT_4 = lesson('k-sw-fourth', 'k-sight-words', 'Sight Words 4', 'Hear a word, then find it among look-alikes.', '👀', [
-  ...sightRounds('k-sw4', 'and', ['an', 'end'], [['I see a cat and a dog.', '🐱'], ['Mom and I bake a cake.', '🎂']]),
-  ...sightRounds('k-sw4', 'go', ['no', 'got'], [['Let’s go to the park!', '🛝'], ['The cars go fast.', '🚗']]),
-  ...sightRounds('k-sw4', 'no', ['not', 'on'], [['I have no hat.', '🎩'], ['No, thank you!', '🙂']]),
-  ...sightRounds('k-sw4', 'up', ['us', 'cup'], [['The kite goes up.', '🪁'], ['Look up at the stars.', '⭐']]),
-  ...sightRounds('k-sw4', 'on', ['off', 'no'], [['The cat sits on the bed.', '🐱'], ['Put on your hat.', '🎩']]),
-  ...sightRounds('k-sw4', 'look', ['book', 'lock'], [['Look at the big bug!', '🐛'], ['Look, it is snowing!', '❄️']])
-]);
+export const K_SIGHT_4 = lesson('k-sw-fourth', 'k-sight-words', 'Sight Words 4', 'Hear a word, then find it among look-alikes.', '👀', sightLesson('k-sw4', K_DOLCH[3]));
+
+export const K_SIGHT_5 = lesson('k-sw-fifth', 'k-sight-words', 'Sight Words 5', 'Hear a word, then find it among look-alikes.', '👀', sightLesson('k-sw5', K_DOLCH[4]));
 
 export const K_RHYME_2 = lesson('k-rh-more', 'k-rhyming', 'More Rhymes', 'Listen for words that end the same.', '🎩', rhymeRounds(
   [['can', 'fan', 'man', 'pan', 'van'], ['bag', 'tag'], ['jam', 'ram'], ['jet', 'net'], ['lock', 'rock', 'sock'], ['king', 'ring'], ['cup', 'pup'], ['bell', 'shell']],

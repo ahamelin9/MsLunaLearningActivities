@@ -3,7 +3,8 @@
 // and little stories. Written for Alex to review all at once.
 
 import type { Lesson, LessonQuestion } from '../../types/reading';
-import { blendRounds, readRounds, rhymeRounds, sentenceRounds, sightRounds, storyRounds } from '../lessonRounds';
+import { blendRounds, readRounds, rhymeRounds, sentenceRounds, storyRounds } from '../lessonRounds';
+import { G1_DOLCH, ORDINALS, sightLesson } from './dolch';
 
 const BLEND = 'Blend the sounds:';
 const MAGIC_E = 'Read the word, then find its picture. The magic E makes the vowel say its name!';
@@ -100,32 +101,16 @@ export const G1_RHYMES = lesson('g1-rh-long', 'g1-rhymes', 'Rhyme Time', 'Listen
 ));
 
 // none of a sight lesson's words in its title or on Luna's perch (CUR-3)
-export const G1_SIGHT_1 = lesson('g1-sw-first', 'g1-sight-words', 'Sight Words 1', 'Hear a word, then find it among look-alikes.', '👀', [
-  ...sightRounds('g1-sw1', 'was', ['saw', 'wash'], [['The cat was on the bed.', '🐱'], ['It was a sunny day.', '☀️']]),
-  ...sightRounds('g1-sw1', 'said', ['sad', 'sand'], [['Mom said it is time to go.', '🕒'], ['Pip said hello to me.', '👋']]),
-  ...sightRounds('g1-sw1', 'have', ['has', 'gave'], [['I have a red bike.', '🚲'], ['We have two cats.', '🐱']]),
-  ...sightRounds('g1-sw1', 'they', ['then', 'the'], [['They play in the park.', '🛝'], ['They like to sing.', '🎵']]),
-  ...sightRounds('g1-sw1', 'of', ['off', 'if'], [['I have a cup of milk.', '🥛'], ['I see a lot of stars.', '⭐']]),
-  ...sightRounds('g1-sw1', 'for', ['far', 'from'], [['This gift is for you.', '🎁'], ['It is time for bed.', '🛏️']])
-]);
+export const G1_SIGHT_1 = lesson('g1-sw-first', 'g1-sight-words', 'Sight Words 1', 'Hear a word, then find it among look-alikes.', '👀', sightLesson('g1-sw1', G1_DOLCH[0]));
 
-export const G1_SIGHT_2 = lesson('g1-sw-second', 'g1-sight-words', 'Sight Words 2', 'Hear a word, then find it among look-alikes.', '👀', [
-  ...sightRounds('g1-sw2', 'with', ['wish', 'will'], [['Come and play with me.', '⚽'], ['I eat with a spoon.', '🥄']]),
-  ...sightRounds('g1-sw2', 'his', ['has', 'hit'], [['Dad has his hat.', '🎩'], ['Sam rides his bike.', '🚲']]),
-  ...sightRounds('g1-sw2', 'her', ['he', 'hen'], [['She has her book.', '📖'], ['Ann hugs her dog.', '🐶']]),
-  ...sightRounds('g1-sw2', 'what', ['that', 'wet'], [['What is in the box?', '📦'], ['What is your name?', '🙂']]),
-  ...sightRounds('g1-sw2', 'when', ['then', 'went'], [['When can we go?', '🚗'], ['I sing when I am happy.', '😀']]),
-  ...sightRounds('g1-sw2', 'where', ['here', 'were'], [['Where is my hat?', '🎩'], ['Where did the cat go?', '🐱']])
-]);
+export const G1_SIGHT_2 = lesson('g1-sw-second', 'g1-sight-words', 'Sight Words 2', 'Hear a word, then find it among look-alikes.', '👀', sightLesson('g1-sw2', G1_DOLCH[1]));
 
-export const G1_SIGHT_3 = lesson('g1-sw-third', 'g1-sight-words', 'Sight Words 3', 'Hear a word, then find it among look-alikes.', '👀', [
-  ...sightRounds('g1-sw3', 'come', ['some', 'came'], [['Come to my house.', '🏠'], ['Come and see the kittens.', '🐱']]),
-  ...sightRounds('g1-sw3', 'some', ['come', 'same'], [['I have some grapes.', '🍇'], ['Can I have some milk?', '🥛']]),
-  ...sightRounds('g1-sw3', 'do', ['dog', 'go'], [['What do you like?', '🙂'], ['I can do it!', '💪']]),
-  ...sightRounds('g1-sw3', 'one', ['on', 'once'], [['I have one nose.', '👃'], ['One bird sat in the tree.', '🐦']]),
-  ...sightRounds('g1-sw3', 'who', ['how', 'why'], [['Who is at the door?', '🚪'], ['Who has my hat?', '🎩']]),
-  ...sightRounds('g1-sw3', 'there', ['three', 'here'], [['There is a bug on me!', '🐛'], ['The park is over there.', '🛝']])
-]);
+export const G1_SIGHT_3 = lesson('g1-sw-third', 'g1-sight-words', 'Sight Words 3', 'Hear a word, then find it among look-alikes.', '👀', sightLesson('g1-sw3', G1_DOLCH[2]));
+
+/** Sight Words 4 on: the rest of Dolch 1–100 (CUR-27b), 10 words a lesson. */
+export const G1_SIGHT_MORE: Lesson[] = G1_DOLCH.slice(3).map((rows, i) =>
+  lesson(`g1-sw-${ORDINALS[i + 3]}`, 'g1-sight-words', `Sight Words ${i + 4}`, 'Hear a word, then find it among look-alikes.', '👀', sightLesson(`g1-sw${i + 4}`, rows))
+);
 
 export const G1_SENTENCES_2 = lesson('g1-rs-home', 'g1-sentences', 'Sentences at Home', 'Read sentences about home and food.', '🏠', sentenceRounds('g1-rh2', [
   ['Mom puts the cake on the table.', WHAT_ABOUT, ['cake', 'A sweet treat'], ['apple', 'Fruit on a tree'], ['egg', 'Egg in a nest']],
@@ -153,104 +138,268 @@ export const G1_SENTENCES_3 = lesson('g1-rs-outside', 'g1-sentences', 'Sentences
   ['The train goes fast on the track.', WHAT_ABOUT, ['train', 'Rolling on the rails'], ['car', 'Driving down the road'], ['boat', 'Floating on the lake']]
 ]));
 
-export const G1_STORIES_1 = lesson('g1-story-little', 'g1-stories', 'Little Stories', 'Read a little story yourself, then answer a question.', '📖', storyRounds('g1-st1', [
+export const G1_STORIES_1 = lesson('g1-story-little', 'g1-stories', 'Little Stories', 'Read a little story yourself, then answer some questions.', '📖', storyRounds('g1-st1', [
   {
     title: 'The Big Red Hen',
     picture: '🐔',
     lines: ['A big red hen sat on a nest.', 'She had six eggs in the nest.', 'She sat and sat.', 'Then the eggs went crack!'],
-    question: 'What came out of the eggs?',
-    answers: ['Little chicks', 'Little ducks', 'Little pigs'],
-    because: 'Yes! Little chicks came out of the eggs.'
+    questions: [
+      { question: 'What came out of the eggs?', answers: ['Little chicks', 'Little ducks', 'Little pigs'], because: 'Yes! Little chicks came out of the eggs.' },
+      { question: 'How many eggs did the hen have?', answers: ['Six', 'Two', 'Ten'], because: 'Yes! She had six eggs in her nest.' },
+      { question: 'What color is the hen?', answers: ['Red', 'Black', 'White'], because: 'That’s right! She is a big red hen.' },
+      { question: 'What did the eggs do?', answers: ['They cracked', 'They rolled away', 'They got wet'], because: 'Yes! The eggs went crack!' }
+    ]
   },
   {
     title: 'Sam and the Ship',
     picture: '🚢',
     lines: ['Sam has a small ship.', 'It can float in the tub.', 'Splash! The ship tips.', 'Sam picks it up and sets it back.'],
-    question: 'Where does the ship float?',
-    answers: ['The tub', 'The sink', 'The pond'],
-    because: 'That’s right! The ship floats in the tub.'
+    questions: [
+      { question: 'Where does the ship float?', answers: ['The tub', 'The sink', 'The pond'], because: 'That’s right! The ship floats in the tub.' },
+      { question: 'Is Sam’s ship big or small?', answers: ['Small', 'Big', 'Long'], because: 'That’s right! Sam has a small ship.' },
+      { question: 'What happens to the ship?', answers: ['It tips over', 'It sinks to the bottom', 'It flies away'], because: 'Yes! Splash! The ship tips.' },
+      { question: 'What does Sam do then?', answers: ['He puts it back in the water', 'He throws it away', 'He goes to bed'], because: 'Yes! Sam picks it up and sets it back.' }
+    ]
   },
   {
     title: 'Frog and Bug',
     picture: '🐸',
     lines: ['A green frog sits on a log.', 'A bug lands next to the frog.', 'Zip! The frog gets the bug.', 'Yum! The frog is glad.'],
-    question: 'What does the frog eat?',
-    answers: ['A bug', 'A leaf', 'A fish'],
-    because: 'Yes! The frog gets the bug and eats it.'
+    questions: [
+      { question: 'What does the frog eat?', answers: ['A bug', 'A leaf', 'A fish'], because: 'Yes! The frog gets the bug and eats it.' },
+      { question: 'Where does the frog sit?', answers: ['A log', 'A rock', 'A lily pad'], because: 'Yes! The frog sits on a log.' },
+      { question: 'What color is the frog?', answers: ['Green', 'Red', 'Blue'], because: 'That’s right! It is a green frog.' },
+      { question: 'How does the frog feel at the end?', answers: ['Glad', 'Sad', 'Mad'], because: 'Yes! Yum! The frog is glad.' }
+    ]
   },
   {
     title: 'Pip’s Black Hat',
     picture: '🎩',
     lines: ['Pip has a black hat.', 'The wind blows and the hat flips off.', 'It lands on a fat cat!', 'The cat runs, and Pip runs too.'],
-    question: 'Where does the hat land?',
-    answers: ['On a cat', 'In a tree', 'On a bus'],
-    because: 'Yes! The hat lands on a fat cat.'
+    questions: [
+      { question: 'Where does the hat land?', answers: ['On a cat', 'In a tree', 'On a bus'], because: 'Yes! The hat lands on a fat cat.' },
+      { question: 'What color is Pip’s hat?', answers: ['Black', 'Red', 'Green'], because: 'Yes! Pip has a black hat.' },
+      { question: 'What makes the hat flip off?', answers: ['The wind', 'The cat', 'A dog'], because: 'That’s right! The wind blows the hat off.' },
+      { question: 'What does the cat do?', answers: ['It runs', 'It naps', 'It sings'], because: 'Yes! The cat runs, and Pip runs after it.' }
+    ]
   },
   {
     title: 'A Fish for Beth',
     picture: '🐟',
     lines: ['Dad and Beth go to the lake.', 'Dad has a rod and Beth has a net.', 'Beth gets a big fish in the net!', 'Dad claps and Beth grins.'],
-    question: 'Who gets the fish?',
-    answers: ['Beth', 'Dad', 'The cat'],
-    because: 'That’s right! Beth gets the fish with her net.'
+    questions: [
+      { question: 'Who gets the fish?', answers: ['Beth', 'Dad', 'The cat'], because: 'That’s right! Beth gets the fish with her net.' },
+      { question: 'Where do Dad and Beth go?', answers: ['The lake', 'The shop', 'The zoo'], because: 'Yes! They go to the lake.' },
+      { question: 'What does Beth have?', answers: ['A net', 'A rod', 'A bucket'], because: 'That’s right! Beth has a net, and Dad has a rod.' },
+      { question: 'What does Dad do when Beth gets the fish?', answers: ['He claps', 'He cries', 'He runs off'], because: 'Yes! Dad claps for Beth.' }
+    ]
   },
   {
     title: 'Luna’s Lunch',
     picture: '🍱',
     lines: ['Ms. Luna has a lunch box.', 'In the box is a plum and a bun.', 'She munches the bun and then the plum.', 'Luna is full, so she naps on a branch.'],
-    question: 'What does Luna do after lunch?',
-    answers: ['She takes a nap', 'She goes for a swim', 'She rides a bus'],
-    because: 'Yes! Luna is full, so she naps on a branch.'
+    questions: [
+      { question: 'What does Luna do after lunch?', answers: ['She takes a nap', 'She goes for a swim', 'She rides a bus'], because: 'Yes! Luna is full, so she naps on a branch.' },
+      { question: 'What is in the lunch box?', answers: ['A bun and a plum', 'A cake and an egg', 'A fish and a nut'], because: 'Yes! There is a plum and a bun.' },
+      { question: 'What does Luna eat first?', answers: ['The bun', 'The plum', 'An apple'], because: 'That’s right! She munches the bun first, then the plum.' },
+      { question: 'Where does Luna nap?', answers: ['Up in a tree', 'In a bed', 'On a boat'], because: 'Yes! She naps on a branch, up in her tree.' }
+    ]
+  },
+  {
+    title: 'The Pet Duck',
+    picture: '🦆',
+    lines: [
+      'Meg has a pet duck.',
+      'The duck likes to swim in the pond.',
+      'One day it swims to a log.',
+      'Meg calls, and the duck swims back to her.'
+    ],
+    questions: [
+      { question: 'What pet does Meg have?', answers: ['A duck', 'A cat', 'A fish'], because: 'Yes! Meg has a pet duck.' },
+      { question: 'Where does the duck like to swim?', answers: ['The pond', 'The tub', 'The sea'], because: 'That’s right! It swims in the pond.' },
+      { question: 'What does the duck swim to one day?', answers: ['A log', 'A boat', 'A rock'], because: 'Yes! It swims to a log.' },
+      { question: 'What does the duck do when Meg calls?', answers: ['It swims back', 'It flies off', 'It hides'], because: 'Yes! The duck swims back to Meg.' }
+    ]
+  },
+  {
+    title: 'Bath Time for Rex',
+    picture: '🐶',
+    lines: [
+      'Rex the dog is all mud.',
+      'Dad fills the tub.',
+      'Rex jumps in with a big splash!',
+      'Now Rex is wet, and Dad is wet too.'
+    ],
+    questions: [
+      { question: 'Who needs a bath?', answers: ['The dog', 'The cat', 'Dad'], because: 'Yes! Rex the dog is all mud.' },
+      { question: 'Why does Rex need a bath?', answers: ['He is muddy', 'He is cold', 'He is hungry'], because: 'That’s right! Rex is all mud.' },
+      { question: 'How does Rex get in the tub?', answers: ['He jumps in', 'He walks in slowly', 'Dad lifts him in'], because: 'Yes! Rex jumps in with a big splash!' },
+      { question: 'Who gets wet?', answers: ['Rex and Dad', 'Just Rex', 'Just Dad'], because: 'Yes! Rex and Dad both get wet.' }
+    ]
+  },
+  {
+    title: 'The Red Bus',
+    picture: '🚌',
+    lines: [
+      'Kim gets on the red bus.',
+      'It stops at the shop.',
+      'Kim hops off and picks a hat.',
+      'Then she rides the bus back home.'
+    ],
+    questions: [
+      { question: 'What color is the bus?', answers: ['Red', 'Yellow', 'Blue'], because: 'Yes! Kim gets on the red bus.' },
+      { question: 'Where does the bus stop?', answers: ['The shop', 'The park', 'The pond'], because: 'That’s right! It stops at the shop.' },
+      { question: 'What does Kim get at the shop?', answers: ['A hat', 'A cake', 'A doll'], because: 'Yes! Kim picks a hat.' },
+      { question: 'How does Kim get home?', answers: ['On the bus', 'She walks', 'In a car'], because: 'Yes! She rides the bus back home.' }
+    ]
+  },
+  {
+    title: 'Luna Sees a Star',
+    picture: '⭐',
+    lines: [
+      'It is night, and Ms. Luna is up.',
+      'She sees a star in the sky.',
+      'She makes a wish on it.',
+      'Then she shuts her eyes and sleeps.'
+    ],
+    questions: [
+      { question: 'When is Luna up?', answers: ['At night', 'In the morning', 'At lunch'], because: 'Yes! It is night, and Luna is up.' },
+      { question: 'What does Luna see?', answers: ['A star', 'A cat', 'A kite'], because: 'That’s right! She sees a star in the sky.' },
+      { question: 'What does Luna make?', answers: ['A wish', 'A cake', 'A hat'], because: 'Yes! She makes a wish on the star.' },
+      { question: 'What does Luna do at the end?', answers: ['She sleeps', 'She sings', 'She eats'], because: 'Yes! She shuts her eyes and sleeps.' }
+    ]
   }
-]), 2);
+]), 5);
 
-export const G1_STORIES_2 = lesson('g1-story-more', 'g1-stories', 'More Little Stories', 'Read a little story yourself, then answer a question.', '📖', storyRounds('g1-st2', [
+export const G1_STORIES_2 = lesson('g1-story-more', 'g1-stories', 'More Little Stories', 'Read a little story yourself, then answer some questions.', '📖', storyRounds('g1-st2', [
   {
     title: 'Jake’s Kite',
     picture: '🪁',
     lines: ['Jake has a kite with a long tail.', 'He runs up the hill with it.', 'The wind lifts the kite up, up, up!', 'Jake smiles and holds the string.'],
-    question: 'Where does Jake run?',
-    answers: ['Up a hill', 'Into a lake', 'To the store'],
-    because: 'Yes! Jake runs up the hill with his kite.'
+    questions: [
+      { question: 'Where does Jake run?', answers: ['Up a hill', 'Into a lake', 'To the store'], because: 'Yes! Jake runs up the hill with his kite.' },
+      { question: 'What is long on the kite?', answers: ['The tail', 'The string', 'The stick'], because: 'Yes! Jake’s kite has a long tail.' },
+      { question: 'What lifts the kite up?', answers: ['The wind', 'Jake’s dad', 'A bird'], because: 'That’s right! The wind lifts it up, up, up!' },
+      { question: 'How does Jake feel?', answers: ['Happy', 'Sad', 'Scared'], because: 'Yes! Jake smiles, so he is happy.' }
+    ]
   },
   {
     title: 'The Snow Day',
     picture: '❄️',
     lines: ['Snow falls on the hill.', 'Kate gets her sled and her red hat.', 'Whee! The sled slides down fast.', 'Kate runs back up to go once more.'],
-    question: 'What does Kate ride down the hill?',
-    answers: ['A sled', 'A bike', 'A bus'],
-    because: 'That’s right! Kate rides her sled down the hill.'
+    questions: [
+      { question: 'What does Kate ride down the hill?', answers: ['A sled', 'A bike', 'A bus'], because: 'That’s right! Kate rides her sled down the hill.' },
+      { question: 'What falls on the hill?', answers: ['Snow', 'Rain', 'Leaves'], because: 'Yes! Snow falls on the hill.' },
+      { question: 'What color is Kate’s hat?', answers: ['Red', 'Blue', 'Green'], because: 'That’s right! Kate has a red hat.' },
+      { question: 'What does Kate do at the end?', answers: ['She goes again', 'She goes home', 'She takes a nap'], because: 'Yes! Kate runs back up to go once more.' }
+    ]
   },
   {
     title: 'A Snack for Pip',
     picture: '🍇',
     lines: ['Pip is hungry at the park.', 'He opens his bag and finds a bunch of grapes.', 'He gives some to Luna.', 'They munch and smile on the bench.'],
-    question: 'What does Pip do with the grapes?',
-    answers: ['He shares them', 'He drops them', 'He hides them'],
-    because: 'Yes! Pip gives some of his grapes to Luna.'
+    questions: [
+      { question: 'What does Pip do with the grapes?', answers: ['He shares them', 'He drops them', 'He hides them'], because: 'Yes! Pip gives some of his grapes to Luna.' },
+      { question: 'Where is Pip?', answers: ['The park', 'The zoo', 'The beach'], because: 'Yes! Pip is at the park.' },
+      { question: 'What is in Pip’s bag?', answers: ['Grapes', 'Cookies', 'A ball'], because: 'That’s right! He finds a bunch of grapes.' },
+      { question: 'Where do they sit to eat?', answers: ['A bench', 'The grass', 'A swing'], because: 'Yes! They munch on the bench.' }
+    ]
   },
   {
     title: 'The Lost Sock',
     picture: '🧦',
     lines: ['Ben has one sock on.', 'Where is the other sock?', 'He checks the bed and the rug.', 'The dog has it! Ben grabs it and laughs.'],
-    question: 'Who has the lost sock?',
-    answers: ['The dog', 'Ben’s dad', 'The cat'],
-    because: 'That’s right! The dog has Ben’s sock.'
+    questions: [
+      { question: 'Who has the lost sock?', answers: ['The dog', 'Ben’s dad', 'The cat'], because: 'That’s right! The dog has Ben’s sock.' },
+      { question: 'How many socks does Ben have on?', answers: ['One', 'Two', 'Three'], because: 'Yes! Ben has just one sock on.' },
+      { question: 'Where does Ben look?', answers: ['His bed and his rug', 'The sink and the tub', 'The car and the yard'], because: 'That’s right! He checks the bed and the rug.' },
+      { question: 'What does Ben do at the end?', answers: ['He laughs', 'He cries', 'He hides'], because: 'Yes! Ben grabs the sock and laughs.' }
+    ]
   },
   {
     title: 'The Drum Band',
     picture: '🥁',
     lines: ['Max has a drum.', 'Tess has a bell.', 'Bang, bang! Ding, ding!', 'They march and sing in the yard.'],
-    question: 'What does Tess play?',
-    answers: ['A bell', 'A drum', 'A flute'],
-    because: 'Yes! Tess plays a bell, ding, ding!'
+    questions: [
+      { question: 'What does Tess play?', answers: ['A bell', 'A drum', 'A flute'], because: 'Yes! Tess plays a bell, ding, ding!' },
+      { question: 'What does Max play?', answers: ['A drum', 'A bell', 'A horn'], because: 'Yes! Max plays the drum, bang, bang!' },
+      { question: 'Where do they march?', answers: ['The yard', 'The street', 'The gym'], because: 'That’s right! They march in the yard.' },
+      { question: 'What sound does the bell make?', answers: ['Ding, ding', 'Bang, bang', 'Moo, moo'], because: 'Yes! Tess’s bell goes ding, ding!' }
+    ]
   },
   {
     title: 'Luna Plants a Seed',
     picture: '🌱',
     lines: ['Ms. Luna digs a small hole.', 'She drops a seed in and pats the dirt.', 'She gives it a drink each day.', 'Then a green stem pops up!'],
-    question: 'What pops up from the dirt?',
-    answers: ['A green stem', 'A red ball', 'A small frog'],
-    because: 'Yes! A green stem pops up from the seed.'
+    questions: [
+      { question: 'What pops up from the dirt?', answers: ['A green stem', 'A red ball', 'A small frog'], because: 'Yes! A green stem pops up from the seed.' },
+      { question: 'What does Luna dig?', answers: ['A hole', 'A pond', 'A tunnel'], because: 'Yes! She digs a small hole.' },
+      { question: 'What does Luna put in the hole?', answers: ['A seed', 'A rock', 'A coin'], because: 'That’s right! She drops a seed in.' },
+      { question: 'What does Luna give the seed each day?', answers: ['Water', 'Milk', 'Juice'], because: 'Yes! She gives it a drink of water each day.' }
+    ]
+  },
+  {
+    title: 'The Fox and the Box',
+    picture: '🦊',
+    lines: [
+      'A fox finds a big box.',
+      'He hops in the box.',
+      'The box tips and rolls down the hill!',
+      'The fox hops out and grins.'
+    ],
+    questions: [
+      { question: 'What does the fox find?', answers: ['A box', 'A ball', 'A bun'], because: 'Yes! The fox finds a big box.' },
+      { question: 'Where does the fox go?', answers: ['Into the box', 'Up a tree', 'Into the pond'], because: 'That’s right! He hops in the box.' },
+      { question: 'What does the box do?', answers: ['It rolls away', 'It flies', 'It sinks'], because: 'Yes! The box tips and rolls down the hill.' },
+      { question: 'How does the fox feel at the end?', answers: ['Happy', 'Sad', 'Mad'], because: 'Yes! The fox grins, so he is happy.' }
+    ]
+  },
+  {
+    title: 'Cupcakes for Mom',
+    picture: '🧁',
+    lines: [
+      'Lin and Dad make cupcakes.',
+      'Lin mixes, and Dad puts them in to bake.',
+      'Lin adds pink frosting on top.',
+      'They give the cupcakes to Mom.'
+    ],
+    questions: [
+      { question: 'What do Lin and Dad make?', answers: ['Cupcakes', 'Soup', 'A pie'], because: 'Yes! They make cupcakes.' },
+      { question: 'Who mixes?', answers: ['Lin', 'Dad', 'Mom'], because: 'That’s right! Lin mixes.' },
+      { question: 'What color is the frosting?', answers: ['Pink', 'Green', 'Black'], because: 'Yes! Lin adds pink frosting.' },
+      { question: 'Who gets the cupcakes?', answers: ['Mom', 'The dog', 'Lin’s teacher'], because: 'Yes! They give the cupcakes to Mom.' }
+    ]
+  },
+  {
+    title: 'Pip Rides a Bike',
+    picture: '🚲',
+    lines: [
+      'Pip gets a new bike.',
+      'He rides it to the end of the block.',
+      'He hits a bump and falls off!',
+      'Pip gets up, dusts off, and rides again.'
+    ],
+    questions: [
+      { question: 'What does Pip get?', answers: ['A bike', 'A kite', 'A sled'], because: 'Yes! Pip gets a new bike.' },
+      { question: 'Where does Pip ride?', answers: ['Down the block', 'Into the lake', 'Up a tree'], because: 'That’s right! He rides to the end of the block.' },
+      { question: 'What makes Pip fall?', answers: ['A bump', 'A dog', 'The rain'], because: 'Yes! He hits a bump and falls off.' },
+      { question: 'What does Pip do after he falls?', answers: ['He rides again', 'He goes home', 'He cries all day'], because: 'Yes! Pip gets up and rides again.' }
+    ]
+  },
+  {
+    title: 'The Sandcastle',
+    picture: '🏖️',
+    lines: [
+      'Max and Ella go to the beach.',
+      'They make a big sandcastle.',
+      'A wave comes up and splashes it.',
+      'They laugh and make a new one.'
+    ],
+    questions: [
+      { question: 'Where do Max and Ella go?', answers: ['The beach', 'The park', 'The store'], because: 'Yes! They go to the beach.' },
+      { question: 'What do they make?', answers: ['A sandcastle', 'A cake', 'A snowman'], because: 'That’s right! They make a big sandcastle.' },
+      { question: 'What splashes the castle?', answers: ['A wave', 'A dog', 'The rain'], because: 'Yes! A wave splashes it.' },
+      { question: 'What do they do after the wave?', answers: ['They build another one', 'They go home sad', 'They yell at the wave'], because: 'Yes! They laugh and make a new one.' }
+    ]
   }
-]), 2);
+]), 5);
