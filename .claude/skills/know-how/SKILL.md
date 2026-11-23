@@ -1923,3 +1923,34 @@ the old version either proves nothing.
   "drum"). Details and numbers: `voice-audit/README.md`, "Things learned".
 - **Check:** `takeformants.py` on the converted take, then Alex's ear on the
   Sound Check page (round 7 picked ER up 3, CR up 1, DR cut from "drum").
+
+## The site stopped updating after a push ("still the same sounds")
+
+*2026-11-23 · found after VOX-8's push*
+
+- **Symptom:** a push lands on GitHub, but the live site still plays and
+  shows the old version, even after a reload. Every deploy from `f579bc8`
+  (2026-11-21) to `65f8d0d` had failed, so run 10, CUR-29 and the recorded
+  sounds weren't live, and nobody had noticed.
+- **Cause:** Cloudflare's builder (Workers Builds, Linux x64) runs
+  `npm clean-install`, and `onnxruntime-node` (pulled in by `kokoro-js`
+  for the voice render) downloads a GPU build in its install script on any
+  Linux x64 machine. That download became a 404 on GitHub, so the install
+  failed before the site was built. Nothing in our dependencies had changed.
+  A clean clone builds fine on the Mac, which never takes that path.
+- **Fix:** `.npmrc` at the repo root has
+  `onnxruntime-node-install-cuda=skip`; nothing here uses a GPU. npm 10
+  warns it's an "Unknown project config" that npm 11 will refuse: when the
+  builder moves to npm 11, set the environment variable
+  `ONNXRUNTIME_NODE_INSTALL_CUDA=skip` in the Worker's build settings on the
+  Cloudflare dashboard instead.
+- **Check:** after every push, read the deploy's result on GitHub:
+  `gh api repos/ahamelin9/MsLunaLearningActivities/commits/<sha>/check-runs --jq '.check_runs[] | [.name,.conclusion] | @tsv'`
+  (`success`, or `failure` with the dashboard link; its log needs Alex's
+  Cloudflare sign-in, so ask him to paste it). To reproduce the install
+  script's failure on the Mac: run `node -r <file that sets os.platform to
+  linux and os.arch to x64> node_modules/onnxruntime-node/script/install`
+  (exit 1 with the 404), then again with
+  `npm_config_onnxruntime_node_install_cuda=skip` (exit 0). Don't fake the
+  arch for a whole `npm ci`: esbuild's own installer then fails on the
+  arm64 Mac.

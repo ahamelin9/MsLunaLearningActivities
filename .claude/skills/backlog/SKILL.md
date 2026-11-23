@@ -119,6 +119,11 @@ Who runs git depends on where the session runs; the backlog hook's
   4. never force-push, rewrite history, or commit before his OK. A ticket
      whose lines wait in the voice queue goes in as `Blocked` (the
      `voice-queue` skill).
+- **After any push, wherever it ran:** a push isn't live until Cloudflare's
+  deploy passes. Check its result on the pushed commit a few minutes later
+  (the `gh api … check-runs` line in know-how, "The site stopped updating
+  after a push"), and say so if it failed: from 2026-11-21 to 11-23 three
+  pushes never went live, and nobody knew.
 
 ## Two chats at once
 
