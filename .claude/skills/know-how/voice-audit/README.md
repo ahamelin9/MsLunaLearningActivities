@@ -16,6 +16,16 @@ conda create -y -p <scratch>/py312 python=3.12
 <scratch>/py312/bin/pip install torch transformers soundfile librosa kokoro praat-parselmouth pyloudnorm
 ```
 
+The voice converter (VOX-7's `convert-takes.py`) needs Python 3.11 and its
+own env, since Chatterbox pins torch 2.6. It lives with conda's envs, not the
+scratchpad, so a reboot keeps it (about 2–3 GB; the model itself is cached in
+`~/.cache/huggingface`, so don't delete that):
+
+```bash
+~/anaconda3/bin/conda create -y -n luna-vc python=3.11
+~/anaconda3/envs/luna-vc/bin/pip install chatterbox-tts "setuptools<81" soundfile
+```
+
 The Node scripts use the repo's own `kokoro-js` and `ffmpeg-static`. Run them
 from the repo root (`node .claude/skills/know-how/voice-audit/<script>`), or
 with `node --input-type=module -e "$(cat …)"` where a script says so.
@@ -27,6 +37,12 @@ with `node --input-type=module -e "$(cat …)"` where a script says so.
 | `ab-render.mjs` | Renders `[{ id, text? , ps?, speed? }]` with Luna's voice: from text (kokoro-js's espeak path, as the app does) or from phonemes you give it. Run with `node --input-type=module -e "$(cat …)" <jobs.json> <outDir>`. |
 | `proto-round1.mjs`, `proto-round2.mjs`, `proto-round2-blends.mjs` | Render takes of the letter sounds with the app's own recipes (`renderSound`) and new tunings. Round 2 added her real hiss held by overlapping grains (not synthetic noise), vowels said slowly instead of stretched, blends with the second sound held, and joined blends. |
 | `edgetrim.py` | Trims the stray sound Kokoro adds around a word said alone: a vowel after a final stop ("cup-ay"), a sound before the first consonant ("a-sheep"), a burst after a final nasal. Alex picked trimmed versions in round 2. |
+| `convert-takes.py` | VOX-7: Alex's takes from the recording page (`localhost:5199/?record`, saved in `scripts/voice/takes/`, which git ignores) trimmed, levelled and converted into Luna's voice. Run from the repo root as `~/anaconda3/envs/luna-vc/bin/python .claude/skills/know-how/voice-audit/convert-takes.py <outdir> [B,D,…]`; `<outdir>` must be outside the repo or ignored, and gets `<take>--his.wav`, `<take>--luna.wav` and `luna-ref.wav` (25 s of her lines it converts to). Only the `--luna` files go on the Sound Check page. |
+| `pack-r5.py`, `page-r5.py`, `page-r5-check.mjs` | VOX-8's round 5 on the Sound Check page. `pack-r5.py <repo> <outdir>` (luna-vc python) packs each card's clips from `.voice-tmp/vox8/` into `audio-r5.json` (the app's clip today, the three takes as Luna, the word, and his own takes for breathy sounds), flagging a silent or cut-off take. `page-r5.py <index.html> <r5-cards.json>` adds the tab to a copy of the page (read the artifact first). `page-r5-check.mjs <repo> <pagedir> [width]` serves the copy and checks it headless before publishing. |
+| `make-r6.py`, `pack-round.py`, `page-r6.py`, `page-r6-check.mjs` | Round 6 (VOX-8): second tries at what round 5 found no take for. `make-r6.py <convdir> <outdir>` (luna-vc) makes the R and SN candidates (each take raised 4 or 7 semitones before converting, whichever leaves the lower F3; the cut from the word; his take made higher; his own) and the SM/PL word cuts, plus `round6.json`. `pack-round.py <repo> <cards.json> r6 <audio-r6.json>` packs any round's cards (`today` from the manifest). `page-r6.py <index.html> <round6.json>` adds the tab, or on a second run only swaps the cards, so the re-recorded E, I, V, Z and the letter names can join. `page-r6-check.mjs <repo> <pagedir> [width]` checks the copy headless (each group in turn, Next, every clip). `add-r6-again.py <againdir> <round6.json>` adds the re-recorded E, I, V, Z and the letter names (VOX-9) to the cards and measures them; re-patch from the page before round 6 (`page-r6.py` swaps only the data, not the code). |
+| `page-r7.py`, `page-r7-check.mjs` | Round 7 (ER, CR, DR recorded again): `make-r6.py <convdir> <outdir> ER,CR,DR round7.json` makes its cards, then `page-r7.py <index.html> <round7.json>` adds the tab, drawing round 6's card under the `r7` prefix. Careful: `list.map(r6Card)` hands the index in as the round, so map with `c => r6Card(c)`; the round 6 check caught it. |
+| `apply-picks.mjs` | `apply-picks.mjs <r5|r6|r7> <picksDir> <takesDir> <cards.json> [overrides.json] [--dry]`. Copies the Sound Check picks (the `picks` collection saved with ArtifactData's `out_dir`) into `scripts/voice/recorded/`, one file for every key sharing the sound (K also feeds C and CK). An overrides file names a pick that isn't a plain take (another card's take, a sound cut from the word). `--dry` lists without copying. Then `npm run voice:render -- --only sound`. |
+| `takeformants.py` | His raw take beside Luna's, per take: voiced share and F1–F3 (librosa LPC, runs in luna-vc). Shows what the converter lost: an R's low F3, a vowel pair too alike, a whispered V or Z. `--word` measures the sounded-out word. |
 | `hear.py` | Phoneme recognizer (wav2vec2 espeak) and, for `words`, Whisper, on a list of clips. |
 | `score.py` | The recognizer limited to English sounds: is the target there, is there a vowel after a stop, are both sounds of a blend there. It can't judge a vowel or a hiss on its own. |
 | `formants.py`, `wordvowel.py` | Vowel formants of the sound clips, and of the same vowels inside Luna's words. |
@@ -110,5 +126,13 @@ Round results and Alex's decisions are on the VOX tickets in
   fix by Whisper and Alex's ear, not by F1 alone.
 - Measure the word's own vowel, never the carrier's: "again" has an `ɛ`,
   "I can say" an `æ`.
+- **The converter (Chatterbox VC) loses R** (VOX-8, round 5). Alex's R
+  dips F3 to about 1200 Hz; the converted take sits at 2800–3200, and Alex
+  hears no R. Inside a word it keeps about half. Pitching his take up 7
+  semitones first (`librosa.effects.pitch_shift`) brings a blend's R to about
+  1900–2000, a lone R or ER only to 2200–2500. Measure his raw take first:
+  if it's right there, recording again won't help.
+- Before blaming the converter, measure the raw take: round 5's V and Z were
+  whispered (0% voiced), and his E and I sat 50 Hz apart in F1.
 - A final V or Z said alone ("five", "buzz") has no pitch at all: Kokoro
   devoices it, so nothing there can be held.

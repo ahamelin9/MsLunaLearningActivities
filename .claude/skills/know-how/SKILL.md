@@ -1858,3 +1858,68 @@ the old version either proves nothing.
   `lettersFor`), so a play of more than 14 pairs brings letters back on a
   later board; `deal` runs on round the deck. Story Corner's words are
   `span`s, not buttons: a check taps them through `p span`.
+
+## A check of the recording page hangs: headless Chrome never answers the microphone
+
+*2026-11-22 · VOX-7*
+
+- **Symptom:** a puppeteer check of `/?record` clicks Record and nothing
+  happens; `navigator.mediaDevices.getUserMedia` never resolves or rejects,
+  even with `--use-fake-ui-for-media-stream`, `--use-fake-device-for-media-stream`,
+  `overridePermissions(…, ['microphone'])` and `headless: 'shell'`.
+- **Cause:** on the Mac, headless Chrome waits on any microphone request,
+  its own fake device included (likely the system's microphone permission,
+  which a headless Chrome can't be asked for).
+- **Fix:** don't ask Chrome for a microphone at all: replace
+  `getUserMedia` before the page loads (`evaluateOnNewDocument`) with a
+  stream of a stand-in clip (an `AudioBufferSourceNode` on a loop into a
+  `MediaStreamDestination`). Everything after the microphone is real: the
+  recorder, the WAV, the dev server's save. The real microphone is tried by
+  Alex in a real browser.
+- **Check:** `node .claude/skills/know-how/record-check.mjs <stand-in.wav> 5199`
+  (Vite on 5199): the page's 8 cards, a take recorded, stopped with the
+  space bar, saved as a non-silent WAV and played back, git ignoring the
+  takes folder, and the save refusing other names and non-WAV bodies. It
+  uses a slot with no take and drops its take again, so Alex's are never
+  touched. A stand-in can be made with `say -v Daniel -o x.aiff "ooo"` and
+  the repo's ffmpeg (a test clip only; the app never speaks on the device).
+
+## A recorded take keeps its silence and the key click after trimming
+
+*2026-11-22 · VOX-7*
+
+- **Symptom:** `convert-takes.py` "trimmed" a quick "b" to 2 s, nearly the
+  whole file, and the converter then hissed through the silence.
+- **Cause:** the trim's threshold sat 45 dB under the loudest moment, and
+  in a quiet room (noise about −61 dB, a take peaking near −20) that's below
+  the room itself, so nothing counted as quiet. Every take from the
+  recording page also has a key or button click at each end.
+- **Fix:** skip the first 0.12 s and last 0.2 s, set the threshold from the
+  take's own noise floor (its quietest tenth) plus 4 to 12 dB, scaled by how
+  loud the take is (a TH is barely above the room), and ignore blips under
+  40 ms. The converter keeps timing, so its output is cut to where the take
+  sat rather than trimmed again.
+- **Check:** the takes' lengths after converting: quick sounds 0.25–0.4 s,
+  held ones 0.45–1.1 s (2026-11-22).
+- **Cutting one sound out of a take** (OO from "m… oo… n"): find the runs
+  with the trim's own threshold, then cut with
+  `-af "atrim=start=A:end=B,asetpts=PTS-STARTPTS,afade=…"`. With `-ss`/`-to`
+  after `-i` instead, the fades are timed on the uncut take and the clip
+  comes out silent (−91 dB). Check a cut's `volumedetect` before rendering.
+
+## A recorded R, ER or blend comes out of the converter with no R
+
+*2026-11-23 · VOX-8*
+
+- **Symptom:** Alex's take has a clear R, but in Luna's voice it's heard as
+  "uh" (R, ER) or the R drops out of a blend (CR, DR, FR).
+- **Cause:** the voice converter (Chatterbox VC) lifts the R's third
+  formant from about 1200 Hz to 2800–3200, where it no longer sounds like R.
+  A wrong first theory was a bad take: measure the raw take before asking
+  for a new one (`voice-audit/takeformants.py`).
+- **Fix:** pitch his take up 4 or 7 semitones before converting and keep
+  whichever comes out with the lower F3 (blends land at 1500–2000 Hz). For
+  a blend that still won't hold, cut it out of a word he said ("dr" from
+  "drum"). Details and numbers: `voice-audit/README.md`, "Things learned".
+- **Check:** `takeformants.py` on the converted take, then Alex's ear on the
+  Sound Check page (round 7 picked ER up 3, CR up 1, DR cut from "drum").

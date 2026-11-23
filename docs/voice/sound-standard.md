@@ -4,10 +4,13 @@ The standard Luna's letter sounds are held to: what a US phonics teacher
 says for each sound, what it must never sound like, and where Luna is
 today. It comes from the research run of 2026-10-28
 ([research notes](research-2026-10-28.md)) and Alex's two rounds of picks
-on the Sound Check page (VOX-1 in `kanban/epics/VOX.md`).
+on the Sound Check page (VOX-1, now closed: `kanban/CHANGELOG.md`).
 
-It's a reference, not a change: nothing in the app follows it until a VOX
-ticket builds it and Alex has heard it.
+Since 2026-11-23 every letter sound and letter name in the app is Alex's
+own take converted into Luna's voice (VOX-7, VOX-8, VOX-9), so "where Luna
+is today" below describes the generated sounds they replaced. The standard
+still says what a recording must sound like, and VOX-4's check is built
+against it.
 
 ## In one minute
 

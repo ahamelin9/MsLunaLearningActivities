@@ -497,3 +497,21 @@ only record of them. One line each: date, ID, title, and `Done` or
 - **2026-11-13** — CUR-17c Story Corner holds two plays at Kindergarten — Done. Nine new tier 1 stories, 18 in all (Alex OKed them), so a Kindergarten play (and 1st grade's on Warm up) no longer tells the same nine. `story-check` wants 18 stories at or below every tier, with a planted short tier, and fails "tier 1 and below hold 9 stories" on the code before; every story fits at the four iPad sizes.
 - **2026-11-13** — Epic BUG complete (bugs): BUG-33 and BUG-32 were its open bugs. The next bug starts `epics/BUG.md` again.
 - **2026-11-21** — CUR-22 The story lessons ask 20 a play, with more stories — Won't do: split by grade into CUR-22a (1st grade, with the engine for both) and CUR-22b (2nd grade), each its own list for Alex to review.
+- **2026-11-22** — VOX-7 A pilot: Alex records the 8 sounds with no pick, converted into Luna's voice — Done. A dev-only recording page (`/?record`) saves Alex's takes where git ignores them, and `convert-takes.py` (in `know-how/voice-audit/`) turns each into Luna's voice with Chatterbox. On the Sound Check page's round 4 he found them "SOOO much better", and his picks are now the app's sounds; the rest of the sounds follow the same way (VOX-8). Alex heard them in the app and OKed.
+  | Sound | Recording (`scripts/voice/recorded/`) |
+  |---|---|
+  | B, D, G, NG | his take, as Luna |
+  | W and WH | his take 2, as Luna |
+  | TH and voiced TH | his own TH, unconverted (a breath, no voice); "this" uses it too, on his call |
+  | OO and UE | the middle of his "m… oo… n", as Luna |
+- **2026-11-23** — VOX-8 Alex records the rest of the sounds, converted into Luna's voice — Done. The other 51 sounds, recorded on `/?record` (3 takes and the word each) and converted with `convert-takes.py`, picked over rounds 5 to 7 on the Sound Check page. Every sound key now plays a recording (`scripts/voice/recorded/`), copied to each key that shares its sound by `apply-picks.mjs`. Why the R sounds took three rounds: his R is strong (F3 about 1200 Hz), but the converter flattens it, so they're pitched up before converting, and ER, CR and DR were recorded again with a crisper start and a longer R (know-how, voice-audit README). Alex: "most of them are perfect now", good for now; R was "good not great", FR "okay not great".
+  | Kind of take | Sounds |
+  |---|---|
+  | his take, as Luna | short a, e, i, o, u; long a, e, i, o, u; ar, or; p, t, k, ch, j, x, qu, y; s, n, l; bl, cl, fl, gl, sl; sk, sp, sw, tw |
+  | his take raised 4 or 7 semitones, then as Luna | r, er, br, cr, gr, pr, tr, sn |
+  | cut from the word sounded out, as Luna | m ("map"), pl ("plum"), dr ("drum") |
+  | his own take, not converted (a breath) | f, h, sh, st |
+  | his own take raised 7 semitones, not converted | v, z, fr |
+  | another card's take | sm: SN's take 2, as Luna |
+- **2026-11-23** — VOX-9 Alex records the letter names, converted into Luna's voice — Done. "The name B still sounds weird": all 33 names the app says (A to Z, and SH, CH, TH, WH, NG, CK, QU said as their letters) were Kokoro's own. Alex recorded three takes of each on the recording page's Letter names group (`name__B__take1.wav`), picked one of each as Luna on round 6, and they play at every speed as `scripts/voice/recorded/name__<KEY>.wav`.
+- **2026-11-23** — VOX-1 Letter sounds retuned by ear — Done, by recording instead of retuning: every letter sound is now Alex's pick of his own takes (VOX-7, VOX-8), so no sound is made from Kokoro's recipes any more (they stay in `phonemes.mjs` for a key without a recording). Its last check, VOX-4's sound check against the recordings, is VOX-4's own Complete when.
