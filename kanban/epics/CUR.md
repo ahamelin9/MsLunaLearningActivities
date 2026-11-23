@@ -68,6 +68,19 @@ Story · P1 · S · needs: —
 - **Blocked (2026-11-21):** built and checked in away mode; waits for Alex's OK on the review sheet (`screenshots/review/cur24-timer.png`) and his commit. `timer-check` passes, and fails 8 lines on the code before.
 - **Complete when:** at 1st and 2nd grade no lesson shows the pie and every game's pie starts at 30 (Treasure Path at 45 in 1st grade), checked in a browser by `timer-check.mjs`, which fails on the code before; build and lint pass; after shots of a game and a lesson.
 
+### CUR-29 · The countdown in every game: Bubble Sounds, Muddled Cards and Story Corner too
+Story · P1 · S · needs: —
+- **Why:** her feedback (2026-11-21), "timer only on games not lessons", reads as every game. CUR-16 left Bubble Sounds (already a race), Luna's Muddled Cards and Story Corner untimed, and CUR-24 kept that, so Alex saw no pie in Bubble Sounds (2026-11-22). Decided (Alex, 2026-11-22): all three get the 30-second pie.
+- **How:**
+  - `timer` on the three games (`engine/timer.ts`'s kinds, 30 seconds at 1st and 2nd grade; Kindergarten stays untimed): Bubble Sounds `find` (a round is 3 or 4 pops, like the Letter Jar), Story Corner `read`, Muddled Cards `find`.
+  - Muddled Cards and Story Corner time each step, not the round: a board is 4 to 6 pairs, a story is a word hunt and then a question. A new `GameDef.timerPerStep` gives a fresh pie after each `api.tick`, and a miss or running out takes the pie away only until the next step.
+  - The lines are the ones every game has ("Time's up! You can still answer it."): no new voice.
+  - `timer-check.mjs` checks the three games' pies (and the fresh pie after a step), and fails on the code before.
+- **Found in the code (2026-11-22):** Story Corner's first step is reading the whole story and then the hunt, so its pie starts with the hunt (`waitsToAsk`, `api.asking()` as the hunt opens), like What's Missing: the story itself is read untimed (Claude's pick, for Alex's OK).
+- **Blocked (2026-11-22):** built; waits for Alex's OK on `screenshots/review/cur29-every-game-timed.png` and his commit. `timer-check` passes and fails 6 lines on the code before (no pie in the three games).
+- **Decided (Alex, 2026-11-22):** "great! push this out please": the look and the story read untimed are OKed; pushed so the teacher can test it, and it stays Blocked with run 10's tickets until she has.
+- **Complete when:** at 1st and 2nd grade, Bubble Sounds, Muddled Cards and Story Corner show the pie at 30; in Muddled Cards and Story Corner a step done brings a fresh 30; in Kindergarten none; checked in a browser by `timer-check.mjs`, which fails on the code before; the other games and lessons behave as before (`timer-check`'s other lines); build and lint pass; after shots of the three games with the pie.
+
 ### CUR-25 · Blend sounds said closer together
 Story · P1 · S · needs: —
 - **Why:** her feedback (2026-11-21): "blends is too far apart, make sounds closer". Luna waits 260 ms between one sound and the next when she sounds a word out (/b/ … /a/ … /t/), so it doesn't sound like one word being blended.

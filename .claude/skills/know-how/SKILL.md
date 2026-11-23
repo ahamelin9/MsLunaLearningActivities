@@ -1022,7 +1022,7 @@ Pitfalls that cost time:
 
 ## Does the round's countdown work? (CUR-16)
 
-*2026-11-13 · CUR-16, CUR-18, CUR-24*
+*2026-11-13 · CUR-16, CUR-18, CUR-24, CUR-29*
 
 - **What it is:** at 1st and 2nd grade the shell's `RoundTimer` puts a kit
   `CountdownPie` at the end of the game's header, for every round of a game
@@ -1031,17 +1031,25 @@ Pitfalls that cost time:
   teacher: "timer only on games, not lessons"): `lessonGame` gives no `timer`. It
   starts with the round, while Luna still asks its question (CUR-18: Alex
   wanted it "right away"), and waits only while an answer is said or the tab
-  is hidden. What's Missing holds it until `api.asking()`, as the desk hides.
-  Running out is a miss with Luna's `timeUp` line.
+  is hidden. What's Missing holds it until `api.asking()`, as the desk hides,
+  and Story Corner until its word hunt starts. Every game has one since
+  CUR-29; Muddled Cards and Story Corner set `timerPerStep`, so each
+  `api.tick` brings a fresh pie and a miss takes it away only until the next
+  step. Running out is a miss with Luna's `timeUp` line.
 - **Check:** `node .claude/skills/know-how/timer-check.mjs 5199`: the 30
   seconds at both grades (the table: 45 for a 1st-grade passage), the pie counting down while Luna asks
   (read from its `--share`, held to her talking time in real seconds), the count,
   a hidden tab, running out (the line, then a wrong answer gets the clue, so
-  it was the first miss), a miss taking the pie away, none at Kindergarten or
-  in the untimed games, What's Missing waiting, and no pie in any lesson at
-  1st or 2nd grade (each one opened). It fails 8 lines on the code before
-  CUR-24. `kit-check.mjs` has the pie itself (light and dark), and
-  `timer-shot.mjs` shoots it in play for a review sheet (`ui:shots` plays at
+  it was the first miss), a miss taking the pie away, none at Kindergarten,
+  Bubble Sounds, Muddled Cards and Story Corner timed with a fresh pie per
+  pair and per hunt and question (CUR-29; it finds a pair by the cards' React
+  keys and the hunt word from the round's props), What's Missing waiting, and
+  no pie in any lesson at 1st or 2nd grade (each one opened). It fails 8
+  lines on the code before CUR-24, and 6 before CUR-29. A wrong tap is said
+  before the miss counts, so wait for the pie to go rather than a fixed
+  moment. `kit-check.mjs` has the pie itself (light and dark), and
+  `timer-shot.mjs` shoots it in play for a review sheet (`games=A,B` for
+  chosen games at 1st grade; it reads Story Corner's story through first) (`ui:shots` plays at
   Kindergarten, so it never shows the pie). `round-shot.mjs` shoots the first
   round of any game or lesson at any grade, light or dark (`--dark`), for a
   review sheet.
