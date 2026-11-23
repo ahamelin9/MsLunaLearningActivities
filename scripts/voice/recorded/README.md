@@ -30,3 +30,13 @@ more: a person saying "mmmm" has already held it.
 Then `npm run voice:render -- --only sound`. The renderer notices the file by
 its contents, so replacing a recording re-renders that clip and deleting one
 falls back to the generated sound.
+
+## Where today's files come from
+
+Since 2026-11-23 every letter sound and letter name here is Alex's own take,
+recorded on the app's recording page (`npm run dev`, then `/?record`; the raw
+takes stay in `../takes/`, which git ignores) and converted into Luna's voice.
+The steps, from take to picked file, and the scripts that do them
+(`convert-takes.py`, `apply-picks.mjs`) are in
+`.claude/skills/know-how/voice-audit/README.md`. The tickets are VOX-7,
+VOX-8 and VOX-9 in `kanban/CHANGELOG.md`.

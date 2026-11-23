@@ -1,0 +1,135 @@
+// The recording page (VOX-7). Roles, the space scale and the type roles only.
+
+.page {
+  min-height: 100vh;
+  background-color: var(--ground);
+  color: var(--ink);
+}
+
+.bar {
+  position: sticky;
+  top: 0;
+  z-index: var(--z-header);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-3) var(--space-6);
+  background: var(--card);
+  border-bottom: var(--border-regular) solid var(--edge);
+}
+
+.title {
+  margin-right: auto;
+  font: var(--text-display-s);
+}
+
+.progress {
+  flex: 0 1 calc(var(--space-16) * 4);
+}
+
+.count {
+  font: var(--text-label);
+  color: var(--ink-soft);
+}
+
+.intro {
+  max-width: 70ch;
+  padding: var(--space-4) var(--space-6) 0;
+  font: var(--text-label);
+  color: var(--ink-soft);
+
+  p {
+    margin: 0 0 var(--space-2);
+  }
+}
+
+.problem {
+  font-weight: bold;
+  color: var(--try-again-text);
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, calc(var(--space-16) * 6)), 1fr));
+  gap: var(--space-4);
+  padding: var(--space-4) var(--space-6) var(--space-8);
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-4);
+}
+
+.head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.sound {
+  margin: 0;
+  font: var(--text-display-m);
+}
+
+.kind {
+  font: var(--text-tag);
+  letter-spacing: var(--tracking-tag);
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+.how {
+  margin: 0;
+  font: var(--text-label);
+}
+
+.slots {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.slot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-3);
+  padding: var(--space-2);
+  border-radius: var(--radius-tile);
+  background: var(--well);
+
+  &[data-state='recording'] {
+    outline: var(--border-regular) solid var(--accent);
+  }
+}
+
+.slot-name {
+  min-width: calc(var(--space-12) * 2);
+  font: var(--text-label);
+}
+
+.note {
+  font: var(--text-label-small);
+  color: var(--ink-soft);
+}
+
+// a few groups, a progress bar each, one group's cards shown at a time
+.groups {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, calc(var(--space-16) * 3)), 1fr));
+  gap: var(--space-3) var(--space-4);
+  padding: var(--space-4) var(--space-6) 0;
+}
+
+.group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}

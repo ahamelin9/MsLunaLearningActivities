@@ -32,6 +32,10 @@ dist-ssr
 # voice rendering scratch
 .voice-tmp/
 
+# Alex's raw recordings from the recording page (VOX-7): his own voice stays
+# on his Mac; only takes converted into Luna's voice go further
+scripts/voice/takes/
+
 # design-review screenshots (npm run ui:shots)
 screenshots/
 

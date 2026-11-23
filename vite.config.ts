@@ -1,12 +1,14 @@
 import { fileURLToPath } from 'node:url'
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+// the recording page's save, under `npm run dev` only (VOX-7)
+import { takesServer } from './scripts/voice/takes-server.mjs'
 
 const src = fileURLToPath(new URL('./src', import.meta.url))
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react(), takesServer()],
   resolve: {
     // `@/utils/audio` from anywhere in TypeScript; stylesheets use loadPaths below
     alias: { '@': src }

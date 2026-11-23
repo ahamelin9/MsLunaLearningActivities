@@ -8,12 +8,19 @@ const KitPage =
   import.meta.env.DEV && new URLSearchParams(location.search).has('kit')
     ? lazy(() => import('./dev/KitPage/KitPage'))
     : null
+// The recording page, `/?record` (VOX-7): dev only too, and it saves through
+// the dev server (scripts/voice/takes-server.mjs)
+const RecordPage =
+  import.meta.env.DEV && new URLSearchParams(location.search).has('record')
+    ? lazy(() => import('./dev/RecordPage/RecordPage'))
+    : null
+const DevPage = KitPage ?? RecordPage
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    {KitPage ? (
+    {DevPage ? (
       <Suspense fallback={null}>
-        <KitPage />
+        <DevPage />
       </Suspense>
     ) : (
       <App />
