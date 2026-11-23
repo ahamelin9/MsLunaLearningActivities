@@ -115,10 +115,16 @@ export interface GameDef<TRound = never> {
   ownLuna?: boolean;
   /**
    * What a round asks, for its countdown at 1st and 2nd grade (CUR-16,
-   * engine/timer.ts). Left out, or undefined for a round, it isn't timed: a
-   * round that is long by nature, or already a race (Bubble Sounds).
+   * engine/timer.ts). Left out, or undefined for a round, it isn't timed
+   * (lessons, CUR-24). Every game has one since CUR-29.
    */
   timer?: (round: TRound) => TimerKind | undefined;
+  /**
+   * The countdown times each step (`api.tick`), not the whole round (CUR-29:
+   * a board of pairs, a story's word hunt and then its question): a fresh pie
+   * after each step, and a miss takes it away only until the next step.
+   */
+  timerPerStep?: boolean;
   /** the countdown waits until the round calls `api.asking()` (CUR-16) */
   waitsToAsk?: boolean;
   /** its signature reward: the squishy kind it brings first (SIGNATURE_KIND in squishies.ts, PRG-5a) */

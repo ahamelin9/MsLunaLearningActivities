@@ -86,6 +86,8 @@ const Play: React.FC<{ round: Round; api: GameApi }> = ({ round, api }) => {
       setPhase('hunt');
       soundManager.playPop();
       sayHunt();
+      // the countdown starts with the hunt: reading the story isn't timed (CUR-29)
+      api.asking();
       return;
     }
     const next = revealed + 1;
@@ -301,6 +303,12 @@ export const storyTime: GameDef<Round> = {
   // a story read line by line, a word hunt and a question (PRG-6's first guess)
   roundSeconds: 90,
   shape: 'book',
+  // 30 seconds at 1st and 2nd grade (CUR-29; the teacher: a timer on games)
+  timer: () => 'read',
+  // a pie for the word hunt, then a fresh one for the question; the story
+  // itself is read untimed
+  timerPerStep: true,
+  waitsToAsk: true,
   sticker: 'book',
   makeRounds: ({ grade, difficulty, count }) => {
     const tier = tierFor(grade, difficulty);

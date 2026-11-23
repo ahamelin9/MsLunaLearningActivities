@@ -13,8 +13,11 @@
 //     round's first miss: the next wrong answer gets the spoken clue;
 //   - a wrong answer before then takes the pie away too;
 //   - every game round has 30 seconds at 1st and 2nd grade, a Treasure Path
-//     passage 45 in 1st grade (CUR-24), and Kindergarten none; no pie in
-//     Bubble Sounds, Muddled Cards or Story Corner;
+//     passage 45 in 1st grade (CUR-24), and Kindergarten none;
+//   - Bubble Sounds, Muddled Cards and Story Corner have it too (CUR-29):
+//     Muddled Cards times each pair and Story Corner its word hunt and then
+//     its question, a fresh 30 with each step, even after running out; Story
+//     Corner's story itself is read untimed;
 //   - What's Missing shows no pie while the desk is looked at, and its full
 //     30 once it asks, counting down while Luna asks (CUR-18);
 //   - no lesson at 1st or 2nd grade shows a pie (the teacher: "timer only
@@ -211,9 +214,106 @@ const clue = page => page.$$eval('button', bs => bs.some(b => /clue/i.test(b.tex
   await page.close();
 }
 for (const title of ['Bubble Sounds', 'Muddled Cards', 'Story Corner']) {
-  const page = await game(1, title);
+  const page = await game(0, title);
   await wait(3000);
-  ok(`1st grade, ${title}: no pie`, (await pie(page)) === null);
+  ok(`Kindergarten, ${title}: no pie`, (await pie(page)) === null);
+  await page.close();
+}
+
+// ---- the three games CUR-16 left untimed (CUR-29) ----
+/** The card's React key (`<pair>-<side>`), from its fiber. */
+const reactKey = el =>
+  el.evaluate(e => {
+    const k = Object.keys(e).find(n => n.startsWith('__reactFiber$'));
+    return e[k]?.key ?? null;
+  });
+/** Story Corner's hunt word, from the round prop of the nearest component above. */
+const huntWord = el =>
+  el.evaluate(e => {
+    const k = Object.keys(e).find(n => n.startsWith('__reactFiber$'));
+    for (let f = e[k]; f; f = f.return) {
+      const h = f.memoizedProps?.round?.hunt;
+      if (h) return h;
+    }
+    return null;
+  });
+const lessThanFull = async page => {
+  await skip(page, 10000);
+  await wait(400);
+  return pie(page);
+};
+{
+  const page = await game(1, 'Bubble Sounds');
+  await until(async () => (await pie(page)) !== null);
+  ok('1st grade, Bubble Sounds: a pie at 30 (CUR-29)', (await pie(page)) === 30, await pie(page));
+  await page.close();
+}
+{
+  const page = await game(1, 'Muddled Cards');
+  await until(async () => (await pie(page)) !== null);
+  ok('1st grade, Muddled Cards: a pie at 30 (CUR-29)', (await pie(page)) === 30, await pie(page));
+  /** Turns over a pair not yet found. */
+  const match = async () => {
+    const cards = await page.$$(`${at('stage')} button[aria-label="face down card"]`);
+    const keyed = [];
+    for (const c of cards) keyed.push([await reactKey(c), c]);
+    const pairOf = k => k.slice(0, k.lastIndexOf('-'));
+    const [firstKey, a] = keyed[0];
+    const b = keyed.find(([k], i) => i > 0 && pairOf(k) === pairOf(firstKey))[1];
+    await quiet(page);
+    await a.click();
+    await wait(300);
+    await b.click();
+  };
+  const down = await lessThanFull(page);
+  await match();
+  const fresh = await until(async () => (await pie(page)) >= 29, 4000);
+  ok('… a pair found brings a fresh 30', down !== null && down <= 21 && fresh, `${down} → ${await pie(page)}`);
+  await skip(page, 35000);
+  await wait(800);
+  const gone = (await pie(page)) === null;
+  await quiet(page);
+  await match();
+  const back = await until(async () => (await pie(page)) >= 29, 4000);
+  ok('… running out takes it away until the next pair, which brings a fresh 30', gone && back, `gone ${gone}, back ${await pie(page)}`);
+  await page.close();
+}
+{
+  const page = await game(1, 'Story Corner');
+  await wait(2500);
+  ok('1st grade, Story Corner: no pie while the story is read', (await pie(page)) === null, await pie(page));
+  for (let i = 0; i < 20 && !(await page.$(`${at('stage')} [data-state="huntable"]`)); i++) {
+    const next = await page.$$eval(`${at('stage')} button`, bs => bs.findIndex(b => /Next line|I have read it/.test(b.textContent)));
+    if (next < 0) break;
+    await (await page.$$(`${at('stage')} button`))[next].click();
+    await wait(250);
+  }
+  await until(async () => (await pie(page)) !== null, 4000);
+  ok('… a pie at 30 once the word hunt starts (CUR-29)', (await pie(page)) === 30, await pie(page));
+  const words = await page.$$(`${at('stage')} [data-state="huntable"] span`);
+  const hunt = words.length ? await huntWord(words[0]) : null;
+  const clean = async w => (await w.evaluate(e => e.textContent)).replace(/[^a-zA-Z]/g, '').toLowerCase();
+  let right = null;
+  let wrong = null;
+  for (const w of words) {
+    if ((await clean(w)) === hunt) right ??= w;
+    else wrong ??= w;
+  }
+  let detail = `hunt "${hunt}"`;
+  let pass = false;
+  if (right && wrong) {
+    const down = await lessThanFull(page);
+    await quiet(page);
+    await wrong.click();
+    // the word tapped is said first, then the miss counts (FB-1)
+    const gone = await until(async () => (await pie(page)) === null, 4000);
+    await quiet(page);
+    await right.click();
+    const fresh = await until(async () => (await pie(page)) >= 29, 4000);
+    pass = down !== null && down <= 21 && gone && fresh;
+    detail += `: ${down} → ${gone ? 'gone' : 'still there'} → ${await pie(page)}`;
+  }
+  ok('… a wrong word takes it away, and the word found brings a fresh 30 for the question', pass, detail);
   await page.close();
 }
 

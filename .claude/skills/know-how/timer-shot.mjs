@@ -3,7 +3,10 @@
 // reaches: its run plays at Kindergarten, and the pie is 1st and 2nd grade's.
 // Each shot is a game or lesson a few seconds into a round, the pie part-way.
 //
-//   node .claude/skills/know-how/timer-shot.mjs [port=5199] [outDir=screenshots/review/timer]
+//   node .claude/skills/know-how/timer-shot.mjs [port=5199] [outDir=screenshots/review/timer] [games=A,B]
+//
+// `games=` shoots those games instead, at 1st grade, iPad landscape (CUR-29);
+// a game with no pie is shot anyway, for a "before".
 //
 // Needs Vite on the port. Shoots light and dark at iPad landscape, iPad
 // portrait (the narrow header) and an iPhone held upright (DES-32a).
@@ -16,19 +19,21 @@ import { viewportFor } from '../../../scripts/ui/sizes.mjs';
 
 const args = process.argv.slice(2);
 const port = args.find(a => /^\d+$/.test(a)) ?? '5199';
-const outDir = args.find(a => !/^\d+$/.test(a)) ?? 'screenshots/review/timer';
+const outDir = args.find(a => !/^\d+$/.test(a) && !a.startsWith('games=')) ?? 'screenshots/review/timer';
+const only = args.find(a => a.startsWith('games='))?.slice(6).split(',');
 mkdirSync(outDir, { recursive: true });
 const at = n => `[data-shot="${n}"]`;
 const wait = ms => new Promise(r => setTimeout(r, ms));
 
 // [grade card, game title or 'lesson', size]
-const SHOTS = [
+const DEFAULT_SHOTS = [
   [1, 'Letter Cookies', { width: 1180, height: 820 }],
   [2, 'Words Off the Page', { width: 820, height: 1180 }],
   // `phone` makes it a phone's browser (sizes.mjs), which scales the page
   [1, 'Treasure Path', { width: 390, height: 660, phone: true }],
   [1, 'lesson', { width: 744, height: 1133 }]
 ];
+const SHOTS = only ? only.map(title => [1, title, { width: 1180, height: 820 }]) : DEFAULT_SHOTS;
 
 const browser = await puppeteer.launch({ executablePath: chromePath(), headless: true, args: ['--mute-audio'] });
 for (const theme of ['light', 'dark']) {
@@ -61,7 +66,18 @@ for (const theme of ['light', 'dark']) {
     }
     await page.waitForSelector(at('play'));
     await page.click(at('play'));
-    await page.waitForSelector(at('countdown-pie'), { timeout: 15000 });
+    // Story Corner's pie starts with its word hunt (CUR-29): read the story through
+    for (let i = 0; i < 20 && title === 'Story Corner'; i++) {
+      await wait(400);
+      const buttons = await page.$$(`${at('stage')} button`);
+      const labels = await Promise.all(buttons.map(b => b.evaluate(e => e.textContent)));
+      const next = labels.findIndex(l => /Next line|I have read it/.test(l));
+      if (next < 0) break;
+      await buttons[next].click();
+    }
+    await page.waitForSelector(at('countdown-pie'), { timeout: only ? 5000 : 15000 }).catch(() => {
+      if (!only) throw new Error(`${title}: no pie`);
+    });
     // past the round's question, a few seconds into its time
     for (let t = 0; t < 12000 && (await page.$('[data-mood][data-state="talking"]')); t += 100) await wait(100);
     await wait(4200);

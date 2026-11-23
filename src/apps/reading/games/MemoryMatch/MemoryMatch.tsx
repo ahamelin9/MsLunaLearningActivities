@@ -271,6 +271,9 @@ export const memoryMatch: GameDef<Round> = {
   // a whole board of pairs a round (PRG-6's first guess)
   roundSeconds: 75,
   shape: 'cards',
+  // 30 seconds at 1st and 2nd grade (CUR-29; the teacher: a timer on games)
+  timer: () => 'find',
+  timerPerStep: true,
   sticker: 'cards',
   makeRounds: ({ grade, difficulty, count }) => {
     return buildRounds(tierFor(grade, difficulty), count);

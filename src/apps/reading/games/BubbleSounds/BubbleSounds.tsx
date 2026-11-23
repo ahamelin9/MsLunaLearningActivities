@@ -312,6 +312,8 @@ export const bubbleSounds: GameDef<Round> = {
   // 3 or 4 bubbles to wait for and pop (CUR-15's first guess, until real plays are timed)
   roundSeconds: 25,
   shape: 'bubbles',
+  // 30 seconds at 1st and 2nd grade (CUR-29; the teacher: a timer on games)
+  timer: () => 'find',
   sticker: 'bubble',
   makeRounds: ({ grade, difficulty, count }) => {
     const tier = tierFor(grade, difficulty);

@@ -121,6 +121,8 @@ export const GameShell: React.FC<GameShellProps> = ({
   const [roundsWon, setRoundsWon] = useState(0);
   // the steps this round has made, for a game whose bar counts steps (CUR-20)
   const [stepsDone, setStepsDone] = useState(0);
+  // a miss or running out since this step began, for a game timed by the step (CUR-29)
+  const [stepMissed, setStepMissed] = useState(false);
   // the lessons done as this play began, to see what finishing it opened (DES-22d)
   const [doneBefore, setDoneBefore] = useState<string[]>(() => progress.completedLessons);
   const [flash, setFlash] = useState<'win' | 'miss' | null>(null);
@@ -262,6 +264,7 @@ export const GameShell: React.FC<GameShellProps> = ({
     setHint(null);
     setRoundsWon(from?.won ?? 0);
     setStepsDone(0);
+    setStepMissed(false);
     setDoneBefore(progress.completedLessons);
     setWinStreak(0);
     setPetalFalls(0);
@@ -279,6 +282,7 @@ export const GameShell: React.FC<GameShellProps> = ({
   const goToNextRound = useCallback(() => {
     setFlash(null);
     setStepsDone(0);
+    setStepMissed(false);
     setAttempts(0);
     setHintLevel(0);
     setHint(null);
@@ -365,6 +369,7 @@ export const GameShell: React.FC<GameShellProps> = ({
     (opts?: { lunaLine?: string; hint?: SpeechPart[]; reveal?: () => void }) => {
       const attemptNumber = attempts + 1;
       setAttempts(attemptNumber);
+      setStepMissed(true);
       // a lesson brings it back next play, even if this one is left here (CUR-6)
       if (attemptNumber === 1) game.lesson?.missed?.(rounds[roundIndex]);
       setWinStreak(0);
@@ -405,6 +410,7 @@ export const GameShell: React.FC<GameShellProps> = ({
    */
   const handleTimeUp = useCallback(() => {
     setAttempts(a => Math.max(a, 1));
+    setStepMissed(true);
     game.lesson?.missed?.(rounds[roundIndex]);
     setWinStreak(0);
     // the round is still unsolved: her line never has its word (BUG-27)
@@ -480,6 +486,7 @@ export const GameShell: React.FC<GameShellProps> = ({
       answeredRef.current = true;
       soundManager.playLetterSnap();
       setStepsDone(n => n + 1);
+      setStepMissed(false);
       sayThen(opts?.say, ANSWER_WATCHDOG_WRONG_MS, () => {
         if (opts?.lunaLine) speak(opts.lunaLine, 'happy');
       });
@@ -595,14 +602,19 @@ export const GameShell: React.FC<GameShellProps> = ({
   // The round's countdown at 1st and 2nd grade (CUR-16): while it is still
   // on its first try, and, for a game that waits, once it has started asking.
   // A miss, running out, or the win takes it away; the next round brings a
-  // fresh one.
+  // fresh one. A game timed by the step (CUR-29: Muddled Cards' pairs, Story
+  // Corner's word hunt and question) gets a fresh one with each step, and a
+  // miss takes it away only until the next step.
   const round = rounds[roundIndex];
   const timerSeconds =
     phase === 'play' && round !== undefined ? roundSecondsLimit(grade, game.timer?.(round)) : undefined;
   const timer =
-    timerSeconds !== undefined && attempts === 0 && flash !== 'win' && (!game.waitsToAsk || asked) ? (
+    timerSeconds !== undefined &&
+    (game.timerPerStep ? !stepMissed : attempts === 0) &&
+    flash !== 'win' &&
+    (!game.waitsToAsk || asked) ? (
       <RoundTimer
-        key={`${playCount}:${roundIndex}`}
+        key={`${playCount}:${roundIndex}:${game.timerPerStep ? stepsDone : 0}`}
         seconds={timerSeconds}
         running={!answering}
         onTimeUp={handleTimeUp}
