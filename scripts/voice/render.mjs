@@ -92,11 +92,20 @@ const plainVersion = createHash('sha1')
  * recorded by a person. Since the app plays files rather than running a
  * model, swapping one in takes no code — drop `sound__B.wav` into
  * scripts/voice/recorded/ and it wins over the generated sound.
+ *
+ * USE_RECORDINGS turns the whole folder on or off. Off since 2026-11-25
+ * (VOX-11): Alex's recorded sounds and letter names (VOX-7 to VOX-9) did not
+ * work as well for the teacher as the generated ones, so the app is back on
+ * Luna's generated voice. The recordings stay in the folder for when someone
+ * records them again (maybe the teacher): set this to true and run
+ * `npm run voice:render` to bring them back.
  */
+const USE_RECORDINGS = false;
 const RECORDED_DIR = join(here, 'recorded');
 const RECORDED_EXT = ['.wav', '.aiff', '.aif', '.mp3', '.m4a', '.flac', '.ogg'];
 
 function recordedFor(clip) {
+  if (!USE_RECORDINGS) return null;
   const safe = clip.value.replace(/[^A-Za-z0-9]/g, '_');
   for (const ext of RECORDED_EXT) {
     const path = join(RECORDED_DIR, `${clip.kind}__${safe}${ext}`);

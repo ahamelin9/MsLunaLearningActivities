@@ -31,6 +31,15 @@ Then `npm run voice:render -- --only sound`. The renderer notices the file by
 its contents, so replacing a recording re-renders that clip and deleting one
 falls back to the generated sound.
 
+## Switched off since 2026-11-25
+
+The app doesn't play these files right now. Alex's recorded sounds didn't
+work as well for the teacher as the generated ones, so `USE_RECORDINGS` in
+`../render.mjs` is `false` and the app is back on the sounds Luna's voice
+makes (VOX-11). The files stay here for when someone records them again
+(maybe the teacher). To bring them back, set it to `true` and run
+`npm run voice:render`, then `npm run voice:audit`.
+
 ## Where today's files come from
 
 Since 2026-11-23 every letter sound and letter name here is Alex's own take,

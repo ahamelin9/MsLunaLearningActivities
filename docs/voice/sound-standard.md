@@ -6,11 +6,13 @@ today. It comes from the research run of 2026-10-28
 ([research notes](research-2026-10-28.md)) and Alex's two rounds of picks
 on the Sound Check page (VOX-1, now closed: `kanban/CHANGELOG.md`).
 
-Since 2026-11-23 every letter sound and letter name in the app is Alex's
-own take converted into Luna's voice (VOX-7, VOX-8, VOX-9), so "where Luna
-is today" below describes the generated sounds they replaced. The standard
-still says what a recording must sound like, and VOX-4's check is built
-against it.
+From 2026-11-23 to 2026-11-25 every letter sound and letter name in the app
+was Alex's own take converted into Luna's voice (VOX-7, VOX-8, VOX-9). They
+didn't work as well for the teacher, so the app is back on the generated
+sounds (VOX-11), and "where Luna is today" below describes what it plays
+again. The recordings are kept, switched off (`scripts/voice/recorded/README.md`).
+The standard still says what a recording must sound like, and VOX-4's check
+is built against it.
 
 ## In one minute
 
