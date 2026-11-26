@@ -7,10 +7,13 @@ tracker, and fixes were rendered to hear side by side on the **Sound Check**
 page (an artifact; Alex's picks are saved in its `picks` collection, read with
 the ArtifactData tool). The audit kept Kokoro: it is one of very few good
 voices that takes exact phonemes, which phonics needs, and the problems are
-in how we cut the letter sounds and how it ends a word said alone. Since
-2026-11-23 every letter sound and letter name is Alex's own take, converted
-into Luna's voice (VOX-7, VOX-8, VOX-9 in the changelog); words and lines are
-still Kokoro's.
+in how we cut the letter sounds and how it ends a word said alone. From
+2026-11-23 every letter sound and letter name was Alex's own take, converted
+into Luna's voice (VOX-7, VOX-8, VOX-9 in the changelog), while words and
+lines stayed Kokoro's. **Since 2026-11-25 the recordings are switched off**
+(VOX-11): they didn't work as well for the teacher, so the app plays the
+generated sounds again. Where a ticket below says the letter sounds or names
+are Alex's recordings, read the generated ones, until recordings come back.
 
 ### VOX-6 · Where Luna sounds shaky, "like a demon"
 Bug · P0 · M · needs: — · likely, not reproduced yet (it needs her whiteboard)
@@ -30,6 +33,24 @@ Bug · P0 · M · needs: — · likely, not reproduced yet (it needs her whitebo
   - Fix each by its kind: a line or word gets a new take, speed or override (`scripts/voice/overrides.json`); a letter sound is now Alex's recording (`scripts/voice/recorded/`), so it gets a new take of his.
   - `npm run voice:render`, then `npm run voice:audit`.
 - **Complete when:** the scan finds no rough clip (done: none); `audio-engine-check.mjs` passes and fails on the code before; the voice checks (`luna-talk-check`, `greeting-check`, `perch-check`, `read-first-check`, `lesson-order-check` and the rest that listen to her) pass; `voice:audit`, build and lint pass; the teacher hears Luna clean on her whiteboard, and Alex OKs it.
+
+### VOX-10 · Every recorded sound at Luna's pitch
+Story · P1 · M · needs: — · confirmed (measured)
+- **Blocked (2026-11-25):** on hold with the recordings, which are switched off (VOX-11). Round 8, its scripts (`voice-audit/`: `repitch.py`, `onepass.py`, `onevoice.py`, `make-r8*.`, `page-r8*`) and the takes are kept. It picks up if recordings come back; if they're new takes (the teacher's, say), measure them with `pitchscan.py` first, since this ticket's numbers are for Alex's.
+- **Progress (2026-11-23):** round 8 is on the Sound Check page (version 15), waiting on Alex's picks. Found while building: the converter has a pitch ceiling (D's take raised 6 semitones still came out at 188 Hz), so raising before converting can't reach her pitch alone. Each sound has two versions: **A**, converted again from a raised take and evened by PSOLA; **B**, today's clip moved by PSOLA, which keeps the formants. `repitch-check.py`: A within a semitone on 70/70, B on 71/72 (E's B found no steady pitch: A only), likeness to Luna down 0.01–0.02, F2 moved 9% (A) and 3% (B); B kept every R's F3 within about 90 Hz, A lost some (PR 1743 → 2411). Z gets a voiced version cut from "zoo" (75% voiced); voiced TH from "this" still came out whispered, so it keeps plain TH's file. Picks go in with `apply-picks.mjs r8` (one card per sound, all its keys), then the renders and `pitchscan.py` again.
+- **Alex (2026-11-23):** "I honestly can't really tell unless we put it next to other sounds": he noticed it in the ship lesson, where sh, i and p each sounded different. So round 8 (version 16) opens on 23 lesson words sounded out as a lesson plays them (`make-r8-words.py`), today's against A and B, and his word picks decide which version goes in; the sound cards stay for any exception. Found on the way: `sound|f` in `overrides.json` still has `targetDb: -27` from Kokoro's synthetic F, so his F plays 8 dB under the rest; the words' A and B play it at -20, and the fix is dropping that `targetDb` when the picks go in.
+- **Alex (2026-11-23), on the words:** "I feel like they all still sound off." Agreed to try the cheapest step first, since falling back is only not picking it: all of a word's sounds converted together in one pass (`onepass.py`), so the converter makes one guess at Luna for all of them. On ship, fish, map, frog and kite (round 8, version 17) the sounds come out most alike to each other: 0.817 against 0.778 today, least-alike pair 0.737 against 0.632 (`onevoice.py`). If his ear agrees, every sound is made this way; if not, next is re-recording every sound in one sitting at a steady pitch (a reference note on the recording page), then one pass.
+- **Why:** Alex, 2026-11-23, after the recorded sounds went live: "much better", but some "sound like from a different bot entirely", and "mainly has to do with the pitch of the voice". `voice-audit/pitchscan.py` measured it: Luna's words sit at 216 Hz (200–233), while the recorded sounds and letter names are mostly 2–4 semitones under, from −5.2 (D) to +4.5 (OO). Of 83 voiced recordings, 11 are within a semitone of her, 40 within 1–3, and 32 further off. The converter gives a take Luna's timbre but keeps the pitch it was said at.
+- **How:**
+  - For each voiced recording, shift its source by the semitones it's off before converting, so the converted take lands at Luna's median: shifting before the converter keeps her timbre (shifting the finished clip would move its formants too, the "chipmunk" sound). The same take, the same pick: only the pitch moves.
+  - Sounds and names already within a semitone, and the breaths with no pitch (s, sh, f, p, t, k…), stay as they are.
+  - While in there: Z measures as wholly unvoiced (a whisper?), and voiced TH plays plain TH's file. Measure both and offer a fix on the same round if one is found.
+  - Put each changed sound on a Sound Check round, today's against the new, for Alex's ear; his picks go into `scripts/voice/recorded/`, then `npm run voice:render -- --only sound` and `--only name`, and `npm run voice:audit`.
+- **Complete when:**
+  - `pitchscan.py` puts every voiced recording Alex keeps within 1 semitone of Luna's median, or he chose today's take for it on the round;
+  - every new take keeps its sound (`takeformants.py`: R's low F3, voicing) and its loudness;
+  - `voice:audit`, build and lint pass;
+  - Alex has heard the round, then the sounds in the app, and OKed.
 
 ### VOX-5 · Single words in a blend of Luna and Kore
 Story · P1 · M · needs: —

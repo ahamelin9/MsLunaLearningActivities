@@ -44,7 +44,7 @@ ok('every card shows, a group at a time', groups > 0 && seen.reduce((a, b) => a 
 await (await page.$$('#r6-groups .bucket'))[0].click();
 if (groups > 1) {
   const second = await page.evaluate(() => r6Shown()[1][1]);
-  await page.click('.next-group');
+  await page.click('#r6 .next-group');
   ok('Next goes to the next group', (await page.$eval('#r6 h3', h => h.textContent)) === second, second);
   await (await page.$$('#r6-groups .bucket'))[0].click();
 }

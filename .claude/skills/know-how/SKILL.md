@@ -1940,8 +1940,9 @@ the old version either proves nothing.
   A clean clone builds fine on the Mac, which never takes that path.
 - **Fix:** `.npmrc` at the repo root has
   `onnxruntime-node-install-cuda=skip`; nothing here uses a GPU. npm 10
-  warns it's an "Unknown project config" that npm 11 will refuse: when the
-  builder moves to npm 11, set the environment variable
+  and 11 (11.4.1 on the Mac, 2026-11-25) warn it's an "Unknown project
+  config" on every `npm run`, harmless, that the next major npm (12) will
+  refuse: when the builder moves to npm 12, set the environment variable
   `ONNXRUNTIME_NODE_INSTALL_CUDA=skip` in the Worker's build settings on the
   Cloudflare dashboard instead.
 - **Check:** after every push, read the deploy's result on GitHub:
@@ -1954,3 +1955,19 @@ the old version either proves nothing.
   `npm_config_onnxruntime_node_install_cuda=skip` (exit 0). Don't fake the
   arch for a whole `npm ci`: esbuild's own installer then fails on the
   arm64 Mac.
+
+## Some recorded sounds sound like "a different bot entirely"
+
+*2026-11-23 · VOX-10*
+
+- **Symptom:** Alex's converted sounds are clear, but a few sound like
+  another voice from one to the next.
+- **Cause:** pitch. The converter has a ceiling, so most converted takes sat
+  2–4 semitones under Luna's words (216 Hz), spread over 10 semitones.
+- **Fix and check:** `voice-audit/pitchscan.py` to measure, `repitch.py` to
+  move each one to her pitch (PSOLA, which keeps the voice's shape), and
+  `repitch-check.py` to prove it kept the voice, the vowel and the R.
+  Details: `voice-audit/README.md`, "Things learned".
+- **Since 2026-11-25 the recordings are off** (VOX-11): the app plays the
+  generated sounds again. How to turn them back on:
+  `scripts/voice/recorded/README.md`.

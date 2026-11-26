@@ -25,7 +25,7 @@ for c in cards:
     line = [f"{c['sid']:5}"]
     for t in c['takes']:
         cid = f"{rid}:{c['sid']}:{t['id']}"
-        if t['id'] == 'today':
+        if t['id'] == 'today' and not t.get('path'):  # a word card's today is built, with a path
             key = c['key'].replace('_alt', '+alt')
             f = manifest.get(f"{c.get('kind', 'sound')}|{key}|normal")
             if not f: flags.append(f'{cid}: no clip in the app'); continue

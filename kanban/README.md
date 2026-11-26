@@ -10,7 +10,7 @@ tickets.
 - **`epics/<EPIC>.md`**: one file per epic, with its goal and every ticket's full section (Why / How / Complete when). A ticket never moves files when its status changes.
 - **`CHANGELOG.md`**: finished and dropped tickets. Once a ticket is deleted, its changelog line is its only record.
 
-**Last updated:** 2026-11-23
+**Last updated:** 2026-11-25
 
 ## How to read this
 
@@ -72,8 +72,8 @@ be pulled into Phase 1 for a break from styling.
 
 ### Now / Next
 
-- **Now:** the phonics are done (2026-11-23): every letter sound and letter name (the 26 letters and 7 pairs, SH to QU) is Alex's own takes converted into Luna's voice (VOX-7, VOX-8, VOX-9), which closed VOX-1. Waiting on the teacher's test, all pushed and in `screenshots/review/HANDOVER.md`: run 10's tickets (CUR-20 to CUR-28 and BUG-34, `f579bc8`) and CUR-29 (the countdown in every game, `4556edb`); they close out once she has tried them. VOX-6 (Luna "like a demon" on her classroom whiteboard) is Blocked on her ear there; its engine and hardening are live (`921ddad`). Still to ask her: which list goes on to 250.
-- **Next:** DES-32c (laptops and the classroom's big screen), then DES-32b (phones turned sideways: Alex's call first, scale or scroll). On the voice: VOX-5 (the Luna/Kore blend for single words; his call first: lines too?), then VOX-2, VOX-4 (now guarding the recorded sounds), then VOX-3. Then CUR-13 (every lesson holds 20, split by grade), content for Alex to review. Still waiting on Alex: DES-28 (which Chromebooks the class has) and SAY-1 (his recordings). The Writing app (WRT) after Phase 7. OPS-11 stays parked.
+- **Now:** the letter sounds and letter names are Luna's generated ones again (VOX-11, done and live 2026-11-25), since Alex's recordings (VOX-7, VOX-8, VOX-9) didn't work as well for the teacher. The recordings are kept, switched off (`scripts/voice/recorded/README.md`), and VOX-10 waits with them. Waiting on the teacher's test, all pushed and in `screenshots/review/HANDOVER.md`: run 10's tickets (CUR-20 to CUR-28 and BUG-34, `f579bc8`) and CUR-29 (the countdown in every game, `4556edb`); they close out once she has tried them. VOX-6 (Luna "like a demon" on her classroom whiteboard) is Blocked on her ear there; its engine and hardening are live (`921ddad`). Still to ask her: which list goes on to 250.
+- **Next:** DES-32c (laptops and the classroom's big screen), then DES-32b (phones turned sideways: Alex's call first, scale or scroll). On the voice: VOX-5 (the Luna/Kore blend for single words; his call first: lines too?), then VOX-2, VOX-4, then VOX-3. Then CUR-13 (every lesson holds 20, split by grade), content for Alex to review. Still waiting on Alex: DES-28 (which Chromebooks the class has) and SAY-1 (his recordings). The Writing app (WRT) after Phase 7. OPS-11 stays parked.
 
 ## Epics
 
@@ -95,6 +95,7 @@ In board order. A new epic gets its file in `epics/` first, then a link here
 |---|---|---|---|---|---|
 | **VOX** | **Luna's voice: letter sounds and words** | Epic | **P0** | | |
 | VOX-6 | Where Luna sounds shaky, "like a demon" | Bug | P0 | M | Blocked |
+| VOX-10 | Every recorded sound at Luna's pitch | Story | P1 | M | Blocked |
 | VOX-5 | Single words in a blend of Luna and Kore | Story | P1 | M | Todo |
 | VOX-2 | Words said alone end cleanly | Story | P1 | S | Todo |
 | VOX-4 | A sound check that can fail | Task | P1 | S | Todo |
